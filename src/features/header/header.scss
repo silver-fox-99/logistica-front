@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #152736;
+  height: 94px;
+
+  &__wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__column {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    
+    &--user {
+      font-size: 18px;
+      color: #fff;
+    }
+  }
+
+  &__button {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+}
