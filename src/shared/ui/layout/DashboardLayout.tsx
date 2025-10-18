@@ -14,6 +14,7 @@ import React from "react";
 
 import './DashboardLayout.scss';
 import {useUserStore} from "@/entities/user/model/user.store.ts";
+import {RiAdminFill} from "react-icons/ri";
 
 const mainNav = [
     { to: "/dashboard/search",  icon: <FiSearch />,      label: "Поиск заказов" },
@@ -46,6 +47,7 @@ function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label
 export default function DashboardLayout() {
 
     const clearUser = useUserStore(state => state.clearUser);
+    const user = useUserStore(state => state.user);
 
     const logout = () => {
         localStorage.removeItem("accessToken");
@@ -113,6 +115,15 @@ export default function DashboardLayout() {
 
 
                             <List disablePadding>
+                                {user?.is_admin && <ListItemButton
+                                    onClick={() => window.location.href = "/admin"}
+
+                                    className="dashboard-buttons dashboard-buttons__logout"
+                                >
+                                    <ListItemIcon><RiAdminFill /></ListItemIcon>
+                                    <ListItemText primary="Админ панель" primaryTypographyProps={{ fontSize: 16 }} />
+                                </ListItemButton>}
+
                                 {bottomNav.map((i) => (
                                     <NavItem key={i.to} {...i} />
                                 ))}

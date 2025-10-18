@@ -12,13 +12,12 @@ import AddCargoPage from "@/pages/dashboard/add-cargo/ui/AddCargoPage.tsx";
 import AddTransportPage from "@/pages/dashboard/add-transport";
 import SecurityPage from "@/pages/dashboard/security";
 import ShipmentsListPage from "@/pages/dashboard/requests/ui/ShipmentsPage.tsx";
+import NotFoundPage from "@/pages/not-found";
+import CompanyPage from "@/pages/dashboard/company";
+import StaffPage from "@/pages/dashboard/staff";
+import PaymentsPage from "@/pages/dashboard/payments";
+import HelpSupportPage from "@/pages/dashboard/help-support";
 
-
-const CompanyPage = () => <div>Company</div>;
-const StaffPage = () => <div>Staff</div>;
-const PaymentsPage = () => <div>Payments</div>;
-
-const HelpPage = () => <div>Help & support</div>;
 
 
 
@@ -50,12 +49,15 @@ const router = createBrowserRouter([
             {path: "requests", element: <ShipmentsListPage scope="my"/>},
 
             {path: "security", element: <SecurityPage/>},
-            {path: "help", element: <HelpPage/>},
+            {path: "help", element: <HelpSupportPage/>},
             {path: "create-cargo", element: <AddCargoPage/>},
-            {path: "create-transport", element: <AddTransportPage/>},
-
+            {path: "create-transport", element: <AddTransportPage/>}
         ],
     },
+    {
+        path: '*',
+        element: <NotFoundPage />
+    }
 ]);
 
 export default function AppRouter() {
