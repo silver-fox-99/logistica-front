@@ -33,9 +33,10 @@ type Props = {
     data: ShipmentRowData;
     onBookmark?: (id: string) => void;
     onMoreOpen?: (id: string) => void;
+    scope: "public" | "my";
 };
 
-export default function ShipmentRow({ data, onBookmark, onMoreOpen }: Props) {
+export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Props) {
     const [expanded, setExpanded] = useState(false);
 
     const openMore = () => {
@@ -177,14 +178,14 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen }: Props) {
                         </Grid>
 
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        {scope === 'my' && <Grid size={{ xs: 12, md: 6 }}>
                             <Stack direction="row" spacing={1}>
                                 <Tooltip title="Repeat"><IconButton><FiRepeat /></IconButton></Tooltip>
                                 <Tooltip title="Delete"><IconButton color="error"><FiTrash2 /></IconButton></Tooltip>
                                 <Tooltip title="Copy"><IconButton><FiCopy /></IconButton></Tooltip>
                                 <Tooltip title="Edit"><IconButton><FiEdit2 /></IconButton></Tooltip>
                             </Stack>
-                        </Grid>
+                        </Grid> }
                     </Grid>
                 </>
             )}

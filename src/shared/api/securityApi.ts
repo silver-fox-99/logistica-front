@@ -1,14 +1,14 @@
-import axios from "axios";
+import api from "@/shared/api/axios.ts";
 
 export const securityApi = {
-    sendEmailCode(email: string) {
-        return axios.post("/api/security/email/send-code", { email });
+    sendEmailCode:(email: string) => {
+        return api.post("/api/security/email/send-code", { email });
     },
 
-    confirmEmailCode(email: string, code: string) {
-        return axios.post("/api/security/email/confirm", { email, code });
+    confirmEmailCode:(email: string, code: string) => {
+        return api.post("/api/security/email/confirm", { email, code });
     },
-    startPasswordChange() {
-        return axios.post("/api/security/password/change/start");
-    },
+    changePassword: async (oldPassword: string, newPassword: string) => {
+        return await api.patch("/profile/change-password", { oldPassword, newPassword });
+    }
 };

@@ -8,10 +8,10 @@ import LoginPage from "@/pages/auth/login";
 import RegisterPage from "@/pages/auth/register";
 import AppLayout from "@/shared/ui/layout/AppLayot.tsx";
 import ProfilePage from "@/pages/dashboard/profile";
-import MyShipmentsPage from "@/pages/dashboard/requests/ui/MyShipmentsPage.tsx";
 import AddCargoPage from "@/pages/dashboard/add-cargo/ui/AddCargoPage.tsx";
 import AddTransportPage from "@/pages/dashboard/add-transport";
 import SecurityPage from "@/pages/dashboard/security";
+import ShipmentsListPage from "@/pages/dashboard/requests/ui/ShipmentsPage.tsx";
 
 
 const CompanyPage = () => <div>Company</div>;
@@ -42,12 +42,12 @@ const router = createBrowserRouter([
         ),
         children: [
             {index: true, element: <ProfilePage/>},
-            {path: "search", element: <MyShipmentsPage/>},
+            {path: "search", element: <ShipmentsListPage scope="public"/>},
             {path: "profile", element: <ProfilePage/>},
             {path: "company", element: <CompanyPage/>},
             {path: "staff", element: <StaffPage/>},
             {path: "payments", element: <PaymentsPage/>},
-            {path: "requests", element: <MyShipmentsPage/>},
+            {path: "requests", element: <ShipmentsListPage scope="my"/>},
 
             {path: "security", element: <SecurityPage/>},
             {path: "help", element: <HelpPage/>},
