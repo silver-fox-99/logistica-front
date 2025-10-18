@@ -8,6 +8,9 @@ import {
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone
 } from "react-icons/fi";
 
+// В начале файла ShipmentRow.tsx
+import './ShipmentRow.scss';
+
 export type ShipmentRowData = {
     id: string;
     routeFrom: string;
@@ -41,7 +44,7 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen }: Props) {
     };
 
     return (
-        <Box sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}>
+        <Box sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }} className="shipment-row">
             <Grid container spacing={1.5} alignItems="center">
 
                 <Grid size={{ xs: 12, md: 8 }}>
@@ -56,24 +59,29 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen }: Props) {
                                 <FiMapPin />
                                 <Typography fontWeight={700}>{data.routeTo}</Typography>
                             </Box>
-                            <Chip size="small" icon={<FiTruck />} label="Cargo" />
-                            <Chip size="small" icon={<FiClock />} variant="outlined" label={`${data.dates.from} – ${data.dates.to}`} />
+                            <Chip size="small" icon={<FiTruck />} label="Груз" className="shipment-row__chip shipment-row__chip--cargo"/>
+                            <Chip size="small" icon={<FiClock />} variant="outlined" label={`${data.dates.from} – ${data.dates.to}`} className="shipment-row__chip shipment-row__chip--dates" />
                         </Stack>
 
+                        <Stack spacing={1}>
                         <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                            <Chip size="small" color="primary" label={`${data.distanceKm} km`} />
-                            {data.dims && <Chip size="small" variant="outlined" icon={<FiPackage />} label={data.dims} />}
-                            {data.typeTags.map((t) => <Chip key={t} size="small" variant="outlined" label={t} />)}
+                            <Chip size="small" color="primary" label={`${data.distanceKm} км`} className="shipment-row__chip shipment-row__chip--distance" />
+                            {data.dims && <Chip size="small" variant="outlined" icon={<FiPackage />} label={data.dims} className="shipment-row__chip shipment-row__chip--dimensions" />}
                         </Stack>
+                        
+                        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                            {data.typeTags.map((t) => <Chip key={t} size="small" variant="outlined" label={t} className="shipment-row__chip shipment-row__chip--type" />)}
+                        </Stack>
+                    </Stack>
 
                         {!!data.badges?.length && (
-                            <Stack direction="row" spacing={1} flexWrap="wrap">
+                            <Stack direction="row" spacing={1} flexWrap="wrap" className="shipment-row__badges">
                                 {data.badges.map((b) => (
                                     <Chip
                                         key={b}
                                         size="small"
                                         label={b}
-                                        sx={{ bgcolor: "#FFF6D7", color: "#8A6D1F", borderColor: "transparent" }}
+                                        className="shipment-row__chip shipment-row__chip--badge"
                                     />
                                 ))}
                             </Stack>
@@ -91,20 +99,20 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen }: Props) {
                     >
                         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" justifyContent="flex-end">
                             {typeof data.repeats === "number" && (
-                                <Chip size="small" label={`Repeats: ${data.repeats}`} sx={{ bgcolor: "#FFF1E6", color: "#B35C00" }} />
+                                <Chip size="small" label={`Repeats: ${data.repeats}`} className="shipment-row__chip shipment-row__chip--repeats" />
                             )}
                             {typeof data.views === "number" && (
-                                <Chip size="small" label={`Views: ${data.views}`} sx={{ bgcolor: "#FFF1E6", color: "#B35C00" }} />
+                                <Chip size="small" label={`Views: ${data.views}`} className="shipment-row__chip shipment-row__chip--views" />
                             )}
                         </Stack>
 
                         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                             {data.paymentType && (
-                                <Chip size="small" color="success" label={data.paymentType} sx={{ color: "#0A5C2B", bgcolor: "#E7F5EA" }} />
+                                <Chip size="small" color="success" label={data.paymentType} className="shipment-row__chip shipment-row__chip--payment" />
                             )}
-                            {data.price && <Chip size="small" color="success" variant="outlined" label={data.price} />}
+                            {data.price && <Chip size="small" color="success" variant="outlined" label={data.price} className="shipment-row__chip shipment-row__chip--price" />}
                             {data.pricePerKm && (
-                                <Typography variant="caption" color="text.secondary">{data.pricePerKm}</Typography>
+                                <Typography variant="caption" color="text.secondary" className="shipment-row__price-per-km">{data.pricePerKm}</Typography>
                             )}
                         </Stack>
 

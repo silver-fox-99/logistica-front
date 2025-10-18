@@ -1,0 +1,123 @@
+.search-orders {  
+    &__filters {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+  
+    &__filter-button {
+      background-color: #4472B8;
+      color: white;
+      border-radius: 8px;
+      text-transform: none;
+      font-weight: 500;
+      padding: 8px 16px;
+      
+      &:hover {
+        background-color: #3a5fa0;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(68, 114, 184, 0.3);
+      }
+    }
+  
+    &__period {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  
+    &__period-select {
+      min-width: 160px;
+      border-radius: 8px;
+    }
+  
+    &__list {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+  
+    &__item {
+      padding: 8px;
+      margin-bottom: 16px;
+    }
+  
+    &__pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+    }
+  }
+
+  .search-orders {
+    .MuiGrid-root {
+      padding: 0;
+      margin: 0;
+    }
+  
+    .MuiGrid-container {
+      margin-bottom: 0;
+    }
+  
+    .MuiButton-root {
+      text-transform: none;
+      border-radius: 8px;
+    }
+  
+    .MuiButton-contained {
+      background-color: #4472B8;
+      
+      &:hover {
+        background-color: #3a5fa0;
+      }
+    }
+  
+    .MuiPaper-root {
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  
+    .MuiSelect-root {
+      border-radius: 8px;
+    }
+  }
+
+//   .search-orders {
+//     @media (max-width: 768px) {
+//       &__filters {
+//         flex-direction: column;
+//         gap: 16px;
+//         align-items: stretch;
+//       }
+  
+//       &__period {
+//         justify-content: center;
+//       }
+  
+//       &__list {
+//         gap: 12px;
+//       }
+//     }
+  
+//     // Планшеты
+//     @media (max-width: 1024px) {
+//       &__header {
+//         padding: 12px;
+//       }
+//     }
+//   }
+
+[class*="css-1lflu6f"] {
+    background-color: #f0f0f0;
+    color: #666;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    height: 24px;
+  }
+
+
+  

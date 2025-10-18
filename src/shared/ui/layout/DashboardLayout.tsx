@@ -6,25 +6,27 @@ import {
 import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck, FiLogOut, FiUsers, FiSearch
 } from "react-icons/fi";
+import { Add } from "@mui/icons-material"
 
 import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
 import React from "react";
 
+import './DashboardLayout.scss';
 
 const mainNav = [
-    { to: "/dashboard/search",  icon: <FiSearch />,      label: "Search" },
-    { to: "/dashboard/profile",  icon: <FiUser />,      label: "Profile" },
-    { to: "/dashboard/company",  icon: <FiPackage />,   label: "Company" },
-    { to: "/dashboard/staff",    icon: <FiUsers />,     label: "Staff" },
-    { to: "/dashboard/payments", icon: <FiCreditCard />,label: "Payments" },
-    { to: "/dashboard/requests", icon: <FiTruck />,     label: "My requests" },
+    { to: "/dashboard/search",  icon: <FiSearch />,      label: "Поиск заказов" },
+    { to: "/dashboard/profile",  icon: <FiUser />,      label: "Профиль" },
+    { to: "/dashboard/company",  icon: <FiPackage />,   label: "Компании" },
+    { to: "/dashboard/staff",    icon: <FiUsers />,     label: "Сотрудники" },
+    { to: "/dashboard/payments", icon: <FiCreditCard />,label: "Платежи" },
+    { to: "/dashboard/requests", icon: <FiTruck />,     label: "Мои заказы" },
 ];
 
 
 const bottomNav = [
-    { to: "/dashboard/security", icon: <FiShield />,    label: "Security" },
-    { to: "/dashboard/help",     icon: <FiHelpCircle />,label: "Help & support" },
+    { to: "/dashboard/security", icon: <FiShield />,    label: "Безопасность" },
+    { to: "/dashboard/help",     icon: <FiHelpCircle />,label: "Помощь и поддержка" },
 ];
 
 function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
@@ -32,28 +34,17 @@ function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label
         <ListItemButton
             component={NavLink}
             to={to}
-            sx={{
-                borderRadius: 1.5,
-                px: 1.25,
-                py: 1,
-                color: "text.primary",
-                "& .MuiListItemIcon-root": { minWidth: 32, color: "text.secondary" },
-                "&.active": {
-                    bgcolor: "primary.main",
-                    color: "common.white",
-                    "& .MuiListItemIcon-root": { color: "common.white" },
-                },
-            }}
+            className="dashboard-buttons"
         >
             <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText primary={label} primaryTypographyProps={{ fontSize: 14 }} />
+            <ListItemText primary={label} primaryTypographyProps={{ fontSize: 16 }} />
         </ListItemButton>
     );
 }
 
 export default function DashboardLayout() {
     return (
-        <Box display="flex" flexDirection="column" minHeight="100dvh">
+        <Box display="flex" flexDirection="column" minHeight="100dvh" className="dashboard-layout">
             <Header isAuthenticated />
             <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32 }}>
                 <Container maxWidth="lg">
@@ -82,14 +73,17 @@ export default function DashboardLayout() {
                                     component={NavLink}
                                     to="/dashboard/create-cargo"
                                     size="small"
-                                    sx={{
-                                        height: 36,
-                                        textTransform: "none",
-                                        bgcolor: "action.hover",
-                                        borderColor: "action.focus",
-                                    }}
+                                    // sx={{
+                                    //     height: 36,
+                                    //     textTransform: "none",
+                                    //     bgcolor: "action.hover",
+                                    //     borderColor: "action.focus",
+                                    // }}
+
+                                    className="dashboard-buttons dashboard-buttons__post "
+                                    startIcon={<Add sx={{ fontSize: 16 }} />}
                                 >
-                                    Post cargo
+                                    Добавить груз
                                 </Button>
                                 <Button
                                     variant="outlined"
@@ -97,14 +91,10 @@ export default function DashboardLayout() {
                                     to="/dashboard/create-transport"
                                     fullWidth
                                     size="small"
-                                    sx={{
-                                        height: 36,
-                                        textTransform: "none",
-                                        bgcolor: "action.hover",
-                                        borderColor: "action.focus",
-                                    }}
+                                    className="dashboard-buttons dashboard-buttons__post"
+                                    startIcon={<Add sx={{ fontSize: 16 }} />}
                                 >
-                                    Post transport
+                                    Добавить транспорт
                                 </Button>
                             </Stack>
 
@@ -118,17 +108,11 @@ export default function DashboardLayout() {
 
                                 <ListItemButton
                                     onClick={() => {/* logout() */}}
-                                    sx={{
-                                        borderRadius: 1.5,
-                                        px: 1.25,
-                                        py: 1,
-                                        color: "text.primary",
-                                        "& .MuiListItemIcon-root": { minWidth: 32, color: "text.secondary" },
-                                        "&:hover": { bgcolor: "action.hover" },
-                                    }}
+
+                                    className="dashboard-buttons dashboard-buttons__logout"
                                 >
                                     <ListItemIcon><FiLogOut /></ListItemIcon>
-                                    <ListItemText primary="Sign out" primaryTypographyProps={{ fontSize: 14 }} />
+                                    <ListItemText primary="Выйти из аккаунта" primaryTypographyProps={{ fontSize: 16 }} />
                                 </ListItemButton>
                             </List>
                         </Paper>

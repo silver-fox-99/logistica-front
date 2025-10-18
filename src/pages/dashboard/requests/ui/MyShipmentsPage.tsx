@@ -7,6 +7,7 @@ import { FiSliders } from "react-icons/fi";
 import ShipmentRow, { type ShipmentRowData } from "@/widgets/shipments/ShipmentRow";
 import ShipmentsFilterDrawer, { type ShipmentsKind } from "@/widgets/shipments/ShipmentsFilterDrawer";
 
+import './MyShipmentsPage.scss';
 
 const mock: (ShipmentRowData & { kind: ShipmentsKind })[] = [
     { id: "row-1", kind: "cargo",   routeFrom: "Klaipėda", routeTo: "Chernihiv", distanceKm: 999,
@@ -71,17 +72,17 @@ export default function MyShipmentsPage() {
             </Paper>
 
 
-            <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+            <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mb: 1 }} className="search-orders__filters">
                 <Button
                     variant="contained"
                     startIcon={<FiSliders />}
                     sx={{ textTransform: "none" }}
                     onClick={() => setDrawerOpen(true)}
                 >
-                    Filter
+                    Фильтр
                 </Button>
 
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" alignItems="center" spacing={1} className="search-orders__period">
                     <Typography variant="body2" color="text.secondary">Period:</Typography>
                     <Select variant="outlined" size="small" value={period} onChange={handlePeriod} sx={{ minWidth: 160 }}>
                         <MenuItem value="all">All time</MenuItem>
@@ -93,9 +94,9 @@ export default function MyShipmentsPage() {
             </Stack>
 
 
-            <Grid container spacing={1.5}>
+            <Grid container spacing={1.5} className="search-orders__list">
                 {list.map((item) => (
-                    <Grid key={item.id} size={{xs:12}} >
+                    <Grid key={item.id} size={{xs:12}} className="search-orders__item">
                         <ShipmentRow
                             data={item}
                             onBookmark={(id) => console.log("bookmark", id)}
