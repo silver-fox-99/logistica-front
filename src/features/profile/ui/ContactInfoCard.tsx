@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {  FiMail } from "react-icons/fi";
+import {FiGlobe, FiMail} from "react-icons/fi";
 import { FaTelegramPlane } from "react-icons/fa";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import { parsePhoneNumber } from "libphonenumber-js";
@@ -17,6 +17,7 @@ export type ContactInfo = {
     telegram?: string;
     whatsapp?: string;
     email?: string;
+    geo?: string
 };
 
 type Props = {
@@ -29,6 +30,7 @@ const schema = z.object({
     phoneMain: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Enter a valid phone"),
     phoneAlt: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Enter a valid phone"),
     telegram: z.string().optional(),
+    geo: z.string().optional(),
     whatsapp: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Enter a valid phone"),
     email: z.string().optional().refine((v) => !v || z.string().email().safeParse(v).success, "Invalid email"),
 });
@@ -44,6 +46,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
             telegram: data.telegram ?? "",
             whatsapp: data.whatsapp ?? "",
             email: data.email ?? "",
+            geo: data.geo ?? ""
         },
         mode: "onTouched",
     });
@@ -56,6 +59,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
             telegram: data.telegram ?? "",
             whatsapp: data.whatsapp ?? "",
             email: data.email ?? "",
+            geo: data.geo ?? ""
         });
     }, [data, reset]);
 
@@ -186,6 +190,26 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                                     startAdornment: (
                                         <InputAdornment position="start">
                                             <FiMail />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Geolocation</Typography>
+                            <TextField
+                                placeholder="Uzbekestan"
+                                fullWidth
+                                disabled={!editing}
+                                {...register("geo")}
+                                error={!!errors.geo}
+                                helperText={errors.geo?.message}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FiGlobe />
                                         </InputAdornment>
                                     ),
                                 }}

@@ -13,8 +13,6 @@ export default function ProfileOverviewCard({
                                                 location = "—",
                                                 registeredAt = "—",
                                                 ratings = [
-                                                    { label: "★", value: 0.0, color: "default" },
-                                                    { label: "★", value: 3.7, color: "warning" },
                                                     { label: "★", value: 4.7, color: "success" },
                                                 ],
                                             }: ProfileOverviewCardProps) {

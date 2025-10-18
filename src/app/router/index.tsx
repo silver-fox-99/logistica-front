@@ -11,14 +11,13 @@ import ProfilePage from "@/pages/dashboard/profile";
 import MyShipmentsPage from "@/pages/dashboard/requests/ui/MyShipmentsPage.tsx";
 import AddCargoPage from "@/pages/dashboard/add-cargo/ui/AddCargoPage.tsx";
 import AddTransportPage from "@/pages/dashboard/add-transport";
-
+import SecurityPage from "@/pages/dashboard/security";
 
 
 const CompanyPage = () => <div>Company</div>;
 const StaffPage = () => <div>Staff</div>;
 const PaymentsPage = () => <div>Payments</div>;
 
-const SecurityPage = () => <div>Security</div>;
 const HelpPage = () => <div>Help & support</div>;
 
 

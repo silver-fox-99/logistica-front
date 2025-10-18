@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { Box, Container, Paper, Step, StepLabel, Stepper, Stack, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import AuthTop from "@/shared/ui/auth/auth-top";
@@ -6,6 +6,7 @@ import StepPhone from "@/features/login/register/ui/StepPhone";
 import StepCode from "@/features/login/register/ui/StepCode";
 import StepProfile from "@/features/login/register/ui/StepProfile";
 import { firebasePhone } from "@/shared/lib/firebasePhone";
+import {authApi} from "@/shared/api/authApi.ts";
 
 export default function RegisterPage() {
     const [activeStep, setActiveStep] = useState(0);
@@ -37,11 +38,23 @@ export default function RegisterPage() {
                     />
                 );
             case 2:
-                return <StepProfile onNext={next} />;
+                return <StepProfile />;
             default:
                 return null;
         }
     }, [activeStep, e164]);
+
+    const checkMe = async () => {
+        try {
+            const res = await authApi.getMe();
+            if (res.data.registration_stage === 'PHONE_VERIFIED')
+                setActiveStep(2);
+        } catch {}
+    }
+
+    useEffect(() => {
+        checkMe()
+    }, []);
 
     return (
         <Container maxWidth="sm" sx={{ py: 5 }}>

@@ -2,8 +2,10 @@ import logo from "./logo.svg"
 import { Link } from "react-router-dom";
 import {Avatar} from "@mui/material";
 import './header.scss'
+import {useUserStore} from "@/entities/user/model/user.store.ts";
 
 export default function Header({isAuthenticated}: {isAuthenticated?: boolean}) {
+    const user = useUserStore((s) => s.user);
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -41,7 +43,7 @@ export default function Header({isAuthenticated}: {isAuthenticated?: boolean}) {
             </div>
 
             {isAuthenticated && <div className="header__column header__column--user">
-                Tim Neutkens <Avatar {...stringAvatar('Tim Neutkens')} />
+                {user?.first_name} {user?.last_name} <Avatar {...stringAvatar(`${user?.first_name} ${user?.last_name}`)} />
             </div>}
 
             {!isAuthenticated && <div className="header__column">

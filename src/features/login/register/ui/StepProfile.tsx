@@ -12,6 +12,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import {authApi} from "@/shared/api/authApi.ts";
+import {useNavigate} from "react-router-dom";
+import {useUserStore} from "@/entities/user/model/user.store.ts";
 
 const schema = z.object({
     firstName: z.string().trim().min(2, "Имя должно быть не короче 2 символов"),
@@ -27,12 +30,14 @@ export type ProfileFormValues = z.infer<typeof schema>;
 
 type StepProfileProps = {
     defaultValues?: Partial<ProfileFormValues>;
-    onNext?: (data: ProfileFormValues) => void | Promise<void>;
 };
 
-export default function StepProfile({ defaultValues, onNext }: StepProfileProps) {
+export default function StepProfile({ defaultValues }: StepProfileProps) {
     const [showPwd, setShowPwd] = useState(false);
     const [showPwd2, setShowPwd2] = useState(false);
+    const navigate = useNavigate()
+    const setUser = useUserStore(s => s.setUser);
+
 
     const {
         register,
@@ -51,7 +56,13 @@ export default function StepProfile({ defaultValues, onNext }: StepProfileProps)
     });
 
     const submit = async (data: ProfileFormValues) => {
-        await onNext?.(data);
+       try {
+           const res = await authApi.completeRegister(data)
+           setUser(res.data)
+           navigate('/dashboard/profile')
+       } catch (e) {
+           console.log(e)
+       }
     };
 
     return (

@@ -13,6 +13,7 @@ import Footer from "@/features/footer/Footer";
 import React from "react";
 
 import './DashboardLayout.scss';
+import {useUserStore} from "@/entities/user/model/user.store.ts";
 
 const mainNav = [
     { to: "/dashboard/search",  icon: <FiSearch />,      label: "Поиск заказов" },
@@ -43,6 +44,16 @@ function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label
 }
 
 export default function DashboardLayout() {
+
+    const clearUser = useUserStore(state => state.clearUser);
+
+    const logout = () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
+        clearUser()
+    }
+
     return (
         <Box display="flex" flexDirection="column" minHeight="100dvh" className="dashboard-layout">
             <Header isAuthenticated />
@@ -107,7 +118,7 @@ export default function DashboardLayout() {
                                 ))}
 
                                 <ListItemButton
-                                    onClick={() => {/* logout() */}}
+                                    onClick={logout}
 
                                     className="dashboard-buttons dashboard-buttons__logout"
                                 >

@@ -24,4 +24,14 @@ export const authApi = {
         if (data?.refreshToken) localStorage.setItem("refreshToken", data.refreshToken);
         return data;
     },
+
+    getMe: async () => {
+        const { data } = await api.get("/auth/me");
+        return data;
+    },
+
+    login: async (payload: { phone: string; password: string; }) => {
+        const { data } = await api.post("/auth/login", payload);
+        return data;
+    }
 };

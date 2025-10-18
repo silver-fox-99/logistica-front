@@ -1,8 +1,11 @@
-import { Box, Button, TextField } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Button, Snackbar, TextField } from "@mui/material";
+import {Link, useNavigate} from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {authApi} from "@/shared/api/authApi.ts";
+import {useUserStore} from "@/entities/user/model/user.store.ts";
+import {useState} from "react";
 
 
 const signInSchema = z.object({
@@ -16,11 +19,9 @@ const signInSchema = z.object({
 
 type SignInForm = z.infer<typeof signInSchema>;
 
-type LoginFormProps = {
-    onSubmit?: (data: SignInForm) => Promise<void> | void;
-};
 
-export default function LoginForm({ onSubmit }: LoginFormProps) {
+
+export default function LoginForm() {
     const {
         register,
         handleSubmit,
@@ -31,9 +32,22 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         mode: "onTouched",
     });
 
+    const [open, setOpen] = useState(false);
+    const setUser = useUserStore(s => s.setUser);
+    const navigate = useNavigate()
     const handleLocalSubmit = async (data: SignInForm) => {
-        if (onSubmit) return onSubmit(data);
-        console.log("sign-in:", data);
+        try {
+            const res = await authApi.login(data)
+            const user = res.data
+            const {accessToken, refreshToken, ...rest} = user
+            localStorage.setItem('accessToken', accessToken)
+            localStorage.setItem('refreshToken', refreshToken)
+
+            setUser(rest)
+            navigate('/dashboard/profile')
+        } catch {
+            setOpen(true)
+        }
     };
 
     return (
@@ -85,6 +99,13 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
             <Link className="button button--reset" to="/reset">
                 Забыли пароль?
             </Link>
+
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                open={open}
+                onClose={() => setOpen(false)}
+                message="Invalid username or password"
+            />
         </Box>
     );
 }
