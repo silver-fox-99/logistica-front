@@ -18,7 +18,18 @@ import StaffPage from "@/pages/dashboard/staff";
 import PaymentsPage from "@/pages/dashboard/payments";
 import HelpSupportPage from "@/pages/dashboard/help-support";
 import ForgotPasswordPage from "@/pages/auth/forgot-password";
+import RequireAdmin from "@/app/router/RequireAdmin.tsx";
+import AdminLayout from "@/shared/ui/layout/AdminLayout.tsx";
+import AdminUsersPage from "@/pages/admin/users";
+import AdminUserPage from "@/pages/admin/user";
+import AdminCargoPage from "@/pages/admin/cargo";
+import AdminTransportPage from "@/pages/admin/transport";
+import AdminBlackListPage from "@/pages/admin/ip-blacklist";
+import AdminActivityLogsPage from "@/pages/admin/activity-log";
+import AdminGeoLocationsPage from "@/pages/admin/geo-location";
 
+
+const AdminOverviewPage = () => <div>Admin overview</div>
 
 
 
@@ -54,6 +65,24 @@ const router = createBrowserRouter([
             {path: "help", element: <HelpSupportPage/>},
             {path: "create-cargo", element: <AddCargoPage/>},
             {path: "create-transport", element: <AddTransportPage/>}
+        ],
+    },
+    {
+        path: "/admin",
+        element: (
+            <RequireAdmin>
+                <AdminLayout />
+            </RequireAdmin>
+        ),
+        children: [
+            { index: true, element: <AdminOverviewPage /> },
+            { path: "users", element: <AdminUsersPage /> },
+            { path: "user/:id", element: <AdminUserPage />},
+            { path: "cargo", element: <AdminCargoPage /> },
+            { path: "transport", element: <AdminTransportPage />},
+            { path: "geo", element: <AdminGeoLocationsPage />},
+            { path:  "black-list", element: <AdminBlackListPage />},
+            { path: "activity-logs", element: <AdminActivityLogsPage />}
         ],
     },
     {

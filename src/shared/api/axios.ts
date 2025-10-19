@@ -20,8 +20,11 @@ api.interceptors.request.use((config) => {
     }
 
     const email = useUserStore.getState().user?.email;
+    const phone = useUserStore.getState().user?.phone;
     if (email) {
         (config.headers as any)['x-user-email'] = email;
+    } else if (phone) {
+        (config.headers as any)['x-user-phone'] = phone;
     } else {
         if ((config.headers as any)['x-user-email']) {
             delete (config.headers as any)['x-user-email'];
