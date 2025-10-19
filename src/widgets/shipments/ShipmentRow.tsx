@@ -8,8 +8,7 @@ import {
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone
 } from "react-icons/fi";
 
-// В начале файла ShipmentRow.tsx
-import './ShipmentRow.scss';
+import "./ShipmentRow.scss";
 
 export type ShipmentRowData = {
     id: string;
@@ -21,22 +20,45 @@ export type ShipmentRowData = {
     typeTags: string[];
     badges?: string[];
     paymentType?: "Cash" | "Bank" | "Card";
-    price?: string;
+    price?: string;              // например "1 250 EUR"
     pricePerKm?: string;
     timeAgo?: string;
     repeats?: number;
     views?: number;
-    contact?: { name?: string; email?: string; phone1?: string; phone2?: string; telegram?: string };
+    contact?: {
+        name?: string;
+        email?: string;
+        phone1?: string;
+        phone2?: string; // часто это и есть additional / contact_extra_phone
+        telegram?: string;
+    };
+
+    /** Доп. блок для инициализации модалки быстрого редактирования */
+    edit?: {
+        dateFrom?: string | null;
+        dateTo?: string | null;
+        priceAmount?: number | null;
+        contactExtraPhone?: string | null;
+        note?: string | null;
+    };
 };
 
 type Props = {
     data: ShipmentRowData;
+    scope: "public" | "my";
     onBookmark?: (id: string) => void;
     onMoreOpen?: (id: string) => void;
-    scope: "public" | "my";
+
+    /** Экшены для scope="my" */
+    onUp?: (id: string) => void;
+    onEdit?: (id: string) => void;
+    onDelete?: (id: string) => void;
+    onCopy?: (id: string) => void;
 };
 
-export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Props) {
+export default function ShipmentRow({
+                                        data, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy
+                                    }: Props) {
     const [expanded, setExpanded] = useState(false);
 
     const openMore = () => {
@@ -45,9 +67,12 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Pro
     };
 
     return (
-        <Box sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }} className="shipment-row">
+        <Box
+            sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
+            className="shipment-row"
+        >
             <Grid container spacing={1.5} alignItems="center">
-
+                {/* ЛЕВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
                         <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
@@ -60,20 +85,54 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Pro
                                 <FiMapPin />
                                 <Typography fontWeight={700}>{data.routeTo}</Typography>
                             </Box>
-                            <Chip size="small" icon={<FiTruck />} label="Груз" className="shipment-row__chip shipment-row__chip--cargo"/>
-                            <Chip size="small" icon={<FiClock />} variant="outlined" label={`${data.dates.from} – ${data.dates.to}`} className="shipment-row__chip shipment-row__chip--dates" />
+
+                            {/* Тип карточки и даты */}
+                            <Chip
+                                size="small"
+                                icon={<FiTruck />}
+                                label="Cargo"
+                                className="shipment-row__chip shipment-row__chip--cargo"
+                            />
+                            <Chip
+                                size="small"
+                                icon={<FiClock />}
+                                variant="outlined"
+                                label={`${data.dates.from} – ${data.dates.to}`}
+                                className="shipment-row__chip shipment-row__chip--dates"
+                            />
                         </Stack>
 
                         <Stack spacing={1}>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                            <Chip size="small" color="primary" label={`${data.distanceKm} км`} className="shipment-row__chip shipment-row__chip--distance" />
-                            {data.dims && <Chip size="small" variant="outlined" icon={<FiPackage />} label={data.dims} className="shipment-row__chip shipment-row__chip--dimensions" />}
+                            <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                                <Chip
+                                    size="small"
+                                    color="primary"
+                                    label={`${data.distanceKm} km`}
+                                    className="shipment-row__chip shipment-row__chip--distance"
+                                />
+                                {data.dims && (
+                                    <Chip
+                                        size="small"
+                                        variant="outlined"
+                                        icon={<FiPackage />}
+                                        label={data.dims}
+                                        className="shipment-row__chip shipment-row__chip--dimensions"
+                                    />
+                                )}
+                            </Stack>
+
+                            <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                                {data.typeTags.map((t) => (
+                                    <Chip
+                                        key={t}
+                                        size="small"
+                                        variant="outlined"
+                                        label={t}
+                                        className="shipment-row__chip shipment-row__chip--type"
+                                    />
+                                ))}
+                            </Stack>
                         </Stack>
-                        
-                        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                            {data.typeTags.map((t) => <Chip key={t} size="small" variant="outlined" label={t} className="shipment-row__chip shipment-row__chip--type" />)}
-                        </Stack>
-                    </Stack>
 
                         {!!data.badges?.length && (
                             <Stack direction="row" spacing={1} flexWrap="wrap" className="shipment-row__badges">
@@ -90,7 +149,7 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Pro
                     </Stack>
                 </Grid>
 
-
+                {/* ПРАВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Stack
                         direction={{ xs: "row", md: "column" }}
@@ -100,20 +159,43 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Pro
                     >
                         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" justifyContent="flex-end">
                             {typeof data.repeats === "number" && (
-                                <Chip size="small" label={`Repeats: ${data.repeats}`} className="shipment-row__chip shipment-row__chip--repeats" />
+                                <Chip
+                                    size="small"
+                                    label={`Repeats: ${data.repeats}`}
+                                    className="shipment-row__chip shipment-row__chip--repeats"
+                                />
                             )}
                             {typeof data.views === "number" && (
-                                <Chip size="small" label={`Views: ${data.views}`} className="shipment-row__chip shipment-row__chip--views" />
+                                <Chip
+                                    size="small"
+                                    label={`Views: ${data.views}`}
+                                    className="shipment-row__chip shipment-row__chip--views"
+                                />
                             )}
                         </Stack>
 
                         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                             {data.paymentType && (
-                                <Chip size="small" color="success" label={data.paymentType} className="shipment-row__chip shipment-row__chip--payment" />
+                                <Chip
+                                    size="small"
+                                    color="success"
+                                    label={data.paymentType}
+                                    className="shipment-row__chip shipment-row__chip--payment"
+                                />
                             )}
-                            {data.price && <Chip size="small" color="success" variant="outlined" label={data.price} className="shipment-row__chip shipment-row__chip--price" />}
+                            {data.price && (
+                                <Chip
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                    label={data.price}
+                                    className="shipment-row__chip shipment-row__chip--price"
+                                />
+                            )}
                             {data.pricePerKm && (
-                                <Typography variant="caption" color="text.secondary" className="shipment-row__price-per-km">{data.pricePerKm}</Typography>
+                                <Typography variant="caption" color="text.secondary" className="shipment-row__price-per-km">
+                                    {data.pricePerKm}
+                                </Typography>
                             )}
                         </Stack>
 
@@ -144,7 +226,6 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Pro
                 </Grid>
             </Grid>
 
-
             {expanded && (
                 <>
                     <Divider sx={{ my: 1.5 }} />
@@ -153,39 +234,62 @@ export default function ShipmentRow({ data, onBookmark, onMoreOpen, scope }: Pro
                             <Stack spacing={1} color="text.secondary">
                                 {data.contact?.name && (
                                     <Stack direction="row" spacing={1} alignItems="center">
-                                        <FiUser /><Typography>{data.contact.name}</Typography>
+                                        <FiUser />
+                                        <Typography>{data.contact.name}</Typography>
                                     </Stack>
                                 )}
                                 {data.contact?.email && (
                                     <Stack direction="row" spacing={1} alignItems="center">
-                                        <FiMail /><Typography>{data.contact.email}</Typography>
+                                        <FiMail />
+                                        <Typography>{data.contact.email}</Typography>
                                     </Stack>
                                 )}
                                 {data.contact?.phone1 && (
                                     <Stack direction="row" spacing={1} alignItems="center">
-                                        <FiPhone /><Typography>{data.contact.phone1}</Typography>
+                                        <FiPhone />
+                                        <Typography>{data.contact.phone1}</Typography>
                                     </Stack>
                                 )}
                                 {data.contact?.phone2 && (
                                     <Stack direction="row" spacing={1} alignItems="center">
-                                        <FiPhone /><Typography>{data.contact.phone2}</Typography>
+                                        <FiPhone />
+                                        <Typography>{data.contact.phone2}</Typography>
                                     </Stack>
                                 )}
-                                {data.contact?.telegram && (
-                                    <Typography>{data.contact.telegram}</Typography>
-                                )}
+                                {data.contact?.telegram && <Typography>{data.contact.telegram}</Typography>}
                             </Stack>
                         </Grid>
 
-
-                        {scope === 'my' && <Grid size={{ xs: 12, md: 6 }}>
-                            <Stack direction="row" spacing={1}>
-                                <Tooltip title="Repeat"><IconButton><FiRepeat /></IconButton></Tooltip>
-                                <Tooltip title="Delete"><IconButton color="error"><FiTrash2 /></IconButton></Tooltip>
-                                <Tooltip title="Copy"><IconButton><FiCopy /></IconButton></Tooltip>
-                                <Tooltip title="Edit"><IconButton><FiEdit2 /></IconButton></Tooltip>
-                            </Stack>
-                        </Grid> }
+                        {scope === "my" && (
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    justifyContent={{ xs: "flex-start", md: "flex-end" }}
+                                >
+                                    <Tooltip title="Bump to top">
+                                        <IconButton onClick={() => onUp?.(data.id)}>
+                                            <FiRepeat />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Edit">
+                                        <IconButton onClick={() => onEdit?.(data.id)}>
+                                            <FiEdit2 />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Copy">
+                                        <IconButton onClick={() => onCopy?.(data.id)}>
+                                            <FiCopy />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+                                        <IconButton color="error" onClick={() => onDelete?.(data.id)}>
+                                            <FiTrash2 />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Stack>
+                            </Grid>
+                        )}
                     </Grid>
                 </>
             )}

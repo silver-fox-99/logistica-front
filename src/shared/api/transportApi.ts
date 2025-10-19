@@ -1,0 +1,71 @@
+import api from "@/shared/api/axios.ts";
+
+/** ----- /transport/init ----- */
+export type TransportInitResponse = {
+    status: boolean;
+    data: {
+        geos: Array<{
+            id: string;
+            parent_id: string | null;
+            type: "COUNTRY" | "REGION" | "CITY";
+            name: string;
+            code: string | null;
+            iso2: string | null;
+            slug: string | null;
+            is_active: boolean;
+            created_at: string;
+            updated_at: string;
+        }>;
+        currency: Record<string, string>;          // { USD: "USD", ... }
+        bargainOptions: Record<string, string>;    // { ALLOWED: "ALLOWED", ... }
+        paymentTerms: Record<string, string>;      // { PREPAID: "PREPAID", ... }
+        paymentMethods: Record<string, string>;    // { CASH: "CASH", ... }
+        vehicleType: Record<string, string>;       // { ANY: "ANY", TENT: "TENT", ... }
+        transportPoints: Record<string, string>;   // { DEPARTURE: "DEPARTURE", ARRIVAL: "ARRIVAL" }
+    };
+    message: string;
+};
+
+export const transportApi = {
+    async init() {
+        const { data } = await api.get<TransportInitResponse>("/transport/init");
+        return data.data;
+    },
+
+    /** ----- POST /transport ----- */
+    async create(payload: CreateTransportDto) {
+        const { data } = await api.post("/transport/create", payload);
+        return data;
+    },
+};
+
+/** ----- DTO из бек-описания ----- */
+export type TransportPointDto = {
+    type: "DEPARTURE" | "ARRIVAL";
+    country: string;
+    region?: string | null;
+    city?: string | null;
+    address?: string | null;
+};
+
+export type CreateTransportDto = {
+    images?: string[];
+    date_from: string | null;
+    date_to: string | null;
+    vehicle_type: "ANY" | "TENT" | "REFRIGERATOR" | "VAN" | "PLATFORM"; // из init.vehicleType
+    cars_count: number | null;
+    weight_t: number | null;
+    volume_m3: number | null;
+    has_dimensions: boolean;
+    length_m?: number;
+    width_m?: number;
+    height_m?: number;
+    price_currency: string; // из init.currency ключ (USD/EUR/…)
+    price_amount: number;
+    payment_method: "CASH" | "BANK_TRANSFER" | "CARD" | null;
+    payment_term: "PREPAID" | "ON_LOAD" | "ON_UNLOAD" | "POSTPAID" | null;
+    bargain: "ALLOWED" | "NOT_ALLOWED";
+    contact_extra_phone?: string | null;
+    note?: string | null;
+    points: TransportPointDto[]; // минимум 2 (DEPARTURE, ARRIVAL)
+};
