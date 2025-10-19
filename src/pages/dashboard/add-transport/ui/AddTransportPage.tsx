@@ -1,98 +1,128 @@
-import { useFieldArray, useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+
+import { useState } from "react";
 import {
     Box, Paper, Stack, Typography, TextField, Button, Divider,
     FormControlLabel, Checkbox, Select, MenuItem, Chip, RadioGroup, Radio
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid"; 
 import { FiPlus, FiTrash2 } from "react-icons/fi";
+import api from "@/shared/api/axios";
 
 /* --- options --- */
 const VEHICLE_TYPES = [
     "Curtain (Tautliner)", "Reefer", "Box", "Flatbed", "Platform",
     "Tipper", "Lowboy", "Container carrier", "Car carrier", "Dump truck",
     "Grain truck", "Cement truck", "Isotherm", "Oversize", "Other"
-];
-const LOAD_TYPES = ["Rear", "Side", "Top"];
-const TAX_TYPES = ["VAT (20%)", "VAT (0%)", "No VAT"];
-const PAYMENT_METHODS = ["Cash", "Bank transfer", "Mixed"];
-const PAYMENT_TERMS = ["On delivery", "Prepayment", "Deferred payment"];
+] as const;
+const LOAD_TYPES = ["Rear", "Side", "Top"] as const;
+const TAX_TYPES = ["VAT (20%)", "VAT (0%)", "No VAT"] as const;
+const PAYMENT_METHODS = ["Cash", "Bank transfer", "Mixed"] as const;
+const PAYMENT_TERMS = ["On delivery", "Prepayment", "Deferred payment"] as const;
 const CURRENCIES = ["USD", "EUR", "UZS"] as const;
 const PRICE_UNITS = ["Total", "Per ton", "Per km"] as const;
 
-/* --- validation --- */
-const schema = z.object({
-    dateFrom: z.string().min(1, "Required"),
-    dateTo: z.string().min(1, "Required"),
+/* --- types --- */
+type Place = { name: string };
+type FormValues = {
+    dateFrom: string;
+    dateTo: string;
 
-    loadPlaces: z.array(z.object({ name: z.string().min(1, "Required") })).min(1),
-    unloadPlaces: z.array(z.object({ name: z.string().min(1, "Required") })).min(1),
+    loadPlaces: Place[];
+    unloadPlaces: Place[];
 
-    vehicleType: z.string().min(1, "Select vehicle type"),
-    vehiclesCount: z.coerce.number().int().min(1, "Min 1").max(100, "Max 100"),
-    loadType: z.string().min(1, "Select load type"),
+    vehicleType: string;
+    vehiclesCount: number;
+    loadType: string;
 
-    capacityTons: z.coerce.number().gte(0).optional(),
-    volumeM3: z.coerce.number().gte(0).optional(),
+    capacityTons?: number;
+    volumeM3?: number;
 
-    dimsEnabled: z.boolean(),
-    bodyLength: z.coerce.number().gte(0).optional(),
-    bodyWidth: z.coerce.number().gte(0).optional(),
-    bodyHeight: z.coerce.number().gte(0).optional(),
-}).refine((v) => !v.dimsEnabled || (!!v.bodyLength && !!v.bodyWidth && !!v.bodyHeight), {
-    message: "Fill all body dimensions",
-    path: ["bodyHeight"],
-}).and(z.object({
-    currency: z.enum(CURRENCIES),
-    price: z.coerce.number().gte(0).optional(),
-    priceUnit: z.enum(PRICE_UNITS),
-    tax: z.string().min(1, "Select tax type"),
-    paymentMethod: z.string().min(1, "Select payment method"),
-    paymentTerm: z.string().min(1, "Select payment term"),
-    bargaining: z.enum(["possible", "none"]),
-    contactPrimary: z.string().min(1, "Choose a phone"),
-    contactSecondary: z.string().optional(),
-    email: z.string().email("Invalid email").optional(),
-    note: z.string().optional(),
-}));
+    dimsEnabled: boolean;
+    bodyLength?: number;
+    bodyWidth?: number;
+    bodyHeight?: number;
 
-type FormValues = z.infer<typeof schema>;
+    currency: (typeof CURRENCIES)[number];
+    price?: number;
+    priceUnit: (typeof PRICE_UNITS)[number];
+    tax: string;
+    paymentMethod: string;
+    paymentTerm: string;
+    bargaining: "possible" | "none";
 
-/* mock contacts из профиля */
+    contactPrimary: string;
+    contactSecondary?: string;
+    email?: string;
+    note?: string;
+};
+
 const CONTACTS = {
     phones: ["+380 097 000 0000", "+380 097 000 0001", "+380 097 000 0002"],
     email: "email@gmail.com",
 };
 
 export default function AddTransportPage() {
-    const {
-        register, control, handleSubmit, formState: { errors, isSubmitting },
-        watch, setValue,
-    } = useForm<FormValues>({
-        resolver: zodResolver(schema),
-        defaultValues: {
-            dateFrom: "", dateTo: "",
-            loadPlaces: [{ name: "" }], unloadPlaces: [{ name: "" }],
-            vehicleType: "", vehiclesCount: 1, loadType: "",
-            capacityTons: undefined, volumeM3: undefined,
-            dimsEnabled: false, bodyLength: undefined, bodyWidth: undefined, bodyHeight: undefined,
-            currency: "USD", price: undefined, priceUnit: "Total",
-            tax: "", paymentMethod: "", paymentTerm: "", bargaining: "possible",
-            contactPrimary: CONTACTS.phones[0], contactSecondary: CONTACTS.phones[1], email: CONTACTS.email,
-            note: "",
-        },
-        mode: "onTouched",
+    const [form, setForm] = useState<FormValues>({
+        dateFrom: "", dateTo: "",
+        loadPlaces: [{ name: "" }], unloadPlaces: [{ name: "" }],
+
+        vehicleType: "", vehiclesCount: 1, loadType: "",
+
+        capacityTons: undefined, volumeM3: undefined,
+        dimsEnabled: false, bodyLength: undefined, bodyWidth: undefined, bodyHeight: undefined,
+
+        currency: "USD", price: undefined, priceUnit: "Total",
+        tax: "", paymentMethod: "", paymentTerm: "", bargaining: "possible",
+
+        contactPrimary: CONTACTS.phones[0], contactSecondary: CONTACTS.phones[1],
+        email: CONTACTS.email,
+
+        note: "",
     });
 
-    const { fields: loadFields, append: addLoad, remove: rmLoad } = useFieldArray({ control, name: "loadPlaces" });
-    const { fields: unloadFields, append: addUnload, remove: rmUnload } = useFieldArray({ control, name: "unloadPlaces" });
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const dimsEnabled = watch("dimsEnabled");
+    const setField = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
+        setForm((s) => ({ ...s, [key]: value }));
 
-    const onSubmit = async (data: FormValues) => {
-        // TODO: call API
-        console.log("create transport request:", data);
+    const num = (v: string) => (v === "" ? undefined : Number(v));
+
+    /* places helpers */
+    const addLoad = () => setField("loadPlaces", [...form.loadPlaces, { name: "" }]);
+    const rmLoad = (i: number) =>
+        setField("loadPlaces", form.loadPlaces.filter((_, idx) => idx !== i));
+    const addUnload = () => setField("unloadPlaces", [...form.unloadPlaces, { name: "" }]);
+    const rmUnload = (i: number) =>
+        setField("unloadPlaces", form.unloadPlaces.filter((_, idx) => idx !== i));
+
+    /* simple validation */
+    const validate = () => {
+        const e: Record<string, string> = {};
+        if (!form.dateFrom) e.dateFrom = "Required";
+        if (!form.dateTo) e.dateTo = "Required";
+        if (!form.loadPlaces[0]?.name) e.loadPlaces = "At least one loading place";
+        if (!form.unloadPlaces[0]?.name) e.unloadPlaces = "At least one unloading place";
+        if (!form.vehicleType) e.vehicleType = "Select vehicle type";
+        if (!form.loadType) e.loadType = "Select load type";
+        if (!form.tax) e.tax = "Select tax type";
+        if (!form.paymentMethod) e.paymentMethod = "Select payment method";
+        if (!form.paymentTerm) e.paymentTerm = "Select payment term";
+        if (form.dimsEnabled) {
+            if (form.bodyLength == null || form.bodyWidth == null || form.bodyHeight == null) {
+                e.bodyHeight = "Fill all body dimensions";
+            }
+        }
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const onSubmit = async (ev: React.FormEvent) => {
+        ev.preventDefault();
+        if (!validate()) return;
+
+        // TODO: адаптируй payload под свой DTO бэка
+        await api.post("/transport", form);
+        // redirect/notify...
     };
 
     return (
@@ -111,44 +141,40 @@ export default function AddTransportPage() {
                     Fill as many details as possible about your vehicle.
                 </Typography>
 
-                <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+                <Box component="form" onSubmit={onSubmit} noValidate>
                     <Grid container spacing={2}>
                         {/* Dates */}
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <TextField
-                                label="Loading date from"
-                                type="date"
-                                InputLabelProps={{ shrink: true }}
-                                fullWidth
-                                {...register("dateFrom")}
-                                error={!!errors.dateFrom}
-                                helperText={errors.dateFrom?.message}
+                                label="Loading date from" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
+                                error={!!errors.dateFrom} helperText={errors.dateFrom}
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <TextField
-                                label="Loading date to"
-                                type="date"
-                                InputLabelProps={{ shrink: true }}
-                                fullWidth
-                                {...register("dateTo")}
-                                error={!!errors.dateTo}
-                                helperText={errors.dateTo?.message}
+                                label="Loading date to" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
+                                error={!!errors.dateTo} helperText={errors.dateTo}
                             />
                         </Grid>
 
                         {/* Places */}
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <Stack spacing={1}>
-                                {loadFields.map((f, i) => (
-                                    <Stack key={f.id} direction="row" spacing={1} alignItems="center">
+                                {form.loadPlaces.map((p, i) => (
+                                    <Stack key={i} direction="row" spacing={1} alignItems="center">
                                         <TextField
                                             label={i === 0 ? "Loading place" : `Loading place ${i + 1}`}
-                                            placeholder="Start typing a name"
-                                            fullWidth
-                                            {...register(`loadPlaces.${i}.name` as const)}
-                                            error={!!errors.loadPlaces?.[i]?.name}
-                                            helperText={errors.loadPlaces?.[i]?.name?.message}
+                                            placeholder="Start typing a name" fullWidth
+                                            value={p.name}
+                                            onChange={(e) => {
+                                                const next = [...form.loadPlaces];
+                                                next[i] = { name: e.target.value };
+                                                setField("loadPlaces", next);
+                                            }}
+                                            error={!!errors.loadPlaces && i === 0}
+                                            helperText={i === 0 ? errors.loadPlaces : ""}
                                         />
                                         {i > 0 && (
                                             <Button variant="text" color="error" onClick={() => rmLoad(i)}>
@@ -157,23 +183,27 @@ export default function AddTransportPage() {
                                         )}
                                     </Stack>
                                 ))}
-                                <Button startIcon={<FiPlus />} variant="outlined" onClick={() => addLoad({ name: "" })}>
+                                <Button startIcon={<FiPlus />} variant="outlined" onClick={addLoad}>
                                     Add loading place
                                 </Button>
                             </Stack>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <Stack spacing={1}>
-                                {unloadFields.map((f, i) => (
-                                    <Stack key={f.id} direction="row" spacing={1} alignItems="center">
+                                {form.unloadPlaces.map((p, i) => (
+                                    <Stack key={i} direction="row" spacing={1} alignItems="center">
                                         <TextField
                                             label={i === 0 ? "Unloading place" : `Unloading place ${i + 1}`}
-                                            placeholder="Start typing a name"
-                                            fullWidth
-                                            {...register(`unloadPlaces.${i}.name` as const)}
-                                            error={!!errors.unloadPlaces?.[i]?.name}
-                                            helperText={errors.unloadPlaces?.[i]?.name?.message}
+                                            placeholder="Start typing a name" fullWidth
+                                            value={p.name}
+                                            onChange={(e) => {
+                                                const next = [...form.unloadPlaces];
+                                                next[i] = { name: e.target.value };
+                                                setField("unloadPlaces", next);
+                                            }}
+                                            error={!!errors.unloadPlaces && i === 0}
+                                            helperText={i === 0 ? errors.unloadPlaces : ""}
                                         />
                                         {i > 0 && (
                                             <Button variant="text" color="error" onClick={() => rmUnload(i)}>
@@ -182,139 +212,157 @@ export default function AddTransportPage() {
                                         )}
                                     </Stack>
                                 ))}
-                                <Button startIcon={<FiPlus />} variant="outlined" onClick={() => addUnload({ name: "" })}>
+                                <Button startIcon={<FiPlus />} variant="outlined" onClick={addUnload}>
                                     Add unloading place
                                 </Button>
                             </Stack>
                         </Grid>
 
                         {/* Vehicle & load */}
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <TextField
                                 select label="Vehicle type" fullWidth
-                                {...register("vehicleType")} error={!!errors.vehicleType} helperText={errors.vehicleType?.message}
+                                value={form.vehicleType} onChange={(e) => setField("vehicleType", e.target.value)}
+                                error={!!errors.vehicleType} helperText={errors.vehicleType}
                             >
                                 {VEHICLE_TYPES.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <TextField
                                 label="Vehicles count" type="number" fullWidth
-                                {...register("vehiclesCount")} error={!!errors.vehiclesCount} helperText={errors.vehiclesCount?.message}
+                                value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", Number(e.target.value || 0))}
                             />
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <TextField
                                 select label="Load type" fullWidth
-                                {...register("loadType")} error={!!errors.loadType} helperText={errors.loadType?.message}
+                                value={form.loadType} onChange={(e) => setField("loadType", e.target.value)}
+                                error={!!errors.loadType} helperText={errors.loadType}
                             >
                                 {LOAD_TYPES.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField label="Payload capacity, t" type="number" fullWidth
-                                       {...register("capacityTons")} error={!!errors.capacityTons} helperText={errors.capacityTons?.message}
+                        <Grid size={{xs:12, md: 6}}>
+                            <TextField
+                                label="Payload capacity, t" type="number" fullWidth
+                                value={form.capacityTons ?? ""} onChange={(e) => setField("capacityTons", num(e.target.value))}
                             />
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField label="Volume, m³" type="number" fullWidth
-                                       {...register("volumeM3")} error={!!errors.volumeM3} helperText={errors.volumeM3?.message}
+                        <Grid size={{xs:12, md: 6}}>
+                            <TextField
+                                label="Volume, m³" type="number" fullWidth
+                                value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                             />
                         </Grid>
 
-                        {/* Body dimensions (optional) */}
-                        <Grid size={{ xs: 12 }}>
+                        {/* Body dimensions */}
+                        <Grid size={{xs:12}}>
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={dimsEnabled}
-                                        onChange={(e) => setValue("dimsEnabled", e.target.checked)}
+                                        checked={form.dimsEnabled}
+                                        onChange={(e) => setField("dimsEnabled", e.target.checked)}
                                     />
                                 }
-                                label={<Stack direction="row" spacing={1} alignItems="center">
-                                    <span>Specify cargo body dimensions</span>
-                                    <Chip label="Enter length, width and height in meters" variant="outlined" />
-                                </Stack>}
+                                label={
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <span>Specify cargo body dimensions</span>
+                                        <Chip label="Enter length, width and height in meters" variant="outlined" />
+                                    </Stack>
+                                }
                             />
                             <Grid container spacing={1} sx={{ mt: 0.5 }}>
-                                <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField label="Length (m)" type="number" fullWidth disabled={!dimsEnabled}
-                                               {...register("bodyLength")} error={!!errors.bodyLength} helperText={errors.bodyHeight && "Fill all body dimensions"}
+                                <Grid size={{xs:12, sm:4}} >
+                                    <TextField
+                                        label="Length (m)" type="number" fullWidth disabled={!form.dimsEnabled}
+                                        value={form.bodyLength ?? ""} onChange={(e) => setField("bodyLength", num(e.target.value))}
+                                        error={!!errors.bodyHeight} helperText={errors.bodyHeight && "Fill all body dimensions"}
                                     />
                                 </Grid>
-                                <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField label="Width (m)" type="number" fullWidth disabled={!dimsEnabled}
-                                               {...register("bodyWidth")} />
+                                <Grid size={{xs:12, sm:4}}>
+                                    <TextField
+                                        label="Width (m)" type="number" fullWidth disabled={!form.dimsEnabled}
+                                        value={form.bodyWidth ?? ""} onChange={(e) => setField("bodyWidth", num(e.target.value))}
+                                    />
                                 </Grid>
-                                <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField label="Height (m)" type="number" fullWidth disabled={!dimsEnabled}
-                                               {...register("bodyHeight")} />
+                                <Grid size={{xs:12, sm:4}} >
+                                    <TextField
+                                        label="Height (m)" type="number" fullWidth disabled={!form.dimsEnabled}
+                                        value={form.bodyHeight ?? ""} onChange={(e) => setField("bodyHeight", num(e.target.value))}
+                                    />
                                 </Grid>
                             </Grid>
                         </Grid>
 
                         {/* Pricing */}
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <Stack direction="row" spacing={1}>
-                                <Controller
-                                    name="currency"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select {...field} size="small" sx={{ minWidth: 100, alignSelf: "center" }}>
-                                            {CURRENCIES.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-                                        </Select>
-                                    )}
+                                <Select
+                                    size="small" sx={{ minWidth: 100, alignSelf: "center" }}
+                                    value={form.currency} onChange={(e) => setField("currency", e.target.value as FormValues["currency"])}
+                                >
+                                    {CURRENCIES.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                                </Select>
+                                <TextField
+                                    label="Price" type="number" fullWidth
+                                    value={form.price ?? ""} onChange={(e) => setField("price", num(e.target.value))}
                                 />
-                                <TextField label="Price" type="number" fullWidth {...register("price")} />
-                                <Controller
-                                    name="priceUnit"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select {...field} size="small" sx={{ minWidth: 120, alignSelf: "center" }}>
-                                            {PRICE_UNITS.map((u) => <MenuItem key={u} value={u}>{u}</MenuItem>)}
-                                        </Select>
-                                    )}
-                                />
+                                <Select
+                                    size="small" sx={{ minWidth: 120, alignSelf: "center" }}
+                                    value={form.priceUnit} onChange={(e) => setField("priceUnit", e.target.value as FormValues["priceUnit"])}
+                                >
+                                    {PRICE_UNITS.map((u) => <MenuItem key={u} value={u}>{u}</MenuItem>)}
+                                </Select>
                             </Stack>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField select label="Tax type" fullWidth
-                                       {...register("tax")} error={!!errors.tax} helperText={errors.tax?.message}
+                        <Grid size={{xs:12, md: 6}}>
+                            <TextField
+                                select label="Tax type" fullWidth
+                                value={form.tax} onChange={(e) => setField("tax", e.target.value)}
+                                error={!!errors.tax} helperText={errors.tax}
                             >
                                 {TAX_TYPES.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField select label="Payment method" fullWidth
-                                       {...register("paymentMethod")} error={!!errors.paymentMethod} helperText={errors.paymentMethod?.message}
+                        <Grid size={{xs:12, md: 6}}>
+                            <TextField
+                                select label="Payment method" fullWidth
+                                value={form.paymentMethod} onChange={(e) => setField("paymentMethod", e.target.value)}
+                                error={!!errors.paymentMethod} helperText={errors.paymentMethod}
                             >
                                 {PAYMENT_METHODS.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField select label="Payment term" fullWidth
-                                       {...register("paymentTerm")} error={!!errors.paymentTerm} helperText={errors.paymentTerm?.message}
+                        <Grid size={{xs:12, md: 6}}>
+                            <TextField
+                                select label="Payment term" fullWidth
+                                value={form.paymentTerm} onChange={(e) => setField("paymentTerm", e.target.value)}
+                                error={!!errors.paymentTerm} helperText={errors.paymentTerm}
                             >
                                 {PAYMENT_TERMS.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField select label="Bargaining" fullWidth {...register("bargaining")}>
+                        <Grid size={{xs:12, md: 6}}>
+                            <TextField
+                                select label="Bargaining" fullWidth
+                                value={form.bargaining} onChange={(e) => setField("bargaining", e.target.value as FormValues["bargaining"])}
+                            >
                                 <MenuItem value="possible">Negotiable</MenuItem>
                                 <MenuItem value="none">Not negotiable</MenuItem>
                             </TextField>
                         </Grid>
 
                         {/* Contacts */}
-                        <Grid size={{ xs: 12 }}>
+                        <Grid size={{xs:12}}>
                             <Divider sx={{ my: 1 }} />
                             <Typography variant="h6" mt={1}>Select contacts to show in the order</Typography>
                             <Typography variant="body2" color="text.secondary" mb={2}>
@@ -322,18 +370,24 @@ export default function AddTransportPage() {
                             </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Primary phone</Typography>
-                            <RadioGroup {...register("contactPrimary")} defaultValue={CONTACTS.phones[0]}>
+                            <RadioGroup
+                                value={form.contactPrimary}
+                                onChange={(e) => setField("contactPrimary", e.target.value)}
+                            >
                                 {CONTACTS.phones.map((p) => (
                                     <FormControlLabel key={p} value={p} control={<Radio />} label={p} />
                                 ))}
                             </RadioGroup>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Additional phone</Typography>
-                            <RadioGroup {...register("contactSecondary")} defaultValue={CONTACTS.phones[1]}>
+                            <RadioGroup
+                                value={form.contactSecondary ?? ""}
+                                onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
+                            >
                                 <FormControlLabel value="" control={<Radio />} label="No additional phone" />
                                 {CONTACTS.phones.map((p) => (
                                     <FormControlLabel key={p} value={p} control={<Radio />} label={p} />
@@ -341,33 +395,27 @@ export default function AddTransportPage() {
                             </RadioGroup>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{xs:12, md: 6}}>
                             <TextField
-                                label="E-mail"
-                                placeholder="email@example.com"
-                                fullWidth
-                                {...register("email")}
-                                error={!!errors.email}
-                                helperText={errors.email?.message}
+                                label="E-mail" placeholder="email@example.com" fullWidth
+                                value={form.email ?? ""} onChange={(e) => setField("email", e.target.value || undefined)}
+                                error={!!errors.email} helperText={errors.email}
                             />
                         </Grid>
 
                         {/* Note */}
-                        <Grid size={{ xs: 12 }}>
+                        <Grid size={{xs:12}}>
                             <TextField
-                                label="Additional information"
-                                placeholder="Provide any extra details"
-                                fullWidth
-                                multiline
-                                minRows={3}
-                                {...register("note")}
+                                label="Additional information" placeholder="Provide any extra details"
+                                fullWidth multiline minRows={3}
+                                value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
                             />
                         </Grid>
 
                         {/* Submit */}
-                        <Grid size={{ xs: 12 }}>
+                        <Grid size={{xs:12}}>
                             <Stack direction="row" justifyContent="center" mt={1.5}>
-                                <Button type="submit" variant="contained" disabled={isSubmitting} sx={{ minWidth: 280 }}>
+                                <Button type="submit" variant="contained" sx={{ minWidth: 280 }}>
                                     Add vehicle
                                 </Button>
                             </Stack>
