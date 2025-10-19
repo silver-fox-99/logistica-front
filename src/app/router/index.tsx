@@ -17,6 +17,7 @@ import CompanyPage from "@/pages/dashboard/company";
 import StaffPage from "@/pages/dashboard/staff";
 import PaymentsPage from "@/pages/dashboard/payments";
 import HelpSupportPage from "@/pages/dashboard/help-support";
+import ForgotPasswordPage from "@/pages/auth/forgot-password";
 
 
 
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
             {path: "/", element: <HomePage/>},
             {path: "/login", element: <LoginPage/>},
             {path: "/register", element: <RegisterPage/>},
+            {path: "/reset-password", element: <ForgotPasswordPage />}
         ],
     },
 

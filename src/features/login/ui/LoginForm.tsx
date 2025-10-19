@@ -96,7 +96,7 @@ export default function LoginForm() {
                 Войти
             </Button>
 
-            <Link className="button button--reset" to="/reset">
+            <Link className="button button--reset" to="/reset-password">
                 Забыли пароль?
             </Link>
 

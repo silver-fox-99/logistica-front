@@ -14,9 +14,9 @@ export default function StepCode({ length = 6, onSubmit, onResend }: StepCodePro
         if (code.length !== length) return;
         setBusy(true);
         try {
-            const idToken = await firebasePhone.confirmCode(code);   // как в демо: confirmation.confirm + getIdToken
-            await authApi.verifyFirebaseIdToken(idToken);            // отправили на бэк
-            onSubmit?.();                                            // дальше — профиль
+            const idToken = await firebasePhone.confirmCode(code);
+            await authApi.verifyFirebaseIdToken(idToken);
+            onSubmit?.();
         } finally {
             setBusy(false);
         }

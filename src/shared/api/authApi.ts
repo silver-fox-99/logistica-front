@@ -33,5 +33,10 @@ export const authApi = {
     login: async (payload: { phone: string; password: string; }) => {
         const { data } = await api.post("/auth/login", payload);
         return data;
-    }
+    },
+
+    resetPasswordWithIdToken: async (idToken: string, password: string) => {
+        const { data } = await api.post("/auth/phone/verify-restore-password", { idToken, password });
+        return data;
+    },
 };
