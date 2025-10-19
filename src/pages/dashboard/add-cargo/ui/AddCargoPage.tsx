@@ -8,6 +8,9 @@ import { FiPlus } from "react-icons/fi";
 import { cargoApi, type CreateCargoDto } from "@/shared/api/cargoApi";
 import {useNavigate} from "react-router-dom";
 
+import './AddCargoPage.scss';
+
+
 /* ===== types from init ===== */
 type Geo = {
     id: string;
@@ -129,7 +132,7 @@ function PlaceRow({
                 value={countryValue}
                 onChange={(_, v) => onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null })}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={`${labelPrefix} country`} placeholder="Select country" />
+                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Страна загрузки" : "Страна выгрузки"} placeholder="Начните вводить страну" />
                 )}
             />
 
@@ -140,7 +143,7 @@ function PlaceRow({
                 onChange={(_, v) => onChange({ ...place, regionId: v?.id ?? null, cityId: null })}
                 disabled={!countryValue || regions.length === 0}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={`${labelPrefix} region`} placeholder="Select region (optional)"/>
+                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Регион загрузки" : "Регион выгрузки"} placeholder="Начните вводить регион"/>
                 )}
             />
 
@@ -151,7 +154,7 @@ function PlaceRow({
                 onChange={(_, v) => onChange({ ...place, cityId: v?.id ?? null })}
                 disabled={!countryValue || mergedCities.length === 0}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={`${labelPrefix} city`} placeholder="Select city (optional)"/>
+                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Город загрузки" : "Город выгрузки"} placeholder="Начните вводить город"/>
                 )}
             />
 
@@ -175,6 +178,7 @@ function PlaceRow({
 export default function AddCargoPage() {
     const [init, setInit] = useState<Awaited<ReturnType<typeof cargoApi.init>> | null>(null);
     const [loadingInit, setLoadingInit] = useState(true);
+    const [activeStep, setActiveStep] = useState(0);
 
     const [form, setForm] = useState<FormValues>({
         dateFrom: "", dateTo: "",
@@ -191,7 +195,7 @@ export default function AddCargoPage() {
         weightTons: undefined,
         volumeM3: undefined,
 
-        dims: { enabled: false, length: undefined, width: undefined, height: undefined },
+        dims: { enabled: true, length: undefined, width: undefined, height: undefined },
 
         currency: "USD",
         price: undefined,
@@ -205,6 +209,14 @@ export default function AddCargoPage() {
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    const steps = [
+        'Даты и маршруты',
+        'Информация о грузе', 
+        'Размеры и вес',
+        'Цена и оплата',
+        'Контакты'
+    ];
+
     useEffect(() => {
         (async () => {
             setLoadingInit(true);
@@ -213,7 +225,7 @@ export default function AddCargoPage() {
             // дефолты
             const currency = Object.keys(data.currency)[0] || "USD";
             const vehicle = Object.keys(data.vehicleType)[0] || "ANY";
-            const loadType = Object.keys(data.loadType)[0] || "FULL";
+            const loadType = Object.keys(data.loadType)[0] || "";
             const cargoType = Object.keys(data.cargoTypes)[0] || "";
             setForm((s) => ({ ...s, currency, vehicleType: vehicle, loadType, cargoType }));
             setLoadingInit(false);
@@ -250,10 +262,8 @@ export default function AddCargoPage() {
         if (!form.paymentMethod) e.paymentMethod = "Select payment method";
         if (!form.paymentTerm) e.paymentTerm = "Select payment term";
 
-        if (form.dims.enabled) {
-            if (form.dims.length == null || form.dims.width == null || form.dims.height == null) {
-                e.dims = "Fill all dimensions";
-            }
+        if (form.dims.length == null || form.dims.width == null || form.dims.height == null) {
+            e.dims = "Fill all dimensions";
         }
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
             e.contactSecondary = "Invalid phone format. Use + and digits, 10–20 digits total.";
@@ -268,19 +278,6 @@ export default function AddCargoPage() {
         if (init?.geos) for (const g of init.geos) m.set(g.id, g);
         return m;
     }, [init]);
-
-    // const placeToCargoPoint = (p: Place, type: "PICKUP" | "DROPOFF"): CreateCargoDto["points"][number] => {
-    //     const country = p.countryId ? geoById.get(p.countryId)?.name ?? "" : "";
-    //     const region = p.regionId ? geoById.get(p.regionId)?.name ?? null : null;
-    //     const city   = p.cityId ? geoById.get(p.cityId)?.name ?? null : null;
-    //     return {
-    //         type,
-    //         country: country || "Unknown",
-    //         region,
-    //         city,
-    //         address: p.address ?? null,
-    //     };
-    // };
 
     /* ===== UI -> DTO ===== */
     const toDto = (v: FormValues): CreateCargoDto => {
@@ -362,297 +359,747 @@ export default function AddCargoPage() {
         navigate("/dashboard/requests");
     };
 
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
+
     return (
-        <Box>
+        <Box className="add-cargo-page">
             {/* header */}
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }}>
-                <Typography variant="h6">Add a cargo request</Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Provide loading/unloading points, cargo parameters and contact information.
-                </Typography>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }} className="add-cargo-page__paper">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} className="add-cargo-page__header">
+                    <Box className="add-cargo-page__icon">
+                        <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/><path d="M20.833 13.889c.48 0 .868.388.868.868v5.208h5.209a.868.868 0 1 1 0 1.736H21.7v5.209a.868.868 0 1 1-1.736 0V21.7h-5.208a.868.868 0 0 1 0-1.736h5.208v-5.208c0-.48.389-.868.868-.868" fill="#4472B8"/></svg>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography variant="h6" mb={1} className="add-cargo-page__title">Добавление заявки на перевозку груза</Typography>
+                        <Typography variant="body2" color="text.secondary" mb={2} className="add-cargo-page__subtitle">
+                            Укажите, пожалуйста, пункты загрузки и выгрузки, параметры груза и контактную информацию.
+                        </Typography>
+                    </Box>
+                </Box>
             </Paper>
 
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
-                <Typography variant="h6" mb={1}>Cargo information</Typography>
-                <Typography variant="body2" color="text.secondary" mb={2}>
-                    Fill as much details as possible.
+            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }} className="add-cargo-page__content-paper">
+                <Typography variant="h6" mb={1} className="add-cargo-page__title">Информация о грузе</Typography>
+                <Typography variant="body2" color="text.secondary" mb={2} className="add-cargo-page__subtitle">
+                    Укажите как можно подробнее доступную информацию о грузе.
                 </Typography>
 
-                <Box component="form" noValidate onSubmit={onSubmit}>
-                    <Grid container spacing={2}>
-                        {/* Dates */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <TextField
-                                label="Loading date from" type="date" InputLabelProps={{ shrink: true }} fullWidth
-                                value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
-                                error={!!errors.dateFrom} helperText={errors.dateFrom}
-                            />
-                        </Grid>
-                        <Grid size={{ xs:12, md:6 }}>
-                            <TextField
-                                label="Loading date to" type="date" InputLabelProps={{ shrink: true }} fullWidth
-                                value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
-                                error={!!errors.dateTo} helperText={errors.dateTo}
-                            />
-                        </Grid>
+                {/* Мобильная версия - Stepper экранами */}
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                    <Box component="form" noValidate onSubmit={onSubmit}>
+                        {/* Прогресс-бар сверху */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                Шаг {activeStep + 1} из {steps.length}: {steps[activeStep]}
+                            </Typography>
+                            <Box sx={{ width: '100%', bgcolor: '#E0E0E0', borderRadius: 1, height: 8 }}>
+                                <Box 
+                                    sx={{ 
+                                        bgcolor: '#4472B8', 
+                                        height: '100%', 
+                                        borderRadius: 1,
+                                        width: `${((activeStep + 1) / steps.length) * 100}%`,
+                                        transition: 'width 0.3s ease'
+                                    }} 
+                                />
+                            </Box>
+                        </Box>
 
-                        {/* PICKUP (left) */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Stack spacing={1}>
-                                {form.pickups.map((p, i) => (
-                                    <PlaceRow
-                                        key={i}
-                                        labelPrefix={i === 0 ? "Pickup" : `Pickup ${i + 1}`}
-                                        place={p}
-                                        geos={init?.geos ?? null}
-                                        errorText={i === 0 ? errors.pickups : undefined}
-                                        showRemove={i > 0}
-                                        onRemove={() => rmPickup(i)}
-                                        onChange={(np) => updatePickup(i, np)}
-                                    />
-                                ))}
-                                <Button startIcon={<FiPlus />} variant="outlined" onClick={addPickup}>
-                                    Add pickup point
-                                </Button>
-                            </Stack>
-                        </Grid>
-
-                        {/* DROPOFF (right) */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Stack spacing={1}>
-                                {form.dropoffs.map((p, i) => (
-                                    <PlaceRow
-                                        key={i}
-                                        labelPrefix={i === 0 ? "Dropoff" : `Dropoff ${i + 1}`}
-                                        place={p}
-                                        geos={init?.geos ?? null}
-                                        errorText={i === 0 ? errors.dropoffs : undefined}
-                                        showRemove={i > 0}
-                                        onRemove={() => rmDropoff(i)}
-                                        onChange={(np) => updateDropoff(i, np)}
-                                    />
-                                ))}
-                                <Button startIcon={<FiPlus />} variant="outlined" onClick={addDropoff}>
-                                    Add dropoff point
-                                </Button>
-                            </Stack>
-                        </Grid>
-
-                        {/* Enums from init */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Select
-                                fullWidth displayEmpty
-                                value={form.cargoType} onChange={(e) => setField("cargoType", e.target.value as string)}
-                            >
-                                {(init ? Object.keys(init.cargoTypes) : []).map((k) => (
-                                    <MenuItem key={k} value={k}>{k}</MenuItem>
-                                ))}
-                            </Select>
-                            {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
-                        </Grid>
-
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Select
-                                fullWidth displayEmpty
-                                value={form.vehicleType} onChange={(e) => setField("vehicleType", e.target.value as string)}
-                            >
-                                {(init ? Object.keys(init.vehicleType) : ["ANY"]).map((k) => (
-                                    <MenuItem key={k} value={k}>{k}</MenuItem>
-                                ))}
-                            </Select>
-                            {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
-                        </Grid>
-
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Select
-                                fullWidth displayEmpty
-                                value={form.loadType} onChange={(e) => setField("loadType", e.target.value as string)}
-                            >
-                                {(init ? Object.keys(init.loadType) : ["FULL"]).map((k) => (
-                                    <MenuItem key={k} value={k}>{k}</MenuItem>
-                                ))}
-                            </Select>
-                            {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
-                        </Grid>
-
-                        <Grid size={{ xs:12, md:6 }}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={form.allowPartial}
-                                        onChange={(e) => setField("allowPartial", e.target.checked)}
-                                    />
-                                }
-                                label="Allow partial load"
-                            />
-                        </Grid>
-
-                        {/* Numbers */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <TextField
-                                label="Weight, t" type="number" fullWidth
-                                value={form.weightTons ?? ""} onChange={(e) => setField("weightTons", num(e.target.value))}
-                            />
-                        </Grid>
-                        <Grid size={{ xs:12, md:6 }}>
-                            <TextField
-                                label="Volume, m³" type="number" fullWidth
-                                value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs:12, md:6 }}>
-                            <TextField
-                                label="Vehicles count" type="number" fullWidth
-                                value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
-                            />
-                        </Grid>
-                        <Grid size={{ xs:12, md:6 }}>
-                            <TextField
-                                label="Pallets count" type="number" fullWidth
-                                value={form.palletsCount ?? ""} onChange={(e) => setField("palletsCount", num(e.target.value))}
-                            />
-                        </Grid>
-
-                        {/* Dimensions */}
-                        <Grid size={{ xs:12 }}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={form.dims.enabled}
-                                        onChange={(e) => setField("dims", { ...form.dims, enabled: e.target.checked })}
-                                    />
-                                }
-                                label={
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <span>Specify cargo dimensions</span>
-                                        <Chip label="Enter length, width and height in meters" variant="outlined" />
-                                    </Stack>
-                                }
-                            />
-                            <Grid container spacing={1} sx={{ mt: 0.5 }}>
-                                <Grid size={{ xs:12, sm:4 }}>
-                                    <TextField
-                                        label="Length (m)" type="number" fullWidth disabled={!form.dims.enabled}
-                                        value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
-                                        error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
-                                    />
+                        {/* Контент экрана */}
+                        <Box sx={{ minHeight: '400px', mb: 3 }}>
+                            {activeStep === 0 && (
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs:12 }}>
+                                        <TextField
+                                            label="Дата загрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                            value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
+                                            error={!!errors.dateFrom} helperText={errors.dateFrom}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <TextField
+                                            label="Дата выгрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                            value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
+                                            error={!!errors.dateTo} helperText={errors.dateTo}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Stack spacing={1}>
+                                            {form.pickups.map((p, i) => (
+                                                <PlaceRow
+                                                    key={i}
+                                                    labelPrefix={i === 0 ? "Страна загрузки" : `Страна загрузки ${i + 1}`}
+                                                    place={p}
+                                                    geos={init?.geos ?? null}
+                                                    errorText={i === 0 ? errors.pickups : undefined}
+                                                    showRemove={i > 0}
+                                                    onRemove={() => rmPickup(i)}
+                                                    onChange={(np) => updatePickup(i, np)}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Stack spacing={1}>
+                                            {form.dropoffs.map((p, i) => (
+                                                <PlaceRow
+                                                    key={i}
+                                                    labelPrefix={i === 0 ? "Страна выгрузки" : `Страна выгрузки ${i + 1}`}
+                                                    place={p}
+                                                    geos={init?.geos ?? null}
+                                                    errorText={i === 0 ? errors.dropoffs : undefined}
+                                                    showRemove={i > 0}
+                                                    onRemove={() => rmDropoff(i)}
+                                                    onChange={(np) => updateDropoff(i, np)}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Grid>
                                 </Grid>
-                                <Grid size={{ xs:12, sm:4 }}>
-                                    <TextField
-                                        label="Width (m)" type="number" fullWidth disabled={!form.dims.enabled}
-                                        value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs:12, sm:4 }}>
-                                    <TextField
-                                        label="Height (m)" type="number" fullWidth disabled={!form.dims.enabled}
-                                        value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Grid>
+                            )}
 
-                        {/* Pricing */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Stack direction="row" spacing={1}>
-                                <Select
-                                    size="small" sx={{ minWidth: 100, alignSelf: "center" }}
-                                    value={form.currency} onChange={(e) => setField("currency", e.target.value as string)}
+                            {activeStep === 1 && (
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип груза</Typography>
+                                        <Select
+                                            fullWidth 
+                                            displayEmpty
+                                            value={form.cargoType || ""} 
+                                            onChange={(e) => setField("cargoType", e.target.value as string)}
+                                            renderValue={(selected) => {
+                                                if (!selected || selected === "") {
+                                                    return <em style={{ color: '#999' }}>Выберите тип груза</em>;
+                                                }
+                                                return selected;
+                                            }}
+                                        >
+                                            {(init ? Object.keys(init.cargoTypes) : []).map((k) => (
+                                                <MenuItem key={k} value={k}>{k}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
+                                    </Grid>
+
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип автомобиля</Typography>
+                                        <Select
+                                            fullWidth 
+                                            displayEmpty
+                                            value={form.vehicleType || ""} 
+                                            onChange={(e) => setField("vehicleType", e.target.value as string)}
+                                            renderValue={(selected) => {
+                                                if (!selected || selected === "") {
+                                                    return <em style={{ color: '#999' }}>Выберите тип</em>;
+                                                }
+                                                return selected;
+                                            }}
+                                        >
+                                            <MenuItem value="">
+                                                <em style={{ color: '#999' }}>Выберите тип</em>
+                                            </MenuItem>
+                                            {(init ? Object.keys(init.vehicleType) : []).map((k) => (
+                                                <MenuItem key={k} value={k}>{k}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
+                                    </Grid>
+
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип загрузки</Typography>
+                                        <Select
+                                            fullWidth 
+                                            displayEmpty
+                                            value={form.loadType || ""} 
+                                            onChange={(e) => setField("loadType", e.target.value as string)}
+                                            renderValue={(selected) => {
+                                                if (!selected || selected === "") {
+                                                    return <em style={{ color: '#999' }}>Выберите тип загрузки</em>;
+                                                }
+                                                return selected;
+                                            }}
+                                        >
+                                            {(init ? Object.keys(init.loadType) : []).map((k) => (
+                                                <MenuItem key={k} value={k}>{k}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
+                                    </Grid>
+
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дозагрузка</Typography>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={form.allowPartial}
+                                                    onChange={(e) => setField("allowPartial", e.target.checked)}
+                                                />
+                                            }
+                                            label="Возможность догрузки"
+                                        />
+                                    </Grid>
+                                </Grid>
+                            )}
+
+                            {activeStep === 2 && (
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Вес груза (т)</Typography>
+                                        <TextField
+                                            type="number" 
+                                            fullWidth
+                                            placeholder="Укажите вес"
+                                            value={form.weightTons ?? ""} 
+                                            onChange={(e) => setField("weightTons", num(e.target.value))}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <TextField
+                                            label="Объём (м³)" type="number" fullWidth placeholder="Укажите объём"
+                                            value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <TextField
+                                            label="Количество автомобилей" type="number" fullWidth placeholder="Укажите количество"
+                                            value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Количество паллет</Typography>
+                                        <TextField
+                                            type="number" 
+                                            fullWidth
+                                            placeholder="Введите количество паллет"
+                                            value={form.palletsCount ?? ""} 
+                                            onChange={(e) => setField("palletsCount", num(e.target.value))}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Размеры груза</Typography>
+
+                                        <Grid container spacing={1}>
+                                            <Grid size={{ xs:12, lg:4 }}>
+                                                <TextField
+                                                    type="number" placeholder="Длина (м)" fullWidth
+                                                    value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
+                                                    error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
+                                                />
+                                            </Grid>
+                                            <Grid size={{ xs:12, lg:4 }}>
+                                                <TextField
+                                                    type="number" placeholder="Ширина (м)" fullWidth
+                                                    value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
+                                                />
+                                            </Grid>
+                                            <Grid size={{ xs:12, lg:4 }}>
+                                                <TextField
+                                                    type="number" placeholder="Высота (м)" fullWidth
+                                                    value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            )}
+
+                            {activeStep === 3 && (
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs:12 }}>
+                                        <Stack direction="row" spacing={1}>
+                                            <Select
+                                                size="small" sx={{ minWidth: 100, alignSelf: "center" }}
+                                                value={form.currency} onChange={(e) => setField("currency", e.target.value as string)}
+                                            >
+                                                {(init ? Object.keys(init.currency) : ["USD"]).map((c) => (
+                                                    <MenuItem key={c} value={c}>{c}</MenuItem>
+                                                ))}
+                                            </Select>
+                                            <TextField
+                                                label="Стоимость" type="number" fullWidth
+                                                value={form.price ?? ""} onChange={(e) => setField("price", num(e.target.value))}
+                                            />
+                                        </Stack>
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
+                                        <Select
+                                            fullWidth 
+                                            displayEmpty
+                                            value={form.paymentMethod || ""} 
+                                            onChange={(e) => setField("paymentMethod", e.target.value as string)}
+                                            renderValue={(selected) => {
+                                                if (!selected || selected === "") {
+                                                    return <em style={{ color: '#999' }}>Выберите метод оплаты</em>;
+                                                }
+                                                return selected;
+                                            }}
+                                        >
+                                            {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
+                                                <MenuItem key={m} value={m}>{m}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Срок оплаты</Typography>
+                                        <Select
+                                            fullWidth 
+                                            displayEmpty
+                                            value={form.paymentTerm || ""} 
+                                            onChange={(e) => setField("paymentTerm", e.target.value as string)}
+                                            renderValue={(selected) => {
+                                                if (!selected || selected === "") {
+                                                    return <em style={{ color: '#999' }}>Выберите срок оплаты</em>;
+                                                }
+                                                return selected;
+                                            }}
+                                        >
+                                            {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
+                                                <MenuItem key={t} value={t}>{t}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Торг</Typography>
+                                        <Select
+                                            fullWidth 
+                                            displayEmpty
+                                            value={form.bargaining || ""} 
+                                            onChange={(e) => setField("bargaining", e.target.value as FormValues["bargaining"])}
+                                            renderValue={(selected) => {
+                                                if (!selected) {
+                                                    return <em style={{ color: '#999' }}>Выберите возможность торга</em>;
+                                                }
+                                                return selected === "possible" ? "Возможен торг" : "Торг невозможен";
+                                            }}
+                                        >
+                                            <MenuItem value="possible">Возможен торг</MenuItem>
+                                            <MenuItem value="none">Торг невозможен</MenuItem>
+                                        </Select>
+                                    </Grid>
+                                </Grid>
+                            )}
+
+                            {activeStep === 4 && (
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>Выберите контакты, которые будут видны в заказе</Typography>
+                                        <Typography variant="body2" color="text.secondary" mb={2}>
+                                            Additional phone will be shown in the order.
+                                        </Typography>
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Additional phone</Typography>
+                                        <TextField
+                                            placeholder="+380971234567"
+                                            fullWidth
+                                            value={form.contactSecondary ?? ""}
+                                            onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
+                                            helperText={errors.contactSecondary ? errors.contactSecondary : "Optional. Format: + and 10–20 digits."}
+                                            error={!!errors.contactSecondary}
+                                        />
+                                        <Button
+                                            variant="text"
+                                            sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
+                                            onClick={() => setField("contactSecondary", "")}
+                                        >
+                                            Clear phone
+                                        </Button>
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <TextField
+                                            label="Additional information" placeholder="Provide any extra details"
+                                            fullWidth multiline minRows={3}
+                                            value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            )}
+                        </Box>
+
+                        {/* Навигация внутри content-paper */}
+                        <Box sx={{ 
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            pt: 2,
+                            borderTop: '1px solid #E0E0E0'
+                        }}>
+                            <Button
+                                onClick={handleBack}
+                                disabled={activeStep === 0}
+                                sx={{ minWidth: 100 }}
+                            >
+                                Назад
+                            </Button>
+                            
+                            <Typography variant="body2" color="text.secondary">
+                                {activeStep + 1} / {steps.length}
+                            </Typography>
+                            
+                            {activeStep === steps.length - 1 ? (
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{ minWidth: 100 }}
+                                    disabled={loadingInit}
                                 >
-                                    {(init ? Object.keys(init.currency) : ["USD"]).map((c) => (
-                                        <MenuItem key={c} value={c}>{c}</MenuItem>
+                                    Отправить
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="contained"
+                                    onClick={handleNext}
+                                    sx={{ minWidth: 100 }}
+                                >
+                                    Продолжить
+                                </Button>
+                            )}
+                        </Box>
+                    </Box>
+                </Box>
+
+                {/* Десктопная версия - обычная форма */}
+                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                    <Box component="form" noValidate onSubmit={onSubmit}>
+                        <Grid container spacing={2}>
+                            {/* Даты */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <TextField
+                                    label="Дата загрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                    value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
+                                    error={!!errors.dateFrom} helperText={errors.dateFrom}
+                                />
+                            </Grid>
+                            <Grid size={{ xs:12, md:6 }}>
+                                <TextField
+                                    label="Дата выгрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                    value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
+                                    error={!!errors.dateTo} helperText={errors.dateTo}
+                                />
+                            </Grid>
+
+                            {/* PICKUP (left) */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Stack spacing={1}>
+                                    {form.pickups.map((p, i) => (
+                                        <PlaceRow
+                                            key={i}
+                                            labelPrefix={i === 0 ? "Страна загрузки" : `Страна загрузки ${i + 1}`}
+                                            place={p}
+                                            geos={init?.geos ?? null}
+                                            errorText={i === 0 ? errors.pickups : undefined}
+                                            showRemove={i > 0}
+                                            onRemove={() => rmPickup(i)}
+                                            onChange={(np) => updatePickup(i, np)}
+                                        />
+                                    ))}
+                                </Stack>
+                            </Grid>
+
+                            {/* DROPOFF (right) */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Stack spacing={1}>
+                                    {form.dropoffs.map((p, i) => (
+                                        <PlaceRow
+                                            key={i}
+                                            labelPrefix={i === 0 ? "Страна выгрузки" : `Страна выгрузки ${i + 1}`}
+                                            place={p}
+                                            geos={init?.geos ?? null}
+                                            errorText={i === 0 ? errors.dropoffs : undefined}
+                                            showRemove={i > 0}
+                                            onRemove={() => rmDropoff(i)}
+                                            onChange={(np) => updateDropoff(i, np)}
+                                        />
+                                    ))}
+                                </Stack>
+                            </Grid>
+
+                            <Grid size={{ xs:12 }}>
+                                        <Divider sx={{ my: 4 }} />
+                            </Grid>
+
+                            {/* Enums from init */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип груза</Typography>
+                                <Select
+                                    fullWidth 
+                                    displayEmpty
+                                    value={form.cargoType || ""} 
+                                    onChange={(e) => setField("cargoType", e.target.value as string)}
+                                    renderValue={(selected) => {
+                                        if (!selected || selected === "") {
+                                            return <em style={{ color: '#999' }}>Выберите тип груза</em>;
+                                        }
+                                        return selected;
+                                    }}
+                                >
+                                    {(init ? Object.keys(init.cargoTypes) : []).map((k) => (
+                                        <MenuItem key={k} value={k}>{k}</MenuItem>
                                     ))}
                                 </Select>
-                                <TextField
-                                    label="Price" type="number" fullWidth
-                                    value={form.price ?? ""} onChange={(e) => setField("price", num(e.target.value))}
+                                {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
+                            </Grid>
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип автомобиля</Typography>
+                                <Select
+                                    fullWidth 
+                                    displayEmpty
+                                    value={form.vehicleType || ""} 
+                                    onChange={(e) => setField("vehicleType", e.target.value as string)}
+                                    renderValue={(selected) => {
+                                        if (!selected || selected === "") {
+                                            return <em style={{ color: '#999' }}>Выберите тип</em>;
+                                        }
+                                        return selected;
+                                    }}
+                                >
+                                    <MenuItem value="">
+                                        <em style={{ color: '#999' }}>Выберите тип</em>
+                                    </MenuItem>
+                                    {(init ? Object.keys(init.vehicleType) : []).map((k) => (
+                                        <MenuItem key={k} value={k}>{k}</MenuItem>
+                                    ))}
+                                </Select>
+                                {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
+                            </Grid>
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип загрузки</Typography>
+                                <Select
+                                    fullWidth 
+                                    displayEmpty
+                                    value={form.loadType || ""} 
+                                    onChange={(e) => setField("loadType", e.target.value as string)}
+                                    renderValue={(selected) => {
+                                        if (!selected || selected === "") {
+                                            return <em style={{ color: '#999' }}>Выберите тип загрузки</em>;
+                                        }
+                                        return selected;
+                                    }}
+                                >
+                                    {(init ? Object.keys(init.loadType) : []).map((k) => (
+                                        <MenuItem key={k} value={k}>{k}</MenuItem>
+                                    ))}
+                                </Select>
+                                {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
+                            </Grid>
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дозагрузка</Typography>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={form.allowPartial}
+                                            onChange={(e) => setField("allowPartial", e.target.checked)}
+                                        />
+                                    }
+                                    label="Возможность догрузки"
                                 />
-                            </Stack>
-                        </Grid>
+                            </Grid>
 
-                        {/* Payments */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Select
-                                fullWidth displayEmpty
-                                value={form.paymentMethod} onChange={(e) => setField("paymentMethod", e.target.value as string)}
-                            >
-                                {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
-                                    <MenuItem key={m} value={m}>{m}</MenuItem>
-                                ))}
-                            </Select>
-                            {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
-                        </Grid>
+                            {/* Numbers */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Вес груза (т)</Typography>
+                                <TextField
+                                    type="number" 
+                                    fullWidth
+                                    placeholder="Укажите вес"
+                                    value={form.weightTons ?? ""} 
+                                    onChange={(e) => setField("weightTons", num(e.target.value))}
+                                />
+                            </Grid>
+                            <Grid size={{ xs:12, md:6 }}>
+                                <TextField
+                                    label="Объём (м³)" type="number" fullWidth placeholder="Укажите объём"
+                                    value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
+                                />
+                            </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Select
-                                fullWidth displayEmpty
-                                value={form.paymentTerm} onChange={(e) => setField("paymentTerm", e.target.value as string)}
-                            >
-                                {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
-                                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                                ))}
-                            </Select>
-                            {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
-                        </Grid>
+                            <Grid size={{ xs:12, md:6 }}>
+                                <TextField
+                                    label="Количество автомобилей" type="number" fullWidth placeholder="Укажите количество"
+                                    value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
+                                />
+                            </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Select
-                                fullWidth
-                                value={form.bargaining}
-                                onChange={(e) => setField("bargaining", e.target.value as FormValues["bargaining"])}
-                            >
-                                <MenuItem value="possible">Negotiable</MenuItem>
-                                <MenuItem value="none">Not negotiable</MenuItem>
-                            </Select>
-                        </Grid>
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Количество паллет</Typography>
+                                <TextField
+                                    type="number" 
+                                    fullWidth
+                                    placeholder="Введите количество паллет"
+                                    value={form.palletsCount ?? ""} 
+                                    onChange={(e) => setField("palletsCount", num(e.target.value))}
+                                />
+                            </Grid>
 
-                        {/* Contacts: only Additional phone */}
-                        <Grid size={{ xs:12 }}>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="h6" mt={1}>Select contacts to show in the order</Typography>
-                            <Typography variant="body2" color="text.secondary" mb={2}>
-                                Additional phone will be shown in the order.
-                            </Typography>
-                        </Grid>
+                            {/* Dimensions */}
+<Grid size={{ xs:12 }}>
+    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Размеры груза</Typography>
 
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Additional phone</Typography>
-                            <TextField
-                                placeholder="+380971234567"
-                                fullWidth
-                                value={form.contactSecondary ?? ""}
-                                onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
-                                helperText={errors.contactSecondary ? errors.contactSecondary : "Optional. Format: + and 10–20 digits."}
-                                error={!!errors.contactSecondary}
-                            />
-                            <Button
-                                variant="text"
-                                sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
-                                onClick={() => setField("contactSecondary", "")}
-                            >
-                                Clear phone
-                            </Button>
-                        </Grid>
+    <Grid container spacing={1}>
+        <Grid size={{ xs:12, lg:4 }}>
+            <TextField
+                 type="number" placeholder="Длина (м)" fullWidth
+                value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
+                error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
+            />
+        </Grid>
+        <Grid size={{ xs:12, lg:4 }}>
+            <TextField
+                type="number" placeholder="Ширина (м)" fullWidth
+                value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
+            />
+        </Grid>
+        <Grid size={{ xs:12, lg:4 }}>
+            <TextField
+                type="number" placeholder="Высота (м)" fullWidth
+                value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
+            />
+        </Grid>
+    </Grid>
+</Grid>
 
-                        {/* Note */}
-                        <Grid size={{ xs:12 }}>
-                            <TextField
-                                label="Additional information" placeholder="Provide any extra details"
-                                fullWidth multiline minRows={3}
-                                value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
-                            />
-                        </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <Divider sx={{ my: 4 }} />
+                                     </Grid>
+                            {/* Pricing */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Stack direction="row" spacing={1}>
+                                    <Select
+                                        size="small" sx={{ minWidth: 100, alignSelf: "center" }}
+                                        value={form.currency} onChange={(e) => setField("currency", e.target.value as string)}
+                                    >
+                                        {(init ? Object.keys(init.currency) : ["USD"]).map((c) => (
+                                            <MenuItem key={c} value={c}>{c}</MenuItem>
+                                        ))}
+                                    </Select>
+                                    <TextField
+                                        label="Стоимость" type="number" fullWidth
+                                        value={form.price ?? ""} onChange={(e) => setField("price", num(e.target.value))}
+                                    />
+                                </Stack>
+                            </Grid>
 
-                        {/* Submit */}
-                        <Grid size={{ xs:12 }}>
-                            <Stack direction="row" justifyContent="center" mt={1.5}>
-                                <Button type="submit" variant="contained" sx={{ minWidth: 280 }} disabled={loadingInit}>
-                                    Publish cargo
+                            {/* Payments */}
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
+                                <Select
+                                    fullWidth 
+                                    displayEmpty
+                                    value={form.paymentMethod || ""} 
+                                    onChange={(e) => setField("paymentMethod", e.target.value as string)}
+                                    renderValue={(selected) => {
+                                        if (!selected || selected === "") {
+                                            return <em style={{ color: '#999' }}>Выберите метод оплаты</em>;
+                                        }
+                                        return selected;
+                                    }}
+                                >
+                                    {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
+                                        <MenuItem key={m} value={m}>{m}</MenuItem>
+                                    ))}
+                                </Select>
+                                {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
+                            </Grid>
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Срок оплаты</Typography>
+                                <Select
+                                    fullWidth 
+                                    displayEmpty
+                                    value={form.paymentTerm || ""} 
+                                    onChange={(e) => setField("paymentTerm", e.target.value as string)}
+                                    renderValue={(selected) => {
+                                        if (!selected || selected === "") {
+                                            return <em style={{ color: '#999' }}>Выберите срок оплаты</em>;
+                                        }
+                                        return selected;
+                                    }}
+                                >
+                                    {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
+                                        <MenuItem key={t} value={t}>{t}</MenuItem>
+                                    ))}
+                                </Select>
+                                {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
+                            </Grid>
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Торг</Typography>
+                                <Select
+                                    fullWidth 
+                                    displayEmpty
+                                    value={form.bargaining || ""} 
+                                    onChange={(e) => setField("bargaining", e.target.value as FormValues["bargaining"])}
+                                    renderValue={(selected) => {
+                                        if (!selected) {
+                                            return <em style={{ color: '#999' }}>Выберите возможность торга</em>;
+                                        }
+                                        return selected === "possible" ? "Возможен торг" : "Торг невозможен";
+                                    }}
+                                >
+                                    <MenuItem value="possible">Возможен торг</MenuItem>
+                                    <MenuItem value="none">Торг невозможен</MenuItem>
+                                </Select>
+                            </Grid>
+
+                            {/* Contacts: only Additional phone */}
+                            <Grid size={{ xs:12 }}>
+                                <Divider sx={{ my: 4 }} />
+                                <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>Выберите контакты, которые будут видны в заказе</Typography>
+                                <Typography variant="body2" color="text.secondary" mb={2}>
+                                Здесь отображаются доступные контакты, добавленные вами в разделе "Профиль". Вы можете изменить или добавить их в личном кабинете.
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
+                                <TextField
+                                    placeholder="+380971234567"
+                                    fullWidth
+                                    value={form.contactSecondary ?? ""}
+                                    onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
+                                    helperText={errors.contactSecondary ? errors.contactSecondary : ""}
+                                    error={!!errors.contactSecondary}
+                                />
+                                <Button
+                                    variant="text"
+                                    sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
+                                    onClick={() => setField("contactSecondary", "")}
+                                >
+                                    Очистить телефон
                                 </Button>
-                            </Stack>
+                            </Grid>
+
+                            {/* Note */}
+                            <Grid size={{ xs:12 }}>
+                                <TextField
+                                    label="Дополнительная информация" placeholder="Укажите дополнительную информацию" className="additional-info-field"
+                                    fullWidth multiline minRows={3}
+                                    value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
+                                />
+                            </Grid>
+
+                            {/* Submit */}
+                            <Grid size={{ xs:12 }}>
+                                <Stack direction="row" justifyContent="center" mt={1.5}>
+                                    <Button type="submit" variant="contained" sx={{ minWidth: 280 }} disabled={loadingInit}>
+                                        Добавить груз
+                                    </Button>
+                                </Stack>
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    </Box>
                 </Box>
             </Paper>
         </Box>
