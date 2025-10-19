@@ -6,7 +6,7 @@ WORKDIR /app
 ENV NODE_ENV=production npm_config_loglevel=warn
 
 COPY package.json package-lock.json* ./
-COPY scripts ./scripts
+#COPY scripts ./scripts
 RUN npm ci --omit=dev
 
 # Если нужны .env* — скопируй до билда
