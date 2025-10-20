@@ -16,6 +16,8 @@ import {
     transportUp, transportPatch, transportDelete
 } from "@/shared/api/shipmentsActions";
 
+import "./MyShipmentsPage.scss";
+
 /** Вспомогалка: парсим число из строки цены "1 250 EUR" → 1250 */
 function parsePriceAmount(price?: string | null): number | null {
     if (!price) return null;
@@ -171,14 +173,25 @@ export default function ShipmentsListPage({ scope }: Props) {
     return (
         <Box>
             <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2 }}>
-                <Typography variant="h6">
-                    {scope === "my" ? "My shipments" : "Search shipments"}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {scope === "my"
-                        ? "Your created orders with transport and cargo."
-                        : "Browse available cargo and transport offers."}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box className="shipments-page__icon">
+                    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/>
+                        <circle cx="18" cy="18" r="6" stroke="#4472B8" strokeWidth="2.5" fill="none"/>
+                        <path d="M24 24L28 28" stroke="#4472B8" strokeWidth="2.5" strokeLinecap="round"/>
+                    </svg>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography variant="h6" mb={1} className="shipments-page__title">
+                            {scope === "my" ? "My shipments" : "Поиск заказов"}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" mb={2} className="shipments-page__subtitle">
+                            {scope === "my"
+                                ? "Your created orders with transport and cargo."
+                                : "Найдите подходящие заказы от других пользователей"}
+                        </Typography>
+                    </Box>
+                </Box>
             </Paper>
 
             <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>

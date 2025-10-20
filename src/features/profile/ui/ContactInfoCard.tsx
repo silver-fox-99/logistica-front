@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-    Paper, Stack, Typography, TextField, InputAdornment, Button
+    Paper, Stack, Typography, TextField, InputAdornment, Button, Box
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { Controller, useForm } from "react-hook-form";
@@ -51,7 +51,6 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
         mode: "onTouched",
     });
 
-
     useEffect(() => {
         reset({
             phoneMain: data.phoneMain ?? "",
@@ -86,15 +85,26 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
         <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}>
             <form onSubmit={handleSubmit(submit)} noValidate>
                 <Stack spacing={1.5}>
-                    <Typography variant="h6">Contact information</Typography>
-                    <Typography variant="body2" color="text.secondary" maxWidth={720}>
-                        Your primary email is used to sign in and to receive important notifications.
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box className="contact-info-card__icon">
+                            <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/>
+                                <path d="M20.833 13.889c.48 0 .868.388.868.868v5.208h5.209a.868.868 0 1 1 0 1.736H21.7v5.209a.868.868 0 1 1-1.736 0V21.7h-5.208a.868.868 0 0 1 0-1.736h5.208v-5.208c0-.48.389-.868.868-.868" fill="#4472B8"/>
+                            </svg>
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" mb={1} className="contact-info-card__title">
+                                Общая информация
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" mb={2} className="contact-info-card__subtitle">
+                                Здесь отображается основная информация о вашем профиле. Эти данные видны другим пользователям.
+                            </Typography>
+                        </Box>
+                    </Box>
 
                     <Grid container spacing={2}>
-
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Primary phone</Typography>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Основной телефон</Typography>
                             <Controller
                                 name="phoneMain"
                                 control={control}
@@ -113,9 +123,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                             />
                         </Grid>
 
-
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Additional phone</Typography>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
                             <Controller
                                 name="phoneAlt"
                                 control={control}
@@ -134,9 +143,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                             />
                         </Grid>
 
-
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Telegram</Typography>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Telegram чат</Typography>
                             <TextField
                                 placeholder="@username"
                                 fullWidth
@@ -155,8 +163,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                             />
                         </Grid>
 
-
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>WhatsApp</Typography>
                             <Controller
                                 name="whatsapp"
@@ -176,8 +183,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                             />
                         </Grid>
 
-
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>E-mail</Typography>
                             <TextField
                                 placeholder="email@example.com"
@@ -197,10 +203,10 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                             />
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Geolocation</Typography>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Геолокация</Typography>
                             <TextField
-                                placeholder="Uzbekestan"
+                                placeholder="Узбекистан"
                                 fullWidth
                                 disabled={!editing}
                                 {...register("geo")}
@@ -218,20 +224,19 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Grid>
                     </Grid>
 
-
                     <Stack direction="row" justifyContent="flex-end" spacing={1}>
                         {editing ? (
                             <>
                                 <Button
                                     variant="outlined"
                                     onClick={() => {
-                                        reset();        // вернуть исходные значения
+                                        reset();
                                         setEditing(false);
                                     }}
                                     disabled={isSubmitting || saving}
                                     sx={{ textTransform: "none" }}
                                 >
-                                    Cancel
+                                    Отмена
                                 </Button>
                                 <Button
                                     type="submit"
@@ -239,7 +244,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                                     disabled={isSubmitting || saving}
                                     sx={{ textTransform: "none" }}
                                 >
-                                    Save
+                                    Сохранить
                                 </Button>
                             </>
                         ) : (
@@ -248,7 +253,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                                 onClick={() => setEditing(true)}
                                 sx={{ textTransform: "none" }}
                             >
-                                Edit
+                                Редактировать
                             </Button>
                         )}
                     </Stack>

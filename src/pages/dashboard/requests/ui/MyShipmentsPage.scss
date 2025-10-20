@@ -1,4 +1,26 @@
 .search-orders {  
+
+  .shipments-page {
+    &__icon {
+        flex-shrink: 0;
+    }
+    
+    &__title {
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    
+    &__subtitle {
+        line-height: 1.4;
+    }
+    
+    &__header-paper {
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 0 8px 8px !important;
+    }
+}
+
     &__filters {
       display: flex;
       justify-content: space-between;
@@ -119,5 +141,21 @@
     height: 24px;
   }
 
+.css-1csi76m-MuiPaper-root {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 32px !important;
+}
 
-  
+.css-j0ozid{
+  gap: 32px !important;
+}
+
+.css-18xxwmt-MuiTypography-root{
+  font-weight: 600 !important;
+}
+
+.css-dw3yii{
+  border: none !important;
+}

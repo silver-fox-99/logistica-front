@@ -1,6 +1,8 @@
 import { Paper, Stack, Avatar, Typography, Chip } from "@mui/material";
 import { FiUser } from "react-icons/fi";
 
+import "./ProfilePage.scss";
+
 type ProfileOverviewCardProps = {
     fullName: string;
     location?: string;
@@ -26,11 +28,12 @@ export default function ProfileOverviewCard({
                 borderColor: "divider",
                 bgcolor: "background.paper",
             }}
+            className="profile-overview-card"
         >
             <Stack spacing={1}>
-                <Typography variant="h6">Profile overview</Typography>
+                <Typography variant="h6">Обзор профиля</Typography>
                 <Typography variant="body2" color="text.secondary">
-                    This section shows the main information about your profile. These details are visible to other users.
+                    В этом разделе отображается основная информация о вашем профиле. Эти данные видны другим пользователям.
                 </Typography>
 
                 <Stack direction="row" spacing={2} alignItems="center" mt={1.5}>
@@ -56,8 +59,8 @@ export default function ProfileOverviewCard({
                         </Stack>
 
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ color: "text.secondary", mt: 0.5 }}>
-                            <Typography variant="body2"><b>Location:</b> {location}</Typography>
-                            <Typography variant="body2"><b>Registration date:</b> {registeredAt}</Typography>
+                            <Typography variant="body2"><b>Местоположение:</b> {location}</Typography>
+                            <Typography variant="body2"><b>Дата регистрации:</b> {registeredAt}</Typography>
                         </Stack>
                     </Stack>
                 </Stack>
