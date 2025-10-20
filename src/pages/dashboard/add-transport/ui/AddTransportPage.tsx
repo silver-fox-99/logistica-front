@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Box, Paper, Stack, Typography, TextField, Button, Divider,
-    FormControlLabel, Checkbox, Select, MenuItem, Chip, Autocomplete
+    Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, FormControl, InputAdornment
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { FiPlus, FiTrash2 } from "react-icons/fi";
+
 import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
 import {useNavigate} from "react-router-dom";
 
@@ -18,7 +18,7 @@ const VEHICLE_TYPES_LABELS: Record<string, string> = {
     PLATFORM: "Platform/Flatbed",
 };
 
-const PRICE_UNITS = ["Total", "Per ton", "Per km"] as const;
+ const PRICE_UNITS = ["Total", "Per ton", "Per km"] as const;
 
 type Geo = {
     id: string;
@@ -138,6 +138,7 @@ function PlaceRow({
         errorKey === "loadPlaces" || errorKey === "unloadPlaces" ? "Select at least country for the first point" : ""
     ) : "";
 
+
     return (
         <Stack spacing={1.25}>
             <Autocomplete
@@ -232,6 +233,12 @@ export default function AddTransportPage() {
         note: "",
     });
 
+    const currencyOptions = useMemo(
+        () => Object.keys(init?.currency ?? {}),
+        [init]
+    );
+    const currentCurrency = form.currency || currencyOptions[0] || "USD";
+
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const steps = [
@@ -262,9 +269,9 @@ export default function AddTransportPage() {
     const updateUnload = (idx: number, p: Place) =>
         setField("unloadPlaces", form.unloadPlaces.map((x, i) => (i === idx ? p : x)));
 
-    const addLoad = () => setField("loadPlaces", [...form.loadPlaces, { } as Place]);
+  //  const addLoad = () => setField("loadPlaces", [...form.loadPlaces, { } as Place]);
     const rmLoad = (i: number) => setField("loadPlaces", form.loadPlaces.filter((_, idx) => idx !== i));
-    const addUnload = () => setField("unloadPlaces", [...form.unloadPlaces, { } as Place]);
+  //  const addUnload = () => setField("unloadPlaces", [...form.unloadPlaces, { } as Place]);
     const rmUnload = (i: number) => setField("unloadPlaces", form.unloadPlaces.filter((_, idx) => idx !== i));
 
     const num = (v: string) => (v === "" ? undefined : Number(v));
@@ -569,21 +576,38 @@ export default function AddTransportPage() {
                             {activeStep === 3 && (
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
-                                        <Stack direction="row" spacing={1}>
-                                            <Select
-                                                size="small" sx={{ minWidth: 100, alignSelf: "center" }} 
-                                                value={form.currency} onChange={(e) => setField("currency", e.target.value as string)}
-                                            >
-                                                {(init ? Object.keys(init.currency) : ["USD"]).map((c) => (
-                                                    <MenuItem key={c} value={c}>{c}</MenuItem>
-                                                ))}
-                                            </Select>
-                                            <TextField
-                                                className="price-input-field"
-                                                label="Стоимость" type="number" fullWidth
-                                                value={form.price ?? ""} onChange={(e) => setField("price", num(e.target.value))}
+                                        <FormControl fullWidth>
+                                            <InputLabel shrink>Стоимость</InputLabel>
+                                            <OutlinedInput
+                                                label="Стоимость"
+                                                value={form.price ?? ""}
+                                                onChange={(e) => setField("price", num(e.target.value))}
+                                                type="number"
+                                                className=""
+                                                startAdornment={
+                                                    <InputAdornment position="start" sx={{ mr: 1 }}>
+                                                        <Select
+                                                            value={currentCurrency}
+                                                            onChange={(e) => setField("currency", e.target.value as string)}
+                                                            variant="standard"
+                                                            disableUnderline
+                                                            displayEmpty
+                                                            sx={{
+                                                                minWidth: 80,
+                                                                fontWeight: 500,
+                                                                ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
+                                                            }}
+                                                            disabled={currencyOptions.length === 0}
+                                                        >
+                                                            {currencyOptions.length > 0
+                                                                ? currencyOptions.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)
+                                                                : <MenuItem value="USD">USD</MenuItem>}
+                                                        </Select>
+                                                    </InputAdornment>
+                                                }
+                                                sx={{ borderRadius: 2, ".MuiOutlinedInput-input": { py: 1.25 } }}
                                             />
-                                        </Stack>
+                                        </FormControl>
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
@@ -866,24 +890,49 @@ export default function AddTransportPage() {
                                 />
                             </Grid>
 
-
                             <Grid size={{xs:12, md:6}}>
-                                <Stack direction="row" spacing={1}>
-                                    <Select
-                                        size="small" sx={{ minWidth: 100, alignSelf: "center" }} 
-                                        value={form.currency} onChange={(e) => setField("currency", e.target.value as string)}
-                                    >
-                                        {(init ? Object.keys(init.currency) : ["USD"]).map((c) => (
-                                            <MenuItem key={c} value={c}>{c}</MenuItem>
-                                        ))}
-                                    </Select>
-                                    <TextField
-                                        className="price-input-field"
-                                        label="Стоимость" type="number" fullWidth
-                                        value={form.price ?? ""} onChange={(e) => setField("price", num(e.target.value))}
-                                    />
-                                </Stack>
+                                <TextField
+                                    label="Масса (т):" type="number" fullWidth placeholder="Укажите вес"
+                                    value={form.capacityTons ?? ""} onChange={(e) => setField("capacityTons", num(e.target.value))}
+                                />
                             </Grid>
+
+
+                            <Grid size={{ xs:12, md:6 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel shrink>Стоимость</InputLabel>
+                                    <OutlinedInput
+                                        label="Стоимость"
+                                        value={form.price ?? ""}
+                                        onChange={(e) => setField("price", num(e.target.value))}
+                                        type="number"
+                                        className="price-input-field"
+                                        startAdornment={
+                                            <InputAdornment position="start" sx={{ mr: 1 }}>
+                                                <Select
+                                                    value={currentCurrency}
+                                                    onChange={(e) => setField("currency", e.target.value as string)}
+                                                    variant="standard"
+                                                    disableUnderline
+                                                    displayEmpty
+                                                    sx={{
+                                                        minWidth: 80,
+                                                        fontWeight: 500,
+                                                        ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
+                                                    }}
+                                                    disabled={currencyOptions.length === 0}
+                                                >
+                                                    {currencyOptions.length > 0
+                                                        ? currencyOptions.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)
+                                                        : <MenuItem value="USD">USD</MenuItem>}
+                                                </Select>
+                                            </InputAdornment>
+                                        }
+                                        sx={{ borderRadius: 2, ".MuiOutlinedInput-input": { py: 1.25 } }}
+                                    />
+                                </FormControl>
+                            </Grid>
+
 
                             <Grid size={{xs:12, md:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
