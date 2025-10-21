@@ -1,1 +1,1 @@
-export {default} from './ui/AdminGeoLocationPage.tsx'
+export {default} from './ui/AdminGeoLocationFlowPage.tsx'

@@ -1,28 +1,29 @@
 import api from "@/shared/api/axios.ts";
+import type {GeoItem, LookupOpt} from "@/shared/api/cargoApi.ts";
 
 /** ----- /transport/init ----- */
+export type TransportInitData = {
+    geos: GeoItem[];
+    transportPoints: Record<string, string>;
+    lookups: {
+        vehicleType: LookupOpt[];
+        paymentMethods: LookupOpt[];
+        paymentTerms: LookupOpt[];
+        bargainOptions: LookupOpt[];
+        currency: LookupOpt[];
+    };
+    maps: {
+        vehicleType: Record<string, string>;
+        paymentMethods: Record<string, string>;
+        paymentTerms: Record<string, string>;
+        bargainOptions: Record<string, string>;
+        currency: Record<string, string>;
+    };
+};
+
 export type TransportInitResponse = {
     status: boolean;
-    data: {
-        geos: Array<{
-            id: string;
-            parent_id: string | null;
-            type: "COUNTRY" | "REGION" | "CITY";
-            name: string;
-            code: string | null;
-            iso2: string | null;
-            slug: string | null;
-            is_active: boolean;
-            created_at: string;
-            updated_at: string;
-        }>;
-        currency: Record<string, string>;          // { USD: "USD", ... }
-        bargainOptions: Record<string, string>;    // { ALLOWED: "ALLOWED", ... }
-        paymentTerms: Record<string, string>;      // { PREPAID: "PREPAID", ... }
-        paymentMethods: Record<string, string>;    // { CASH: "CASH", ... }
-        vehicleType: Record<string, string>;       // { ANY: "ANY", TENT: "TENT", ... }
-        transportPoints: Record<string, string>;   // { DEPARTURE: "DEPARTURE", ARRIVAL: "ARRIVAL" }
-    };
+    data: TransportInitData;
     message: string;
 };
 

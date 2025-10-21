@@ -72,6 +72,15 @@ type FormValues = {
     note?: string;
 };
 
+type Init = Awaited<ReturnType<typeof transportApi.init>> | null;
+type Opt  = { slug: string; label: string };
+
+const getOpts = (name: keyof NonNullable<Init>["lookups"], initData: Init): Opt[] =>
+    initData?.lookups ? (initData.lookups[name] as Opt[]) : [];
+
+const findLabel = (opts: Opt[], slug?: string) =>
+    opts.find(o => o.slug === slug)?.label ?? slug ?? "";
+
 function buildGeoMaps(geos: Geo[]) {
     const byId = new Map<string, Geo>();
     const countries: Geo[] = [];
@@ -213,6 +222,12 @@ export default function AddTransportPage() {
     const [loadingInit, setLoadingInit] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
 
+    const vehicleOpts   = useMemo(() => getOpts("vehicleType", init),    [init]);
+    const payMethodOpts = useMemo(() => getOpts("paymentMethods", init), [init]);
+    const payTermOpts   = useMemo(() => getOpts("paymentTerms", init),   [init]);
+    const currencyOpts  = useMemo(() => getOpts("currency", init),       [init]);
+
+
     const [form, setForm] = useState<FormValues>({
         dateFrom: "", dateTo: "",
         loadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
@@ -233,11 +248,7 @@ export default function AddTransportPage() {
         note: "",
     });
 
-    const currencyOptions = useMemo(
-        () => Object.keys(init?.currency ?? {}),
-        [init]
-    );
-    const currentCurrency = form.currency || currencyOptions[0] || "USD";
+    const currentCurrency = form.currency || currencyOpts[0]?.slug || "USD";
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -254,12 +265,16 @@ export default function AddTransportPage() {
             setLoadingInit(true);
             const data = await transportApi.init();
             setInit(data);
-            const firstCurrency = Object.keys(data.currency)[0] || "USD";
-            const defVehicle = Object.keys(data.vehicleType)[0] || "ANY";
-            setForm((s) => ({ ...s, currency: firstCurrency, vehicleType: defVehicle }));
+
+            const currency = data.lookups.currency[0]?.slug     ?? "USD";
+            const vehicle  = data.lookups.vehicleType[0]?.slug  ?? "ANY";
+            setForm(s => ({ ...s, currency, vehicleType: vehicle }));
+
             setLoadingInit(false);
         })();
     }, []);
+
+
 
     const setField = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
         setForm((s) => ({ ...s, [key]: value }));
@@ -485,21 +500,15 @@ export default function AddTransportPage() {
                                             displayEmpty
                                             value={form.vehicleType}
                                             onChange={(e) => setField("vehicleType", e.target.value as string)}
-                                            renderValue={(selected) => {
-                                                if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите тип автомобиля</em>;
-                                                }
-                                                return VEHICLE_TYPES_LABELS[selected] ?? selected;
-                                            }}
+                                            renderValue={selected =>
+                                                !selected ? <em style={{color:'#999'}}>Выберите тип автомобиля</em>
+                                                    : findLabel(vehicleOpts, selected as string)
+                                            }
                                         >
                                             <MenuItem value="">
                                                 <em style={{ color: '#999' }}>Выберите тип автомобиля</em>
                                             </MenuItem>
-                                            {(init ? Object.keys(init.vehicleType) : ["ANY"]).map((key) => (
-                                                <MenuItem key={key} value={key}>
-                                                    {VEHICLE_TYPES_LABELS[key] ?? key}
-                                                </MenuItem>
-                                            ))}
+                                            {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
                                         {errors.vehicleType && (
                                             <Typography variant="caption" color="error">{errors.vehicleType}</Typography>
@@ -588,21 +597,17 @@ export default function AddTransportPage() {
                                                     <InputAdornment position="start" sx={{ mr: 1 }}>
                                                         <Select
                                                             value={currentCurrency}
-                                                            onChange={(e) => setField("currency", e.target.value as string)}
+                                                            onChange={e => setField("currency", e.target.value as string)}
                                                             variant="standard"
                                                             disableUnderline
                                                             displayEmpty
-                                                            sx={{
-                                                                minWidth: 80,
-                                                                fontWeight: 500,
-                                                                ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
-                                                            }}
-                                                            disabled={currencyOptions.length === 0}
+                                                            disabled={currencyOpts.length === 0}
                                                         >
-                                                            {currencyOptions.length > 0
-                                                                ? currencyOptions.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)
+                                                            {currencyOpts.length
+                                                                ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)
                                                                 : <MenuItem value="USD">USD</MenuItem>}
                                                         </Select>
+
                                                     </InputAdornment>
                                                 }
                                                 sx={{ borderRadius: 2, ".MuiOutlinedInput-input": { py: 1.25 } }}
@@ -612,24 +617,31 @@ export default function AddTransportPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
                                         <Select
-                                            fullWidth 
+                                            fullWidth
                                             displayEmpty
-                                            value={form.paymentMethod} 
-                                            onChange={(e) => setField("paymentMethod", e.target.value as string)}
-                                            renderValue={(selected) => {
-                                                if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите метод оплаты</em>;
-                                                }
-                                                return selected;
-                                            }}
+                                            value={form.paymentMethod || ""}
+                                            onChange={e => setField("paymentMethod", e.target.value as string)}
+                                            renderValue={sel => !sel
+                                                ? <em style={{color:'#999'}}>Выберите метод оплаты</em>
+                                                : findLabel(payMethodOpts, sel as string)}
                                         >
-                                            <MenuItem value="">
-                                                <em style={{ color: '#999' }}>Выберите метод оплаты</em>
-                                            </MenuItem>
-                                            {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
-                                                <MenuItem key={m} value={m}>{m}</MenuItem>
-                                            ))}
+                                            <MenuItem value=""><em style={{color:'#999'}}>Выберите метод оплаты</em></MenuItem>
+                                            {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
+
+                                        <Select
+                                            fullWidth
+                                            displayEmpty
+                                            value={form.paymentTerm || ""}
+                                            onChange={e => setField("paymentTerm", e.target.value as string)}
+                                            renderValue={sel => !sel
+                                                ? <em style={{color:'#999'}}>Выберите срок оплаты</em>
+                                                : findLabel(payTermOpts, sel as string)}
+                                        >
+                                            <MenuItem value=""><em style={{color:'#999'}}>Выберите срок оплаты</em></MenuItem>
+                                            {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                        </Select>
+
                                         {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
@@ -649,9 +661,7 @@ export default function AddTransportPage() {
                                             <MenuItem value="">
                                                 <em style={{ color: '#999' }}>Выберите срок оплаты</em>
                                             </MenuItem>
-                                            {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
-                                                <MenuItem key={t} value={t}>{t}</MenuItem>
-                                            ))}
+                                            {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
                                         {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                                     </Grid>
@@ -838,11 +848,7 @@ export default function AddTransportPage() {
                                 <MenuItem value="">
                                     <em style={{ color: '#999' }}>Выберите тип автомобиля</em>
                                 </MenuItem>
-                                {(init ? Object.keys(init.vehicleType) : ["ANY"]).map((key) => (
-                                    <MenuItem key={key} value={key}>
-                                        {VEHICLE_TYPES_LABELS[key] ?? key}
-                                    </MenuItem>
-                                ))}
+                                {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                             </Select>
                             {errors.vehicleType && (
                                 <Typography variant="caption" color="error">{errors.vehicleType}</Typography>
@@ -910,20 +916,15 @@ export default function AddTransportPage() {
                                         startAdornment={
                                             <InputAdornment position="start" sx={{ mr: 1 }}>
                                                 <Select
-                                                    value={currentCurrency}
-                                                    onChange={(e) => setField("currency", e.target.value as string)}
+                                                    value={form.currency || currencyOpts[0]?.slug || "USD"}
+                                                    onChange={e => setField("currency", e.target.value as string)}
                                                     variant="standard"
                                                     disableUnderline
                                                     displayEmpty
-                                                    sx={{
-                                                        minWidth: 80,
-                                                        fontWeight: 500,
-                                                        ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
-                                                    }}
-                                                    disabled={currencyOptions.length === 0}
+                                                    disabled={currencyOpts.length === 0}
                                                 >
-                                                    {currencyOptions.length > 0
-                                                        ? currencyOptions.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)
+                                                    {currencyOpts.length
+                                                        ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)
                                                         : <MenuItem value="USD">USD</MenuItem>}
                                                 </Select>
                                             </InputAdornment>
@@ -951,9 +952,7 @@ export default function AddTransportPage() {
                                     <MenuItem value="">
                                         <em style={{ color: '#999' }}>Выберите метод оплаты</em>
                                     </MenuItem>
-                                    {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
-                                        <MenuItem key={m} value={m}>{m}</MenuItem>
-                                    ))}
+                                    {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                 </Select>
                                 {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                             </Grid>
@@ -975,9 +974,7 @@ export default function AddTransportPage() {
                                     <MenuItem value="">
                                         <em style={{ color: '#999' }}>Выберите срок оплаты</em>
                                     </MenuItem>
-                                    {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
-                                        <MenuItem key={t} value={t}>{t}</MenuItem>
-                                    ))}
+                                    {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                 </Select>
                                 {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                             </Grid>

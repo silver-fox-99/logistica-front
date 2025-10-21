@@ -1,9 +1,23 @@
+export type PublicPointType =
+    | "DEPARTURE" | "ARRIVAL"
+    | "PICKUP" | "DROPOFF"
+    | "WAYPOINT";
+export type PublicPoint = {
+    id?: string;
+    type: PublicPointType;
+    country?: string | null;
+    region?: string | null;
+    city?: string | null;
+    address?: string | null;
+};
+
 export type PublicShipmentBase = {
     id: string;
     dates: { from: string; to: string };
     // краткое представление маршрута — пока без геокодинга (можно дополнить позже)
     routeFrom?: string;
     routeTo?: string;
+    points: PublicPoint[];
     metrics?: string[]; // например: ["22 t", "96 m3", "2 cars"]
     tags?: string[];    // ["ANY", "FULL", "PALLETS"]
     price?: string;     // "USD 500.00"
@@ -34,6 +48,7 @@ export type PublicCargoApi = {
     payment_method: string;
     payment_term: string;
     bargain: string;
+    points: PublicPoint[];
     contact_extra_phone: string | null;
     note: string | null;
     created_at: string;
@@ -60,6 +75,7 @@ export type PublicTransportApi = {
     payment_method: string;
     payment_term: string;
     bargain: string;
+    points: PublicPoint[];
     contact_extra_phone: string | null;
     note: string | null;
     created_at: string;

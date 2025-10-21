@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, TextField, MenuItem, Select, InputLabel, FormControl, FormHelperText, Autocomplete } from "@mui/material";
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, TextField,
+    MenuItem, Select, InputLabel, FormControl, FormHelperText, Autocomplete
+} from "@mui/material";
 import type { GeoLocation, LocationType, CreateLocationDto, UpdateLocationDto } from "@/shared/api/adminGeoApi";
 
 const TYPES: LocationType[] = ["COUNTRY", "REGION", "CITY", "DISTRICT", "OTHER"];
@@ -40,7 +43,7 @@ export default function GeoLocationDialog({
         setErrors({});
     }, [initial, open, all]);
 
-    // Родителя нельзя выбирать самого себя и его прямых/косвенных детей (простейшая защита от циклов)
+    // запрещаем выбирать самого себя и своих потомков
     const unavailableIds = useMemo(() => {
         if (!initial?.id) return new Set<string>();
         const set = new Set<string>([initial.id]);
@@ -51,16 +54,27 @@ export default function GeoLocationDialog({
         return set;
     }, [all, initial?.id]);
 
-    const parentOptions = useMemo(
-        () => all.filter(i => !unavailableIds.has(i.id)),
-        [all, unavailableIds]
-    );
+    // лёгкая логика согласованности типов:
+    // - COUNTRY: без родителя
+    // - REGION: родитель — COUNTRY или null
+    // - CITY/DISTRICT/OTHER: родитель — любой (COUNTRY/REGION/…); это даёт гибкость
+    const parentOptions = useMemo(() => {
+        let opts = all.filter(i => !unavailableIds.has(i.id));
+        if (type === "COUNTRY") {
+            opts = []; // без родителя
+        }
+        if (type === "REGION") {
+            opts = opts.filter(i => i.type === "COUNTRY" || i.parent_id === null);
+        }
+        return opts;
+    }, [all, unavailableIds, type]);
 
     const validate = () => {
         const e: Record<string, string | undefined> = {};
         if (!name.trim()) e.name = "Name is required";
         if (!type) e.type = "Type is required";
         if (type === "COUNTRY" && iso2 && !/^[A-Za-z]{2}$/.test(iso2)) e.iso2 = "ISO2 must be 2 letters";
+        if (type === "COUNTRY" && parent) e.type = "Country can't have a parent";
         if (code && code.length > 32) e.code = "Max length is 32";
         if (slug && slug.length > 200) e.slug = "Max length is 200";
         setErrors(e);
@@ -71,7 +85,8 @@ export default function GeoLocationDialog({
         if (!validate()) return;
         if (mode === "create") {
             const dto: CreateLocationDto = {
-                type, name: name.trim(),
+                type,
+                name: name.trim(),
                 parent_id: parent?.id || undefined,
                 code: code || undefined,
                 iso2: iso2 || undefined,
@@ -117,6 +132,7 @@ export default function GeoLocationDialog({
                         value={parent}
                         onChange={(_, v) => setParent(v)}
                         renderInput={(p) => <TextField {...p} size="small" label="Parent (optional)" />}
+                        disabled={type === "COUNTRY"}
                     />
 
                     <TextField

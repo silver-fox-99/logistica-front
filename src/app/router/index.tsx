@@ -27,6 +27,7 @@ import AdminTransportPage from "@/pages/admin/transport";
 import AdminBlackListPage from "@/pages/admin/ip-blacklist";
 import AdminActivityLogsPage from "@/pages/admin/activity-log";
 import AdminGeoLocationsPage from "@/pages/admin/geo-location";
+import AdminLookupsPage from "@/pages/admin/admin-lookups/ui/AdminLookupsPage.tsx";
 
 
 const AdminOverviewPage = () => <div>Admin overview</div>
@@ -81,8 +82,9 @@ const router = createBrowserRouter([
             { path: "cargo", element: <AdminCargoPage /> },
             { path: "transport", element: <AdminTransportPage />},
             { path: "geo", element: <AdminGeoLocationsPage />},
-            { path:  "black-list", element: <AdminBlackListPage />},
-            { path: "activity-logs", element: <AdminActivityLogsPage />}
+            { path: "black-list", element: <AdminBlackListPage />},
+            { path: "activity-logs", element: <AdminActivityLogsPage />},
+            { path: "initial-data", element: <AdminLookupsPage />}
         ],
     },
     {

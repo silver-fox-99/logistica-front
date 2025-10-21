@@ -1,0 +1,160 @@
+import { useState } from "react";
+import Grid from "@mui/material/Grid";
+import { Card, CardContent, Stack, TextField, InputAdornment, Button } from "@mui/material";
+import { FiUser, FiPhone, FiMail, FiSave, FiLoader } from "react-icons/fi";
+import { useForm } from "react-hook-form";
+import { adminUserApi } from "@/shared/api/adminUserApi";
+import type { AdminUser } from "@/shared/api/adminUsersApi";
+import { diffPayload } from "../model/diffPayload";
+
+const phoneRegex = /^\+?[1-9]\d{1,19}$/;
+
+type FormValues = {
+    first_name?: string | null;
+    last_name?: string | null;
+    phone?: string;
+    email?: string | null;
+    avatar?: string | null;
+};
+
+export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: AdminUser) => void; }) {
+    const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm<FormValues>({
+        defaultValues: {
+            first_name: user.first_name ?? "",
+            last_name:  user.last_name ?? "",
+            phone:      user.phone ?? "",
+            email:      user.email ?? "",
+            avatar:     user.avatar ?? "",
+        },
+    });
+
+    const [busy, setBusy] = useState(false);
+
+    const submit = async (values: FormValues) => {
+        setBusy(true);
+        try {
+            const normalized: FormValues = {
+                first_name: values.first_name?.trim() ? values.first_name.trim() : null,
+                last_name:  values.last_name?.trim()  ? values.last_name.trim()  : null,
+                phone:      values.phone?.trim()      ? values.phone.trim()      : undefined,
+                email:      values.email?.trim()      ? values.email.trim()      : null,
+                avatar:     values.avatar?.trim()     ? values.avatar.trim()     : null,
+            };
+
+            const payload = diffPayload<FormValues>(
+                {
+                    first_name: user.first_name ?? null,
+                    last_name:  user.last_name ?? null,
+                    phone:      user.phone ?? undefined,
+                    email:      user.email ?? null,
+                    avatar:     user.avatar ?? null,
+                },
+                normalized
+            );
+
+            if (payload.phone && (!phoneRegex.test(payload.phone) || payload.phone.length < 10 || payload.phone.length > 20)) {
+                alert("Phone must be E.164 and 10–20 chars");
+                setBusy(false);
+                return;
+            }
+            if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+                alert("Email is invalid");
+                setBusy(false);
+                return;
+            }
+            if (payload.avatar && !/^https?:\/\//i.test(payload.avatar)) {
+                alert("Avatar must be a valid URL");
+                setBusy(false);
+                return;
+            }
+
+            if (Object.keys(payload).length) {
+                await adminUserApi.patch(user.id, payload as any);
+            }
+            const res = await adminUserApi.get(user.id);
+            onUpdated(res.data.user);
+            reset({
+                first_name: res.data.user.first_name ?? "",
+                last_name:  res.data.user.last_name ?? "",
+                phone:      res.data.user.phone ?? "",
+                email:      res.data.user.email ?? "",
+                avatar:     res.data.user.avatar ?? "",
+            });
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    return (
+        <Card variant="outlined" sx={{ borderRadius: 2 }}>
+            <CardContent>
+                <form onSubmit={handleSubmit(submit)}>
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <Stack spacing={2}>
+                                <TextField
+                                    label="First name"
+                                    {...register("first_name", {
+                                        setValueAs: (v) => (typeof v === "string" ? v : ""),
+                                        maxLength: { value: 120, message: "Max 120 chars" },
+                                    })}
+                                    error={!!errors.first_name}
+                                    helperText={errors.first_name?.message}
+                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiUser/></InputAdornment> }}
+                                />
+                                <TextField
+                                    label="Last name"
+                                    {...register("last_name", {
+                                        setValueAs: (v) => (typeof v === "string" ? v : ""),
+                                        maxLength: { value: 120, message: "Max 120 chars" },
+                                    })}
+                                    error={!!errors.last_name}
+                                    helperText={errors.last_name?.message}
+                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiUser/></InputAdornment> }}
+                                />
+                                <TextField
+                                    label="Phone (E.164)"
+                                    {...register("phone", {
+                                        setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                        validate: (v) => !v || (phoneRegex.test(v) && v.length >= 10 && v.length <= 20) || "Phone must be E.164 and 10–20 chars",
+                                    })}
+                                    error={!!errors.phone}
+                                    helperText={errors.phone?.message}
+                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiPhone/></InputAdornment> }}
+                                />
+                            </Stack>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <Stack spacing={2}>
+                                <TextField
+                                    label="Email"
+                                    {...register("email", {
+                                        setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                        validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Email is invalid",
+                                    })}
+                                    error={!!errors.email}
+                                    helperText={errors.email?.message}
+                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiMail/></InputAdornment> }}
+                                />
+                                <TextField
+                                    label="Avatar URL"
+                                    {...register("avatar", {
+                                        setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                        validate: (v) => !v || /^https?:\/\//i.test(v) || "Must be a valid URL",
+                                    })}
+                                    error={!!errors.avatar}
+                                    helperText={errors.avatar?.message}
+                                />
+                            </Stack>
+                        </Grid>
+                        <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end">
+                            <Button type="submit" variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>} disabled={busy || !isDirty}>
+                                {busy ? "Saving…" : "Save general info"}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </form>
+            </CardContent>
+        </Card>
+    );
+}

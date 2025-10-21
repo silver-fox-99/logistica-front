@@ -4,7 +4,7 @@ import {
     AppBar, Toolbar, Typography, Box, Container, Paper, Stack,
     List, ListItemButton, ListItemIcon, ListItemText, Divider, IconButton
 } from "@mui/material";
-import { FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2 } from "react-icons/fi";
+import {FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2, FiDatabase} from "react-icons/fi";
 import React from "react";
 import {BsGeoAltFill} from "react-icons/bs";
 
@@ -43,6 +43,7 @@ export default function AdminLayout() {
                                 <NavItem to="/admin/cargo" icon={<FiPackage />} label="Cargo" />
                                 <NavItem to="/admin/transport" icon={<FiPackage />} label="Transport" />
                                 <NavItem to="/admin/geo" icon={<BsGeoAltFill />} label="Geo locations" />
+                                <NavItem to="/admin/initial-data" icon={<FiDatabase  />} label="Initial data" />
                                 <NavItem to="/admin/black-list" icon={<FiShield />} label="Black list" />
                                 <NavItem to="/admin/activity-logs" icon={<FiSettings />} label="Activity logs" />
                             </List>

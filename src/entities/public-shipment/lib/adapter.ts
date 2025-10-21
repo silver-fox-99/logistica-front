@@ -21,6 +21,7 @@ export function adaptCargo(a: PublicCargoApi): PublicShipmentBase {
         metrics,
         tags,
         price,
+        points: a.points,
         note: a.note ?? undefined,
         createdAt: a.created_at,
     };
@@ -46,6 +47,7 @@ export function adaptTransport(a: PublicTransportApi): PublicShipmentBase {
         metrics,
         tags,
         price,
+        points: a.points,
         note: a.note ?? undefined,
         createdAt: a.created_at,
     };

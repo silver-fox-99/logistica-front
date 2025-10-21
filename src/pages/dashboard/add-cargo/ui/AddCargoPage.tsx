@@ -25,6 +25,10 @@ type Geo = {
     updated_at: string;
 };
 
+type LookupOpt = { slug: string; label: string };
+
+type InitData = Awaited<ReturnType<typeof cargoApi.init>> | null;
+
 /* ===== local form types ===== */
 type Place = {
     countryId?: string | null;
@@ -63,6 +67,14 @@ type FormValues = {
     contactSecondary?: string; // -> contact_extra_phone
     note?: string;
 };
+
+const getOpts = (
+    name: keyof NonNullable<NonNullable<InitData>["lookups"]>,
+    initData: InitData
+): LookupOpt[] => initData?.lookups ? (initData.lookups[name] as LookupOpt[]) : [];
+
+const findLabel = (opts: LookupOpt[], slug?: string) =>
+    opts.find(o => o.slug === slug)?.label ?? slug ?? "";
 
 /* ===== geo helpers ===== */
 function buildGeoMaps(geos: Geo[]) {
@@ -180,10 +192,12 @@ export default function AddCargoPage() {
     const [loadingInit, setLoadingInit] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
 
-    const currencyOptions = useMemo(
-        () => Object.keys(init?.currency ?? {}),
-        [init]
-    );
+    const currencyOpts   = useMemo(() => getOpts("currency", init),        [init]);
+    const vehicleOpts    = useMemo(() => getOpts("vehicleType", init),     [init]);
+    const loadOpts       = useMemo(() => getOpts("loadType", init),        [init]);
+    const cargoOpts      = useMemo(() => getOpts("cargoTypes", init),      [init]);
+    const payMethodOpts  = useMemo(() => getOpts("paymentMethods", init),  [init]);
+    const payTermOpts    = useMemo(() => getOpts("paymentTerms", init),    [init]);
 
 
     const [form, setForm] = useState<FormValues>({
@@ -213,8 +227,10 @@ export default function AddCargoPage() {
         note: "",
     });
 
-    const currentCurrency = form.currency || currencyOptions[0] || "USD";
+    const currentCurrency = form.currency || currencyOpts[0]?.slug || "USD";
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+
 
     const steps = [
         'Даты и маршруты',
@@ -230,11 +246,11 @@ export default function AddCargoPage() {
             const data = await cargoApi.init(); // GET /cargo/init
             setInit(data);
             // дефолты
-            const currency = Object.keys(data.currency)[0] || "USD";
-            const vehicle = Object.keys(data.vehicleType)[0] || "ANY";
-            const loadType = Object.keys(data.loadType)[0] || "";
-            const cargoType = Object.keys(data.cargoTypes)[0] || "";
-            setForm((s) => ({ ...s, currency, vehicleType: vehicle, loadType, cargoType }));
+            const currency = data.lookups.currency[0]?.slug   ?? "USD";
+            const vehicle  = data.lookups.vehicleType[0]?.slug ?? "ANY";
+            const loadType = data.lookups.loadType[0]?.slug    ?? "FULL";
+            const cargo    = data.lookups.cargoTypes[0]?.slug  ?? "";
+            setForm((s) => ({ ...s, currency, vehicleType: vehicle, loadType, cargoType: cargo }));
             setLoadingInit(false);
         })();
     }, []);
@@ -267,11 +283,13 @@ export default function AddCargoPage() {
         if (!form.vehicleType) e.vehicleType = "Select vehicle type";
         if (!form.loadType) e.loadType = "Select load type";
         if (!form.paymentMethod) e.paymentMethod = "Select payment method";
-        if (!form.paymentTerm) e.paymentTerm = "Select payment term";
+        // if (!form.paymentTerm) e.paymentTerm = "Select payment term";
 
-            if (form.dims.length == null || form.dims.width == null || form.dims.height == null) {
-                e.dims = "Fill all dimensions";
-        }
+         if (form.dims.enabled) {
+               if (form.dims.length == null || form.dims.width == null || form.dims.height == null) {
+                     e.dims = "Fill all dimensions";
+                   }
+             }
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
             e.contactSecondary = "Invalid phone format. Use + and digits, 10–20 digits total.";
         }
@@ -328,7 +346,7 @@ export default function AddCargoPage() {
             price_amount: v.price ?? 0,
 
             // обязательно передаём валидное значение
-            payment_method: v.paymentMethod as CreateCargoDto["payment_method"],
+            payment_method: (v.paymentMethod || undefined) as CreateCargoDto["payment_method"],
             // допускается null
             payment_term: (v.paymentTerm || null) as CreateCargoDto["payment_term"],
 
@@ -476,6 +494,7 @@ export default function AddCargoPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип груза</Typography>
                                         <Select
+                                            variant="outlined"
                                             fullWidth 
                                             displayEmpty
                                             value={form.cargoType || ""} 
@@ -484,12 +503,12 @@ export default function AddCargoPage() {
                                                 if (!selected || selected === "") {
                                                     return <em style={{ color: '#999' }}>Выберите тип груза</em>;
                                                 }
-                                                return selected;
+                                                return findLabel(cargoOpts, selected as string);
                                             }}
                                         >
-                                            {(init ? Object.keys(init.cargoTypes) : []).map((k) => (
-                                                <MenuItem key={k} value={k}>{k}</MenuItem>
-                                            ))}
+                                            {cargoOpts.map(o => (
+                                                   <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
+                                                 ))}
                                         </Select>
                                         {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
                                     </Grid>
@@ -511,9 +530,7 @@ export default function AddCargoPage() {
                                             <MenuItem value="">
                                                 <em style={{ color: '#999' }}>Выберите тип</em>
                                             </MenuItem>
-                                            {(init ? Object.keys(init.vehicleType) : []).map((k) => (
-                                                <MenuItem key={k} value={k}>{k}</MenuItem>
-                                            ))}
+                                            {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
                                         {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
                                     </Grid>
@@ -532,9 +549,7 @@ export default function AddCargoPage() {
                                                 return selected;
                                             }}
                                         >
-                                            {(init ? Object.keys(init.loadType) : []).map((k) => (
-                                                <MenuItem key={k} value={k}>{k}</MenuItem>
-                                            ))}
+                                            {loadOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
                                         {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
                                     </Grid>
@@ -640,10 +655,10 @@ export default function AddCargoPage() {
                                                                 fontWeight: 500,
                                                                 ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
                                                             }}
-                                                            disabled={currencyOptions.length === 0}
+                                                            disabled={currencyOpts.length === 0}
                                                         >
-                                                            {currencyOptions.length > 0
-                                                                ? currencyOptions.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)
+                                                            {currencyOpts.length
+                                                                ? currencyOpts.map((c: LookupOpt) => <MenuItem key={c.slug} value={c.slug}>{c.label}</MenuItem>)
                                                                 : <MenuItem value="USD">USD</MenuItem>}
                                                         </Select>
                                                     </InputAdornment>
@@ -666,9 +681,7 @@ export default function AddCargoPage() {
                                                 return selected;
                                             }}
                                         >
-                                            {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
-                                                <MenuItem key={m} value={m}>{m}</MenuItem>
-                                            ))}
+                                            {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
                                         {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                                     </Grid>
@@ -686,9 +699,7 @@ export default function AddCargoPage() {
                                                 return selected;
                                             }}
                                         >
-                                            {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
-                                                <MenuItem key={t} value={t}>{t}</MenuItem>
-                                            ))}
+                                            {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
                                         {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                                     </Grid>
@@ -867,8 +878,8 @@ export default function AddCargoPage() {
                                         return selected;
                                     }}
                             >
-                                {(init ? Object.keys(init.cargoTypes) : []).map((k) => (
-                                    <MenuItem key={k} value={k}>{k}</MenuItem>
+                                {cargoOpts.map((o: LookupOpt) => (
+                                    <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
                                 ))}
                             </Select>
                             {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
@@ -891,8 +902,8 @@ export default function AddCargoPage() {
                                     <MenuItem value="">
                                         <em style={{ color: '#999' }}>Выберите тип</em>
                                     </MenuItem>
-                                    {(init ? Object.keys(init.vehicleType) : []).map((k) => (
-                                    <MenuItem key={k} value={k}>{k}</MenuItem>
+                                {vehicleOpts.map((o: LookupOpt) => (
+                                    <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
                                 ))}
                             </Select>
                             {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
@@ -912,8 +923,8 @@ export default function AddCargoPage() {
                                         return selected;
                                     }}
                                 >
-                                    {(init ? Object.keys(init.loadType) : []).map((k) => (
-                                    <MenuItem key={k} value={k}>{k}</MenuItem>
+                                {loadOpts.map((o: LookupOpt) => (
+                                    <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
                                 ))}
                             </Select>
                             {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
@@ -1022,11 +1033,11 @@ export default function AddCargoPage() {
                                                         fontWeight: 500,
                                                         ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
                                                     }}
-                                                    disabled={currencyOptions.length === 0}
+                                                    disabled={currencyOpts.length === 0}
                                                 >
-                                                    {currencyOptions.length > 0
-                                                        ? currencyOptions.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)
-                                                        : <MenuItem value="USD">USD</MenuItem>}
+                                                    {currencyOpts.length
+                                                       ? currencyOpts.map(c => <MenuItem key={c.slug} value={c.slug}>{c.label}</MenuItem>)
+                                                          : <MenuItem value="USD">USD</MenuItem>}
                                                 </Select>
                                             </InputAdornment>
                                         }
@@ -1052,8 +1063,8 @@ export default function AddCargoPage() {
                                         return selected;
                                     }}
                             >
-                                {(init ? Object.keys(init.paymentMethods) : []).map((m) => (
-                                    <MenuItem key={m} value={m}>{m}</MenuItem>
+                                {payMethodOpts.map((o: LookupOpt) => (
+                                    <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
                                 ))}
                             </Select>
                             {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
@@ -1073,8 +1084,8 @@ export default function AddCargoPage() {
                                         return selected;
                                     }}
                             >
-                                {(init ? Object.keys(init.paymentTerms) : []).map((t) => (
-                                    <MenuItem key={t} value={t}>{t}</MenuItem>
+                                {payTermOpts.map((o: LookupOpt) => (
+                                    <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
                                 ))}
                             </Select>
                             {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
