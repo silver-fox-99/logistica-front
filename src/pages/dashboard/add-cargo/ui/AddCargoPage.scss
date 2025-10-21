@@ -163,19 +163,8 @@
   & .MuiAutocomplete-root {
     .MuiAutocomplete-endAdornment {
       .MuiAutocomplete-popupIndicator {
-        background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M.195.195c.26-.26.683-.26.943 0l3.529 3.529L8.195.195a.667.667 0 0 1 .943.943l-4 4a.667.667 0 0 1-.943 0l-4-4a.667.667 0 0 1 0-.943' fill='%23717680'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 10px 6px;
-        width: 10px;
-        height: 6px;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        
-        svg {
-          display: none;
-        }
+
+
       }
     }
     

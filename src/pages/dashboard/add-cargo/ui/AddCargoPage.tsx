@@ -43,28 +43,28 @@ type FormValues = {
     dateFrom: string;
     dateTo: string;
 
-    pickups: Place[];     // PICKUP points
-    dropoffs: Place[];    // DROPOFF points
+    pickups: Place[];
+    dropoffs: Place[];
 
-    cargoType: string;    // init.cargoTypes key
-    vehicleType: string;  // init.vehicleType key
-    loadType: string;     // init.loadType key (FULL/PARTIAL/ANY)
+    cargoType: string;
+    vehicleType: string;
+    loadType: string;
     allowPartial: boolean;
 
-    vehiclesCount?: number;   // cars_count
-    palletsCount?: number;    // pallets_count
-    weightTons?: number;      // weight_t
-    volumeM3?: number;        // volume_m3
+    vehiclesCount?: number;
+    palletsCount?: number;
+    weightTons?: number;
+    volumeM3?: number;
 
-    dims: Dims;               // has_dimensions + length/width/height
+    dims: Dims;
 
-    currency: string;         // init.currency key
-    price?: number;           // price_amount
-    paymentMethod: string;    // init.paymentMethods key
-    paymentTerm: string;      // init.paymentTerms key
-    bargaining: "possible" | "none"; // -> ALLOWED/NOT_ALLOWED
+    currency: string;
+    price?: number;
+    paymentMethod: string;
+    paymentTerm: string;
+    bargaining: "possible" | "none";
 
-    contactSecondary?: string; // -> contact_extra_phone
+    contactSecondary?: string;
     note?: string;
 };
 
@@ -109,7 +109,7 @@ function buildGeoMaps(geos: Geo[]) {
 
 /* ===== vertical PlaceRow (country → region → city) ===== */
 type PlaceRowProps = {
-    labelPrefix: string; // "Pickup" | "Dropoff"
+    labelPrefix: string;
     place: Place;
     onChange: (p: Place) => void;
     geos: Geo[] | null;
@@ -141,11 +141,12 @@ function PlaceRow({
             <Autocomplete
                 options={countries}
                 getOptionLabel={(o) => o.name}
-                value={countryValue}
+                
                 onChange={(_, v) => onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null })}
                 renderInput={(params) => (
                     <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Страна загрузки" : "Страна выгрузки"} placeholder="Начните вводить страну" />
                 )}
+                disableClearable={true}
             />
 
             <Autocomplete
@@ -243,9 +244,8 @@ export default function AddCargoPage() {
     useEffect(() => {
         (async () => {
             setLoadingInit(true);
-            const data = await cargoApi.init(); // GET /cargo/init
+            const data = await cargoApi.init();
             setInit(data);
-            // дефолты
             const currency = data.lookups.currency[0]?.slug   ?? "USD";
             const vehicle  = data.lookups.vehicleType[0]?.slug ?? "ANY";
             const loadType = data.lookups.loadType[0]?.slug    ?? "FULL";
@@ -265,9 +265,7 @@ export default function AddCargoPage() {
     const updateDropoff = (idx: number, p: Place) =>
         setField("dropoffs", form.dropoffs.map((x, i) => (i === idx ? p : x)));
 
-  //  const addPickup = () => setField("pickups", [...form.pickups, {} as Place]);
     const rmPickup = (i: number) => setField("pickups", form.pickups.filter((_, idx) => idx !== i));
-  //  const addDropoff = () => setField("dropoffs", [...form.dropoffs, {} as Place]);
     const rmDropoff = (i: number) => setField("dropoffs", form.dropoffs.filter((_, idx) => idx !== i));
 
     /* ===== validation ===== */
@@ -283,7 +281,6 @@ export default function AddCargoPage() {
         if (!form.vehicleType) e.vehicleType = "Select vehicle type";
         if (!form.loadType) e.loadType = "Select load type";
         if (!form.paymentMethod) e.paymentMethod = "Select payment method";
-        // if (!form.paymentTerm) e.paymentTerm = "Select payment term";
 
          if (form.dims.enabled) {
                if (form.dims.length == null || form.dims.width == null || form.dims.height == null) {
@@ -311,7 +308,6 @@ export default function AddCargoPage() {
         const firstPickup = v.pickups[0] || {};
         const firstDrop   = v.dropoffs[0] || {};
 
-        // берём названия из init по id
         const getName = (id?: string | null) =>
             id ? (geoById.get(id)?.name ?? "") : "";
 
@@ -321,7 +317,6 @@ export default function AddCargoPage() {
             date_from: v.dateFrom || null,
             date_to: v.dateTo || null,
 
-            // ⬇️ добавили в payload
             country_from: countryFromName,
 
             vehicle_type: (v.vehicleType as CreateCargoDto["vehicle_type"]) || "ANY",
@@ -329,7 +324,6 @@ export default function AddCargoPage() {
             cargo_type: (v.cargoType as CreateCargoDto["cargo_type"]) || "GENERAL",
             allow_partial_load: !!v.allowPartial,
 
-            // всегда number | null (не undefined!)
             weight_t: v.weightTons ?? null,
             volume_m3: v.volumeM3 ?? null,
             cars_count: v.vehiclesCount ?? null,
@@ -345,9 +339,7 @@ export default function AddCargoPage() {
             price_currency: v.currency,
             price_amount: v.price ?? 0,
 
-            // обязательно передаём валидное значение
             payment_method: (v.paymentMethod || undefined) as CreateCargoDto["payment_method"],
-            // допускается null
             payment_term: (v.paymentTerm || null) as CreateCargoDto["payment_term"],
 
             bargain,
@@ -394,7 +386,6 @@ export default function AddCargoPage() {
 
     return (
         <Box className="add-cargo-page">
-            {/* header */}
             <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }} className="add-cargo-page__paper">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} className="add-cargo-page__header">
                     <Box className="add-cargo-page__icon">
@@ -418,7 +409,6 @@ export default function AddCargoPage() {
                 {/* Мобильная версия - Stepper экранами */}
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                 <Box component="form" noValidate onSubmit={onSubmit}>
-                        {/* Прогресс-бар сверху */}
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                 Шаг {activeStep + 1} из {steps.length}: {steps[activeStep]}
@@ -436,7 +426,6 @@ export default function AddCargoPage() {
                             </Box>
                         </Box>
 
-                        {/* Контент экрана */}
                         <Box sx={{ minHeight: '400px', mb: 3 }}>
                             {activeStep === 0 && (
                     <Grid container spacing={2}>
@@ -729,17 +718,17 @@ export default function AddCargoPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>Выберите контакты, которые будут видны в заказе</Typography>
                                         <Typography variant="body2" color="text.secondary" mb={2}>
-                                            Additional phone will be shown in the order.
+                                            Здесь отображаются доступные контакты, добавленные вами в разделе "Профиль". Вы можете изменить или добавить их в личном кабинете.
                                         </Typography>
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Additional phone</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
                                         <TextField
                                             placeholder="+380971234567"
                                             fullWidth
                                             value={form.contactSecondary ?? ""}
                                             onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
-                                            helperText={errors.contactSecondary ? errors.contactSecondary : "Optional. Format: + and 10–20 digits."}
+                                            helperText={errors.contactSecondary ? errors.contactSecondary : ""}
                                             error={!!errors.contactSecondary}
                                         />
                                         <Button
@@ -747,12 +736,12 @@ export default function AddCargoPage() {
                                             sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
                                             onClick={() => setField("contactSecondary", "")}
                                         >
-                                            Clear phone
+                                            Очистить телефон
                                         </Button>
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label="Additional information" placeholder="Provide any extra details"
+                                            label="Дополнительная информация" placeholder="Укажите дополнительную информацию"
                                             fullWidth multiline minRows={3}
                                             value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
                                         />
@@ -761,7 +750,6 @@ export default function AddCargoPage() {
                             )}
                         </Box>
 
-                        {/* Навигация внутри content-paper */}
                         <Box sx={{ 
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -803,19 +791,18 @@ export default function AddCargoPage() {
                     </Box>
                 </Box>
 
-                {/* Десктопная версия - обычная форма */}
+                {/* Десктопная версия */}
                 <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                     <Box component="form" noValidate onSubmit={onSubmit}>
                         <Grid container spacing={2}>
-                            {/* Даты */}
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                             <TextField
                                     label="Дата загрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
                                 value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
                                 error={!!errors.dateFrom} helperText={errors.dateFrom}
                             />
                         </Grid>
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                             <TextField
                                     label="Дата выгрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
                                 value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
@@ -823,8 +810,7 @@ export default function AddCargoPage() {
                             />
                         </Grid>
 
-                        {/* PICKUP (left) */}
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                             <Stack spacing={1}>
                                 {form.pickups.map((p, i) => (
                                     <PlaceRow
@@ -841,8 +827,7 @@ export default function AddCargoPage() {
                             </Stack>
                         </Grid>
 
-                        {/* DROPOFF (right) */}
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                             <Stack spacing={1}>
                                 {form.dropoffs.map((p, i) => (
                                     <PlaceRow
@@ -863,8 +848,7 @@ export default function AddCargoPage() {
                                         <Divider sx={{ my: 4 }} />
                             </Grid>
 
-                        {/* Enums from init */}
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип груза</Typography>
                             <Select
                                     fullWidth 
@@ -885,7 +869,7 @@ export default function AddCargoPage() {
                             {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип автомобиля</Typography>
                             <Select
                                     fullWidth 
@@ -909,7 +893,7 @@ export default function AddCargoPage() {
                             {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип загрузки</Typography>
                             <Select
                                     fullWidth 
@@ -930,7 +914,7 @@ export default function AddCargoPage() {
                             {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дозагрузка</Typography>
                             <FormControlLabel
                                 control={
@@ -943,8 +927,7 @@ export default function AddCargoPage() {
                             />
                         </Grid>
 
-                        {/* Numbers */}
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Вес груза (т)</Typography>
                             <TextField
                                     type="number" 
@@ -954,21 +937,21 @@ export default function AddCargoPage() {
                                     onChange={(e) => setField("weightTons", num(e.target.value))}
                             />
                         </Grid>
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                             <TextField
                                     label="Объём (м³)" type="number" fullWidth placeholder="Укажите объём"
                                 value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                             />
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                             <TextField
                                     label="Количество автомобилей" type="number" fullWidth placeholder="Укажите количество"
                                 value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
                             />
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Количество паллет</Typography>
                             <TextField
                                     type="number" 
@@ -979,39 +962,36 @@ export default function AddCargoPage() {
                             />
                         </Grid>
 
-                        {/* Dimensions */}
-                        <Grid size={{ xs:12 }}>
-    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Размеры груза</Typography>
+                        <Grid size={{ xs:12, sm:6 }}>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Длина (м)</Typography>
+                            <TextField
+                                type="number" placeholder="Длина (м)" fullWidth
+                                value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
+                                error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
+                            />
+                        </Grid>
 
-    <Grid container spacing={1}>
-        <Grid size={{ xs:12, lg:4 }}>
-                                    <TextField
-                 type="number" placeholder="Длина (м)" fullWidth
-                                        value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
-                                        error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
-                                    />
-                                </Grid>
-        <Grid size={{ xs:12, lg:4 }}>
-                                    <TextField
-                type="number" placeholder="Ширина (м)" fullWidth
-                                        value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
-                                    />
-                                </Grid>
-        <Grid size={{ xs:12, lg:4 }}>
-                                    <TextField
-                type="number" placeholder="Высота (м)" fullWidth
-                                        value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
-                                    />
-                                </Grid>
-                            </Grid>
+                        <Grid size={{ xs:12, sm:6 }}>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Ширина (м)</Typography>
+                            <TextField
+                                type="number" placeholder="Ширина (м)" fullWidth
+                                value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs:12, sm:6 }}>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Высота (м)</Typography>
+                            <TextField
+                                type="number" placeholder="Высота (м)" fullWidth
+                                value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
+                            />
                         </Grid>
 
                                     <Grid size={{ xs:12 }}>
                                         <Divider sx={{ my: 4 }} />
                                      </Grid>
-                        {/* Pricing */}
-                        <Grid size={{ xs:12, md:6 }}>
-                            <Grid size={{ xs:12, md:6 }}>
+
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <FormControl fullWidth>
                                     <InputLabel shrink>Стоимость</InputLabel>
                                     <OutlinedInput
@@ -1044,12 +1024,9 @@ export default function AddCargoPage() {
                                         sx={{ borderRadius: 2, ".MuiOutlinedInput-input": { py: 1.25 } }}
                                     />
                                 </FormControl>
-                            </Grid>
-
                         </Grid>
 
-                        {/* Payments */}
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
                             <Select
                                     fullWidth 
@@ -1070,7 +1047,7 @@ export default function AddCargoPage() {
                             {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Срок оплаты</Typography>
                             <Select
                                     fullWidth 
@@ -1091,7 +1068,7 @@ export default function AddCargoPage() {
                             {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Торг</Typography>
                             <Select
                                 fullWidth
@@ -1110,7 +1087,6 @@ export default function AddCargoPage() {
                             </Select>
                         </Grid>
 
-                        {/* Contacts: only Additional phone */}
                         <Grid size={{ xs:12 }}>
                                 <Divider sx={{ my: 4 }} />
                                 <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>Выберите контакты, которые будут видны в заказе</Typography>
@@ -1119,7 +1095,7 @@ export default function AddCargoPage() {
                             </Typography>
                         </Grid>
 
-                        <Grid size={{ xs:12, md:6 }}>
+                        <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
                             <TextField
                                 placeholder="+380971234567"
@@ -1138,7 +1114,6 @@ export default function AddCargoPage() {
                             </Button>
                         </Grid>
 
-                        {/* Note */}
                         <Grid size={{ xs:12 }}>
                             <TextField
                                     label="Дополнительная информация" placeholder="Укажите дополнительную информацию" className="additional-info-field"
@@ -1147,7 +1122,6 @@ export default function AddCargoPage() {
                             />
                         </Grid>
 
-                        {/* Submit */}
                         <Grid size={{ xs:12 }}>
                             <Stack direction="row" justifyContent="center" mt={1.5}>
                                 <Button type="submit" variant="contained" sx={{ minWidth: 280 }} disabled={loadingInit}>

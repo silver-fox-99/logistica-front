@@ -11,6 +11,23 @@
     align-items: center;
   }
 
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__logo {
+    img {
+      width: 150px;
+      height: auto;
+      
+      @media (max-width: 860px) {
+        width: 120px;
+      }
+    }
+  }
+
   &__column {
     display: flex;
     align-items: center;

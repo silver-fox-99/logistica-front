@@ -125,28 +125,13 @@ export default function DashboardLayout() {
 
     return (
         <Box display="flex" flexDirection="column" minHeight="100dvh" className="dashboard-layout">
-            <Header isAuthenticated />
+            <Header 
+                isAuthenticated 
+                showBurger={isMobile}
+                onMenuClick={() => toggle(true)}
+            />
             <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32 }}>
                 <Container maxWidth="lg">
-
-                    {isMobile && (
-                        <Box sx={{ position: "sticky", top: 8, zIndex: 5, mb: 1 }}>
-                            <IconButton
-                                aria-label="Открыть меню"
-                                onClick={() => toggle(true)}
-                                size="large"
-                                sx={{
-                                    borderRadius: 2,
-                                    bgcolor: "background.paper",
-                                    boxShadow: 1,
-                                    ":hover": { bgcolor: "action.hover" },
-                                }}
-                            >
-                                <FiMenu />
-                            </IconButton>
-                        </Box>
-                    )}
-
                     <Stack direction="row" spacing={3} alignItems="flex-start">
 
                         {isMobile ? (

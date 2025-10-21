@@ -400,7 +400,7 @@ export default function AddTransportPage() {
         <Box className="add-transport-page">
             <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }} className="add-transport-page__paper">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} className="add-transport-page__header">
-                    <Box className="add-transport-page__icon">
+                <Box className="add-transport-page__icon">
                         <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/><path d="M20.833 13.889c.48 0 .868.388.868.868v5.208h5.209a.868.868 0 1 1 0 1.736H21.7v5.209a.868.868 0 1 1-1.736 0V21.7h-5.208a.868.868 0 0 1 0-1.736h5.208v-5.208c0-.48.389-.868.868-.868" fill="#4472B8"/></svg>
                     </Box>
                     <Box sx={{ flex: 1 }}>
@@ -778,14 +778,14 @@ export default function AddTransportPage() {
                 <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                     <Box component="form" onSubmit={onSubmit} noValidate className="add-transport-page__form">
                         <Grid container spacing={2}>
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <TextField
                                     label="Дата загрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
                                     value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
                                     error={!!errors.dateFrom} helperText={errors.dateFrom}
                                 />
                             </Grid>
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <TextField
                                     label="Дата выгрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
                                     value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
@@ -793,7 +793,7 @@ export default function AddTransportPage() {
                                 />
                             </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <Stack flexDirection="column" spacing={1}>
                                     {form.loadPlaces.map((p, i) => (
                                         <PlaceRow
@@ -810,7 +810,7 @@ export default function AddTransportPage() {
                                 </Stack>
                             </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <Stack  flexDirection="column" spacing={1}>
                                     {form.unloadPlaces.map((p, i) => (
                                         <PlaceRow
@@ -831,7 +831,7 @@ export default function AddTransportPage() {
                                  <Divider sx={{ my: 4 }} />
                             </Grid>
 
-                        <Grid size={{xs:12, md:6}}>
+                        <Grid size={{xs:12, sm:6}}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип автомобиля</Typography>
                             <Select
                                 fullWidth 
@@ -855,48 +855,46 @@ export default function AddTransportPage() {
                             )}
                         </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <TextField
                                     label="Количество автомобилей" type="number" fullWidth
                                     value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", Number(e.target.value || 0))}
                                 />
                             </Grid>
 
-<Grid size={{xs:12}}>
-    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Указать габариты груза</Typography>
+                            <Grid size={{xs:12, sm:6}}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Длина (м)</Typography>
+                                <TextField
+                                    type="number" placeholder="Длина (м)" fullWidth
+                                    value={form.bodyLength ?? ""} onChange={(e) => setField("bodyLength", num(e.target.value))}
+                                    error={!!errors.bodyHeight} helperText={errors.bodyHeight && "Fill all body dimensions"}
+                                />
+                            </Grid>
 
-    <Grid container spacing={1}>
-        <Grid size={{xs:12, lg:4}}>
-            <TextField
-                 type="number" placeholder="Длина (м)" fullWidth
-                value={form.bodyLength ?? ""} onChange={(e) => setField("bodyLength", num(e.target.value))}
-                error={!!errors.bodyHeight} helperText={errors.bodyHeight && "Fill all body dimensions"}
-            />
-        </Grid>
-        <Grid size={{xs:12, lg:4}}>
-            <TextField
-                type="number" placeholder="Ширина (м)" fullWidth
-                value={form.bodyWidth ?? ""} onChange={(e) => setField("bodyWidth", num(e.target.value))}
-            />
-        </Grid>
-        <Grid size={{xs:12, lg:4}}>
-            <TextField
-                type="number" placeholder="Высота (м)" fullWidth
-                value={form.bodyHeight ?? ""} onChange={(e) => setField("bodyHeight", num(e.target.value))}
-            />
-        </Grid>
-    </Grid>
-</Grid>
+                            <Grid size={{xs:12, sm:6}}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Ширина (м)</Typography>
+                                <TextField
+                                    type="number" placeholder="Ширина (м)" fullWidth
+                                    value={form.bodyWidth ?? ""} onChange={(e) => setField("bodyWidth", num(e.target.value))}
+                                />
+                            </Grid>
 
+                            <Grid size={{xs:12, sm:6}}>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Высота (м)</Typography>
+                                <TextField
+                                    type="number" placeholder="Высота (м)" fullWidth
+                                    value={form.bodyHeight ?? ""} onChange={(e) => setField("bodyHeight", num(e.target.value))}
+                                />
+                            </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <TextField
                                     label="Объём (м³):" type="number" fullWidth placeholder="Укажите объём"
                                     value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                                 />
                             </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <TextField
                                     label="Масса (т):" type="number" fullWidth placeholder="Укажите вес"
                                     value={form.capacityTons ?? ""} onChange={(e) => setField("capacityTons", num(e.target.value))}
@@ -904,7 +902,7 @@ export default function AddTransportPage() {
                             </Grid>
 
 
-                            <Grid size={{ xs:12, md:6 }}>
+                            <Grid size={{ xs:12, sm:6 }}>
                                 <FormControl fullWidth>
                                     <InputLabel shrink>Стоимость</InputLabel>
                                     <OutlinedInput
@@ -935,7 +933,7 @@ export default function AddTransportPage() {
                             </Grid>
 
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
                                 <Select
                                     fullWidth 
@@ -957,7 +955,7 @@ export default function AddTransportPage() {
                                 {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                             </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Срок оплаты</Typography>
                                 <Select
                                     fullWidth 
@@ -979,7 +977,7 @@ export default function AddTransportPage() {
                                 {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                             </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Торг</Typography>
                                 <Select
                                     fullWidth 
@@ -1006,7 +1004,7 @@ export default function AddTransportPage() {
                                     </Typography>
                                 </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
                                 <TextField
                                     placeholder="+380971234567"
@@ -1025,7 +1023,7 @@ export default function AddTransportPage() {
                                 </Button>
                             </Grid>
 
-                            <Grid size={{xs:12, md:6}}>
+                            <Grid size={{xs:12, sm:6}}>
                                 <TextField
                                     label="E-mail" placeholder="email@example.com" fullWidth
                                     value={form.email ?? ""} onChange={(e) => setField("email", e.target.value || undefined)}

@@ -1,10 +1,19 @@
 import logo from "./logo.svg"
 import { Link } from "react-router-dom";
-import {Avatar} from "@mui/material";
+import {Avatar, IconButton} from "@mui/material";
+import {FiMenu} from "react-icons/fi";
 import './header.scss'
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 
-export default function Header({isAuthenticated}: {isAuthenticated?: boolean}) {
+export default function Header({
+    isAuthenticated, 
+    onMenuClick,
+    showBurger
+}: {
+    isAuthenticated?: boolean;
+    onMenuClick?: () => void;
+    showBurger?: boolean;
+}) {
     const user = useUserStore((s) => s.user);
 
     function stringToColor(string: string) {
@@ -38,12 +47,27 @@ export default function Header({isAuthenticated}: {isAuthenticated?: boolean}) {
 
     return <div className="header">
         <div className="header__wrapper container">
-            <div className="header__logo">
-                <img src={logo} alt="logo"/>
+            <div className="header__left">
+                <div className="header__logo">
+                    <img src={logo} alt="logo"/>
+                </div>
             </div>
 
             {isAuthenticated && <div className="header__column header__column--user">
                 {user?.first_name} {user?.last_name} <Avatar {...stringAvatar(`${user?.first_name} ${user?.last_name}`)} />
+                {showBurger && (
+                    <IconButton
+                        aria-label="Открыть меню"
+                        onClick={onMenuClick}
+                        size="large"
+                        sx={{
+                            color: '#fff',
+                            ml: 1,
+                        }}
+                    >
+                        <FiMenu />
+                    </IconButton>
+                )}
             </div>}
 
             {!isAuthenticated && <div className="header__column">
