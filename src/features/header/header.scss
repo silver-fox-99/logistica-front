@@ -25,6 +25,10 @@
       @media (max-width: 860px) {
         width: 120px;
       }
+      
+      @media (max-width: 480px) {
+        width: 100px;
+      }
     }
   }
 
@@ -33,14 +37,34 @@
     align-items: center;
     gap: 16px;
     
+    @media (max-width: 480px) {
+      gap: 8px;
+    }
+    
     &--user {
       font-size: 18px;
       color: #fff;
+      
+      @media (max-width: 480px) {
+        font-size: 14px;
+      }
     }
   }
 
   &__button {
     padding-left: 50px;
     padding-right: 50px;
+    
+    @media (max-width: 860px) {
+      padding-left: 20px;
+      padding-right: 20px;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 480px) {
+      padding-left: 12px;
+      padding-right: 12px;
+      font-size: 12px;
+    }
   }
 }
