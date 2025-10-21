@@ -8,40 +8,8 @@ import {
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone
 } from "react-icons/fi";
 
+import type { ShipmentRowData } from "@/entities/shipment/model/type";
 import "./ShipmentRow.scss";
-
-export type ShipmentRowData = {
-    id: string;
-    routeFrom: string;
-    routeTo: string;
-    distanceKm: number;
-    dates: { from: string; to: string };
-    dims?: string;
-    typeTags: string[];
-    badges?: string[];
-    paymentType?: "Cash" | "Bank" | "Card";
-    price?: string;              // например "1 250 EUR"
-    pricePerKm?: string;
-    timeAgo?: string;
-    repeats?: number;
-    views?: number;
-    contact?: {
-        name?: string;
-        email?: string;
-        phone1?: string;
-        phone2?: string; // часто это и есть additional / contact_extra_phone
-        telegram?: string;
-    };
-
-    /** Доп. блок для инициализации модалки быстрого редактирования */
-    edit?: {
-        dateFrom?: string | null;
-        dateTo?: string | null;
-        priceAmount?: number | null;
-        contactExtraPhone?: string | null;
-        note?: string | null;
-    };
-};
 
 type Props = {
     data: ShipmentRowData;
@@ -229,8 +197,11 @@ export default function ShipmentRow({
             {expanded && (
                 <>
                     <Divider sx={{ my: 1.5 }} />
-                    <Grid container spacing={1.5}>
+                    <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
+                            <Typography variant="subtitle2" fontWeight={600} mb={1}>
+                                Контактная информация
+                            </Typography>
                             <Stack spacing={1} color="text.secondary">
                                 {data.contact?.name && (
                                     <Stack direction="row" spacing={1} alignItems="center">
@@ -256,33 +227,112 @@ export default function ShipmentRow({
                                         <Typography>{data.contact.phone2}</Typography>
                                     </Stack>
                                 )}
+                                {data.contactExtraPhone && (
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <FiPhone />
+                                        <Typography>Доп. телефон: {data.contactExtraPhone}</Typography>
+                                    </Stack>
+                                )}
                                 {data.contact?.telegram && <Typography>{data.contact.telegram}</Typography>}
                             </Stack>
                         </Grid>
 
+                        {/* Правая колонка - Детали заказа */}
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <Typography variant="subtitle2" fontWeight={600} mb={1}>
+                                Детали заказа
+                            </Typography>
+                            <Stack spacing={0.75} color="text.secondary">
+                                {data.vehicleType && (
+                                    <Typography variant="body2">
+                                        <strong>Тип автомобиля:</strong> {data.vehicleType}
+                                    </Typography>
+                                )}
+                                {data.cargoType && (
+                                    <Typography variant="body2">
+                                        <strong>Тип груза:</strong> {data.cargoType}
+                                    </Typography>
+                                )}
+                                {data.loadType && (
+                                    <Typography variant="body2">
+                                        <strong>Тип загрузки:</strong> {data.loadType}
+                                    </Typography>
+                                )}
+                                {data.carsCount != null && (
+                                    <Typography variant="body2">
+                                        <strong>Количество автомобилей:</strong> {data.carsCount}
+                                    </Typography>
+                                )}
+                                {data.palletsCount != null && (
+                                    <Typography variant="body2">
+                                        <strong>Количество паллет:</strong> {data.palletsCount}
+                                    </Typography>
+                                )}
+                                {data.weightT != null && (
+                                    <Typography variant="body2">
+                                        <strong>Вес:</strong> {data.weightT} т
+                                    </Typography>
+                                )}
+                                {data.volumeM3 != null && (
+                                    <Typography variant="body2">
+                                        <strong>Объем:</strong> {data.volumeM3} м³
+                                    </Typography>
+                                )}
+                                {data.allowPartialLoad != null && (
+                                    <Typography variant="body2">
+                                        <strong>Дозагрузка:</strong> {data.allowPartialLoad ? "Возможна" : "Невозможна"}
+                                    </Typography>
+                                )}
+                                {data.paymentTerm && (
+                                    <Typography variant="body2">
+                                        <strong>Срок оплаты:</strong> {data.paymentTerm}
+                                    </Typography>
+                                )}
+                                {data.bargain && (
+                                    <Typography variant="body2">
+                                        <strong>Торг:</strong> {data.bargain === "ALLOWED" ? "Возможен" : "Невозможен"}
+                                    </Typography>
+                                )}
+                            </Stack>
+                        </Grid>
+
+                        {/* Дополнительная информация (примечания) */}
+                        {data.note && (
+                            <Grid size={{ xs: 12 }}>
+                                <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
+                                    Дополнительная информация
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {data.note}
+                                </Typography>
+                            </Grid>
+                        )}
+
+                        {/* Кнопки действий для "my" scope */}
                         {scope === "my" && (
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12 }}>
+                                <Divider sx={{ my: 1 }} />
                                 <Stack
                                     direction="row"
                                     spacing={1}
                                     justifyContent={{ xs: "flex-start", md: "flex-end" }}
                                 >
-                                    <Tooltip title="Bump to top">
+                                    <Tooltip title="Поднять вверх">
                                         <IconButton onClick={() => onUp?.(data.id)}>
                                             <FiRepeat />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Edit">
+                                    <Tooltip title="Редактировать">
                                         <IconButton onClick={() => onEdit?.(data.id)}>
                                             <FiEdit2 />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Copy">
+                                    <Tooltip title="Копировать">
                                         <IconButton onClick={() => onCopy?.(data.id)}>
                                             <FiCopy />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Delete">
+                                    <Tooltip title="Удалить">
                                         <IconButton color="error" onClick={() => onDelete?.(data.id)}>
                                             <FiTrash2 />
                                         </IconButton>

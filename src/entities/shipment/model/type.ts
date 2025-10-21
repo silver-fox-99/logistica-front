@@ -17,6 +17,20 @@ export type ShipmentRowData = {
     repeats?: number;
     views?: number;
     contact?: { name?: string; email?: string; phone1?: string; phone2?: string; telegram?: string };
+    
+
+    vehicleType?: string;
+    loadType?: string;
+    cargoType?: string;
+    allowPartialLoad?: boolean;
+    carsCount?: number;
+    palletsCount?: number;
+    weightT?: number;
+    volumeM3?: number;
+    paymentTerm?: string;
+    bargain?: string;
+    note?: string;
+    contactExtraPhone?: string;
 };
 
 
@@ -35,6 +49,18 @@ export type CargoApiItem = {
     price_currency: string;
     price_amount: string | number;
     payment_method?: "BANK_TRANSFER" | "CASH" | "CARD";
+    
+
+    vehicle_type?: string;
+    load_type?: string;
+    cargo_type?: string;
+    allow_partial_load?: boolean;
+    cars_count?: number;
+    pallets_count?: number;
+    payment_term?: string;
+    bargain?: string;
+    note?: string;
+    contact_extra_phone?: string;
 };
 
 export type TransportApiItem = CargoApiItem;

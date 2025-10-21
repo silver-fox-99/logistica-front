@@ -46,7 +46,22 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
             name,
             email: i.user?.email,
             phone1: i.user?.phone,
+            phone2: i.contact_extra_phone ?? undefined,
         },
+        
+        // Дополнительные поля
+        vehicleType: i.vehicle_type,
+        loadType: i.load_type,
+        cargoType: i.cargo_type,
+        allowPartialLoad: i.allow_partial_load,
+        carsCount: i.cars_count,
+        palletsCount: i.pallets_count,
+        weightT: i.weight_t ? Number(i.weight_t) : undefined,
+        volumeM3: i.volume_m3 ? Number(i.volume_m3) : undefined,
+        paymentTerm: i.payment_term,
+        bargain: i.bargain,
+        note: i.note ?? undefined,
+        contactExtraPhone: i.contact_extra_phone ?? undefined,
     };
 }
 

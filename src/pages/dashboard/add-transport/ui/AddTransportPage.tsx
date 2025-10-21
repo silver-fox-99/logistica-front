@@ -592,7 +592,7 @@ export default function AddTransportPage() {
                                                 value={form.price ?? ""}
                                                 onChange={(e) => setField("price", num(e.target.value))}
                                                 type="number"
-                                                className=""
+                                                className="price-input-field"
                                                 startAdornment={
                                                     <InputAdornment position="start" sx={{ mr: 1 }}>
                                                         <Select
@@ -601,13 +601,17 @@ export default function AddTransportPage() {
                                                             variant="standard"
                                                             disableUnderline
                                                             displayEmpty
+                                                            sx={{
+                                                                minWidth: 80,
+                                                                fontWeight: 500,
+                                                                ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
+                                                            }}
                                                             disabled={currencyOpts.length === 0}
                                                         >
                                                             {currencyOpts.length
                                                                 ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)
                                                                 : <MenuItem value="USD">USD</MenuItem>}
                                                         </Select>
-
                                                     </InputAdornment>
                                                 }
                                                 sx={{ borderRadius: 2, ".MuiOutlinedInput-input": { py: 1.25 } }}
@@ -914,11 +918,16 @@ export default function AddTransportPage() {
                                         startAdornment={
                                             <InputAdornment position="start" sx={{ mr: 1 }}>
                                                 <Select
-                                                    value={form.currency || currencyOpts[0]?.slug || "USD"}
+                                                    value={currentCurrency}
                                                     onChange={e => setField("currency", e.target.value as string)}
                                                     variant="standard"
                                                     disableUnderline
                                                     displayEmpty
+                                                    sx={{
+                                                        minWidth: 80,
+                                                        fontWeight: 500,
+                                                        ".MuiSelect-select": { py: 0.5, pl: 0, pr: "24px !important" },
+                                                    }}
                                                     disabled={currencyOpts.length === 0}
                                                 >
                                                     {currencyOpts.length
