@@ -11,6 +11,24 @@ export type PublicPoint = {
     address?: string | null;
 };
 
+export type PublicFilters = {
+    pickup_country?: string;
+    pickup_region?: string;
+    pickup_city?: string;
+    dropoff_country?: string;
+    dropoff_region?: string;
+    dropoff_city?: string;
+    date_from?: string;
+    date_to?: string;
+    vehicle_type?: string;
+    q?: string;
+
+    // allow_partial_load?: boolean;
+    // price_currency?: string;
+    // price_min?: number;
+    // price_max?: number;
+};
+
 export type PublicShipmentBase = {
     id: string;
     dates: { from: string; to: string };

@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
-import { Box, Paper, Stack, Typography, Button, Tabs, Tab, Pagination, Chip, Tooltip } from "@mui/material";
+import { Box, Paper, Stack, Typography, Button, Tabs, Tab, Pagination, Chip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiFilter, FiTruck, FiPackage, FiChevronRight } from "react-icons/fi";
-import { usePublicShipments } from "@/entities/public-shipment/model/usePublicShipmets.ts";
+import { usePublicShipments } from "@/entities/public-shipment/model/usePublicShipmets";
 import { PublicShipmentCard } from "@/widgets/public/PublicShipmentCard";
+import { PublicFiltersDrawer } from "@/widgets/public/PublicFiltersDrawer";
+import type {PublicFilters} from "@/entities/public-shipment/model/types.ts";
 
 type TabKind = "cargo" | "transport";
 
@@ -12,9 +14,15 @@ export default function HomePage() {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const { items, pages, total, loading } = usePublicShipments(tab, page, limit);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [filters, setFilters] = useState<PublicFilters>({});
 
+    const { items, pages, total, loading } = usePublicShipments(tab, page, limit, filters);
     const list = useMemo(() => items, [items]);
+
+    const activeFiltersCount = useMemo(() => {
+        return Object.values(filters).filter(v => v !== undefined && v !== "").length;
+    }, [filters]);
 
     return (
         <Box sx={{ py: 2 }}>
@@ -28,13 +36,17 @@ export default function HomePage() {
                     </Stack>
 
                     <Stack direction="row" gap={1} alignItems="center">
-                        <Tooltip title="Filters (coming soon)">
-              <span>
-                <Button variant="outlined" startIcon={<FiFilter />} disabled sx={{ textTransform: "none" }}>
-                  Filters
-                </Button>
-              </span>
-                        </Tooltip>
+                        <Button
+                            variant="outlined"
+                            startIcon={<FiFilter />}
+                            sx={{ textTransform: "none" }}
+                            onClick={() => setDrawerOpen(true)}
+                        >
+                            Filters
+                        </Button>
+                        {activeFiltersCount > 0 && (
+                            <Chip size="small" color="primary" variant="outlined" label={`Filters: ${activeFiltersCount}`} />
+                        )}
                         <Chip size="small" color="default" variant="outlined" label={`Total: ${total}`} />
                     </Stack>
                 </Stack>
@@ -54,12 +66,12 @@ export default function HomePage() {
 
             <Grid container spacing={1.5}>
                 {list.map((item) => (
-                    <Grid key={item.id} size={{xs: 12}}>
+                    <Grid key={item.id} size={{ xs: 12 }}>
                         <PublicShipmentCard
                             data={item}
                             cta={{
                                 label: "More details",
-                                href: `/login?next=/${tab}/${item.id}`, // важный момент: подставляем next
+                                href: `/login?next=/${tab}/${item.id}`,
                                 icon: <FiChevronRight />,
                             }}
                             kind={tab}
@@ -68,13 +80,13 @@ export default function HomePage() {
                 ))}
 
                 {loading && (
-                    <Grid size={{xs: 12}}>
+                    <Grid size={{ xs: 12 }}>
                         <Typography variant="body2" color="text.secondary">Loading...</Typography>
                     </Grid>
                 )}
 
                 {!loading && list.length === 0 && (
-                    <Grid size={{xs: 12}} >
+                    <Grid size={{ xs: 12 }}>
                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
                             <Typography>No results</Typography>
                             <Typography variant="body2" color="text.secondary">
@@ -88,6 +100,18 @@ export default function HomePage() {
             <Stack direction="row" alignItems="center" justifyContent="center" sx={{ mt: 2 }}>
                 <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />
             </Stack>
+
+            <PublicFiltersDrawer
+                open={drawerOpen}
+                kind={tab}
+                initial={filters}
+                onClose={() => setDrawerOpen(false)}
+                onApply={(f) => {
+                    setFilters(f);
+                    setPage(1);
+                    setDrawerOpen(false);
+                }}
+            />
         </Box>
     );
 }

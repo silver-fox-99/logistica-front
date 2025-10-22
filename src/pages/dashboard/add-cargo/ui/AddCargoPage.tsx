@@ -37,7 +37,7 @@ type Place = {
     address?: string | null;
 };
 
-type Dims = { enabled: boolean; length?: number; width?: number; height?: number };
+type Dims = { length?: number; width?: number; height?: number };
 
 type FormValues = {
     dateFrom: string;
@@ -216,7 +216,7 @@ export default function AddCargoPage() {
         weightTons: undefined,
         volumeM3: undefined,
 
-        dims: { enabled: true, length: undefined, width: undefined, height: undefined },
+        dims: { length: undefined, width: undefined, height: undefined },
 
         currency: "USD",
         price: undefined,
@@ -282,11 +282,6 @@ export default function AddCargoPage() {
         if (!form.loadType) e.loadType = "Select load type";
         if (!form.paymentMethod) e.paymentMethod = "Select payment method";
 
-         if (form.dims.enabled) {
-               if (form.dims.length == null || form.dims.width == null || form.dims.height == null) {
-                     e.dims = "Fill all dimensions";
-                   }
-             }
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
             e.contactSecondary = "Invalid phone format. Use + and digits, 10–20 digits total.";
         }
@@ -311,6 +306,9 @@ export default function AddCargoPage() {
         const getName = (id?: string | null) =>
             id ? (geoById.get(id)?.name ?? "") : "";
 
+        const anyDim =
+            v.dims.length != null || v.dims.width != null || v.dims.height != null;
+
         const countryFromName = getName(firstPickup.countryId) || "Unknown";
 
         return {
@@ -329,12 +327,14 @@ export default function AddCargoPage() {
             cars_count: v.vehiclesCount ?? null,
             pallets_count: v.palletsCount ?? null,
 
-            has_dimensions: !!v.dims.enabled,
-            ...(v.dims.enabled ? {
-                length_m: v.dims.length!,
-                width_m:  v.dims.width!,
-                height_m: v.dims.height!,
-            } : {}),
+            has_dimensions: anyDim,
+            ...(anyDim
+                ? {
+                    length_m: v.dims.length ?? 0,
+                    width_m:  v.dims.width  ?? 0,
+                    height_m: v.dims.height ?? 0,
+                }
+                : {}),
 
             price_currency: v.currency,
             price_amount: v.price ?? 0,

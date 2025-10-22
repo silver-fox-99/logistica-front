@@ -1,13 +1,13 @@
 import api from "@/shared/api/axios.ts";
 import type {CargoApiItem, ListResponse, ShipmentsKind, TransportApiItem} from "@/entities/shipment/model/type.ts";
+import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
 
 
 type Scope = "public" | "my";
 
-export type ListParams = {
+export type ListParams = Partial<PublicFilters> & {
     page?: number;
     limit?: number;
-
 };
 
 const listUrl = (kind: ShipmentsKind, scope: Scope) =>

@@ -1,12 +1,11 @@
-
 import { useEffect, useState } from "react";
-import { shipmentsApi } from "@/shared/api/shipmentsApi";
+import { shipmentsApi, type ListParams } from "@/shared/api/shipmentsApi";
 import { adaptCargo, adaptTransport } from "../lib/adapter";
 import type { ShipmentsKind, ShipmentRowData } from "./type";
 
 type Scope = "public" | "my";
 
-export function useShipments(kind: ShipmentsKind, scope: Scope, page = 1, limit = 10) {
+export function useShipments(kind: ShipmentsKind, scope: Scope, page = 1, limit = 10, filters: Partial<ListParams> = {}) {
     const [items, setItems] = useState<ShipmentRowData[]>([]);
     const [total, setTotal] = useState(0);
     const [pages, setPages] = useState(1);
@@ -19,7 +18,7 @@ export function useShipments(kind: ShipmentsKind, scope: Scope, page = 1, limit 
             setLoading(true);
             setError(null);
             try {
-                const resp = await shipmentsApi.list(kind, scope, { page, limit });
+                const resp = await shipmentsApi.list(kind, scope, { page, limit, ...filters });
                 if (aborted) return;
                 const adapted = resp.data.map((i: any) => (kind === "cargo" ? adaptCargo(i) : adaptTransport(i)));
                 setItems(adapted);
@@ -34,7 +33,7 @@ export function useShipments(kind: ShipmentsKind, scope: Scope, page = 1, limit 
         };
         run();
         return () => { aborted = true; };
-    }, [kind, scope, page, limit ]);
+    }, [kind, scope, page, limit, JSON.stringify(filters)]);
 
     return { items, total, pages, loading, error };
 }

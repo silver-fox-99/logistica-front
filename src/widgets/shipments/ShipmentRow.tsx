@@ -8,7 +8,7 @@ import {
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone
 } from "react-icons/fi";
 
-import type { ShipmentRowData } from "@/entities/shipment/model/type";
+import type {ShipmentRowData, ShipmentsKind} from "@/entities/shipment/model/type";
 import "./ShipmentRow.scss";
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
     scope: "public" | "my";
     onBookmark?: (id: string) => void;
     onMoreOpen?: (id: string) => void;
-
+    kind: ShipmentsKind;
     /** Экшены для scope="my" */
     onUp?: (id: string) => void;
     onEdit?: (id: string) => void;
@@ -25,7 +25,7 @@ type Props = {
 };
 
 export default function ShipmentRow({
-                                        data, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy
+                                        data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy
                                     }: Props) {
     const [expanded, setExpanded] = useState(false);
 
@@ -57,9 +57,9 @@ export default function ShipmentRow({
                             {/* Тип карточки и даты */}
                             <Chip
                                 size="small"
-                                icon={<FiTruck />}
-                                label="Cargo"
-                                className="shipment-row__chip shipment-row__chip--cargo"
+                                icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}
+                                label={kind === "cargo" ? "Cargo" : "Transport"}
+                                className={`shipment-row__chip ${kind === "cargo" ? "shipment-row__chip--cargo" : "shipment-row__chip--transport"}`}
                             />
                             <Chip
                                 size="small"

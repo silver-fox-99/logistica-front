@@ -27,7 +27,6 @@ const MAX_VISIBLE_POINTS = 4;
 
 export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind }: Props) {
 
-    console.log(data)
     const labels = useMemo(() => {
         const pts = (data.points ?? []).slice();
 
