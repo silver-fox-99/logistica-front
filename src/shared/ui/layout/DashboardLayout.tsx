@@ -3,12 +3,12 @@ import { Outlet, NavLink } from "react-router-dom";
 import React, { useState, Fragment } from "react";
 import {
     Box, Container, Paper, Stack, Button, Divider, List, ListItemButton,
-    ListItemIcon, ListItemText, Drawer, IconButton, useMediaQuery
+    ListItemIcon, ListItemText, Drawer,  useMediaQuery
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
-    FiLogOut, FiUsers, FiSearch, FiMenu
+    FiLogOut, FiUsers, FiSearch
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 

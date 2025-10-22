@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import {
     Avatar, Box, Button, Chip, Divider, IconButton, InputAdornment, MenuItem, Paper, Select, Stack,
-    Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography, ToggleButton, ToggleButtonGroup
-} from "@mui/material";
+    Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography} from "@mui/material";
 import { FiMapPin, FiPlus, FiRefreshCw, FiSearch, FiTrash2, FiEdit3, FiChevronRight } from "react-icons/fi";
 import { useGeoLocations } from "@/features/admin/geo-locations/model/useGeoLocations";
 import GeoLocationDialog from "@/features/admin/geo-locations/ui/GeoLocationDialog";
@@ -37,7 +36,7 @@ export default function AdminGeoLocationsPage() {
     const [dlgMode, setDlgMode] = useState<"create" | "edit">("create");
     const [editing, setEditing] = useState<GeoLocation | null>(null);
     const [busy, setBusy] = useState(false);
-    const [scope, setScope] = useState<"direct" | "all">("all"); // NEW
+    const [scope] = useState<"direct" | "all">("all"); // NEW
 
     const current = selectedId ? byId.get(selectedId) ?? null : null;
 

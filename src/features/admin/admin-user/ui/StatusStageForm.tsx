@@ -24,7 +24,7 @@ export function StatusStageForm({ user, onUpdated }: { user: AdminUser; onUpdate
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 2 }}>Во
+        <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent>
                 <Stack spacing={2} direction={{ xs: "column" }}>
                     <TextField select label="Registration stage" value={stage} onChange={(e) => setStage(e.target.value as RegistrationStage)} sx={{ minWidth: 220 }}>

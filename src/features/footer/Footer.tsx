@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import logo from '../header/logo.svg'
 import instaLogo from './instagram.svg'
 import facebookLogo from './facebook.svg'
-import linkedinLogo from './linkedin.svg'
+
 import './footer.scss'
 
 export default function Footer() {
