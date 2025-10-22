@@ -10,8 +10,8 @@ const dimStr = (l?: any, w?: any, h?: any) => {
 
 const tagsFromPayload = (p: { weight_t?: any; volume_m3?: any }): string[] => {
     const t: string[] = [];
-    if (p.weight_t != null) t.push(`${Number(p.weight_t)}t`);
-    if (p.volume_m3 != null) t.push(`${Number(p.volume_m3)}m³`);
+    if (p.weight_t != null && Number(p.weight_t) > 0) t.push(`${Number(p.weight_t)}t`);
+    if (p.volume_m3 != null && Number(p.volume_m3) > 0) t.push(`${Number(p.volume_m3)}m³`);
     return t;
 };
 

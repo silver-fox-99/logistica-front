@@ -307,7 +307,9 @@ export default function AddCargoPage() {
             id ? (geoById.get(id)?.name ?? "") : "";
 
         const anyDim =
-            v.dims.length != null || v.dims.width != null || v.dims.height != null;
+            (v.dims.length != null && v.dims.length > 0) ||
+            (v.dims.width != null && v.dims.width > 0) ||
+            (v.dims.height != null && v.dims.height > 0);
 
         const countryFromName = getName(firstPickup.countryId) || "Unknown";
 
@@ -330,9 +332,9 @@ export default function AddCargoPage() {
             has_dimensions: anyDim,
             ...(anyDim
                 ? {
-                    length_m: v.dims.length ?? 0,
-                    width_m:  v.dims.width  ?? 0,
-                    height_m: v.dims.height ?? 0,
+                    length_m: v.dims.length || undefined,
+                    width_m:  v.dims.width  || undefined,
+                    height_m: v.dims.height || undefined,
                 }
                 : {}),
 

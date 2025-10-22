@@ -344,6 +344,11 @@ export default function AddTransportPage() {
             placeToPoint(firstUnload, "ARRIVAL"),
         ];
 
+        const hasDims = v.dimsEnabled && 
+            ((v.bodyLength != null && v.bodyLength > 0) ||
+             (v.bodyWidth != null && v.bodyWidth > 0) ||
+             (v.bodyHeight != null && v.bodyHeight > 0));
+
         return {
             images: undefined,
 
@@ -356,11 +361,11 @@ export default function AddTransportPage() {
             weight_t: v.capacityTons ?? null,
             volume_m3: v.volumeM3 ?? null,
 
-            has_dimensions: !!v.dimsEnabled,
-            ...(v.dimsEnabled ? {
-                length_m: v.bodyLength!,
-                width_m: v.bodyWidth!,
-                height_m: v.bodyHeight!,
+            has_dimensions: hasDims,
+            ...(hasDims ? {
+                length_m: v.bodyLength || undefined,
+                width_m: v.bodyWidth || undefined,
+                height_m: v.bodyHeight || undefined,
             } : {}),
 
             price_currency: v.currency,

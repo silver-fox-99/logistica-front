@@ -72,12 +72,14 @@ export default function ShipmentRow({
 
                         <Stack spacing={1}>
                             <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                                <Chip
-                                    size="small"
-                                    color="primary"
-                                    label={`${data.distanceKm} km`}
-                                    className="shipment-row__chip shipment-row__chip--distance"
-                                />
+                                {data.distanceKm > 0 && (
+                                    <Chip
+                                        size="small"
+                                        color="primary"
+                                        label={`${data.distanceKm} km`}
+                                        className="shipment-row__chip shipment-row__chip--distance"
+                                    />
+                                )}
                                 {data.dims && (
                                     <Chip
                                         size="small"
@@ -126,14 +128,14 @@ export default function ShipmentRow({
                         justifyContent="space-between"
                     >
                         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" justifyContent="flex-end">
-                            {typeof data.repeats === "number" && (
+                            {typeof data.repeats === "number" && data.repeats > 0 && (
                                 <Chip
                                     size="small"
                                     label={`Repeats: ${data.repeats}`}
                                     className="shipment-row__chip shipment-row__chip--repeats"
                                 />
                             )}
-                            {typeof data.views === "number" && (
+                            {typeof data.views === "number" && data.views > 0 && (
                                 <Chip
                                     size="small"
                                     label={`Views: ${data.views}`}
@@ -258,22 +260,22 @@ export default function ShipmentRow({
                                         <strong>Тип загрузки:</strong> {data.loadType}
                                     </Typography>
                                 )}
-                                {data.carsCount != null && (
+                                {data.carsCount != null && data.carsCount > 0 && (
                                     <Typography variant="body2">
                                         <strong>Количество автомобилей:</strong> {data.carsCount}
                                     </Typography>
                                 )}
-                                {data.palletsCount != null && (
+                                {data.palletsCount != null && data.palletsCount > 0 && (
                                     <Typography variant="body2">
                                         <strong>Количество паллет:</strong> {data.palletsCount}
                                     </Typography>
                                 )}
-                                {data.weightT != null && (
+                                {data.weightT != null && data.weightT > 0 && (
                                     <Typography variant="body2">
                                         <strong>Вес:</strong> {data.weightT} т
                                     </Typography>
                                 )}
-                                {data.volumeM3 != null && (
+                                {data.volumeM3 != null && data.volumeM3 > 0 && (
                                     <Typography variant="body2">
                                         <strong>Объем:</strong> {data.volumeM3} м³
                                     </Typography>
