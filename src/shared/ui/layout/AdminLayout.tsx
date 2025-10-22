@@ -20,18 +20,18 @@ function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label
 export default function AdminLayout() {
     return (
         <Box display="flex" flexDirection="column" minHeight="100dvh">
-            <Container maxWidth="xl">
-            <AppBar position="sticky" color="default" elevation={0}>
-                <Toolbar>
-                    <Typography variant="h6" fontWeight={700}>Admin</Typography>
-                    <Box flexGrow={1} />
-                    <IconButton component={NavLink} to="/dashboard" title="Back to dashboard">
-                        <FiHome />
-                    </IconButton>
-                </Toolbar>
-                <Divider />
-            </AppBar>
-            </Container>
+<AppBar position="sticky" color="default" elevation={0}>
+    <Container maxWidth="xl">
+        <Toolbar>
+            <Typography variant="h6" fontWeight={700}>Admin</Typography>
+            <Box flexGrow={1} />
+            <IconButton component={NavLink} to="/dashboard" title="Back to dashboard">
+                <FiHome />
+            </IconButton>
+        </Toolbar>
+        <Divider />
+    </Container>
+</AppBar>
 
             <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, py: 3 }}>
                 <Container maxWidth="xl">
