@@ -28,7 +28,7 @@ export function DangerZoneCard({
                             } finally { setBusy(false); }
                         }}
                     >
-                        Ban user
+                        Заблокировать пользователя
                     </Button>
 
                     <Button
@@ -37,7 +37,7 @@ export function DangerZoneCard({
                         startIcon={<FiTrash2/>}
                         disabled={busy}
                         onClick={async () => {
-                            if (!confirm("Delete this user? This action cannot be undone.")) return;
+                            if (!confirm("Удалить этого пользователя? Это действие не может быть отменено.")) return;
                             setBusy(true);
                             try {
                                 await adminUserApi.remove(user.id);
@@ -45,7 +45,7 @@ export function DangerZoneCard({
                             } finally { setBusy(false); }
                         }}
                     >
-                        Delete user
+                        Удалить пользователя
                     </Button>
                 </Stack>
             </CardContent>

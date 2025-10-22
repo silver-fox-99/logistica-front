@@ -27,14 +27,14 @@ export function StatusStageForm({ user, onUpdated }: { user: AdminUser; onUpdate
         <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent>
                 <Stack spacing={2} direction={{ xs: "column" }}>
-                    <TextField select label="Registration stage" value={stage} onChange={(e) => setStage(e.target.value as RegistrationStage)} sx={{ minWidth: 220 }}>
+                    <TextField select label="Этап регистрации" value={stage} onChange={(e) => setStage(e.target.value as RegistrationStage)} sx={{ minWidth: 220 }}>
                         {STAGES.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                     </TextField>
-                    <TextField select label="Status" value={status} onChange={(e) => setStatus(e.target.value as UserStatus)} sx={{ minWidth: 220 }}>
+                    <TextField select label="Статус" value={status} onChange={(e) => setStatus(e.target.value as UserStatus)} sx={{ minWidth: 220 }}>
                         {STATUSES.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                     </TextField>
                     <Button onClick={submit} disabled={!dirty || busy} variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>}>
-                        {busy ? "Saving…" : "Save"}
+                        {busy ? "Сохранение…" : "Сохранить"}
                     </Button>
                 </Stack>
             </CardContent>

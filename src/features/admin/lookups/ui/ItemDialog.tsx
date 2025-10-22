@@ -41,7 +41,7 @@ export function ItemDialog({
             <DialogTitle>{initial ? "Редактировать элемент" : "Создать элемент"}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} mt={1}>
-                    <TextField label="Слаг (UPPER_SNAKE)" value={slug} onChange={(e) => setSlug(e.target.value)} disabled={!!initial}/>
+                    <TextField label="Код (Введите в верхнем регистре)" value={slug} onChange={(e) => setSlug(e.target.value)} disabled={!!initial}/>
                     <TextField label="Название" value={label} onChange={(e) => setLabel(e.target.value)} />
                     <TextField label="Порядок сортировки" type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value || "0", 10))} />
                     <FormControlLabel control={<Switch checked={active} onChange={(_, v) => setActive(v)} />} label="Активен" />

@@ -25,11 +25,11 @@ export function AdminToggle({ user, onUpdated }: { user: AdminUser; onUpdated: (
                     <FormControlLabel
                         control={<Switch checked={value} onChange={(_, c) => setValue(c)} />}
                         label={<span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <FiShield/> Admin rights
+              <FiShield/> Права администратора
             </span>}
                     />
                     <Button onClick={submit} disabled={!dirty || busy} variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>}>
-                        {busy ? "Updating…" : "Save"}
+                        {busy ? "Обновление…" : "Сохранить"}
                     </Button>
                 </Stack>
             </CardContent>

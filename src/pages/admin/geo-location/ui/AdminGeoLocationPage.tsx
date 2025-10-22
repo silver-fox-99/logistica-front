@@ -132,7 +132,7 @@ export default function AdminGeoLocationsPage() {
                 <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} alignItems={{ md: "center" }} justifyContent="space-between">
                     <Stack direction="row" spacing={1.5} flexWrap="wrap">
                         <TextField
-                            size="small" placeholder="Поиск по названию/коду/слагу/ISO2…" value={search}
+                            size="small" placeholder="Поиск по названию/коду/ISO2…" value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
                             sx={{ minWidth: 280 }}

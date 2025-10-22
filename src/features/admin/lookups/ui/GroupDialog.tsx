@@ -31,7 +31,7 @@ export function GroupDialog({
             <DialogTitle>{initial ? "Редактировать группу" : "Создать группу"}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} mt={1}>
-                    <TextField label="Код (lower_snake)" value={code} onChange={(e) => setCode(e.target.value)} disabled={!!initial}/>
+                    <TextField label="Код (Введите в нижнем регистре)" value={code} onChange={(e) => setCode(e.target.value)} disabled={!!initial}/>
                     <TextField label="Название" value={title} onChange={(e) => setTitle(e.target.value)} />
                     <TextField label="Описание" value={description ?? ""} onChange={(e) => setDescription(e.target.value)} multiline minRows={2} />
                 </Stack>

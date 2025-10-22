@@ -10,7 +10,7 @@ export function MetaForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: 
 
     const submit = async () => {
         let meta: Record<string, any>;
-        try { meta = JSON.parse(text); } catch { alert("Meta must be a valid JSON object"); return; }
+        try { meta = JSON.parse(text); } catch { alert("Мета должен быть валидным JSON объектом"); return; }
         setBusy(true);
         try {
             await adminUserApi.patch(user.id, { meta });
@@ -25,14 +25,14 @@ export function MetaForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: 
             <CardContent>
                 <Stack spacing={2}>
                     <TextField
-                        label="Meta (JSON)"
+                        label="Мета (JSON)"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         multiline minRows={8}
                         InputProps={{ startAdornment: <FiCpu style={{ marginRight: 8 }} /> as any }}
                     />
                     <Button onClick={submit} variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>} disabled={busy}>
-                        {busy ? "Saving…" : "Save meta"}
+                        {busy ? "Сохранение…" : "Сохранить метаданные"}
                     </Button>
                 </Stack>
             </CardContent>

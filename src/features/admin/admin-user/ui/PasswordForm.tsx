@@ -8,7 +8,7 @@ import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 
 const schema = z.object({
-    password: z.string().min(8, "Min 8 chars").max(128, "Max 128 chars"),
+    password: z.string().min(8, "Минимум 8 символов").max(128, "Максимум 128 символов"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -36,7 +36,7 @@ export function PasswordForm({ user, onUpdated }: { user: AdminUser; onUpdated: 
                 <form onSubmit={handleSubmit(submit)}>
                     <Stack spacing={2}>
                         <TextField
-                            label="New password"
+                            label="Новый пароль"
                             type="password"
                             {...register("password")}
                             error={!!errors.password}
@@ -44,7 +44,7 @@ export function PasswordForm({ user, onUpdated }: { user: AdminUser; onUpdated: 
                             InputProps={{ startAdornment: <FiLock style={{ marginRight: 8 }} /> as any }}
                         />
                         <Button type="submit" variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>} disabled={busy || !isDirty}>
-                            {busy ? "Updating…" : "Update password"}
+                            {busy ? "Обновление…" : "Обновить пароль"}
                         </Button>
                     </Stack>
                 </form>

@@ -108,7 +108,7 @@ export default function AdminGeoLocationFlowPage() {
                     <Stack direction="row" spacing={1.5} flexWrap="wrap">
                         <TextField
                             size="small"
-                            placeholder="Поиск по названию/коду/слагу/ISO2…"
+                            placeholder="Поиск по названию/коду/ISO2…"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}

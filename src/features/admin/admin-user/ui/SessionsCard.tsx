@@ -8,7 +8,7 @@ export function SessionsCard({ sessions }: { sessions: AdminUserSessionsItem[] }
         <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent>
                 <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <Typography variant="h6" fontWeight={700}>Sessions</Typography>
+                    <Typography variant="h6" fontWeight={700}>Сессии</Typography>
                     <Chip size="small" label={sessions.length}/>
                 </Stack>
                 <Divider sx={{ mb: 2 }}/>
@@ -19,16 +19,16 @@ export function SessionsCard({ sessions }: { sessions: AdminUserSessionsItem[] }
                             <Stack spacing={0.5}>
                                 <Typography variant="body2" fontWeight={600}>{s.userAgent?.slice(0, 100) || "—"}</Typography>
                                 <Typography variant="caption" color="text.secondary">
-                                    IP: {s.ip || "—"} • Created: {fmt(s.createdAt)} • Expires: {fmt(s.expiresAt)}
+                                    IP: {s.ip || "—"} • Создано: {fmt(s.createdAt)} • Истекает: {fmt(s.expiresAt)}
                                 </Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <Chip size="small" label={s.status} color={s.status === "ACTIVE" ? "success" : "default"}/>
-                                <IconButton size="small" onClick={() => navigator.clipboard?.writeText(s.id)} title="Copy session id">#</IconButton>
+                                <IconButton size="small" onClick={() => navigator.clipboard?.writeText(s.id)} title="Скопировать ID сессии">#</IconButton>
                             </Stack>
                         </Stack>
                     ))}
-                    {!sessions.length && <Typography variant="body2" color="text.secondary">No sessions</Typography>}
+                    {!sessions.length && <Typography variant="body2" color="text.secondary">Сессий нет</Typography>}
                 </Stack>
             </CardContent>
         </Card>

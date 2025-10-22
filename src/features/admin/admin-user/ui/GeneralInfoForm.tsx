@@ -53,17 +53,17 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             );
 
             if (payload.phone && (!phoneRegex.test(payload.phone) || payload.phone.length < 10 || payload.phone.length > 20)) {
-                alert("Phone must be E.164 and 10–20 chars");
+                alert("Телефон должен быть в формате E.164 и содержать 10-20 символов");
                 setBusy(false);
                 return;
             }
             if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-                alert("Email is invalid");
+                alert("Email неверный");
                 setBusy(false);
                 return;
             }
             if (payload.avatar && !/^https?:\/\//i.test(payload.avatar)) {
-                alert("Avatar must be a valid URL");
+                alert("Аватар должен быть валидным URL");
                 setBusy(false);
                 return;
             }
@@ -93,30 +93,30 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Stack spacing={2}>
                                 <TextField
-                                    label="First name"
+                                    label="Имя"
                                     {...register("first_name", {
                                         setValueAs: (v) => (typeof v === "string" ? v : ""),
-                                        maxLength: { value: 120, message: "Max 120 chars" },
+                                        maxLength: { value: 120, message: "Максимум 120 символов" },
                                     })}
                                     error={!!errors.first_name}
                                     helperText={errors.first_name?.message}
                                     InputProps={{ startAdornment: <InputAdornment position="start"><FiUser/></InputAdornment> }}
                                 />
                                 <TextField
-                                    label="Last name"
+                                    label="Фамилия"
                                     {...register("last_name", {
                                         setValueAs: (v) => (typeof v === "string" ? v : ""),
-                                        maxLength: { value: 120, message: "Max 120 chars" },
+                                        maxLength: { value: 120, message: "Максимум 120 символов" },
                                     })}
                                     error={!!errors.last_name}
                                     helperText={errors.last_name?.message}
                                     InputProps={{ startAdornment: <InputAdornment position="start"><FiUser/></InputAdornment> }}
                                 />
                                 <TextField
-                                    label="Phone (E.164)"
+                                    label="Телефон (E.164)"
                                     {...register("phone", {
                                         setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
-                                        validate: (v) => !v || (phoneRegex.test(v) && v.length >= 10 && v.length <= 20) || "Phone must be E.164 and 10–20 chars",
+                                        validate: (v) => !v || (phoneRegex.test(v) && v.length >= 10 && v.length <= 20) || "Телефон должен быть в формате E.164 и содержать 10-20 символов",
                                     })}
                                     error={!!errors.phone}
                                     helperText={errors.phone?.message}
@@ -127,20 +127,20 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Stack spacing={2}>
                                 <TextField
-                                    label="Email"
+                                    label="Email адрес"
                                     {...register("email", {
                                         setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
-                                        validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Email is invalid",
+                                        validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Email неверный",
                                     })}
                                     error={!!errors.email}
                                     helperText={errors.email?.message}
                                     InputProps={{ startAdornment: <InputAdornment position="start"><FiMail/></InputAdornment> }}
                                 />
                                 <TextField
-                                    label="Avatar URL"
+                                    label="Аватар URL"
                                     {...register("avatar", {
                                         setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
-                                        validate: (v) => !v || /^https?:\/\//i.test(v) || "Must be a valid URL",
+                                        validate: (v) => !v || /^https?:\/\//i.test(v) || "Должен быть валидным URL",
                                     })}
                                     error={!!errors.avatar}
                                     helperText={errors.avatar?.message}
@@ -149,7 +149,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                         </Grid>
                         <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end">
                             <Button type="submit" variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>} disabled={busy || !isDirty}>
-                                {busy ? "Saving…" : "Save general info"}
+                                {busy ? "Сохранение…" : "Сохранить информацию"}
                             </Button>
                         </Grid>
                     </Grid>

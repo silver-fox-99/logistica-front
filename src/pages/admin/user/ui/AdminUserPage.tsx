@@ -16,8 +16,8 @@ export default function AdminUserPage() {
     const navigate = useNavigate();
     const { user, sessions, loading, err, setUser } = useAdminUser(id);
 
-    if (loading) return <Container><Typography color="text.secondary">Loading…</Typography></Container>;
-    if (!user)   return <Container><Alert severity="error">{err ?? "User not found"}</Alert></Container>;
+    if (loading) return <Container><Typography color="text.secondary">Загрузка…</Typography></Container>;
+    if (!user)   return <Container><Alert severity="error">{err ?? " Пользователь не найден"}</Alert></Container>;
 
     return (
         <Container disableGutters>
@@ -25,15 +25,15 @@ export default function AdminUserPage() {
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="center">
                         <FiUser/>
-                        <Typography variant="h5" fontWeight={700}>User details</Typography>
+                        <Typography variant="h5" fontWeight={700}>Детали пользователя</Typography>
                         <Chip size="small" label={user.id.slice(0, 8)} />
-                        {user.is_admin && <Chip size="small" icon={<FiShield/>} color="warning" label="Admin" />}
+                        {user.is_admin && <Chip size="small" icon={<FiShield/>} color="warning" label="Администратор" />}
                         <Chip size="small" label={user.status}
                               color={user.status === "ACTIVE" ? "success" : "default"}
                               variant={user.status === "ACTIVE" ? "filled" : "outlined"} />
                     </Stack>
                     <Button variant="outlined" startIcon={<FiArrowLeft/>} onClick={() => navigate("/admin/users")}>
-                        Back to list
+                        Назад к списку
                     </Button>
                 </Stack>
 
