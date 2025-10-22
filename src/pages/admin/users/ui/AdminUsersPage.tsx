@@ -107,7 +107,7 @@ export default function AdminUsersPage() {
             >
                 <Stack spacing={0}>
                     <Typography variant="h5" fontWeight={700}>
-                        Users
+                        Пользователи
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         {totalSafe.toLocaleString()} user{totalSafe === 1 ? "" : "s"}
@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
                 <Stack direction="row" spacing={1.5}>
                     <TextField
                         size="small"
-                        placeholder="Search by phone or email…"
+                        placeholder="Поиск по телефону или email…"
                         onChange={(e) => setSearch(e.target.value)}
                         InputProps={{
                             startAdornment: (
@@ -135,7 +135,7 @@ export default function AdminUsersPage() {
                     >
                         {[10, 20, 50, 100].map((n) => (
                             <MenuItem key={n} value={n}>
-                                {n}/page
+                                {n}/страница
                             </MenuItem>
                         ))}
                     </Select>
@@ -152,22 +152,22 @@ export default function AdminUsersPage() {
                                     onClick={toggleCreatedSort}
                                     sx={{ cursor: "pointer", whiteSpace: "nowrap" }}
                                 >
-                                    Created{" "}
+                                    Создан{" "}
                                     {params.sort === "created_at" ? (dirSafe === "desc" ? "↓" : "↑") : ""}
                                 </TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Phone</TableCell>
+                                <TableCell>Имя</TableCell>
+                                <TableCell>Телефон</TableCell>
                                 <TableCell>Email</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Reg. stage</TableCell>
+                                <TableCell>Статус</TableCell>
+                                <TableCell>Этап регистрации</TableCell>
                                 <TableCell
                                     onClick={toggleLoginSort}
                                     sx={{ cursor: "pointer", whiteSpace: "nowrap" }}
                                 >
-                                    Last login{" "}
+                                    Последний вход{" "}
                                     {params.sort === "last_login_at" ? (dirSafe === "desc" ? "↓" : "↑") : ""}
                                 </TableCell>
-                                <TableCell>Role</TableCell>
+                                <TableCell>Роль</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -181,13 +181,13 @@ export default function AdminUsersPage() {
                                     <TableCell>
                                         <Typography variant="body2">{u.phone}</Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            {u.phone_verified_at ? "verified" : "unverified"}
+                                            {u.phone_verified_at ? "Подтвержден" : "Не подтвержден"}
                                         </Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body2">{u.email || "—"}</Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            {u.email ? (u.email_verified_at ? "verified" : "unverified") : ""}
+                                            {u.email ? (u.email_verified_at ? "Подтвержден" : "Не подтвержден") : ""}
                                         </Typography>
                                     </TableCell>
                                     <TableCell>
@@ -204,9 +204,9 @@ export default function AdminUsersPage() {
                                     <TableCell>{fmt(u.last_login_at)}</TableCell>
                                     <TableCell>
                                         {u.is_admin ? (
-                                            <Chip size="small" icon={<FiShield />} color="warning" label="Admin" />
+                                            <Chip size="small" icon={<FiShield />} color="warning" label="Администратор" />
                                         ) : (
-                                            <Chip size="small" variant="outlined" label="User" />
+                                            <Chip size="small" variant="outlined" label="Пользователь" />
                                         )}
                                     </TableCell>
                                 </TableRow>
@@ -216,7 +216,7 @@ export default function AdminUsersPage() {
                                 <TableRow>
                                     <TableCell colSpan={8}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            {error ?? "No users found"}
+                                            {error ?? "Пользователи не найдены"}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -226,7 +226,7 @@ export default function AdminUsersPage() {
                                 <TableRow>
                                     <TableCell colSpan={8}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            Loading…
+                                            Загрузка…
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -239,7 +239,7 @@ export default function AdminUsersPage() {
             {/* pagination */}
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="caption" color="text.secondary">
-                    Page {pageSafe} of {pagesSafe}
+                    Страница {pageSafe} из {pagesSafe}
                 </Typography>
                 <Pagination
                     count={pagesSafe}

@@ -99,7 +99,7 @@ export default function AdminBlacklistPage() {
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }} justifyContent="space-between">
                 <Stack spacing={0}>
                     <Stack direction="row" spacing={1} alignItems="center">
-                        <FaBan /><Typography variant="h5" fontWeight={700}>IP Blacklist</Typography>
+                        <FaBan /><Typography variant="h5" fontWeight={700}>IP Чёрный список</Typography>
                     </Stack>
                     <Typography variant="body2" color="text.secondary">
                         {totalSafe.toLocaleString()} record{totalSafe === 1 ? "" : "s"}
@@ -109,15 +109,15 @@ export default function AdminBlacklistPage() {
                 <Stack direction="row" spacing={1.5}>
                     <TextField
                         size="small"
-                        placeholder="Search by IP, CIDR or reason…"
+                        placeholder="Поиск по IP, CIDR или причине…"
                         onChange={(e) => setSearch(e.target.value)}
                         InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
                         sx={{ minWidth: 280 }}
                     />
                     <Select size="small" value={String(limitSafe)} onChange={(e) => setLimit(Number(e.target.value))}>
-                        {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/page</MenuItem>)}
+                        {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/страница</MenuItem>)}
                     </Select>
-                    <Button variant="contained" onClick={() => setCreateOpen(true)}>Add entry</Button>
+                    <Button variant="contained" onClick={() => setCreateOpen(true)}>Добавить запись</Button>
                 </Stack>
             </Stack>
 
@@ -127,14 +127,14 @@ export default function AdminBlacklistPage() {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Created</TableCell>
-                                <TableCell>Network</TableCell>
-                                <TableCell>Reason</TableCell>
-                                <TableCell>Active</TableCell>
-                                <TableCell>Expires</TableCell>
-                                <TableCell>Hits</TableCell>
-                                <TableCell>Created by</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell>Создано</TableCell>
+                                <TableCell>Сетевой адрес</TableCell>
+                                <TableCell>Причина</TableCell>
+                                <TableCell>Активен</TableCell>
+                                <TableCell>Истекает</TableCell>
+                                <TableCell>Обращений</TableCell>
+                                <TableCell>Создано</TableCell>
+                                <TableCell align="right">Действия</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -169,8 +169,8 @@ export default function AdminBlacklistPage() {
                                     </TableCell>
                                     <TableCell align="right">
                                         <Stack direction="row" spacing={1} justifyContent="flex-end">
-                                            <Button size="small" variant="outlined" onClick={() => setEditItem(row)}>Edit</Button>
-                                            <Tooltip title="Delete">
+                                            <Button size="small" variant="outlined" onClick={() => setEditItem(row)}>Редактировать</Button>
+                                            <Tooltip title="Удалить">
                         <span>
                           <IconButton color="error" onClick={() => setDelItem(row)}>
                             <FiTrash2 />
@@ -186,7 +186,7 @@ export default function AdminBlacklistPage() {
                                 <TableRow>
                                     <TableCell colSpan={8}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            {error ?? "No entries found"}
+                                            {error ?? "Записи не найдены"}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -196,7 +196,7 @@ export default function AdminBlacklistPage() {
                                 <TableRow>
                                     <TableCell colSpan={8}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            Loading…
+                                            Загрузка…
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -209,7 +209,7 @@ export default function AdminBlacklistPage() {
             {/* pagination */}
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="caption" color="text.secondary">
-                    Page {pageSafe} of {pagesSafe}
+                    Страница {pageSafe} из {pagesSafe}
                 </Typography>
                 <Pagination count={pagesSafe} page={pageSafe} onChange={(_, p) => setPage(p)} siblingCount={1} />
             </Stack>
@@ -217,7 +217,7 @@ export default function AdminBlacklistPage() {
             {/* create */}
             <IpBanDialog
                 open={createOpen}
-                title="Add IP or CIDR to blacklist"
+                title="Добавить IP или CIDR в чёрный список"
                 onClose={() => setCreateOpen(false)}
                 onSubmit={createSubmit}
                 submitting={busy}
@@ -226,7 +226,7 @@ export default function AdminBlacklistPage() {
             {/* edit */}
             <IpBanDialog
                 open={!!editItem}
-                title="Edit blacklist entry"
+                title="Редактировать запись в чёрном списке"
                 defaultValues={editItem ? {
                     network: editItem.network,
                     reason: editItem.reason ?? "",
@@ -240,16 +240,16 @@ export default function AdminBlacklistPage() {
 
             {/* delete confirm */}
             <Dialog open={!!delItem} onClose={() => setDelItem(null)}>
-                <DialogTitle>Delete entry</DialogTitle>
+                <DialogTitle>Удалить запись</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
-                        Are you sure you want to delete <b>{delItem?.network}</b>?
+                        Вы уверены, что хотите удалить <b>{delItem?.network}</b>?
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDelItem(null)}>Cancel</Button>
+                    <Button onClick={() => setDelItem(null)}>Отмена</Button>
                     <Button color="error" variant="contained" onClick={remove} disabled={busy}>
-                        {busy ? "Deleting…" : "Delete"}
+                        {busy ? "Удаление…" : "Удалить"}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -113,7 +113,7 @@ export default function GeoLocationDialog({
             <DialogContent dividers>
                 <Stack spacing={2} sx={{ mt: 1 }}>
                     <FormControl size="small" error={!!errors.type}>
-                        <InputLabel>Type</InputLabel>
+                        <InputLabel>Тип</InputLabel>
                         <Select label="Type" value={type} onChange={(e) => setType(e.target.value as LocationType)}>
                             {TYPES.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
                         </Select>
@@ -121,7 +121,7 @@ export default function GeoLocationDialog({
                     </FormControl>
 
                     <TextField
-                        size="small" label="Name" value={name}
+                        size="small" label="Название" value={name}
                         onChange={(e) => setName(e.target.value)}
                         error={!!errors.name} helperText={errors.name}
                     />
@@ -131,49 +131,49 @@ export default function GeoLocationDialog({
                         getOptionLabel={(o) => `${o.name} (${o.type})`}
                         value={parent}
                         onChange={(_, v) => setParent(v)}
-                        renderInput={(p) => <TextField {...p} size="small" label="Parent (optional)" />}
+                        renderInput={(p) => <TextField {...p} size="small" label="Локация (опционально)" />}
                         disabled={type === "COUNTRY"}
                     />
 
                     <TextField
-                        size="small" label="Code (optional)" value={code}
+                        size="small" label="Код (опционально)" value={code}
                         onChange={(e) => setCode(e.target.value)}
                         error={!!errors.code} helperText={errors.code}
                     />
 
                     <TextField
-                        size="small" label="ISO2 (countries only)" value={iso2}
+                        size="small" label="ISO2 (только для стран)" value={iso2}
                         onChange={(e) => setIso2(e.target.value)}
                         error={!!errors.iso2} helperText={errors.iso2}
                         placeholder="US, UA, PL…"
                     />
 
                     <TextField
-                        size="small" label="Slug (optional)" value={slug}
+                        size="small" label="Слаг (опционально)" value={slug}
                         onChange={(e) => setSlug(e.target.value)}
                         error={!!errors.slug} helperText={errors.slug}
                     />
 
                     {mode === "edit" && (
                         <FormControl size="small">
-                            <InputLabel shrink>Active</InputLabel>
+                            <InputLabel shrink>Активен</InputLabel>
                             <Select
                                 notched
                                 value={String(isActive)}
                                 onChange={(e) => setIsActive(e.target.value === "true")}
-                                label="Active"
+                                label="Активен"
                             >
-                                <MenuItem value="true">Active</MenuItem>
-                                <MenuItem value="false">Inactive</MenuItem>
+                                <MenuItem value="true">Активен</MenuItem>
+                                <MenuItem value="false">Неактивен</MenuItem>
                             </Select>
                         </FormControl>
                     )}
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>Отмена</Button>
                 <Button variant="contained" onClick={handleSave} disabled={submitting}>
-                    {submitting ? "Saving…" : "Save"}
+                    {submitting ? "Сохранение…" : "Сохранить"}
                 </Button>
             </DialogActions>
         </Dialog>

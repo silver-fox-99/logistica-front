@@ -24,7 +24,7 @@ export function ItemDialog({
     const onSave = async () => {
         let metaObj: any = undefined;
         if (meta.trim().length) {
-            try { metaObj = JSON.parse(meta); } catch { alert("Meta must be valid JSON"); return; }
+            try { metaObj = JSON.parse(meta); } catch { alert("Мета должен быть валидным JSON"); return; }
         }
         await onSubmit({
             slug: slug.trim().toUpperCase(),
@@ -38,19 +38,19 @@ export function ItemDialog({
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{initial ? "Edit item" : "Create item"}</DialogTitle>
+            <DialogTitle>{initial ? "Редактировать элемент" : "Создать элемент"}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} mt={1}>
-                    <TextField label="Slug (UPPER_SNAKE)" value={slug} onChange={(e) => setSlug(e.target.value)} disabled={!!initial}/>
-                    <TextField label="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
-                    <TextField label="Sort order" type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value || "0", 10))} />
-                    <FormControlLabel control={<Switch checked={active} onChange={(_, v) => setActive(v)} />} label="Active" />
-                    <TextField label="Meta (JSON)" value={meta} onChange={(e) => setMeta(e.target.value)} multiline minRows={4} />
+                    <TextField label="Слаг (UPPER_SNAKE)" value={slug} onChange={(e) => setSlug(e.target.value)} disabled={!!initial}/>
+                    <TextField label="Название" value={label} onChange={(e) => setLabel(e.target.value)} />
+                    <TextField label="Порядок сортировки" type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value || "0", 10))} />
+                    <FormControlLabel control={<Switch checked={active} onChange={(_, v) => setActive(v)} />} label="Активен" />
+                    <TextField label="Мета (JSON)" value={meta} onChange={(e) => setMeta(e.target.value)} multiline minRows={4} />
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} variant="text">Cancel</Button>
-                <Button onClick={onSave} variant="contained" disabled={!label || (!initial && !slug)}>Save</Button>
+                <Button onClick={onClose} variant="text">Отмена</Button>
+                <Button onClick={onSave} variant="contained" disabled={!label || (!initial && !slug)}>Сохранить</Button>
             </DialogActions>
         </Dialog>
     );

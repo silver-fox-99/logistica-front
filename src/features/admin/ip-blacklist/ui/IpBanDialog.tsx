@@ -7,12 +7,12 @@ import { z } from "zod";
 
 // Схема принимает строки из инпутов, а пустые строки конвертим в undefined.
 const submitSchema = z.object({
-    network: z.string().trim().min(1, "Network is required").max(100, "Too long"),
+    network: z.string().trim().min(1, "Сетевой адрес обязателен").max(100, "Слишком долго"),
     reason: z.string().trim().optional().transform(v => (v === "" ? undefined : v)),
     is_active: z.boolean(),
     expiresAt: z.string().trim().optional()
         .transform(v => (v === "" ? undefined : v))
-        .refine((v) => !v || !Number.isNaN(Date.parse(v)), { message: "Invalid ISO datetime" }),
+        .refine((v) => !v || !Number.isNaN(Date.parse(v)), { message: "Невалидная дата ISO" }),
 });
 
 export type IpBanFormValues = z.infer<typeof submitSchema>;
@@ -79,7 +79,7 @@ export default function IpBanDialog({
             <DialogContent>
                 <Stack spacing={2} sx={{ mt: 1 }}>
                     <TextField
-                        label="Network (IP or CIDR)"
+                        label="Сетевой адрес (IP или CIDR)"
                         placeholder="203.0.113.7 or 203.0.113.0/24"
                         value={network}
                         onChange={(e) => setNetwork(e.target.value)}
@@ -89,7 +89,7 @@ export default function IpBanDialog({
                     />
 
                     <TextField
-                        label="Reason"
+                        label="Причина"
                         multiline
                         minRows={2}
                         value={reason ?? ""}
@@ -99,7 +99,7 @@ export default function IpBanDialog({
                     />
 
                     <TextField
-                        label="Expires at (ISO, optional)"
+                        label="Истекает (ISO, опционально)"
                         placeholder="2025-12-31T23:59:59.000Z"
                         value={expiresAt ?? ""}
                         onChange={(e) => setExpiresAt(e.target.value)}
@@ -111,21 +111,21 @@ export default function IpBanDialog({
                         control={
                             <Switch checked={isActive} onChange={(_, v) => setIsActive(v)} />
                         }
-                        label="Active"
+                        label="Активен"
                     />
 
                     {hasErrors && (
                         <Alert severity="warning" variant="outlined">
-                            Please fix the errors above and try again.
+                            Пожалуйста, исправьте ошибки выше и попробуйте снова.
                         </Alert>
                     )}
                 </Stack>
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>Отмена</Button>
                 <Button variant="contained" onClick={handleSave} disabled={submitting}>
-                    {submitting ? "Saving…" : "Save"}
+                    {submitting ? "Сохранение…" : "Сохранить"}
                 </Button>
             </DialogActions>
         </Dialog>

@@ -18,7 +18,7 @@ export default function AdminLookupsPage() {
     const headerRight = useMemo(() => (
         <Stack direction="row" spacing={1}>
             <Button variant="outlined" startIcon={<FiPlus />} onClick={() => setOpenGroup({ mode: "create" })}>
-                New group
+                Новая группа
             </Button>
         </Stack>
     ), []);
@@ -49,7 +49,7 @@ export default function AdminLookupsPage() {
 
     useEffect(() => { if (current) void reloadItems(); }, [current]); // ensure reload when current changes
 
-    if (loading) return <Container><Typography color="text.secondary">Loading…</Typography></Container>;
+    if (loading) return <Container><Typography color="text.secondary">Загрузка…</Typography></Container>;
     if (error)   return <Container><Alert severity="error">{error}</Alert></Container>;
 
     return (
@@ -58,7 +58,7 @@ export default function AdminLookupsPage() {
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="center">
                         <FiDatabase />
-                        <Typography variant="h5" fontWeight={700}>Lookups</Typography>
+                        <Typography variant="h5" fontWeight={700}>Справочник</Typography>
                         <Chip size="small" label={groups.length} />
                         {current && <Chip size="small" color="primary" label={current.title} />}
                     </Stack>
@@ -75,7 +75,7 @@ export default function AdminLookupsPage() {
                             onCreate={() => setOpenGroup({ mode: "create" })}
                             onEdit={(g) => setOpenGroup({ mode: "edit", group: g })}
                             onDelete={async (g) => {
-                                if (!confirm(`Delete group "${g.title}"? Items will be removed as well.`)) return;
+                                if (!confirm(`Удалить группу "${g.title}"? Элементы будут удалены тоже.`)) return;
                                 await lookupsApi.deleteGroup(g.id);
                                 await reloadGroups();
                                 if (current?.id === g.id) setCurrent(null);
@@ -92,7 +92,7 @@ export default function AdminLookupsPage() {
                             onEdit={(it) => setOpenItem({ mode: "edit", item: it })}
                             onDelete={async (it) => {
                                 if (!current) return;
-                                if (!confirm(`Delete item "${it.label}"?`)) return;
+                                if (!confirm(`Удалить элемент "${it.label}"?`)) return;
                                 await lookupsApi.deleteItem(current.code, it.id);
                                 await reloadItems();
                             }}

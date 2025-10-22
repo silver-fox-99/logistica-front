@@ -28,18 +28,18 @@ export function GroupDialog({
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{initial ? "Edit group" : "Create group"}</DialogTitle>
+            <DialogTitle>{initial ? "Редактировать группу" : "Создать группу"}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} mt={1}>
-                    <TextField label="Code (lower_snake)" value={code} onChange={(e) => setCode(e.target.value)} disabled={!!initial}/>
-                    <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    <TextField label="Description" value={description ?? ""} onChange={(e) => setDescription(e.target.value)} multiline minRows={2} />
+                    <TextField label="Код (lower_snake)" value={code} onChange={(e) => setCode(e.target.value)} disabled={!!initial}/>
+                    <TextField label="Название" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <TextField label="Описание" value={description ?? ""} onChange={(e) => setDescription(e.target.value)} multiline minRows={2} />
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} variant="text">Cancel</Button>
+                <Button onClick={onClose} variant="text">Отмена</Button>
                 <Button onClick={submit} variant="contained" disabled={busy || !title || (!initial && !code)}>
-                    {initial ? "Save" : "Create"}
+                    {initial ? "Сохранить" : "Создать"}
                 </Button>
             </DialogActions>
         </Dialog>

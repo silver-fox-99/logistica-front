@@ -65,7 +65,7 @@ export default function AdminTransportPage() {
         <Stack spacing={2}>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }} justifyContent="space-between">
                 <Stack spacing={0}>
-                    <Typography variant="h5" fontWeight={700}>Transport</Typography>
+                    <Typography variant="h5" fontWeight={700}>Транспорт</Typography>
                     <Typography variant="body2" color="text.secondary">
                         {totalSafe.toLocaleString()} record{totalSafe === 1 ? "" : "s"}
                     </Typography>
@@ -74,13 +74,13 @@ export default function AdminTransportPage() {
                 <Stack direction="row" spacing={1.5}>
                     <TextField
                         size="small"
-                        placeholder="Search by route, note, phone, etc…"
+                        placeholder="Поиск по маршруту, заметке, телефону и т.д.…"
                         onChange={(e) => setSearch(e.target.value)}
                         InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
                         sx={{ minWidth: 280 }}
                     />
                     <Select size="small" value={String(limitSafe)} onChange={(e) => setLimit(Number(e.target.value))}>
-                        {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/page</MenuItem>)}
+                        {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/страница</MenuItem>)}
                     </Select>
                 </Stack>
             </Stack>
@@ -90,15 +90,15 @@ export default function AdminTransportPage() {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Created</TableCell>
-                                <TableCell>Owner</TableCell>
-                                <TableCell>Route</TableCell>
-                                <TableCell>Dates</TableCell>
-                                <TableCell>Vehicle</TableCell>
-                                <TableCell>Weight/Vol</TableCell>
-                                <TableCell>Cars</TableCell>
-                                <TableCell>Price</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell>Создан</TableCell>
+                                <TableCell>Владелец</TableCell>
+                                <TableCell>Маршрут</TableCell>
+                                <TableCell>Дата</TableCell>
+                                <TableCell>Тип</TableCell>
+                                <TableCell>Вес/Объем</TableCell>
+                                <TableCell>Автомобили</TableCell>
+                                <TableCell>Цена</TableCell>
+                                <TableCell align="right">Действия</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -136,7 +136,7 @@ export default function AdminTransportPage() {
                                     <TableCell>
                                         <Chip size="small" label={t.vehicle_type} />
                                         {t.has_dimensions && (
-                                            <Chip size="small" color="primary" label="Dims" sx={{ ml: .5 }} />
+                                            <Chip size="small" color="primary" label="Размеры" sx={{ ml: .5 }} />
                                         )}
                                     </TableCell>
 
@@ -163,7 +163,7 @@ export default function AdminTransportPage() {
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        <Tooltip title="Delete transport">
+                                        <Tooltip title="Удалить транспорт">
                       <span>
                         <IconButton color="error" onClick={() => setToDelete(t)}>
                           <FiTrash2 />
@@ -178,7 +178,7 @@ export default function AdminTransportPage() {
                                 <TableRow>
                                     <TableCell colSpan={9}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            {error ?? "No transport found"}
+                                            {error ?? "Транспорт не найден"}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -188,7 +188,7 @@ export default function AdminTransportPage() {
                                 <TableRow>
                                     <TableCell colSpan={9}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            Loading…
+                                            Загрузка…
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -200,22 +200,22 @@ export default function AdminTransportPage() {
 
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="caption" color="text.secondary">
-                    Page {pageSafe} of {pagesSafe}
+                    Страница {pageSafe} из {pagesSafe}
                 </Typography>
                 <Pagination count={pagesSafe} page={pageSafe} onChange={(_, p) => setPage(p)} siblingCount={1} />
             </Stack>
 
             <Dialog open={!!toDelete} onClose={() => setToDelete(null)}>
-                <DialogTitle>Delete transport</DialogTitle>
+                <DialogTitle>Удалить транспорт</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
-                        Are you sure you want to delete transport <b>{toDelete?.id.slice(0, 8)}…</b>?
+                        Вы уверены, что хотите удалить транспорт <b>{toDelete?.id.slice(0, 8)}…</b>?
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setToDelete(null)}>Cancel</Button>
+                    <Button onClick={() => setToDelete(null)}>Отмена</Button>
                     <Button color="error" variant="contained" onClick={confirmDelete} disabled={busy}>
-                        {busy ? "Deleting…" : "Delete"}
+                        {busy ? "Удаление…" : "Удалить"}
                     </Button>
                 </DialogActions>
             </Dialog>

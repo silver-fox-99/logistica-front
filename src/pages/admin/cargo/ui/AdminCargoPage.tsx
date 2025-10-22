@@ -64,7 +64,7 @@ export default function AdminCargoPage() {
         <Stack spacing={2}>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }} justifyContent="space-between">
                 <Stack spacing={0}>
-                    <Typography variant="h5" fontWeight={700}>Cargo</Typography>
+                    <Typography variant="h5" fontWeight={700}>Грузы</Typography>
                     <Typography variant="body2" color="text.secondary">
                         {totalSafe.toLocaleString()} record{totalSafe === 1 ? "" : "s"}
                     </Typography>
@@ -73,13 +73,13 @@ export default function AdminCargoPage() {
                 <Stack direction="row" spacing={1.5}>
                     <TextField
                         size="small"
-                        placeholder="Search by route, note, phone, etc…"
+                        placeholder="Поиск по маршруту, заметке, телефону и т.д.…"
                         onChange={(e) => setSearch(e.target.value)}
                         InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
                         sx={{ minWidth: 280 }}
                     />
                     <Select size="small" value={String(limitSafe)} onChange={(e) => setLimit(Number(e.target.value))}>
-                        {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/page</MenuItem>)}
+                        {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/страница</MenuItem>)}
                     </Select>
                 </Stack>
             </Stack>
@@ -89,15 +89,15 @@ export default function AdminCargoPage() {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Created</TableCell>
-                                <TableCell>Owner</TableCell>
-                                <TableCell>Route</TableCell>
-                                <TableCell>Dates</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>Weight/Vol</TableCell>
-                                <TableCell>Cars</TableCell>
-                                <TableCell>Price</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell>Создан</TableCell>
+                                <TableCell>Владелец</TableCell>
+                                <TableCell>Маршрут</TableCell>
+                                <TableCell>Дата</TableCell>
+                                <TableCell>Тип</TableCell>
+                                <TableCell>Вес/Объем</TableCell>
+                                <TableCell>Автомобили</TableCell>
+                                <TableCell>Цена</TableCell>
+                                <TableCell align="right">Действия</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -141,8 +141,8 @@ export default function AdminCargoPage() {
                                             <Chip size="small" label={c.cargo_type} />
                                             <Chip size="small" variant="outlined" label={c.load_type} />
                                             <Chip size="small" variant="outlined" label={c.vehicle_type} />
-                                            {c.has_dimensions && <Chip size="small" color="primary" label="Dims" />}
-                                            {c.allow_partial_load && <Chip size="small" color="secondary" label="Partial" />}
+                                            {c.has_dimensions && <Chip size="small" color="primary" label="Размеры" />}
+                                            {c.allow_partial_load && <Chip size="small" color="secondary" label="Частичная" />}
                                         </Stack>
                                     </TableCell>
 
@@ -171,7 +171,7 @@ export default function AdminCargoPage() {
 
                                     {/* Actions */}
                                     <TableCell align="right">
-                                        <Tooltip title="Delete cargo">
+                                        <Tooltip title="Удалить груз">
                       <span>
                         <IconButton color="error" onClick={() => setToDelete(c)}>
                           <FiTrash2 />
@@ -186,7 +186,7 @@ export default function AdminCargoPage() {
                                 <TableRow>
                                     <TableCell colSpan={9}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            {error ?? "No cargo found"}
+                                            {error ?? "Грузы не найдены"}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -196,7 +196,7 @@ export default function AdminCargoPage() {
                                 <TableRow>
                                     <TableCell colSpan={9}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            Loading…
+                                            Загрузка…
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -208,23 +208,23 @@ export default function AdminCargoPage() {
 
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="caption" color="text.secondary">
-                    Page {pageSafe} of {pagesSafe}
+                    Страница {pageSafe} из {pagesSafe}
                 </Typography>
                 <Pagination count={pagesSafe} page={pageSafe} onChange={(_, p) => setPage(p)} siblingCount={1} />
             </Stack>
 
             {/* Delete dialog */}
             <Dialog open={!!toDelete} onClose={() => setToDelete(null)}>
-                <DialogTitle>Delete cargo</DialogTitle>
+                <DialogTitle>Удалить груз</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
-                        Are you sure you want to delete cargo <b>{toDelete?.id.slice(0, 8)}…</b>?
+                        Вы уверены, что хотите удалить груз <b>{toDelete?.id.slice(0, 8)}…</b>?
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setToDelete(null)}>Cancel</Button>
+                    <Button onClick={() => setToDelete(null)}>Отмена</Button>
                     <Button color="error" variant="contained" onClick={confirmDelete} disabled={busy}>
-                        {busy ? "Deleting…" : "Delete"}
+                        {busy ? "Удаление…" : "Удалить"}
                     </Button>
                 </DialogActions>
             </Dialog>

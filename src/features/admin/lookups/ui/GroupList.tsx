@@ -16,8 +16,8 @@ export function GroupList({
         <List
             subheader={
                 <ListSubheader component="div">
-                    Groups
-                    <Tooltip title="Create group">
+                    Группы
+                    <Tooltip title="Создать группу">
                         <IconButton size="small" onClick={onCreate} sx={{ ml: 1 }}>
                             <FiPlus />
                         </IconButton>

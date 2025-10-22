@@ -56,7 +56,7 @@ function ActivityFiltersBar({
 
                 <TextField
                     size="small"
-                    placeholder="Search (user, description, IP)…"
+                    placeholder="Поиск (пользователь, описание, IP)…"
                     value={filters.search}
                     onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
                     InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
@@ -70,13 +70,13 @@ function ActivityFiltersBar({
                     onChange={(e) => setFilters((f) => ({ ...f, method: String(e.target.value) }))}
                     sx={{ minWidth: 150 }}
                 >
-                    <MenuItem value=""><em>All methods</em></MenuItem>
+                    <MenuItem value=""><em>Все методы</em></MenuItem>
                     {METHODS.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
                 </Select>
 
                 <TextField
                     size="small"
-                    placeholder="Status"
+                    placeholder="Статус"
                     type="number"
                     value={filters.statusCode ?? ""}
                     onChange={(e) => {
@@ -94,11 +94,11 @@ function ActivityFiltersBar({
                         onChange={(_, v) => setFilters((f) => ({ ...f, includeAnonymous: v }))}
                         size="small"
                     />
-                    <Typography variant="body2">Include anonymous</Typography>
+                    <Typography variant="body2">Включить анонимных</Typography>
                 </Stack>
 
                 <Select size="small" value={String(limit)} onChange={(e) => setLimit(Number(e.target.value))}>
-                    {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/page</MenuItem>)}
+                    {[10, 20, 50, 100].map(n => <MenuItem key={n} value={n}>{n}/страница</MenuItem>)}
                 </Select>
 
                 {/* Правый край: More / Clear / итого */}
@@ -109,10 +109,10 @@ function ActivityFiltersBar({
                         endIcon={openMore ? <FiChevronUp /> : <FiChevronDown />}
                         onClick={() => setOpenMore(v => !v)}
                     >
-                        More filters
+                        Больше фильтров
                     </Button>
                     <Button size="small" startIcon={<FiRotateCcw />} onClick={clearAll}>
-                        Clear
+                        Очистить
                     </Button>
                     <Typography variant="caption" color="text.secondary">
                         {total.toLocaleString()} record{total === 1 ? "" : "s"}
@@ -125,7 +125,7 @@ function ActivityFiltersBar({
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.25, rowGap: 1.25 }}>
                     <TextField
                         size="small"
-                        placeholder="Endpoint (e.g. /auth/login)"
+                        placeholder="Маршрут (например, /auth/login)"
                         value={filters.endpoint}
                         onChange={(e) => setFilters((f) => ({ ...f, endpoint: e.target.value }))}
                         sx={controlSx}
@@ -134,7 +134,7 @@ function ActivityFiltersBar({
                     <TextField
                         size="small"
                         type="datetime-local"
-                        label="From"
+                        label="От"
                         InputLabelProps={{ shrink: true }}
                         value={filters.dateFrom ?? ""}
                         onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value }))}
@@ -143,7 +143,7 @@ function ActivityFiltersBar({
                     <TextField
                         size="small"
                         type="datetime-local"
-                        label="To"
+                        label="До"
                         InputLabelProps={{ shrink: true }}
                         value={filters.dateTo ?? ""}
                         onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value }))}
@@ -152,7 +152,7 @@ function ActivityFiltersBar({
 
                     <TextField
                         size="small"
-                        placeholder="User ID (UUID)"
+                        placeholder="ID пользователя (UUID)"
                         value={filters.userId ?? ""}
                         onChange={(e) => setFilters((f) => ({ ...f, userId: e.target.value }))}
                         sx={{ minWidth: 260 }}
@@ -177,7 +177,7 @@ export default function AdminActivityLogsPage() {
             <Stack direction={{ xs: "column" }} spacing={0.5}>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <FiClock />
-                    <Typography variant="h5" fontWeight={700}>Activity logs</Typography>
+                    <Typography variant="h5" fontWeight={700}>Журнал активности</Typography>
                 </Stack>
             </Stack>
 
@@ -196,14 +196,14 @@ export default function AdminActivityLogsPage() {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Time</TableCell>
-                                <TableCell>User</TableCell>
-                                <TableCell>Method</TableCell>
-                                <TableCell>Endpoint</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Duration</TableCell>
+                                <TableCell>Время</TableCell>
+                                <TableCell>Пользователь</TableCell>
+                                <TableCell>Метод</TableCell>
+                                <TableCell>Маршрут</TableCell>
+                                <TableCell>Статус</TableCell>
+                                <TableCell>Продолжительность</TableCell>
                                 <TableCell>IP</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell align="right">Действия</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -227,10 +227,10 @@ export default function AdminActivityLogsPage() {
                                             label={row.statusCode}
                                         />
                                     </TableCell>
-                                    <TableCell>{row.durationMs} ms</TableCell>
+                                    <TableCell>{row.durationMs} мс</TableCell>
                                     <TableCell>{row.ip}</TableCell>
                                     <TableCell align="right">
-                                        <Tooltip title="View details">
+                                        <Tooltip title="Посмотреть детали">
                       <span>
                         <IconButton onClick={() => openDetails(row)}><FiInfo /></IconButton>
                       </span>
@@ -243,7 +243,7 @@ export default function AdminActivityLogsPage() {
                                 <TableRow>
                                     <TableCell colSpan={8}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            {error ?? "No logs found"}
+                                            {error ?? "Логи не найдены"}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -253,7 +253,7 @@ export default function AdminActivityLogsPage() {
                                 <TableRow>
                                     <TableCell colSpan={8}>
                                         <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                                            Loading…
+                                            Загрузка…
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -266,7 +266,7 @@ export default function AdminActivityLogsPage() {
             {/* pagination */}
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography variant="caption" color="text.secondary">
-                    Page {page} of {pages}
+                    Страница {page} из {pages}
                 </Typography>
                 <Pagination count={pages} page={page} onChange={(_, p) => setPage(p)} siblingCount={1} />
             </Stack>

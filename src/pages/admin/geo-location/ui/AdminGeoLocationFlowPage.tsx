@@ -90,15 +90,15 @@ export default function AdminGeoLocationFlowPage() {
                 <Stack spacing={0.5}>
                     <Stack direction="row" spacing={1} alignItems="center">
                         <FiMapPin />
-                        <Typography variant="h5" fontWeight={700}>Geo locations</Typography>
+                        <Typography variant="h5" fontWeight={700}>Гео-локации</Typography>
                     </Stack>
                     <Typography variant="body2" color="text.secondary">
-                        {items.length.toLocaleString()} total
+                        {items.length.toLocaleString()} всего
                     </Typography>
                 </Stack>
                 <Stack direction="row" spacing={1}>
-                    <Button startIcon={<FiPlus />} variant="contained" onClick={openCreateGeneral}>Add location</Button>
-                    <Tooltip title="Reload"><span><IconButton onClick={reload}><FiRefreshCw /></IconButton></span></Tooltip>
+                    <Button startIcon={<FiPlus />} variant="contained" onClick={openCreateGeneral}>Добавить локацию</Button>
+                    <Tooltip title="Обновить"><span><IconButton onClick={reload}><FiRefreshCw /></IconButton></span></Tooltip>
                 </Stack>
             </Stack>
 
@@ -108,7 +108,7 @@ export default function AdminGeoLocationFlowPage() {
                     <Stack direction="row" spacing={1.5} flexWrap="wrap">
                         <TextField
                             size="small"
-                            placeholder="Search by name/code/slug/ISO2…"
+                            placeholder="Поиск по названию/коду/слагу/ISO2…"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
@@ -116,11 +116,11 @@ export default function AdminGeoLocationFlowPage() {
                         />
                         <Select size="small" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as LocationType | "")}
                                 sx={{ minWidth: 180 }} displayEmpty>
-                            {TYPES.map(t => <MenuItem key={t || "ALL"} value={t}>{t || "All types"}</MenuItem>)}
+                            {TYPES.map(t => <MenuItem key={t || "ALL"} value={t}>{t || "Все типы"}</MenuItem>)}
                         </Select>
                     </Stack>
                     <Typography variant="caption" color="text.secondary">
-                        Tip: double-click Country/Region to add a City, double-click City to edit.
+                        Подсказка: двойной клик по Стране/Региону для добавления Города, двойной клик по Городу для редактирования.
                     </Typography>
                 </Stack>
             </Paper>
@@ -138,46 +138,46 @@ export default function AdminGeoLocationFlowPage() {
             <Paper variant="outlined" sx={{ borderRadius: 2 }}>
                 <Box sx={{ overflowX: "auto" }}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2, py: 1 }}>
-                        <Typography variant="subtitle2">Children list</Typography>
-                        <Button size="small" startIcon={<FiPlus />} onClick={openCreateGeneral}>Add</Button>
+                        <Typography variant="subtitle2">Список элементов</Typography>
+                        <Button size="small" startIcon={<FiPlus />} onClick={openCreateGeneral}>Добавить</Button>
                     </Stack>
                     <Divider />
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>Parent</TableCell>
-                                <TableCell>Code</TableCell>
+                                <TableCell>Название</TableCell>
+                                <TableCell>Тип</TableCell>
+                                <TableCell>Родитель</TableCell>
+                                <TableCell>Код</TableCell>
                                 <TableCell>ISO2</TableCell>
-                                <TableCell>Slug</TableCell>
-                                <TableCell>Active</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell>Слаг</TableCell>
+                                <TableCell>Активен</TableCell>
+                                <TableCell align="right">Действия</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {rows.map((row) => (
                                 <TableRow key={row.id} hover>
-                                    <TableCell>{row.name || "Unnamed"}</TableCell>
+                                    <TableCell>{row.name || "Без названия"}</TableCell>
                                     <TableCell><Chip size="small" label={row.type} /></TableCell>
                                     <TableCell>{row.parent_id ? (byId.get(row.parent_id)?.name ?? row.parent_id) : "—"}</TableCell>
                                     <TableCell>{row.code || "—"}</TableCell>
                                     <TableCell>{row.iso2 || "—"}</TableCell>
                                     <TableCell>{row.slug || "—"}</TableCell>
-                                    <TableCell>{row.is_active === false ? "No" : "Yes"}</TableCell>
+                                    <TableCell>{row.is_active === false ? "Нет" : "Да"}</TableCell>
                                     <TableCell align="right">
                                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                            <Tooltip title="Edit"><span><IconButton size="small" onClick={() => openEditCity(row.id)}><FiEdit3 /></IconButton></span></Tooltip>
-                                            <Tooltip title="Delete"><span><IconButton size="small" color="error" onClick={() => handleDelete(row)}><FiTrash2 /></IconButton></span></Tooltip>
+                                            <Tooltip title="Редактировать"><span><IconButton size="small" onClick={() => openEditCity(row.id)}><FiEdit3 /></IconButton></span></Tooltip>
+                                            <Tooltip title="Удалить"><span><IconButton size="small" color="error" onClick={() => handleDelete(row)}><FiTrash2 /></IconButton></span></Tooltip>
                                         </Stack>
                                     </TableCell>
                                 </TableRow>
                             ))}
                             {!loading && rows.length === 0 && (
-                                <TableRow><TableCell colSpan={8}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>No locations</Typography></TableCell></TableRow>
+                                <TableRow><TableCell colSpan={8}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>Локации не найдены</Typography></TableCell></TableRow>
                             )}
                             {loading && (
-                                <TableRow><TableCell colSpan={8}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>Loading…</Typography></TableCell></TableRow>
+                                <TableRow><TableCell colSpan={8}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>Загрузка…</Typography></TableCell></TableRow>
                             )}
                             {error && (
                                 <TableRow><TableCell colSpan={8}><Typography align="center" color="error" sx={{ py: 4 }}>{error}</Typography></TableCell></TableRow>
@@ -192,7 +192,7 @@ export default function AdminGeoLocationFlowPage() {
                 key={`${dlgMode}-${editing?.id ?? "new"}-${createParentId ?? "none"}`}
                 open={dlgOpen}
                 mode={dlgMode}
-                title={dlgMode === "create" ? "Add geo location" : `Edit: ${editing?.name}`}
+                title={dlgMode === "create" ? "Добавить гео-локацию" : `Редактировать: ${editing?.name}`}
                 all={items}
                 initial={
                     dlgMode === "edit"

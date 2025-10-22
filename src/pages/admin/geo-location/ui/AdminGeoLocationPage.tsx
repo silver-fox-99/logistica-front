@@ -118,13 +118,13 @@ export default function AdminGeoLocationsPage() {
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }} justifyContent="space-between">
                 <Stack spacing={0.5}>
                     <Stack direction="row" spacing={1} alignItems="center">
-                        <FiMapPin /><Typography variant="h5" fontWeight={700}>Geo locations</Typography>
+                        <FiMapPin /><Typography variant="h5" fontWeight={700}>Гео-локации</Typography>
                     </Stack>
-                    <Typography variant="body2" color="text.secondary">{items.length.toLocaleString()} total</Typography>
+                    <Typography variant="body2" color="text.secondary">{items.length.toLocaleString()} всего</Typography>
                 </Stack>
                 <Stack direction="row" spacing={1}>
-                    <Button startIcon={<FiPlus />} variant="contained" onClick={openCreate}>Add location</Button>
-                    <Tooltip title="Reload"><span><IconButton onClick={reload}><FiRefreshCw /></IconButton></span></Tooltip>
+                    <Button startIcon={<FiPlus />} variant="contained" onClick={openCreate}>Добавить локацию</Button>
+                    <Tooltip title="Обновить"><span><IconButton onClick={reload}><FiRefreshCw /></IconButton></span></Tooltip>
                 </Stack>
             </Stack>
 
@@ -133,29 +133,24 @@ export default function AdminGeoLocationsPage() {
                 <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} alignItems={{ md: "center" }} justifyContent="space-between">
                     <Stack direction="row" spacing={1.5} flexWrap="wrap">
                         <TextField
-                            size="small" placeholder="Search by name/code/slug/ISO2…" value={search}
+                            size="small" placeholder="Поиск по названию/коду/слагу/ISO2…" value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch /></InputAdornment> }}
                             sx={{ minWidth: 280 }}
                         />
                         <Select size="small" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as LocationType | "")}
                                 sx={{ minWidth: 180 }} displayEmpty>
-                            {TYPES.map(t => <MenuItem key={t || "ALL"} value={t}>{t || "All types"}</MenuItem>)}
+                            {TYPES.map(t => <MenuItem key={t || "ALL"} value={t}>{t || "Все типы"}</MenuItem>)}
                         </Select>
                     </Stack>
 
-                    {/* NEW: режим выборки */}
-                    <ToggleButtonGroup size="small" value={scope} exclusive onChange={(_, v) => v && setScope(v)}>
-                        <ToggleButton value="direct">Direct children</ToggleButton>
-                        <ToggleButton value="all">All descendants</ToggleButton>
-                    </ToggleButtonGroup>
                 </Stack>
             </Paper>
 
             <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="stretch">
                 {/* left: hierarchy roots */}
                 <Paper variant="outlined" sx={{ width: { md: 360 }, flexShrink: 0, borderRadius: 2, p: 1, maxHeight: 560, overflow: "auto" }}>
-                    <Typography variant="subtitle2" sx={{ px: 1, py: 0.5 }}>Hierarchy</Typography>
+                    <Typography variant="subtitle2" sx={{ px: 1, py: 0.5 }}>Иерархия</Typography>
                     <Divider sx={{ mb: 1 }} />
                     <Stack spacing={0.5}>
                         {treeRoots.map(root => {
@@ -167,17 +162,17 @@ export default function AdminGeoLocationsPage() {
                                 >
                                     <Stack direction="row" alignItems="center" spacing={1}>
                                         <Avatar sx={{ width: 24, height: 24 }}>{(root.name?.[0] ?? "?").toUpperCase()}</Avatar>
-                                        <Typography variant="body2" fontWeight={600}>{root.name || "Unnamed"}</Typography>
+                                        <Typography variant="body2" fontWeight={600}>{root.name || "Без названия"}</Typography>
                                         <Chip size="small" label={root.type} variant="outlined" />
                                     </Stack>
                                     <Typography variant="caption" color="text.secondary" sx={{ pl: 4 }}>
-                                        {childCount} {childCount === 1 ? "child" : "children"}
+                                        {childCount} {childCount === 1 ? "элемент" : "элементов"}
                                     </Typography>
                                 </Stack>
                             );
                         })}
-                        {!loading && treeRoots.length === 0 && <Typography align="center" color="text.secondary" sx={{ py: 2 }}>No roots found</Typography>}
-                        {loading && <Typography align="center" color="text.secondary" sx={{ py: 2 }}>Loading…</Typography>}
+                        {!loading && treeRoots.length === 0 && <Typography align="center" color="text.secondary" sx={{ py: 2 }}>Элементы не найдены</Typography>}
+                        {loading && <Typography align="center" color="text.secondary" sx={{ py: 2 }}>Загрузка…</Typography>}
                         {error && <Typography align="center" color="error" sx={{ py: 2 }}>{error}</Typography>}
                     </Stack>
                 </Paper>
@@ -187,7 +182,7 @@ export default function AdminGeoLocationsPage() {
                     <Box sx={{ overflowX: "auto" }}>
                         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2, py: 1 }}>
                             <Stack spacing={0}>
-                                <Typography variant="subtitle2">Children list</Typography>
+                                <Typography variant="subtitle2">Список элементов</Typography>
                                 {current && (
                                     <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap">
                                         {buildChain(current, byId).map((n, i) => (
@@ -198,22 +193,22 @@ export default function AdminGeoLocationsPage() {
                                     </Stack>
                                 )}
                             </Stack>
-                            <Button size="small" startIcon={<FiPlus />} onClick={openCreate}>Add</Button>
+                            <Button size="small" startIcon={<FiPlus />} onClick={openCreate}>Добавить</Button>
                         </Stack>
                         <Divider />
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell>Country</TableCell>
-                                    <TableCell>Region</TableCell>
-                                    <TableCell>Parent</TableCell>
-                                    <TableCell>Code</TableCell>
+                                    <TableCell>Название</TableCell>
+                                    <TableCell>Тип</TableCell>
+                                    <TableCell>Страна</TableCell>
+                                    <TableCell>Регион</TableCell>
+                                    <TableCell>Родитель</TableCell>
+                                    <TableCell>Код</TableCell>
                                     <TableCell>ISO2</TableCell>
-                                    <TableCell>Slug</TableCell>
-                                    <TableCell>Active</TableCell>
-                                    <TableCell align="right">Actions</TableCell>
+                                    <TableCell>Слаг</TableCell>
+                                    <TableCell>Активен</TableCell>
+                                    <TableCell align="right">Действия</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -222,7 +217,7 @@ export default function AdminGeoLocationsPage() {
                                         <TableCell>
                                             <Stack direction="row" alignItems="center" spacing={1}>
                                                 <Box sx={{ width: depth * 16 }} />
-                                                <span>{node.name || "Unnamed"}</span>
+                                                <span>{node.name || "Без названия"}</span>
                                             </Stack>
                                         </TableCell>
                                         <TableCell><Chip size="small" label={node.type} /></TableCell>
@@ -232,20 +227,20 @@ export default function AdminGeoLocationsPage() {
                                         <TableCell>{node.code || "—"}</TableCell>
                                         <TableCell>{node.iso2 || "—"}</TableCell>
                                         <TableCell>{node.slug || "—"}</TableCell>
-                                        <TableCell>{node.is_active === false ? "No" : "Yes"}</TableCell>
+                                        <TableCell>{node.is_active === false ? "Нет" : "Да"}</TableCell>
                                         <TableCell align="right">
                                             <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                                <Tooltip title="Edit"><span><IconButton size="small" onClick={() => openEdit(node)}><FiEdit3 /></IconButton></span></Tooltip>
-                                                <Tooltip title="Delete"><span><IconButton size="small" color="error" onClick={() => handleDelete(node)}><FiTrash2 /></IconButton></span></Tooltip>
+                                                <Tooltip title="Редактировать"><span><IconButton size="small" onClick={() => openEdit(node)}><FiEdit3 /></IconButton></span></Tooltip>
+                                                <Tooltip title="Удалить"><span><IconButton size="small" color="error" onClick={() => handleDelete(node)}><FiTrash2 /></IconButton></span></Tooltip>
                                             </Stack>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                                 {!loading && rows.length === 0 && (
-                                    <TableRow><TableCell colSpan={10}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>No locations</Typography></TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={10}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>Локации не найдены</Typography></TableCell></TableRow>
                                 )}
                                 {loading && (
-                                    <TableRow><TableCell colSpan={10}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>Loading…</Typography></TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={10}><Typography align="center" color="text.secondary" sx={{ py: 4 }}>Загрузка…</Typography></TableCell></TableRow>
                                 )}
                             </TableBody>
                         </Table>
@@ -257,7 +252,7 @@ export default function AdminGeoLocationsPage() {
                 key={`${dlgMode}-${editing?.id ?? "new"}`}
                 open={dlgOpen}
                 mode={dlgMode}
-                title={dlgMode === "create" ? "Add geo location" : `Edit: ${editing?.name}`}
+                title={dlgMode === "create" ? "Добавить гео-локацию" : `Редактировать: ${editing?.name}`}
                 all={items}
                 initial={dlgMode === "edit" ? editing ?? undefined : { parent_id: selectedId ?? undefined }}
                 onClose={() => { setDlgOpen(false); setEditing(null); }}

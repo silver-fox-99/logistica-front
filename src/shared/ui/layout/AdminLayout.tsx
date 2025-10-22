@@ -38,14 +38,14 @@ export default function AdminLayout() {
                     <Stack direction="row" spacing={3} alignItems="flex-start">
                         <Paper elevation={0} sx={{ p: 1.5, width: 260, flexShrink: 0 }}>
                             <List disablePadding>
-                                <NavItem to="/admin" icon={<FiBarChart2 />} label="Overview" />
-                                <NavItem to="/admin/users" icon={<FiUsers />} label="Users" />
-                                <NavItem to="/admin/cargo" icon={<FiPackage />} label="Cargo" />
-                                <NavItem to="/admin/transport" icon={<FiPackage />} label="Transport" />
-                                <NavItem to="/admin/geo" icon={<BsGeoAltFill />} label="Geo locations" />
-                                <NavItem to="/admin/initial-data" icon={<FiDatabase  />} label="Initial data" />
-                                <NavItem to="/admin/black-list" icon={<FiShield />} label="Black list" />
-                                <NavItem to="/admin/activity-logs" icon={<FiSettings />} label="Activity logs" />
+                                <NavItem to="/admin" icon={<FiBarChart2 />} label="Обзор" />
+                                <NavItem to="/admin/users" icon={<FiUsers />} label="Пользователи" />
+                                <NavItem to="/admin/cargo" icon={<FiPackage />} label="Грузы" />
+                                <NavItem to="/admin/transport" icon={<FiPackage />} label="Транспорт" />
+                                <NavItem to="/admin/geo" icon={<BsGeoAltFill />} label="Гео-локации" />
+                                <NavItem to="/admin/initial-data" icon={<FiDatabase  />} label="Справочник" />
+                                <NavItem to="/admin/black-list" icon={<FiShield />} label="Черный список" />
+                                <NavItem to="/admin/activity-logs" icon={<FiSettings />} label="Логи активности" />
                             </List>
                         </Paper>
 
