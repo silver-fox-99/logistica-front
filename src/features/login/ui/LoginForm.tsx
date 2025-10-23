@@ -1,17 +1,17 @@
-import { Box, Button, Snackbar, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 import {authApi} from "@/shared/api/authApi.ts";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
-import {useState} from "react";
 
 
 const signInSchema = z.object({
     phone: z
         .string()
-        .min(1, "Phone is required")
+        .min(1, "Введите номер телефона")
         .transform((v) => v.replace(/[^\d+]/g, ""))
         .refine((v) => /^\+?\d{7,15}$/.test(v), "Введите верный номер телефона"),
     password: z.string().min(6, "Пароль должен быть не короче 6 символов"),
@@ -32,7 +32,6 @@ export default function LoginForm() {
         mode: "onTouched",
     });
 
-    const [open, setOpen] = useState(false);
     const setUser = useUserStore(s => s.setUser);
     const navigate = useNavigate()
     const handleLocalSubmit = async (data: SignInForm) => {
@@ -44,9 +43,11 @@ export default function LoginForm() {
             localStorage.setItem('refreshToken', refreshToken)
 
             setUser(rest)
+            toast.success('Вход выполнен успешно!')
             navigate('/dashboard/profile')
-        } catch {
-            setOpen(true)
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Неверный номер телефона или пароль'
+            toast.error(message)
         }
     };
 
@@ -99,13 +100,6 @@ export default function LoginForm() {
             <Link className="button button--reset" to="/reset-password">
                 Забыли пароль?
             </Link>
-
-            <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                open={open}
-                onClose={() => setOpen(false)}
-                message="Invalid username or password"
-            />
         </Box>
     );
 }

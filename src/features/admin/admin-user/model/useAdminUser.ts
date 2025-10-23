@@ -15,7 +15,7 @@ export function useAdminUser(id: string) {
             setUser(res.data.user);
             setSessions(res.data.sessions ?? []);
         } catch (e: any) {
-            setErr(e?.response?.data?.message ?? "Failed to load user");
+            setErr(e?.response?.data?.message ?? "Не удалось загрузить пользователя");
         } finally {
             setLoading(false);
         }

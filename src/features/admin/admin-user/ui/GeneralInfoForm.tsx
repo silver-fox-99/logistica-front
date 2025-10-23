@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid";
 import { Card, CardContent, Stack, TextField, InputAdornment, Button } from "@mui/material";
 import { FiUser, FiPhone, FiMail, FiSave, FiLoader } from "react-icons/fi";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 import { diffPayload } from "../model/diffPayload";
@@ -53,17 +54,17 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             );
 
             if (payload.phone && (!phoneRegex.test(payload.phone) || payload.phone.length < 10 || payload.phone.length > 20)) {
-                alert("Телефон должен быть в формате E.164 и содержать 10-20 символов");
+                toast.error("Телефон должен быть в формате E.164 и содержать 10-20 символов");
                 setBusy(false);
                 return;
             }
             if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-                alert("Email неверный");
+                toast.error("Email неверный");
                 setBusy(false);
                 return;
             }
             if (payload.avatar && !/^https?:\/\//i.test(payload.avatar)) {
-                alert("Аватар должен быть валидным URL");
+                toast.error("Аватар должен быть валидным URL");
                 setBusy(false);
                 return;
             }
@@ -73,6 +74,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             }
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
+            toast.success('Информация о пользователе обновлена');
             reset({
                 first_name: res.data.user.first_name ?? "",
                 last_name:  res.data.user.last_name ?? "",
@@ -80,6 +82,9 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                 email:      res.data.user.email ?? "",
                 avatar:     res.data.user.avatar ?? "",
             });
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении пользователя';
+            toast.error(message);
         } finally {
             setBusy(false);
         }

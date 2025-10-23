@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, Stack, Switch, FormControlLabel, Button } from "@mui/material";
 import { FiShield, FiSave, FiLoader } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 
@@ -15,6 +16,10 @@ export function AdminToggle({ user, onUpdated }: { user: AdminUser; onUpdated: (
             await adminUserApi.patch(user.id, { is_admin: value });
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
+            toast.success('Права администратора обновлены');
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении прав';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 

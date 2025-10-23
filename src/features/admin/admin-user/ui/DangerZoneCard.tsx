@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Card, CardContent, Stack, Button } from "@mui/material";
 import { FiSlash, FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 
@@ -25,6 +26,10 @@ export function DangerZoneCard({
                                 await adminUserApi.ban(user.id);
                                 const res = await adminUserApi.get(user.id);
                                 onBanned(res.data.user);
+                                toast.success('Пользователь заблокирован');
+                            } catch (error: any) {
+                                const message = error?.response?.data?.message || 'Ошибка при блокировке пользователя';
+                                toast.error(message);
                             } finally { setBusy(false); }
                         }}
                     >
@@ -41,7 +46,11 @@ export function DangerZoneCard({
                             setBusy(true);
                             try {
                                 await adminUserApi.remove(user.id);
+                                toast.success('Пользователь удален');
                                 onDeleted();
+                            } catch (error: any) {
+                                const message = error?.response?.data?.message || 'Ошибка при удалении пользователя';
+                                toast.error(message);
                             } finally { setBusy(false); }
                         }}
                     >

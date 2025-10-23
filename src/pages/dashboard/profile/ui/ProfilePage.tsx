@@ -1,4 +1,5 @@
-import {Snackbar, Stack} from "@mui/material";
+import {Stack} from "@mui/material";
+import { toast } from "react-toastify";
 import ProfileOverviewCard from "@/features/profile/ui/ProfileOverviewCard.tsx";
 import ContactInfoCard, {type ContactInfo} from "@/features/profile/ui/ContactInfoCard.tsx";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
@@ -10,7 +11,6 @@ export default function ProfilePage() {
     const user = useUserStore(s => s.user)
     const setUser = useUserStore(s => s.setUser)
     const [userDate, setUserDate] = useState<string>('Unknown')
-    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -39,8 +39,10 @@ export default function ProfilePage() {
             }
             const res = await profileApi.updateProfile(preparedData)
             setUser(res.data)
-        } catch {
-            setOpen(true)
+            toast.success('Информация профиля успешно обновлена')
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Не удалось обновить информацию профиля'
+            toast.error(message)
         }
     }
 
@@ -63,14 +65,6 @@ export default function ProfilePage() {
                 saving={false}
                 onSave={updateUser}
             />
-
-            <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                open={open}
-                onClose={() => setOpen(false)}
-                message="Error to update profile"
-            />
-
         </Stack>
     );
 }

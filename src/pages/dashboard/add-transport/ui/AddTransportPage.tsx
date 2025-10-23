@@ -4,6 +4,7 @@ import {
     Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, FormControl, InputAdornment
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import { toast } from "react-toastify";
 
 import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
 import {useNavigate} from "react-router-dom";
@@ -144,7 +145,7 @@ function PlaceRow({
     const cityValue = place.cityId ? mergedCities.find(c => c.id === place.cityId) ?? null : null;
 
     const errorText = errorKey ? (
-        errorKey === "loadPlaces" || errorKey === "unloadPlaces" ? "Select at least country for the first point" : ""
+        errorKey === "loadPlaces" || errorKey === "unloadPlaces" ? "Выберите хотя бы страну для первой точки" : ""
     ) : "";
 
 
@@ -293,22 +294,22 @@ export default function AddTransportPage() {
 
     const validate = () => {
         const e: Record<string, string> = {};
-        if (!form.dateFrom) e.dateFrom = "Required";
-        if (!form.dateTo) e.dateTo = "Required";
+        if (!form.dateFrom) e.dateFrom = "Обязательно";
+        if (!form.dateTo) e.dateTo = "Обязательно";
 
-        if (!form.loadPlaces[0]?.countryId) e.loadPlaces = "Select at least country for the first loading point";
-        if (!form.unloadPlaces[0]?.countryId) e.unloadPlaces = "Select at least country for the first unloading point";
+        if (!form.loadPlaces[0]?.countryId) e.loadPlaces = "Выберите хотя бы страну для первой точки загрузки";
+        if (!form.unloadPlaces[0]?.countryId) e.unloadPlaces = "Выберите хотя бы страну для первой точки разгрузки";
 
-        if (!form.vehicleType) e.vehicleType = "Select vehicle type";
-        if (!form.paymentMethod) e.paymentMethod = "Select payment method";
-        if (!form.paymentTerm) e.paymentTerm = "Select payment term";
+        if (!form.vehicleType) e.vehicleType = "Выберите тип транспорта";
+        if (!form.paymentMethod) e.paymentMethod = "Выберите способ оплаты";
+        if (!form.paymentTerm) e.paymentTerm = "Выберите условия оплаты";
         if (form.dimsEnabled) {
             if (form.bodyLength == null || form.bodyWidth == null || form.bodyHeight == null) {
-                e.bodyHeight = "Fill all body dimensions";
+                e.bodyHeight = "Заполните все размеры кузова";
             }
         }
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
-            e.contactSecondary = "Invalid phone format. Use + and digits, 10–20 digits total.";
+            e.contactSecondary = "Неверный формат телефона. Используйте + и цифры, всего 10-20 цифр";
         }
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -387,10 +388,19 @@ export default function AddTransportPage() {
 
     const onSubmit = async (ev: React.FormEvent) => {
         ev.preventDefault();
-        if (!validate()) return;
-        const payload = toDto(form);
-        await transportApi.create(payload);
-        navigate("/dashboard/requests")
+        if (!validate()) {
+            toast.warning('Заполните все обязательные поля');
+            return;
+        }
+        try {
+            const payload = toDto(form);
+            await transportApi.create(payload);
+            toast.success('Транспорт успешно создан!');
+            navigate("/dashboard/requests")
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при создании транспорта';
+            toast.error(message);
+        }
     };
 
     const handleNext = () => {

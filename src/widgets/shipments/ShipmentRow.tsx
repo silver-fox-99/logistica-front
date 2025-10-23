@@ -43,18 +43,29 @@ export default function ShipmentRow({
                 {/* ЛЕВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
-                        <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
-                            <Box display="inline-flex" alignItems="center" gap={0.75}>
+                        <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
+                            <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, flexShrink: 0 }}>
                                 <FiMapPin />
-                                <Typography fontWeight={700}>{data.routeFrom}</Typography>
+                                <Tooltip title={data.routeFrom}>
+                                    <Typography fontWeight={700} noWrap sx={{ maxWidth: { xs: 180, md: 300 } }}>
+                                        {data.routeFrom}
+                                    </Typography>
+                                </Tooltip>
                             </Box>
-                            <Typography color="text.secondary">→</Typography>
-                            <Box display="inline-flex" alignItems="center" gap={0.75}>
+                            <Typography color="text.secondary" sx={{ flexShrink: 0 }}>→</Typography>
+                            <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, flexShrink: 0 }}>
                                 <FiMapPin />
-                                <Typography fontWeight={700}>{data.routeTo}</Typography>
+                                <Tooltip title={data.routeTo}>
+                                    <Typography fontWeight={700} noWrap sx={{ maxWidth: { xs: 180, md: 300 } }}>
+                                        {data.routeTo}
+                                    </Typography>
+                                </Tooltip>
                             </Box>
 
-                            {/* Тип карточки и даты */}
+                        </Stack>
+
+                        {/* Тип карточки и даты */}
+                        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
                             <Chip
                                 size="small"
                                 icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}

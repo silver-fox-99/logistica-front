@@ -4,6 +4,7 @@ import { FiLock, FiSave, FiLoader } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 
@@ -26,7 +27,11 @@ export function PasswordForm({ user, onUpdated }: { user: AdminUser; onUpdated: 
             await adminUserApi.patch(user.id, { password: values.password });
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
+            toast.success('Пароль успешно обновлен');
             reset({ password: "" });
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении пароля';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 

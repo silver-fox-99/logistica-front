@@ -1,21 +1,22 @@
 import { useState } from "react";
 import {
     Card, CardContent, CardActions, Button, Stack,
-    TextField, Typography, Alert, IconButton, InputAdornment
+    TextField, Typography, IconButton, InputAdornment
 } from "@mui/material";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { securityApi } from "@/shared/api/securityApi";
 
 const schema = z.object({
-    oldPassword: z.string().min(1, "Enter your current password"),
-    newPassword: z.string().min(8, "New password must be at least 8 characters"),
-    confirmPassword: z.string().min(1, "Please confirm the new password"),
+    oldPassword: z.string().min(1, "Введите текущий пароль"),
+    newPassword: z.string().min(8, "Новый пароль должен быть не короче 8 символов"),
+    confirmPassword: z.string().min(1, "Подтвердите новый пароль"),
 }).refine((val) => val.newPassword === val.confirmPassword, {
     path: ["confirmPassword"],
-    message: "Passwords do not match",
+    message: "Пароли не совпадают",
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -30,19 +31,16 @@ export function ChangePasswordCard() {
     const [showOld, setShowOld] = useState(false);
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const onSubmit = async ({ oldPassword, newPassword }: FormValues) => {
         setLoading(true);
-        setSuccessMsg(null);
-        setErrorMsg(null);
         try {
             await securityApi.changePassword(oldPassword, newPassword);
-            setSuccessMsg("Password has been updated successfully.");
+            toast.success("Пароль успешно обновлен");
             reset({ oldPassword: "", newPassword: "", confirmPassword: "" });
         } catch (e: any) {
-            setErrorMsg(e?.response?.data?.message ?? "Failed to change the password.");
+            const message = e?.response?.data?.message ?? "Не удалось изменить пароль";
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -111,12 +109,9 @@ export function ChangePasswordCard() {
                         }}
                     />
 
-                    {successMsg && <Alert severity="success">{successMsg}</Alert>}
-                    {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
-
                     <CardActions sx={{ p: 0 }}>
                         <Button type="submit" variant="contained" disabled={loading}>
-                            {loading ? "Please wait..." : "Change password"}
+                            {loading ? "Пожалуйста, подождите..." : "Изменить пароль"}
                         </Button>
                     </CardActions>
                 </Stack>

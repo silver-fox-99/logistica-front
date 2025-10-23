@@ -73,7 +73,7 @@ export function useActivityLogs(initial = { page: 1, limit: 10 }) {
             setTotal(res.total);
             setPages(res.pages ?? Math.max(1, Math.ceil(res.total / limit)));
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Failed to load activity logs");
+            setError(e?.response?.data?.message ?? "Не удалось загрузить логи активности");
         } finally {
             setLoading(false);
         }

@@ -5,6 +5,7 @@ import {
     MenuItem, Select, InputLabel, FormControl, Divider, CircularProgress
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import { toast } from "react-toastify";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type { GeoPoint } from "@/entities/shipment/model/type";
 
@@ -327,8 +328,13 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             payload.bargain = form.bargain || "ALLOWED";
         }
 
-        await onSubmit(payload);
-        onClose();
+        try {
+            await onSubmit(payload);
+            onClose();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении заказа';
+            toast.error(message);
+        }
     };
 
     return (

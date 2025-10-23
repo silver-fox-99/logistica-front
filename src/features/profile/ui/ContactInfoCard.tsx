@@ -27,12 +27,12 @@ type Props = {
 };
 
 const schema = z.object({
-    phoneMain: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Enter a valid phone"),
-    phoneAlt: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Enter a valid phone"),
+    phoneMain: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Введите корректный номер телефона"),
+    phoneAlt: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Введите корректный номер телефона"),
     telegram: z.string().optional(),
     geo: z.string().optional(),
-    whatsapp: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Enter a valid phone"),
-    email: z.string().optional().refine((v) => !v || z.string().email().safeParse(v).success, "Invalid email"),
+    whatsapp: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Введите корректный номер телефона"),
+    email: z.string().optional().refine((v) => !v || z.string().email().safeParse(v).success, "Введите корректный email"),
 });
 
 export default function ContactInfoCard({ data, onSave, saving }: Props) {

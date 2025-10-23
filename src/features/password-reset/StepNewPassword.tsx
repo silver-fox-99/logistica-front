@@ -7,9 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const schema = z.object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirm: z.string().min(1, "Please confirm the password"),
-}).refine(v => v.password === v.confirm, { path: ["confirm"], message: "Passwords do not match" });
+    password: z.string().min(8, "Пароль должен быть не короче 8 символов"),
+    confirm: z.string().min(1, "Подтвердите пароль"),
+}).refine(v => v.password === v.confirm, { path: ["confirm"], message: "Пароли не совпадают" });
 
 type FormValues = z.infer<typeof schema>;
 
@@ -37,11 +37,11 @@ export default function StepNewPassword({
         setSuccess(null);
         try {
             await submitWith(v.password);
-            setSuccess("Your password has been updated.");
+            setSuccess("Ваш пароль был обновлен");
             reset({ password: "", confirm: "" });
             onSubmit?.();
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Failed to update the password.");
+            setError(e?.response?.data?.message ?? "Не удалось обновить пароль");
         } finally {
             setLoading(false);
         }
@@ -51,7 +51,7 @@ export default function StepNewPassword({
         <form onSubmit={handleSubmit(submit)}>
             <Stack spacing={2}>
                 <TextField
-                    label="New password"
+                    label="Новый пароль"
                     type={show1 ? "text" : "password"}
                     {...register("password")}
                     error={!!errors.password}
@@ -65,7 +65,7 @@ export default function StepNewPassword({
                     }}
                 />
                 <TextField
-                    label="Confirm new password"
+                    label="Подтвердите новый пароль"
                     type={show2 ? "text" : "password"}
                     {...register("confirm")}
                     error={!!errors.confirm}
@@ -83,7 +83,7 @@ export default function StepNewPassword({
                 {error && <Alert severity="error">{error}</Alert>}
 
                 <Button type="submit" variant="contained" disabled={loading}>
-                    {loading ? "Please wait..." : "Save new password"}
+                    {loading ? "Пожалуйста, подождите..." : "Сохранить новый пароль"}
                 </Button>
             </Stack>
         </form>

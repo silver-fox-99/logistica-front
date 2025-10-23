@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiSliders } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 import { useShipments } from "@/entities/shipment/model/useShipments";
 import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
@@ -65,9 +66,15 @@ function ListBody({
 
     const handleCopySubmit = async (payload: { date_from: string; date_to: string }) => {
         if (!copyId) return;
-        await shipmentCopy(kind, copyId, payload);
-        setCopyId(null);
-        onRequestReload?.();
+        try {
+            await shipmentCopy(kind, copyId, payload);
+            toast.success('Заказ успешно скопирован!');
+            setCopyId(null);
+            onRequestReload?.();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при копировании заказа';
+            toast.error(message);
+        }
     };
 
     const copyInitial = useMemo(() => {
@@ -87,15 +94,27 @@ function ListBody({
     const reload = () => onRequestReload?.();
 
     const handleUp = async (id: string) => {
-        if (kind === "cargo") await cargoUp(id);
-        else await transportUp(id);
-        reload();
+        try {
+            if (kind === "cargo") await cargoUp(id);
+            else await transportUp(id);
+            toast.success('Заказ поднят!');
+            reload();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при поднятии заказа';
+            toast.error(message);
+        }
     };
 
     const handleDelete = async (id: string) => {
-        if (kind === "cargo") await cargoDelete(id);
-        else await transportDelete(id);
-        reload();
+        try {
+            if (kind === "cargo") await cargoDelete(id);
+            else await transportDelete(id);
+            toast.success('Заказ успешно удален!');
+            reload();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при удалении заказа';
+            toast.error(message);
+        }
     };
 
     const handleEditSubmit = async (payload: any) => {
@@ -104,13 +123,19 @@ function ListBody({
               const prune = (obj: any) =>
                 Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 
-              if (kind === "cargo") {
-                await cargoPatch(editItem.id, prune(payload));
-              } else {
-                await transportPatch(editItem.id, prune(payload));
+              try {
+                  if (kind === "cargo") {
+                    await cargoPatch(editItem.id, prune(payload));
+                  } else {
+                    await transportPatch(editItem.id, prune(payload));
+                  }
+                  toast.success('Заказ успешно обновлен!');
+                  setEditItem(null);
+                  reload();
+              } catch (error: any) {
+                  const message = error?.response?.data?.message || 'Ошибка при обновлении заказа';
+                  toast.error(message);
               }
-          setEditItem(null);
-          reload();
         };
 
     // Initial values for edit dialog

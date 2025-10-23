@@ -16,6 +16,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions, Button,
 } from "@mui/material";
 import { FiSearch, FiTrash2, FiMapPin, FiUser } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { useAdminCargo } from "@/features/admin/cargo-list/model/useAdminCargo";
 import { adminCargoApi, type CargoItem } from "@/shared/api/adminCargoApi.ts";
 import { useNavigate } from "react-router-dom";
@@ -53,8 +54,12 @@ export default function AdminCargoPage() {
         setBusy(true);
         try {
             await adminCargoApi.remove(toDelete.id);
+            toast.success('Груз удален');
             setToDelete(null);
             refetch();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при удалении груза';
+            toast.error(message);
         } finally {
             setBusy(false);
         }

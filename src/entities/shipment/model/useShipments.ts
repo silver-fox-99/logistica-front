@@ -26,7 +26,7 @@ export function useShipments(kind: ShipmentsKind, scope: Scope, page = 1, limit 
                 setPages(resp.pages);
             } catch (e: any) {
                 if (aborted) return;
-                setError(e?.response?.data?.message ?? "Failed to load shipments");
+                setError(e?.response?.data?.message ?? "Не удалось загрузить заказы");
             } finally {
                 if (!aborted) setLoading(false);
             }

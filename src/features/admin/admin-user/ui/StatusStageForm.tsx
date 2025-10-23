@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, Stack, TextField, MenuItem, Button } from "@mui/material";
 import { FiSave, FiLoader } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 import type { RegistrationStage, UserStatus } from "@/entities/user/model/user.types";
@@ -20,6 +21,10 @@ export function StatusStageForm({ user, onUpdated }: { user: AdminUser; onUpdate
             await adminUserApi.patch(user.id, { registration_stage: stage, status });
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
+            toast.success('Статус и этап регистрации обновлены');
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 

@@ -23,7 +23,7 @@ export default function AdminLayout() {
 <AppBar position="sticky" color="default" elevation={0}>
     <Container maxWidth="xl">
         <Toolbar>
-            <Typography variant="h6" fontWeight={700}>Admin</Typography>
+            <Typography variant="h6" fontWeight={700}>Панель администратора</Typography>
             <Box flexGrow={1} />
             <IconButton component={NavLink} to="/dashboard" title="Back to dashboard">
                 <FiHome />

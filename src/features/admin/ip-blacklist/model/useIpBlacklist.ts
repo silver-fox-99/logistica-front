@@ -29,7 +29,7 @@ export function useIpBlacklist(initial = { page: 1, limit: 20 }) {
             setTotal(res.total);
             setPages(res.pages);
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Failed to load blacklist");
+            setError(e?.response?.data?.message ?? "Не удалось загрузить черный список");
         } finally {
             setLoading(false);
         }

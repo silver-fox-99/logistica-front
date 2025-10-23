@@ -9,8 +9,8 @@ function CountriesTable({ rows }: { rows: TopCountry[] }) {
         <Table size="small">
             <TableHead>
                 <TableRow>
-                    <TableCell>Country</TableCell>
-                    <TableCell align="right">Ads</TableCell>
+                    <TableCell>Страна</TableCell>
+                    <TableCell align="right">Объявлений</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -21,7 +21,7 @@ function CountriesTable({ rows }: { rows: TopCountry[] }) {
                     </TableRow>
                 ))}
                 {rows.length === 0 && (
-                    <TableRow><TableCell colSpan={2}>No data</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={2}>Нет данных</TableCell></TableRow>
                 )}
             </TableBody>
         </Table>
@@ -39,13 +39,13 @@ export default function TopCountriesTabs({
     const [tab, setTab] = useState(0);
     return (
         <Card variant="outlined" sx={{ borderRadius: 3 }}>
-            <CardHeader title="Top countries" subheader="By role in route" />
+            <CardHeader title="Популярные страны" subheader="По роли в маршруте" />
             <CardContent sx={{ pt: 0 }}>
                 <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" allowScrollButtonsMobile>
-                    <Tab label="Cargo — Pickup" />
-                    <Tab label="Cargo — Dropoff" />
-                    <Tab label="Transport — Departure" />
-                    <Tab label="Transport — Arrival" />
+                    <Tab label="Груз — Откуда" />
+                    <Tab label="Груз — Куда" />
+                    <Tab label="Транспорт — Отправление" />
+                    <Tab label="Транспорт — Прибытие" />
                 </Tabs>
                 <Box sx={{ mt: 2 }}>
                     {tab === 0 && <CountriesTable rows={cargoPickup} />}

@@ -31,9 +31,9 @@ const bottomNav = [
     { to: "/dashboard/help",     icon: <FiHelpCircle />,  label: "Помощь и поддержка" },
 ];
 
-function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
+function NavItem({ to, icon, label, onClick }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void }) {
     return (
-        <ListItemButton component={NavLink} to={to} className="dashboard-buttons">
+        <ListItemButton component={NavLink} to={to} className="dashboard-buttons" onClick={onClick}>
             <ListItemIcon>{icon}</ListItemIcon>
             <ListItemText primary={label} primaryTypographyProps={{ fontSize: 16 }} />
         </ListItemButton>
@@ -56,7 +56,7 @@ function SidebarContent({
         <Fragment>
             <List disablePadding>
                 {mainNav.map((i) => (
-                    <NavItem key={i.to} {...i} />
+                    <NavItem key={i.to} {...i} onClick={onItemClick} />
                 ))}
             </List>
 
@@ -101,7 +101,7 @@ function SidebarContent({
                 )}
 
                 {bottomNav.map((i) => (
-                    <NavItem key={i.to} {...i} />
+                    <NavItem key={i.to} {...i} onClick={onItemClick} />
                 ))}
 
                 <ListItemButton

@@ -4,6 +4,7 @@ import {
     Checkbox, FormControlLabel, Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, InputAdornment
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import { toast } from "react-toastify";
 
 import { cargoApi, type CreateCargoDto } from "@/shared/api/cargoApi";
 import {useNavigate} from "react-router-dom";
@@ -271,19 +272,19 @@ export default function AddCargoPage() {
     /* ===== validation ===== */
     const validate = () => {
         const e: Record<string, string> = {};
-        if (!form.dateFrom) e.dateFrom = "Required";
-        if (!form.dateTo) e.dateTo = "Required";
+        if (!form.dateFrom) e.dateFrom = "Обязательно";
+        if (!form.dateTo) e.dateTo = "Обязательно";
 
-        if (!form.pickups[0]?.countryId) e.pickups = "Select at least country for the first pickup";
-        if (!form.dropoffs[0]?.countryId) e.dropoffs = "Select at least country for the first dropoff";
+        if (!form.pickups[0]?.countryId) e.pickups = "Выберите хотя бы страну для первой точки погрузки";
+        if (!form.dropoffs[0]?.countryId) e.dropoffs = "Выберите хотя бы страну для первой точки выгрузки";
 
-        if (!form.cargoType) e.cargoType = "Select cargo type";
-        if (!form.vehicleType) e.vehicleType = "Select vehicle type";
-        if (!form.loadType) e.loadType = "Select load type";
-        if (!form.paymentMethod) e.paymentMethod = "Select payment method";
+        if (!form.cargoType) e.cargoType = "Выберите тип груза";
+        if (!form.vehicleType) e.vehicleType = "Выберите тип транспорта";
+        if (!form.loadType) e.loadType = "Выберите тип загрузки";
+        if (!form.paymentMethod) e.paymentMethod = "Выберите способ оплаты";
 
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
-            e.contactSecondary = "Invalid phone format. Use + and digits, 10–20 digits total.";
+            e.contactSecondary = "Неверный формат телефона. Используйте + и цифры, всего 10-20 цифр";
         }
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -307,9 +308,9 @@ export default function AddCargoPage() {
             id ? (geoById.get(id)?.name ?? "") : "";
 
         const anyDim =
-            (v.dims.length != null && v.dims.length > 0) ||
-            (v.dims.width != null && v.dims.width > 0) ||
-            (v.dims.height != null && v.dims.height > 0);
+                (v.dims && v.dims.length != null && v.dims.length > 0) ||
+                (v.dims && v.dims.width != null && v.dims.width > 0) ||
+                (v.dims && v.dims.height != null && v.dims.height > 0);
 
         const countryFromName = getName(firstPickup.countryId) || "Unknown";
 
@@ -372,10 +373,19 @@ export default function AddCargoPage() {
 
     const onSubmit = async (ev: React.FormEvent) => {
         ev.preventDefault();
-        if (!validate()) return;
-        const payload = toDto(form);
-        await cargoApi.create(payload);
-        navigate("/dashboard/requests");
+        if (!validate()) {
+            toast.warning('Заполните все обязательные поля');
+            return;
+        }
+        try {
+            const payload = toDto(form);
+            await cargoApi.create(payload);
+            toast.success('Груз успешно создан!');
+            navigate("/dashboard/requests");
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при создании груза';
+            toast.error(message);
+        }
     };
 
     const handleNext = () => {

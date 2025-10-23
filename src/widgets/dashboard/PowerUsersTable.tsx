@@ -6,14 +6,14 @@ import type { PowerUser } from "@/shared/api/dashboardApi";
 export default function PowerUsersTable({ rows }: { rows: PowerUser[] }) {
     return (
         <Card variant="outlined" sx={{ borderRadius: 3 }}>
-            <CardHeader title="Power users" subheader="By ads and updates" />
+            <CardHeader title="Активные пользователи" subheader="По объявлениям и обновлениям" />
             <CardContent sx={{ pt: 0 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell>User</TableCell>
-                            <TableCell align="right">Ads</TableCell>
-                            <TableCell align="right">Updates</TableCell>
+                            <TableCell>Пользователь</TableCell>
+                            <TableCell align="right">Объявления</TableCell>
+                            <TableCell align="right">Обновления</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -32,7 +32,7 @@ export default function PowerUsersTable({ rows }: { rows: PowerUser[] }) {
                             </TableRow>
                         ))}
                         {rows.length === 0 && (
-                            <TableRow><TableCell colSpan={3}>No data</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={3}>Нет данных</TableCell></TableRow>
                         )}
                     </TableBody>
                 </Table>

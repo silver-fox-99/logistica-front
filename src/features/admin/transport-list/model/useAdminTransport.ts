@@ -31,7 +31,7 @@ export function useAdminTransport(initial = { page: 1, limit: 20 }) {
                 setTotal(res.total);
                 setPages(res.pages);
             } catch (e: any) {
-                if (!aborted) setError(e?.response?.data?.message ?? "Failed to load transport");
+                if (!aborted) setError(e?.response?.data?.message ?? "Не удалось загрузить транспорт");
             } finally {
                 if (!aborted) setLoading(false);
             }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
+import { toast } from "react-toastify";
 import OtpInput from "@/shared/ui/inputs/OtpInput";
 import { firebasePhone } from "@/shared/lib/firebasePhone";
 
@@ -19,14 +20,24 @@ export default function StepCodeReset({ length = 6, phoneE164, onVerified, onBac
         setBusy(true);
         try {
             const idToken = await firebasePhone.confirmCode(code);
-            onVerified(idToken); // передаём наверх — использовать на шаге 3
+            toast.success('Код успешно подтвержден');
+            onVerified(idToken);
+        } catch (error: any) {
+            const message = error?.message || 'Неверный код подтверждения';
+            toast.error(message);
         } finally {
             setBusy(false);
         }
     };
 
     const resend = async () => {
-        await firebasePhone.sendCode(phoneE164);
+        try {
+            await firebasePhone.sendCode(phoneE164);
+            toast.success('Код отправлен повторно');
+        } catch (error: any) {
+            const message = error?.message || 'Не удалось отправить код';
+            toast.error(message);
+        }
     };
 
     return (
@@ -34,12 +45,12 @@ export default function StepCodeReset({ length = 6, phoneE164, onVerified, onBac
             <OtpInput length={length} value={code} onChange={setCode} autoFocus />
             <Box>
                 <Button fullWidth variant="contained" disabled={busy || code.length !== length} onClick={verify} sx={{ height: 44 }}>
-                    Verify
+                    Подтвердить
                 </Button>
             </Box>
             <Stack direction="row" spacing={1}>
-                <Button variant="text" onClick={resend}>Resend code</Button>
-                {onBack && <Button variant="outlined" onClick={onBack}>Change phone</Button>}
+                <Button variant="text" onClick={resend}>Отправить код повторно</Button>
+                {onBack && <Button variant="outlined" onClick={onBack}>Изменить номер</Button>}
             </Stack>
         </Stack>
     );

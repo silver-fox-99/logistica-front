@@ -21,10 +21,9 @@ const paymentMap: Record<string, "Cash" | "Bank" | "Card" | undefined> = {
     CARD: "Card",
 };
 
-/** Человеко-читаемая строка локации (для списка), приоритет: city → region → country */
 function asRouteString(p?: GeoPoint): string {
     if (!p) return "—";
-    return (p.city ?? p.region ?? p.country ?? "—") || "—";
+    return [p.city, p.region, p.country].filter(Boolean).join(", ") || "—";
 }
 
 export function adaptCargo(i: CargoApiItem): ShipmentRowData {

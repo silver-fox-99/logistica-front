@@ -32,7 +32,7 @@ export function useAdminUsers(initial: AdminUsersQuery = { page: 1, limit: 20, s
                 setTotal(res.total);
                 setPages(res.pages);
             } catch (e: any) {
-                if (!aborted) setError(e?.response?.data?.message ?? "Failed to load users");
+                if (!aborted) setError(e?.response?.data?.message ?? "Не удалось загрузить пользователей");
             } finally {
                 if (!aborted) setLoading(false);
             }

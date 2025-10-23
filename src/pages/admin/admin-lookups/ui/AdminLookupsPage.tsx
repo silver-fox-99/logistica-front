@@ -2,6 +2,7 @@ import Grid from "@mui/material/Grid";
 import { Alert, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { FiDatabase, FiPlus } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { useLookups } from "@/features/admin/lookups/model/useLookups";
 import { GroupList } from "@/features/admin/lookups/ui/GroupList";
 import { ItemTable } from "@/features/admin/lookups/ui/ItemTable";
@@ -76,9 +77,15 @@ export default function AdminLookupsPage() {
                             onEdit={(g) => setOpenGroup({ mode: "edit", group: g })}
                             onDelete={async (g) => {
                                 if (!confirm(`Удалить группу "${g.title}"? Элементы будут удалены тоже.`)) return;
-                                await lookupsApi.deleteGroup(g.id);
-                                await reloadGroups();
-                                if (current?.id === g.id) setCurrent(null);
+                                try {
+                                    await lookupsApi.deleteGroup(g.id);
+                                    toast.success('Группа удалена');
+                                    await reloadGroups();
+                                    if (current?.id === g.id) setCurrent(null);
+                                } catch (error: any) {
+                                    const message = error?.response?.data?.message || 'Ошибка при удалении группы';
+                                    toast.error(message);
+                                }
                             }}
                         />
                     </Grid>
@@ -93,8 +100,14 @@ export default function AdminLookupsPage() {
                             onDelete={async (it) => {
                                 if (!current) return;
                                 if (!confirm(`Удалить элемент "${it.label}"?`)) return;
-                                await lookupsApi.deleteItem(current.code, it.id);
-                                await reloadItems();
+                                try {
+                                    await lookupsApi.deleteItem(current.code, it.id);
+                                    toast.success('Элемент удален');
+                                    await reloadItems();
+                                } catch (error: any) {
+                                    const message = error?.response?.data?.message || 'Ошибка при удалении элемента';
+                                    toast.error(message);
+                                }
                             }}
                             onMove={moveItem}
                             onReload={() => reloadItems()}
@@ -111,12 +124,20 @@ export default function AdminLookupsPage() {
                     onClose={() => setOpenGroup(null)}
                     initial={openGroup.mode === "edit" ? openGroup.group : undefined}
                     onSubmit={async (v) => {
-                        if (openGroup.mode === "create") {
-                            await lookupsApi.createGroup(v);
-                        } else if (openGroup.mode === "edit" && openGroup.group) {
-                            await lookupsApi.updateGroup(openGroup.group.id, { title: v.title, description: v.description ?? null });
+                        try {
+                            if (openGroup.mode === "create") {
+                                await lookupsApi.createGroup(v);
+                                toast.success('Группа создана');
+                            } else if (openGroup.mode === "edit" && openGroup.group) {
+                                await lookupsApi.updateGroup(openGroup.group.id, { title: v.title, description: v.description ?? null });
+                                toast.success('Группа обновлена');
+                            }
+                            await reloadGroups();
+                        } catch (error: any) {
+                            const message = error?.response?.data?.message || 'Ошибка при сохранении группы';
+                            toast.error(message);
+                            throw error;
                         }
-                        await reloadGroups();
                     }}
                 />
             )}
@@ -128,13 +149,21 @@ export default function AdminLookupsPage() {
                     onClose={() => setOpenItem(null)}
                     initial={openItem.mode === "edit" ? openItem.item : undefined}
                     onSubmit={async (v) => {
-                        if (openItem.mode === "create") {
-                            await lookupsApi.createItem(current.code, v);
-                        } else if (openItem.mode === "edit" && openItem.item) {
-                            const { slug, ...rest } = v; // slug у редактирования не меняем
-                            await lookupsApi.updateItem(current.code, openItem.item.id, rest);
+                        try {
+                            if (openItem.mode === "create") {
+                                await lookupsApi.createItem(current.code, v);
+                                toast.success('Элемент создан');
+                            } else if (openItem.mode === "edit" && openItem.item) {
+                                const { slug, ...rest } = v;
+                                await lookupsApi.updateItem(current.code, openItem.item.id, rest);
+                                toast.success('Элемент обновлен');
+                            }
+                            await reloadItems();
+                        } catch (error: any) {
+                            const message = error?.response?.data?.message || 'Ошибка при сохранении элемента';
+                            toast.error(message);
+                            throw error;
                         }
-                        await reloadItems();
                     }}
                 />
             )}

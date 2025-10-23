@@ -60,7 +60,7 @@ export function usePublicShipments(
                 setPages(resp.pages ?? 1);
             } catch (e: any) {
                 if (aborted) return;
-                setError(e?.message ?? "Failed to load list");
+                setError(e?.message ?? "Не удалось загрузить список");
                 setItems([]);
                 setTotal(0);
                 setPages(1);

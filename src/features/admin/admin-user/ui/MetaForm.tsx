@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, Stack, TextField, Button } from "@mui/material";
 import { FiCpu, FiSave, FiLoader } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 
@@ -10,13 +11,17 @@ export function MetaForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: 
 
     const submit = async () => {
         let meta: Record<string, any>;
-        try { meta = JSON.parse(text); } catch { alert("Мета должен быть валидным JSON объектом"); return; }
+        try { meta = JSON.parse(text); } catch { toast.error("Мета должен быть валидным JSON объектом"); return; }
         setBusy(true);
         try {
             await adminUserApi.patch(user.id, { meta });
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
             setText(JSON.stringify(res.data.user.meta ?? {}, null, 2));
+            toast.success('Метаданные обновлены');
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении метаданных';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 

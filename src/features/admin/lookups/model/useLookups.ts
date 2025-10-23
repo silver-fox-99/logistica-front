@@ -16,7 +16,7 @@ export function useLookups() {
             setGroups(gs);
             if (gs.length && !current) setCurrent(gs[0]);
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Failed to load groups");
+            setError(e?.response?.data?.message ?? "Не удалось загрузить группы");
         } finally {
             setLoading(false);
         }
@@ -27,7 +27,7 @@ export function useLookups() {
             const rows = await lookupsApi.listItems(group);
             setItems(rows);
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Failed to load items");
+            setError(e?.response?.data?.message ?? "Не удалось загрузить элементы");
             setItems([]);
         }
     }, []);

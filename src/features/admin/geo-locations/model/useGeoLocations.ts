@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import { adminGeoApi, type GeoLocation, type LocationType, type CreateLocationDto, type UpdateLocationDto } from "@/shared/api/adminGeoApi";
 
 export function useGeoLocations() {
@@ -16,7 +17,7 @@ export function useGeoLocations() {
             const list = await adminGeoApi.list();
             setItems(list);
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Failed to load geo locations");
+            setError(e?.response?.data?.message ?? "Не удалось загрузить геолокации");
         } finally {
             setLoading(false);
         }
@@ -41,21 +42,42 @@ export function useGeoLocations() {
     const childrenOf = (parentId: string | null) => filtered.filter(i => (i.parent_id ?? null) === parentId);
 
     const create = async (dto: CreateLocationDto) => {
-        const created = await adminGeoApi.create(dto);
-        setItems(prev => [created, ...prev]);
-        return created;
+        try {
+            const created = await adminGeoApi.create(dto);
+            setItems(prev => [created, ...prev]);
+            toast.success('Локация создана');
+            return created;
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при создании локации';
+            toast.error(message);
+            throw error;
+        }
     };
 
     const update = async (id: string, dto: UpdateLocationDto) => {
-        const upd = await adminGeoApi.update(id, dto);
-        setItems(prev => prev.map(i => (i.id === id ? upd : i)));
-        return upd;
+        try {
+            const upd = await adminGeoApi.update(id, dto);
+            setItems(prev => prev.map(i => (i.id === id ? upd : i)));
+            toast.success('Локация обновлена');
+            return upd;
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении локации';
+            toast.error(message);
+            throw error;
+        }
     };
 
     const remove = async (id: string) => {
-        await adminGeoApi.remove(id);
-        setItems(prev => prev.filter(i => i.id !== id));
-        if (selectedId === id) setSelectedId(null);
+        try {
+            await adminGeoApi.remove(id);
+            setItems(prev => prev.filter(i => i.id !== id));
+            if (selectedId === id) setSelectedId(null);
+            toast.success('Локация удалена');
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при удалении локации';
+            toast.error(message);
+            throw error;
+        }
     };
 
     return {

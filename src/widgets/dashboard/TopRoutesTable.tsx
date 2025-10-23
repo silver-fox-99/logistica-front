@@ -17,10 +17,10 @@ export default function TopRoutesTable({
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell>From</TableCell>
-                            <TableCell>To</TableCell>
-                            <TableCell align="right">Ads</TableCell>
-                            <TableCell align="right">Total price</TableCell>
+                            <TableCell>Откуда</TableCell>
+                            <TableCell>Куда</TableCell>
+                            <TableCell align="right">Объявлений</TableCell>
+                            <TableCell align="right">Общая цена</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -37,7 +37,7 @@ export default function TopRoutesTable({
                             </TableRow>
                         ))}
                         {rows.length === 0 && (
-                            <TableRow><TableCell colSpan={4}>No data</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={4}>Нет данных</TableCell></TableRow>
                         )}
                     </TableBody>
                 </Table>

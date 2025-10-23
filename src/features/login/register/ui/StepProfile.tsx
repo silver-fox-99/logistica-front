@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
 import {authApi} from "@/shared/api/authApi.ts";
 import {useNavigate} from "react-router-dom";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
@@ -59,9 +60,11 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
        try {
            const res = await authApi.completeRegister(data)
            setUser(res.data)
+           toast.success('Регистрация успешно завершена!')
            navigate('/dashboard/profile')
-       } catch (e) {
-           console.log(e)
+       } catch (error: any) {
+           const message = error?.response?.data?.message || 'Ошибка при регистрации'
+           toast.error(message)
        }
     };
 

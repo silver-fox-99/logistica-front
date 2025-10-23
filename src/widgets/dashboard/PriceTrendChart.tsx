@@ -5,7 +5,7 @@ import type { PriceTrendPoint } from "@/shared/api/dashboardApi";
 export default function PriceTrendChart({ data }: { data: PriceTrendPoint[] }) {
     return (
         <Card variant="outlined" sx={{ borderRadius: 3, height: 360 }}>
-            <CardHeader title="Price trend (daily)" subheader="Average & median, cargo/transport" />
+            <CardHeader title="Тренд цен (ежедневный)" subheader="Среднее медианное значение, груз/транспорт" />
             <CardContent sx={{ height: 280 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data}>
@@ -13,10 +13,10 @@ export default function PriceTrendChart({ data }: { data: PriceTrendPoint[] }) {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Line type="monotone" dataKey="cargo_avg" name="Cargo avg" dot={false} />
-                        <Line type="monotone" dataKey="cargo_median" name="Cargo median" dot={false} />
-                        <Line type="monotone" dataKey="transport_avg" name="Transport avg" dot={false} />
-                        <Line type="monotone" dataKey="transport_median" name="Transport median" dot={false} />
+                        <Line type="monotone" dataKey="cargo_avg" name="Среднее значение груза" dot={false} />
+                        <Line type="monotone" dataKey="cargo_median" name="Медианное значение груза" dot={false} />
+                        <Line type="monotone" dataKey="transport_avg" name="Среднее значение транспорта" dot={false} />
+                        <Line type="monotone" dataKey="transport_median" name="Медианное значение транспорта" dot={false} />
                     </LineChart>
                 </ResponsiveContainer>
             </CardContent>

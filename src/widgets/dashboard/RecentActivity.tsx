@@ -14,16 +14,16 @@ export default function RecentActivity() {
     }, []);
     return (
         <Card variant="outlined" sx={{ borderRadius: 3 }}>
-            <CardHeader title="Recent API activity" />
+            <CardHeader title="Последние API активности" />
             <CardContent sx={{ pt: 0 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Time</TableCell>
-                            <TableCell>Method</TableCell>
-                            <TableCell>Endpoint</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell align="right">Duration</TableCell>
+                            <TableCell>Время</TableCell>
+                            <TableCell>Метод</TableCell>
+                            <TableCell>Маршрут</TableCell>
+                            <TableCell>Статус</TableCell>
+                            <TableCell align="right">Время выполнения</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -39,11 +39,11 @@ export default function RecentActivity() {
                                         label={r.statusCode}
                                     />
                                 </TableCell>
-                                <TableCell align="right">{r.durationMs} ms</TableCell>
+                                <TableCell align="right">{r.durationMs} мс</TableCell>
                             </TableRow>
                         ))}
                         {rows.length === 0 && (
-                            <TableRow><TableCell colSpan={5}>No activity</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={5}>Нет активности</TableCell></TableRow>
                         )}
                     </TableBody>
                 </Table>

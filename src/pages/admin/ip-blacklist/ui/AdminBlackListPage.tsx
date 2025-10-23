@@ -19,6 +19,7 @@ import {
     Button,
 } from "@mui/material";
 import { FiSearch, FiTrash2, FiUser } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { useIpBlacklist } from "@/features/admin/ip-blacklist/model/useIpBlacklist";
 import { adminIpBlacklistApi, type IpBan } from "@/shared/api/adminIpBlackListApi.ts";
 import IpBanDialog, { type IpBanFormValues } from "@/features/admin/ip-blacklist/ui/IpBanDialog";
@@ -55,8 +56,12 @@ export default function AdminBlacklistPage() {
                 is_active: v.is_active,
                 expiresAt: v.expiresAt || undefined,
             });
+            toast.success('IP добавлен в черный список');
             setCreateOpen(false);
             refetch();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при добавлении IP';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 
@@ -70,8 +75,12 @@ export default function AdminBlacklistPage() {
                 is_active: v.is_active,
                 expiresAt: v.expiresAt ? v.expiresAt : undefined,
             });
+            toast.success('Запись обновлена');
             setEditItem(null);
             refetch();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при обновлении записи';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 
@@ -88,8 +97,12 @@ export default function AdminBlacklistPage() {
         setBusy(true);
         try {
             await adminIpBlacklistApi.remove(delItem.id);
+            toast.success('IP удален из черного списка');
             setDelItem(null);
             refetch();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Ошибка при удалении IP';
+            toast.error(message);
         } finally { setBusy(false); }
     };
 

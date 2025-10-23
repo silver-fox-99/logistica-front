@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Card, CardContent, CardActions, Button, Stack, TextField, Typography, Alert } from "@mui/material";
+import { Card, CardContent, CardActions, Button, Stack, TextField, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiMail, FiSend } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { addEmailSchema, type AddEmailForm } from "../model/schema";
 import {securityApi} from "@/shared/api/securityApi.ts";
 
@@ -14,19 +15,16 @@ export function AddEmailCard() {
     });
 
     const [loading, setLoading] = useState(false);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const onSubmit = async (data: AddEmailForm) => {
         setLoading(true);
-        setSuccessMsg(null);
-        setErrorMsg(null);
         try {
             await securityApi.sendEmailCode(data.email);
-            setSuccessMsg("Verification code has been sent to your E-mail.");
+            toast.success("Код подтверждения отправлен на ваш E-mail");
             reset({ email: data.email });
         } catch (e: any) {
-            setErrorMsg(e?.response?.data?.message ?? "Failed to send the code.");
+            const message = e?.response?.data?.message ?? "Не удалось отправить код";
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -54,9 +52,6 @@ export function AddEmailCard() {
                     <Typography variant="caption" color="text.secondary">
                         A verification code will be sent to this address. Use it to complete the E-mail linking.
                     </Typography>
-
-                    {successMsg && <Alert severity="success">{successMsg}</Alert>}
-                    {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
                     <CardActions sx={{ p: 0, mt: 1 }}>
                         <Button type="submit" variant="contained" startIcon={<FiSend />} disabled={loading}>

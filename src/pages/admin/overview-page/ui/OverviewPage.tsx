@@ -39,17 +39,17 @@ export default function AdminOverviewPage() {
             <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, mb: 2 }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Stack>
-                        <Typography variant="h6" fontWeight={700}>Admin overview</Typography>
+                        <Typography variant="h6" fontWeight={700}>Обзор</Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Platform metrics, trends and top lists
+                            Метрики платформы, тренды и популярные списки
                         </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={1}>
-                        <Typography variant="body2" color="text.secondary">Range:</Typography>
+                        <Typography variant="body2" color="text.secondary">Период:</Typography>
                         <Select size="small" value={range} onChange={onRangeChange} sx={{ minWidth: 120 }}>
-                            <MenuItem value="7d">Last 7 days</MenuItem>
-                            <MenuItem value="30d">Last 30 days</MenuItem>
-                            <MenuItem value="90d">Last 90 days</MenuItem>
+                            <MenuItem value="7d">Последние 7 дней</MenuItem>
+                            <MenuItem value="30d">Последние 30 дней</MenuItem>
+                            <MenuItem value="90d">Последние 90 дней</MenuItem>
                         </Select>
                     </Stack>
                 </Stack>
@@ -61,17 +61,17 @@ export default function AdminOverviewPage() {
                 <>
                     <Grid container spacing={1.5}>
                         <Grid size={{ xs: 12, md: 3 }}>
-                            <KpiCard title="New users" value={data?.kpi.newUsers ?? 0} icon={<FiUsers size={24} />} />
+                            <KpiCard title="Новые пользователи" value={data?.kpi.newUsers ?? 0} icon={<FiUsers size={24} />} />
                         </Grid>
                         <Grid size={{ xs: 12, md: 3 }}>
-                            <KpiCard title="New cargos" value={data?.kpi.newCargos ?? 0} icon={<FiPackage size={24} />} />
+                            <KpiCard title="Новые грузы" value={data?.kpi.newCargos ?? 0} icon={<FiPackage size={24} />} />
                         </Grid>
                         <Grid size={{ xs: 12, md: 3 }}>
-                            <KpiCard title="New transports" value={data?.kpi.newTransports ?? 0} icon={<FiTruck size={24} />} />
+                            <KpiCard title="Новые транспортировки" value={data?.kpi.newTransports ?? 0} icon={<FiTruck size={24} />} />
                         </Grid>
                         <Grid size={{ xs: 12, md: 3 }}>
                             <KpiCard
-                                title="Avg price (7d)"
+                                title="Средняя цена (7д)"
                                 value={`Cargo: ${avgCargo.toFixed(0)} | Transport: ${avgTransport.toFixed(0)}`}
                                 icon={<FiTrendingUp size={24} />}
                             />
@@ -81,14 +81,14 @@ export default function AdminOverviewPage() {
                             <PriceTrendChart data={data?.series.priceTrend ?? []} />
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TopRoutesTable title="Top routes — Cargo" rows={data?.top.routes.cargo ?? []} />
+                        <Grid size={{ xs: 12 }}>
+                            <TopRoutesTable title="Популярные маршруты — Груз" rows={data?.top.routes.cargo ?? []} />
                         </Grid>
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TopRoutesTable title="Top routes — Transport" rows={data?.top.routes.transport ?? []} />
+                        <Grid size={{ xs: 12 }}>
+                            <TopRoutesTable title="Популярные маршруты — Транспорт" rows={data?.top.routes.transport ?? []} />
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12 }}>
                             <TopCountriesTabs
                                 cargoPickup={data?.top.countries.cargo.pickup ?? []}
                                 cargoDrop={data?.top.countries.cargo.dropoff ?? []}
@@ -97,7 +97,7 @@ export default function AdminOverviewPage() {
                             />
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12 }}>
                             <PowerUsersTable rows={data?.top.powerUsers ?? []} />
                         </Grid>
 
