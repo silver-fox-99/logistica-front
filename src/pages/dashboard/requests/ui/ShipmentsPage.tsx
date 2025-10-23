@@ -10,6 +10,7 @@ import { useShipments } from "@/entities/shipment/model/useShipments";
 import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
 import ShipmentRow from "@/widgets/shipments/ShipmentRow";
 import ShipmentsFilterDrawer from "@/widgets/shipments/ShipmentsFilterDrawer";
+import ConfirmDialog from "@/widgets/common/ConfirmDialog";
 
 import {
     cargoUp, cargoPatch, cargoDelete,
@@ -58,11 +59,24 @@ function ListBody({
     const [copyOpen, setCopyOpen] = useState(false);
     const [copyId, setCopyId] = useState<string | null>(null);
 
+    // Delete confirmation
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+
     const openCopy = (id: string) => {
         setCopyId(id);
         setCopyOpen(true);
     };
     const closeCopy = () => setCopyOpen(false);
+
+    const openDelete = (id: string) => {
+        setDeleteId(id);
+        setDeleteOpen(true);
+    };
+    const closeDelete = () => {
+        setDeleteOpen(false);
+        setDeleteId(null);
+    };
 
     const handleCopySubmit = async (payload: { date_from: string; date_to: string }) => {
         if (!copyId) return;
@@ -105,11 +119,17 @@ function ListBody({
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = (id: string) => {
+        openDelete(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
         try {
-            if (kind === "cargo") await cargoDelete(id);
-            else await transportDelete(id);
+            if (kind === "cargo") await cargoDelete(deleteId);
+            else await transportDelete(deleteId);
             toast.success('Заказ успешно удален!');
+            closeDelete();
             reload();
         } catch (error: any) {
             const message = error?.response?.data?.message || 'Ошибка при удалении заказа';
@@ -221,6 +241,16 @@ function ListBody({
                 onSubmit={handleCopySubmit}
                 initial={copyInitial}
             />
+
+            <ConfirmDialog
+                open={deleteOpen}
+                title="Подтверждение удаления"
+                message="Вы уверены, что хотите удалить этот заказ? Это действие нельзя отменить."
+                confirmText="Удалить"
+                cancelText="Отмена"
+                onClose={closeDelete}
+                onConfirm={confirmDelete}
+            />
         </>
     );
 }
@@ -317,7 +347,6 @@ export default function ShipmentsListPage({ scope }: Props) {
                     setReloadKey((k) => k + 1); // also reload when type changes or filters applied
                 }}
             />
-
 
         </Box>
     );
