@@ -28,10 +28,7 @@ import AdminBlackListPage from "@/pages/admin/ip-blacklist";
 import AdminActivityLogsPage from "@/pages/admin/activity-log";
 import AdminGeoLocationsPage from "@/pages/admin/geo-location";
 import AdminLookupsPage from "@/pages/admin/admin-lookups/ui/AdminLookupsPage.tsx";
-
-
-const AdminOverviewPage = () => <div>Admin overview</div>
-
+import AdminOverviewPage from "@/pages/admin/overview-page";
 
 
 const router = createBrowserRouter([

@@ -1,0 +1,53 @@
+import {
+    Card, CardHeader, CardContent, Table, TableBody, TableCell, TableHead, TableRow, Chip,
+} from "@mui/material";
+import { adminActivityApi, type ActivityItem } from "@/shared/api/adminActivityApi";
+import { useEffect, useState } from "react";
+
+export default function RecentActivity() {
+    const [rows, setRows] = useState<ActivityItem[]>([]);
+    useEffect(() => {
+        adminActivityApi
+            .list({ limit: 10, page: 1, includeAnonymous: "true" })
+            .then((d) => setRows(d.data))
+            .catch(() => setRows([]));
+    }, []);
+    return (
+        <Card variant="outlined" sx={{ borderRadius: 3 }}>
+            <CardHeader title="Recent API activity" />
+            <CardContent sx={{ pt: 0 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Time</TableCell>
+                            <TableCell>Method</TableCell>
+                            <TableCell>Endpoint</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell align="right">Duration</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rows.map((r) => (
+                            <TableRow key={r.id}>
+                                <TableCell>{new Date(r.time).toLocaleString()}</TableCell>
+                                <TableCell>{r.method}</TableCell>
+                                <TableCell>{r.endpoint}</TableCell>
+                                <TableCell>
+                                    <Chip
+                                        size="small"
+                                        color={r.statusCode >= 400 ? "error" : "success"}
+                                        label={r.statusCode}
+                                    />
+                                </TableCell>
+                                <TableCell align="right">{r.durationMs} ms</TableCell>
+                            </TableRow>
+                        ))}
+                        {rows.length === 0 && (
+                            <TableRow><TableCell colSpan={5}>No activity</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    );
+}
