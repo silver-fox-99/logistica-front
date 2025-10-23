@@ -50,7 +50,7 @@ export async function transportDelete(id: string) {
 
 export async function shipmentCopy(kind: ShipmentsKind, sourceId: string, payload: { date_from: string; date_to: string }) {
     // пример: POST /shipments/{kind}/copy
-    return api.post(`/shipments/${kind}/copy`, {
+    return api.post(`/${kind}/copy`, {
         source_id: sourceId,
         ...payload,
     });
