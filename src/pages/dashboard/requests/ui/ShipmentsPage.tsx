@@ -80,6 +80,12 @@ function ListBody({
 
     const handleCopySubmit = async (payload: { date_from: string; date_to: string }) => {
         if (!copyId) return;
+
+        if (kind !== "cargo" && kind !== "transport") {
+            toast.error('Неверный тип заказа');
+            return;
+        }
+        
         try {
             await shipmentCopy(kind, copyId, payload);
             toast.success('Заказ успешно скопирован!');
@@ -108,6 +114,11 @@ function ListBody({
     const reload = () => onRequestReload?.();
 
     const handleUp = async (id: string) => {
+        if (kind !== "cargo" && kind !== "transport") {
+            toast.error('Неверный тип заказа');
+            return;
+        }
+        
         try {
             if (kind === "cargo") await cargoUp(id);
             else await transportUp(id);
@@ -125,6 +136,14 @@ function ListBody({
 
     const confirmDelete = async () => {
         if (!deleteId) return;
+        
+
+        if (kind !== "cargo" && kind !== "transport") {
+            toast.error('Неверный тип заказа');
+            closeDelete();
+            return;
+        }
+        
         try {
             if (kind === "cargo") await cargoDelete(deleteId);
             else await transportDelete(deleteId);
@@ -138,14 +157,19 @@ function ListBody({
     };
 
     const handleEditSubmit = async (payload: any) => {
-          if (!editItem) return;
+        if (!editItem) return;
 
-              const prune = (obj: any) =>
-                Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+        if (kind !== "cargo" && kind !== "transport") {
+            toast.error('Неверный тип заказа');
+            return;
+        }
 
-              try {
-                  if (kind === "cargo") {
-                    await cargoPatch(editItem.id, prune(payload));
+        const prune = (obj: any) =>
+            Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+
+        try {
+            if (kind === "cargo") {
+                await cargoPatch(editItem.id, prune(payload));
                   } else {
                     await transportPatch(editItem.id, prune(payload));
                   }
