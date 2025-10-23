@@ -1,4 +1,5 @@
 import api from "@/shared/api/axios";
+import type {ShipmentsKind} from "@/entities/shipment/model/type.ts";
 
 /** ------ Cargo ------ */
 export async function cargoUp(id: string) {
@@ -45,4 +46,12 @@ export async function transportPatch(id: string, dto: TransportPatchDto) {
 export async function transportDelete(id: string) {
     const { data } = await api.delete(`/transport/${id}`);
     return data;
+}
+
+export async function shipmentCopy(kind: ShipmentsKind, sourceId: string, payload: { date_from: string; date_to: string }) {
+    // пример: POST /shipments/{kind}/copy
+    return api.post(`/shipments/${kind}/copy`, {
+        source_id: sourceId,
+        ...payload,
+    });
 }

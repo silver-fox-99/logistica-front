@@ -10,16 +10,17 @@ import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/t
 import ShipmentRow from "@/widgets/shipments/ShipmentRow";
 import ShipmentsFilterDrawer from "@/widgets/shipments/ShipmentsFilterDrawer";
 
-import QuickEditDialog from "@/widgets/shipments/QuickEditDialog";
 import {
     cargoUp, cargoPatch, cargoDelete,
-    transportUp, transportPatch, transportDelete
+    transportUp, transportPatch, transportDelete, shipmentCopy
 } from "@/shared/api/shipmentsActions";
 
 
 
 import "./MyShipmentsPage.scss";
 import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
+import FullEditDialog from "@/widgets/shipments/FullEditDialog.tsx";
+import CopyShipmentDialog from "@/widgets/shipments/CopyShipmentDialog.tsx";
 
 /** Helper: parse "1 250 EUR" -> 1250 */
 function parsePriceAmount(price?: string | null): number | null {
@@ -53,6 +54,29 @@ function ListBody({
     const [editOpen, setEditOpen] = useState(false);
     const [editItem, setEditItem] = useState<ShipmentRowData | null>(null);
 
+    const [copyOpen, setCopyOpen] = useState(false);
+    const [copyId, setCopyId] = useState<string | null>(null);
+
+    const openCopy = (id: string) => {
+        setCopyId(id);
+        setCopyOpen(true);
+    };
+    const closeCopy = () => setCopyOpen(false);
+
+    const handleCopySubmit = async (payload: { date_from: string; date_to: string }) => {
+        if (!copyId) return;
+        await shipmentCopy(kind, copyId, payload);
+        setCopyId(null);
+        onRequestReload?.();
+    };
+
+    const copyInitial = useMemo(() => {
+        const item = list.find(x => x.id === copyId);
+        return item
+            ? { dateFrom: item.dates?.from ?? "", dateTo: item.dates?.to ?? "" }
+            : { dateFrom: "", dateTo: "" };
+    }, [copyId, list]);
+
     const openEdit = (id: string) => {
         const found = list.find((x) => x.id === id) || null;
         setEditItem(found);
@@ -74,34 +98,20 @@ function ListBody({
         reload();
     };
 
-    const handleEditSubmit = async (payload: {
-        date_from: string | null;
-        date_to: string | null;
-        price_amount: number | null;
-        contact_extra_phone: string | null;
-        note: string | null;
-    }) => {
-        if (!editItem) return;
-        if (kind === "cargo") {
-            await cargoPatch(editItem.id, {
-                date_from: payload.date_from ?? undefined,
-                date_to: payload.date_to ?? undefined,
-                price_amount: payload.price_amount ?? undefined,
-                contact_extra_phone: payload.contact_extra_phone ?? undefined,
-                note: payload.note ?? undefined,
-            });
-        } else {
-            await transportPatch(editItem.id, {
-                date_from: payload.date_from ?? undefined,
-                date_to: payload.date_to ?? undefined,
-                price_amount: payload.price_amount ?? undefined,
-                contact_extra_phone: payload.contact_extra_phone ?? undefined,
-                note: payload.note ?? undefined,
-            });
-        }
-        setEditItem(null);
-        reload();
-    };
+    const handleEditSubmit = async (payload: any) => {
+          if (!editItem) return;
+
+              const prune = (obj: any) =>
+                Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+
+              if (kind === "cargo") {
+                await cargoPatch(editItem.id, prune(payload));
+              } else {
+                await transportPatch(editItem.id, prune(payload));
+              }
+          setEditItem(null);
+          reload();
+        };
 
     // Initial values for edit dialog
     const editInitial = useMemo(() => {
@@ -132,7 +142,7 @@ function ListBody({
                             onUp={scope === "my" ? handleUp : undefined}
                             onEdit={scope === "my" ? openEdit : undefined}
                             onDelete={scope === "my" ? handleDelete : undefined}
-                            onCopy={scope === "my" ? (id) => console.log("copy", id) : undefined}
+                            onCopy={scope === "my" ? openCopy : undefined}
                         />
                     </Grid>
                 ))}
@@ -149,12 +159,41 @@ function ListBody({
                 <Button variant="text" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>Next</Button>
             </Stack>
 
-            <QuickEditDialog
+            <FullEditDialog
                 open={editOpen}
                 kind={kind}
-                initial={editInitial}
                 onClose={closeEdit}
                 onSubmit={handleEditSubmit}
+             initial={{
+               dateFrom: editInitial?.dateFrom ?? null,
+               dateTo: editInitial?.dateTo ?? null,
+               vehicleType: editItem?.vehicleType ?? "ANY",
+               // cargo-only:
+               loadType: (editItem as any)?.loadType ?? "ANY",
+               cargoType: (editItem as any)?.cargoType ?? "GENERAL",
+               allowPartialLoad: (editItem as any)?.allowPartialLoad ?? false,
+               palletsCount: (editItem as any)?.palletsCount ?? null,
+               // transport-only:
+               carsCount: (editItem as any)?.carsCount ?? (kind === "transport" ? 1 : null),
+               bargain: (editItem as any)?.bargain ?? (kind === "transport" ? "ALLOWED" : null),
+               weightT: editItem?.weightT ?? (editItem as any)?.weight_t ?? null,
+               volumeM3: editItem?.volumeM3 ?? (editItem as any)?.volume_m3 ?? null,
+               hasDimensions: (editItem as any)?.hasDimensions ?? (editItem as any)?.has_dimensions ?? false,
+               lengthM: (editItem as any)?.length ?? (editItem as any)?.length_m ?? null,
+               widthM: (editItem as any)?.width ?? (editItem as any)?.width_m ?? null,
+               heightM: (editItem as any)?.height ?? (editItem as any)?.height_m ?? null,
+               priceCurrency: (editItem as any)?.price_currency ?? "USD",
+               priceAmount: parsePriceAmount(editItem?.price ?? "") ?? (editItem as any)?.price_amount ?? null,
+               note: editItem?.note ?? null,
+               points: editItem?.points ?? [],
+             }}
+            />
+
+            <CopyShipmentDialog
+                open={copyOpen}
+                onClose={closeCopy}
+                onSubmit={handleCopySubmit}
+                initial={copyInitial}
             />
         </>
     );
@@ -252,6 +291,8 @@ export default function ShipmentsListPage({ scope }: Props) {
                     setReloadKey((k) => k + 1); // also reload when type changes or filters applied
                 }}
             />
+
+
         </Box>
     );
 }

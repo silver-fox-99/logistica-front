@@ -1,0 +1,80 @@
+import { useEffect, useMemo, useState } from "react";
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    Stack, TextField, Button
+} from "@mui/material";
+import Grid from "@mui/material/Grid";
+
+type Props = {
+    open: boolean;
+    onClose: () => void;
+    onSubmit: (payload: { date_from: string; date_to: string }) => Promise<void> | void;
+    initial?: { dateFrom?: string | null; dateTo?: string | null };
+};
+
+const toStr = (v?: string | null) => (v ?? "");
+
+export default function CopyShipmentDialog({ open, onClose, onSubmit, initial }: Props) {
+    const [dateFrom, setDateFrom] = useState<string>("");
+    const [dateTo, setDateTo] = useState<string>("");
+
+    useEffect(() => {
+        if (!open) return;
+        setDateFrom(toStr(initial?.dateFrom));
+        setDateTo(toStr(initial?.dateTo));
+    }, [open, initial?.dateFrom, initial?.dateTo]);
+
+    const errorMsg = useMemo(() => {
+        if (!dateFrom || !dateTo) return "Both dates are required";
+        if (dateFrom > dateTo) return "Loading date must be before or equal to unloading date";
+        return "";
+    }, [dateFrom, dateTo]);
+
+    const handleSubmit = async () => {
+        if (errorMsg) return;
+        await onSubmit({ date_from: dateFrom, date_to: dateTo });
+        onClose();
+    };
+
+    return (
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+            <DialogTitle>Copy order</DialogTitle>
+            <DialogContent>
+                <Stack spacing={2} mt={0.5}>
+                    <Grid container spacing={1.5}>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField
+                                label="Loading date from"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                value={dateFrom}
+                                onChange={(e) => setDateFrom(e.target.value)}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField
+                                label="Unloading date to"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                value={dateTo}
+                                onChange={(e) => setDateTo(e.target.value)}
+                                fullWidth
+                            />
+                        </Grid>
+                    </Grid>
+
+                    {!!errorMsg && (
+                        <div style={{ color: "#d32f2f", fontSize: 12 }}>{errorMsg}</div>
+                    )}
+                </Stack>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose} variant="text">Cancel</Button>
+                <Button onClick={handleSubmit} variant="contained" disabled={!!errorMsg}>
+                    Create copy
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}

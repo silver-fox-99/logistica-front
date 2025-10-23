@@ -1,6 +1,12 @@
 
 export type ShipmentsKind = "cargo" | "transport";
 
+export type GeoPoint = {
+    country?: string | null;
+    region?: string | null;
+    city?: string | null;
+};
+
 export type ShipmentRowData = {
     id: string;
     routeFrom: string;
@@ -16,6 +22,7 @@ export type ShipmentRowData = {
     timeAgo?: string;
     repeats?: number;
     views?: number;
+    points?: GeoPoint[];
     contact?: { name?: string; email?: string; phone1?: string; phone2?: string; telegram?: string };
     
 
