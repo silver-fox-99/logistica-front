@@ -5,6 +5,8 @@ export type GeoPoint = {
     country?: string | null;
     region?: string | null;
     city?: string | null;
+    type?: string | null;
+    id?: string;
 };
 
 export type ShipmentRowData = {

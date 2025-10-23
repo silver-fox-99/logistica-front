@@ -165,6 +165,7 @@ function ListBody({
                 onClose={closeEdit}
                 onSubmit={handleEditSubmit}
              initial={{
+                 id: editItem?.id ?? undefined,
                dateFrom: editInitial?.dateFrom ?? null,
                dateTo: editInitial?.dateTo ?? null,
                vehicleType: editItem?.vehicleType ?? "ANY",

@@ -28,6 +28,7 @@ type Geo = {
 type VehicleTypeOpt = { value: string; label: string };
 
 type InitialData = {
+    id?: string;
     dateFrom?: string | null;
     dateTo?: string | null;
     vehicleType?: string | null;
@@ -311,8 +312,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             price_amount: toOptionalNumber(form.priceAmount),
             note: form.note || null,
             points: [
-                { country: nameOf(form.p1_countryId), region: nameOf(form.p1_regionId), city: nameOf(form.p1_cityId) },
-                { country: nameOf(form.p2_countryId), region: nameOf(form.p2_regionId), city: nameOf(form.p2_cityId) },
+                {id: initial?.points?.[0]?.id, type: initial?.points?.[0]?.type, cargo_id: initial?.id, country: nameOf(form.p1_countryId), region: nameOf(form.p1_regionId), city: nameOf(form.p1_cityId) },
+                {id: initial?.points?.[1]?.id, type: initial?.points?.[1]?.type, cargo_id: initial?.id, country: nameOf(form.p2_countryId), region: nameOf(form.p2_regionId), city: nameOf(form.p2_cityId) },
             ],
         };
 
