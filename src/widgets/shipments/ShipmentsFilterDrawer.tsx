@@ -203,12 +203,12 @@ export default function ShipmentsFilterDrawer({
                         disabled={dropoffCitiesDisabled}
                     />
 
-                    <Stack direction="row" gap={1.2}>
-                        <TextField fullWidth size="small" type="date" label="From" InputLabelProps={{ shrink: true }}
-                                   value={filters.dropoff_date_from ?? ""} onChange={(e) => setF({ dropoff_date_from: e.target.value || undefined })}/>
-                        <TextField fullWidth size="small" type="date" label="To" InputLabelProps={{ shrink: true }}
-                                   value={filters.dropoff_date_to ?? ""} onChange={(e) => setF({ dropoff_date_to: e.target.value || undefined })}/>
-                    </Stack>
+                    {/*<Stack direction="row" gap={1.2}>*/}
+                    {/*    <TextField fullWidth size="small" type="date" label="From" InputLabelProps={{ shrink: true }}*/}
+                    {/*               value={filters.dropoff_date_from ?? ""} onChange={(e) => setF({ dropoff_date_from: e.target.value || undefined })}/>*/}
+                    {/*    <TextField fullWidth size="small" type="date" label="To" InputLabelProps={{ shrink: true }}*/}
+                    {/*               value={filters.dropoff_date_to ?? ""} onChange={(e) => setF({ dropoff_date_to: e.target.value || undefined })}/>*/}
+                    {/*</Stack>*/}
                 </Stack>
 
                 {/* VEHICLE / RANGES */}
