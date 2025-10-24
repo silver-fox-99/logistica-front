@@ -1,0 +1,34 @@
+{
+  "header": {
+    "login": "Kirish",
+    "register": "Ro‘yxatdan o‘tish"
+  },
+  "footer": {
+    "companyName": "Kompaniya nomi",
+    "address": "Manzil",
+    "city": "Shahar",
+    "company": "Kompaniya",
+    "aboutCompany": "Biz haqimizda",
+    "contacts": "Aloqa",
+    "askAndAnswer": "Savol-javob",
+    "support": "Yordam",
+    "privacyAndPolicy": "Shartlar va siyosat",
+    "termsCookie": "Cookie siyosati",
+    "terms": "Foydalanish shartlari",
+    "privacy": "Maxfiylik siyosati"
+  },
+  "loginPage": {
+    "title": "Kirish",
+    "subtitle": "Ro‘yxatdan o‘tishda ko‘rsatgan telefon raqamingizdan foydalaning. Raqam “+” belgisi va mamlakat kodi bilan boshlanishi kerak.",
+    "needToRegister": "Hali ro‘yxatdan o‘tmagansizmi?",
+    "register": "Ro‘yxatdan o‘tish"
+  },
+  "loginForm": {
+    "phone": "Telefon raqami",
+    "password": "Parol",
+    "login": "Kirish",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "error": "Telefon raqami yoki parol noto‘g‘ri",
+    "success": "Kirish muvaffaqiyatli!"
+  }
+}

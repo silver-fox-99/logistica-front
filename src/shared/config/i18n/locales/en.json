@@ -1,0 +1,34 @@
+{
+  "header": {
+    "login": "Login",
+    "register": "Sign up"
+  },
+  "footer": {
+    "companyName": "Company Name",
+    "address": "Address",
+    "city": "City",
+    "company": "Company",
+    "aboutCompany": "About us",
+    "contacts": "Contacts",
+    "askAndAnswer": "Questions & Answers",
+    "support": "Support",
+    "privacyAndPolicy": "Terms & Policies",
+    "termsCookie": "Cookie Policy",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy"
+  },
+  "loginPage": {
+    "title": "Login",
+    "subtitle": "Use the phone number you provided during registration. The number must start with “+” and the country code.",
+    "needToRegister": "Not registered yet?",
+    "register": "Sign up"
+  },
+  "loginForm": {
+    "phone": "Phone number",
+    "password": "Password",
+    "login": "Log in",
+    "forgotPassword": "Forgot password?",
+    "error": "Invalid phone number or password",
+    "success": "Login successful!"
+  }
+}

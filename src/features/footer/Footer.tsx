@@ -4,17 +4,22 @@ import instaLogo from './instagram.svg'
 import facebookLogo from './facebook.svg'
 
 import './footer.scss'
+import LanguageSwitcher from "@/shared/ui/language-switcher/LanguageSwitcher.tsx";
+import {useTranslation} from "react-i18next";
 
 export default function Footer() {
+
+    const {t} = useTranslation()
+
     return <div className="footer">
        <div className="footer__body container">
            <div className="footer__column">
                <img className="footer__logo" src={logo} alt="logo"/>
 
                <div className="footer__contacts">
-                   <Link to="/" >Name Company</Link>
-                   <Link to="/" >Address</Link>
-                   <Link to="/" >City Company</Link>
+                   <Link to="/" >{t('footer.companyName')}</Link>
+                   <Link to="/" >{t('footer.address')}</Link>
+                   <Link to="/" >{t('footer.city')}</Link>
                </div>
                
                <div className="footer__socials">
@@ -29,32 +34,34 @@ export default function Footer() {
 
 
                </div>
+
+               <LanguageSwitcher />
            </div>
 
            <div className="footer__column">
-               <h5 className="footer__title">Компания</h5>
+               <h5 className="footer__title">{t('footer.company')}</h5>
 
                <div className="footer__links">
-                   <Link to="/" >О компании</Link>
-                   <Link to="/" >Контакты</Link>
-                   <Link to="/">Вопросы и ответы</Link>
-                   <Link to="/">Поддержка</Link>
+                   <Link to="/" >{t('footer.aboutCompany')}</Link>
+                   <Link to="/" >{t('footer.contacts')}</Link>
+                   <Link to="/">{t('footer.askAndAnswer')}</Link>
+                   <Link to="/">{t('footer.support')}</Link>
                </div>
            </div>
 
            <div className="footer__column">
-               <div className="footer__title">Условия и политика</div>
+               <div className="footer__title">{t('footer.privacyAndPolicy')}</div>
 
                <div className="footer__links">
-                   <Link to="/">Политика cookie</Link>
-                   <Link to="/">Условия использования</Link>
-                   <Link to="/">Политика конфиденциальности</Link>
+                   <Link to="/">{t('footer.termsCookie')}</Link>
+                   <Link to="/">{t('footer.terms')}</Link>
+                   <Link to="/">{t('footer.privacy')}</Link>
                </div>
            </div>
        </div>
 
         <div className="footer__bottom container">
-            © 2025 NameCompany. All rights reserved. Design by nikitich.
+            © 2025 Logistica. All rights reserved. Design by nikitich.
         </div>
     </div>
 }

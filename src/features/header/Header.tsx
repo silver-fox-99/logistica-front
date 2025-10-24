@@ -4,6 +4,7 @@ import {Avatar, IconButton} from "@mui/material";
 import {FiMenu} from "react-icons/fi";
 import './header.scss'
 import {useUserStore} from "@/entities/user/model/user.store.ts";
+import {useTranslation} from "react-i18next";
 
 export default function Header({
     isAuthenticated, 
@@ -15,6 +16,7 @@ export default function Header({
     showBurger?: boolean;
 }) {
     const user = useUserStore((s) => s.user);
+    const {t} = useTranslation()
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -71,8 +73,8 @@ export default function Header({
             </div>}
 
             {!isAuthenticated && <div className="header__column">
-                <Link to="/login" className="header__button button button--transparent" >Вход</Link>
-                <Link to="/register" className="header__button button" >Регистрация</Link>
+                <Link to="/login" className="header__button button button--transparent" >{t('header.login')}</Link>
+                <Link to="/register" className="header__button button" >{t('header.register')}</Link>
             </div>}
         </div>
 

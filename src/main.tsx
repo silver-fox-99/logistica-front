@@ -4,6 +4,8 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './index.scss'
 import AppRoot from './app'
+import "@/app/providers/i18n/i18n";
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

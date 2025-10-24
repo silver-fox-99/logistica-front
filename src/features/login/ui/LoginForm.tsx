@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import {authApi} from "@/shared/api/authApi.ts";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
+import {useTranslation} from "react-i18next";
 
 
 const signInSchema = z.object({
@@ -32,6 +33,8 @@ export default function LoginForm() {
         mode: "onTouched",
     });
 
+    const {t} = useTranslation()
+
     const setUser = useUserStore(s => s.setUser);
     const navigate = useNavigate()
     const handleLocalSubmit = async (data: SignInForm) => {
@@ -43,10 +46,10 @@ export default function LoginForm() {
             localStorage.setItem('refreshToken', refreshToken)
 
             setUser(rest)
-            toast.success('Вход выполнен успешно!')
+            toast.success(t('loginForm.success'))
             navigate('/dashboard/profile')
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Неверный номер телефона или пароль'
+            const message = error?.response?.data?.message || t('loginForm.error')
             toast.error(message)
         }
     };
@@ -59,7 +62,7 @@ export default function LoginForm() {
             sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%", mt: "32px" }}
         >
             <TextField
-                label="Номер телефона"
+                label={t('loginForm.phone')}
                 type="tel"
                 autoComplete="tel"
                 fullWidth
@@ -72,7 +75,7 @@ export default function LoginForm() {
             />
 
             <TextField
-                label="Пароль"
+                label={t('loginForm.password')}
                 type="password"
                 autoComplete="current-password"
                 fullWidth
@@ -94,11 +97,11 @@ export default function LoginForm() {
                     height: "42px",
                 }}
             >
-                Войти
+                {t('loginForm.login')}
             </Button>
 
             <Link className="button button--reset" to="/reset-password">
-                Забыли пароль?
+                {t('loginForm.forgotPassword')}
             </Link>
         </Box>
     );
