@@ -25,7 +25,7 @@ export default function LanguageSwitcher() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
-    const currentLang = i18n.resolvedLanguage || i18n.language || "en";
+    const currentLang = i18n.resolvedLanguage || i18n.language || "uz";
     const currentFlag = useMemo(
         () => flagUrl(langToCountry[currentLang] || "GB", 24),
         [currentLang]
