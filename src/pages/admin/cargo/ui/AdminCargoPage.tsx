@@ -24,9 +24,9 @@ import React from "react";
 
 const n = (v?: number, d = 0) => (typeof v === "number" ? v : d);
 const fmtDT = (d?: string | null) =>
-    d ? new Date(d).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", hour12: false }) : "—";
+    d ? new Date(d)?.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", hour12: false }) : "—";
 const fmtD = (d?: string | null) =>
-    d ? new Date(d).toLocaleDateString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit" }) : "—";
+    d ? new Date(d)?.toLocaleDateString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit" }) : "—";
 
 function route(p: CargoItem["points"]): string {
     if (!p?.length) return "—";
@@ -71,7 +71,7 @@ export default function AdminCargoPage() {
                 <Stack spacing={0}>
                     <Typography variant="h5" fontWeight={700}>Грузы</Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {totalSafe.toLocaleString()} record{totalSafe === 1 ? "" : "s"}
+                        {totalSafe?.toLocaleString()} record{totalSafe === 1 ? "" : "s"}
                     </Typography>
                 </Stack>
 
@@ -170,7 +170,7 @@ export default function AdminCargoPage() {
                                             {c.price_amount} {c.price_currency}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            {c.payment_method.replaceAll("_", " ")}, {c.payment_term.toLowerCase()}
+                                            {c.payment_method.replaceAll("_", " ")}, {c.payment_term?.toLowerCase()}
                                         </Typography>
                                     </TableCell>
 
