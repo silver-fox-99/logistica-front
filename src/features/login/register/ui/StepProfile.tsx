@@ -13,32 +13,38 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import {authApi} from "@/shared/api/authApi.ts";
 import {useNavigate} from "react-router-dom";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 
-const schema = z.object({
-    firstName: z.string().trim().min(2, "Имя должно быть не короче 2 символов"),
-    lastName: z.string().trim().min(2, "Фамилия должна быть не короче 2 символов"),
-    password: z.string().min(6, "Пароль должен быть не короче 6 символов"),
-    confirmPassword: z.string().min(1, "Подтверждение пароля должно быть не короче 1 символа"),
-}).refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Пароль и подтверждение пароля не совпадают",
-});
-
-export type ProfileFormValues = z.infer<typeof schema>;
+export type ProfileFormValues = {
+    firstName: string;
+    lastName: string;
+    password: string;
+    confirmPassword: string;
+};
 
 type StepProfileProps = {
     defaultValues?: Partial<ProfileFormValues>;
 };
 
 export default function StepProfile({ defaultValues }: StepProfileProps) {
+    const { t } = useTranslation();
     const [showPwd, setShowPwd] = useState(false);
     const [showPwd2, setShowPwd2] = useState(false);
     const navigate = useNavigate()
     const setUser = useUserStore(s => s.setUser);
 
+    const schema = z.object({
+        firstName: z.string().trim().min(2, t("register.firstNameRequired")),
+        lastName: z.string().trim().min(2, t("register.lastNameRequired")),
+        password: z.string().min(6, t("register.passwordRequired")),
+        confirmPassword: z.string().min(1, t("register.confirmPasswordRequired")),
+    }).refine((data) => data.password === data.confirmPassword, {
+        path: ["confirmPassword"],
+        message: t("register.confirmPasswordMismatch"),
+    });
 
     const {
         register,
@@ -60,10 +66,10 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
        try {
            const res = await authApi.completeRegister(data)
            setUser(res.data)
-           toast.success('Регистрация успешно завершена!')
+           toast.success(t("register.registrationSuccess"))
            navigate('/dashboard/profile')
        } catch (error: any) {
-           const message = error?.response?.data?.message || 'Ошибка при регистрации'
+           const message = error?.response?.data?.message || t("register.registrationError")
            toast.error(message)
        }
     };
@@ -76,8 +82,8 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             sx={{ display: "grid", gap: 2 }}
         >
             <TextField
-                label="Имя*"
-                placeholder="Ваше имя (как в документе)"
+                label={t("register.firstNameLabel")}
+                placeholder={t("register.firstNamePlaceholder")}
                 autoComplete="given-name"
                 fullWidth
                 {...register("firstName")}
@@ -87,8 +93,8 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             />
 
             <TextField
-                label="Фамилия*"
-                placeholder="Ваша фамилия (как в документе)"
+                label={t("register.lastNameLabel")}
+                placeholder={t("register.lastNamePlaceholder")}
                 autoComplete="family-name"
                 fullWidth
                 {...register("lastName")}
@@ -98,14 +104,14 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             />
 
             <TextField
-                label="Пароль*"
-                placeholder="Введите пароль"
+                label={t("register.passwordLabel")}
+                placeholder={t("register.passwordPlaceholder")}
                 type={showPwd ? "text" : "password"}
                 autoComplete="new-password"
                 fullWidth
                 {...register("password")}
                 error={!!errors.password}
-                helperText={errors.password?.message ?? "Пароль должен быть не короче 6 символов"}
+                helperText={errors.password?.message ?? t("register.passwordRequired")}
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                 InputProps={{
                     endAdornment: (
@@ -119,8 +125,8 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             />
 
             <TextField
-                label="Повторите пароль*"
-                placeholder="Подтвердите пароль"
+                label={t("register.confirmPasswordLabel")}
+                placeholder={t("register.confirmPasswordPlaceholder")}
                 type={showPwd2 ? "text" : "password"}
                 autoComplete="new-password"
                 fullWidth
@@ -141,7 +147,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
 
             <Stack spacing={0.5}>
                 <Typography variant="caption" color="text.secondary">
-                    *Пароль должен быть не короче 6 символов
+                    {t("register.passwordHint")}
                 </Typography>
             </Stack>
 
@@ -152,7 +158,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
                 disabled={isSubmitting}
                 sx={{ height: 44, textTransform: "none" }}
             >
-                Зарегистрироваться
+                {t("register.registerButton")}
             </Button>
         </Box>
     );

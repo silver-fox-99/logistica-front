@@ -1,4 +1,5 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     open: boolean;
@@ -11,10 +12,12 @@ type Props = {
 };
 
 export default function ConfirmDialog({
-                                          open, title = "Confirm action", message = "Are you sure?",
-                                          confirmText = "Confirm", cancelText = "Cancel",
+                                          open, title, message,
+                                          confirmText, cancelText,
                                           onClose, onConfirm
                                       }: Props) {
+    const { t } = useTranslation();
+    
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
             {!!title && <DialogTitle>{title}</DialogTitle>}
@@ -24,8 +27,8 @@ export default function ConfirmDialog({
                 </DialogContent>
             )}
             <DialogActions>
-                <Button onClick={onClose}>{cancelText}</Button>
-                <Button color="error" variant="contained" onClick={onConfirm}>{confirmText}</Button>
+                <Button onClick={onClose}>{cancelText || t('shipments.confirmDialog.defaultCancel')}</Button>
+                <Button color="error" variant="contained" onClick={onConfirm}>{confirmText || t('shipments.confirmDialog.defaultConfirm')}</Button>
             </DialogActions>
         </Dialog>
     );

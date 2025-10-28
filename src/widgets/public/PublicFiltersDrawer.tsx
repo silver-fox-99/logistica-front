@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { FiFilter, FiRefreshCw } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi.ts";
 
 export type PublicFilters = {
@@ -52,6 +53,7 @@ type VehicleTypeOption = { value: string; label: string };
 type Option = { id: string; label: string };
 
 export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: Props) {
+    const { t } = useTranslation();
     const [f, setF] = useState<PublicFilters>(initial ?? {});
     const [filtersData, setFiltersData] = useState<null | {
         geos: Geo[];
@@ -166,28 +168,30 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
         <Drawer anchor="right" open={open} onClose={onClose}>
             <Box sx={{ width: 360, p: 2 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h6" fontWeight={700}>Filters</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ textTransform: "capitalize" }}>{kind}</Typography>
+                    <Typography variant="h6" fontWeight={700}>{t('shipments.filters.title')}</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ textTransform: "capitalize" }}>
+                        {kind === "cargo" ? t('shipments.filters.cargo') : t('shipments.filters.transport')}
+                    </Typography>
                 </Stack>
 
                 <Divider sx={{ my: 2 }} />
 
                 {/* PICKUP */}
-                <Typography variant="subtitle2" gutterBottom>Pickup</Typography>
+                <Typography variant="subtitle2" gutterBottom>{t('shipments.filters.pickup')}</Typography>
                 <Stack gap={1.2}>
                     <Autocomplete
                         options={countriesOpts}
                         value={pickupCountryValue}
                         onChange={(_, opt) => handlePickupCountry(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Country" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.country')} />}
                     />
                     <Autocomplete
                         options={asOptions(pickupRegions)}
                         value={pickupRegionValue}
                         onChange={(_, opt) => handlePickupRegion(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Region" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.region')} />}
                         disabled={pickupRegionsDisabled}
                     />
                     <Autocomplete
@@ -195,34 +199,34 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                         value={pickupCityValue}
                         onChange={(_, opt) => setF(v => ({ ...v, pickup_city: opt?.id }))}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="City" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.city')} />}
                         disabled={pickupCitiesDisabled}
                     />
 
                     <Stack direction="row" gap={1.2}>
-                        <TextField fullWidth size="small" type="date" label="From" InputLabelProps={{ shrink: true }}
+                        <TextField fullWidth size="small" type="date" label={t('shipments.filters.from')} InputLabelProps={{ shrink: true }}
                                    value={f.pickup_date_from ?? ""} onChange={(e)=>setF(v=>({...v,pickup_date_from:e.target.value||undefined}))}/>
-                        <TextField fullWidth size="small" type="date" label="To" InputLabelProps={{ shrink: true }}
+                        <TextField fullWidth size="small" type="date" label={t('shipments.filters.to')} InputLabelProps={{ shrink: true }}
                                    value={f.pickup_date_to ?? ""} onChange={(e)=>setF(v=>({...v,pickup_date_to:e.target.value||undefined}))}/>
                     </Stack>
                 </Stack>
 
                 {/* DROPOFF */}
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Dropoff</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.dropoff')}</Typography>
                 <Stack gap={1.2}>
                     <Autocomplete
                         options={countriesOpts}
                         value={dropoffCountryValue}
                         onChange={(_, opt) => handleDropoffCountry(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Country" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.country')} />}
                     />
                     <Autocomplete
                         options={asOptions(dropoffRegions)}
                         value={dropoffRegionValue}
                         onChange={(_, opt) => handleDropoffRegion(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Region" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.region')} />}
                         disabled={dropoffRegionsDisabled}
                     />
                     <Autocomplete
@@ -230,7 +234,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                         value={dropoffCityValue}
                         onChange={(_, opt) => setF(v => ({ ...v, dropoff_city: opt?.id }))}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="City" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.city')} />}
                         disabled={dropoffCitiesDisabled}
                     />
 
@@ -243,36 +247,36 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                 </Stack>
 
                 {/* VEHICLE */}
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Vehicle</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.vehicle')}</Typography>
                 <Autocomplete
                     options={vehicleOpts}
                     value={vehicleValue}
                     onChange={(_, opt) => setF(v => ({ ...v, vehicle_type: opt?.id }))}
                     isOptionEqualToValue={(o, v) => o.id === v.id}
-                    renderInput={(params) => <TextField {...params} size="small" label="Vehicle type" />}
+                    renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.vehicleType')} />}
                 />
 
                 {/* WEIGHT */}
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Weight (t)</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.weight')}</Typography>
                 <Stack direction="row" gap={1.2}>
-                    <TextField fullWidth size="small" type="number" label="Min" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.min')} inputProps={{ step: "0.001", min: 0 }}
                                value={f.weight_min ?? ""} onChange={setNum("weight_min")}/>
-                    <TextField fullWidth size="small" type="number" label="Max" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.max')} inputProps={{ step: "0.001", min: 0 }}
                                value={f.weight_max ?? ""} onChange={setNum("weight_max")}/>
                 </Stack>
 
                 {/* VOLUME */}
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Volume (m³)</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.volume')}</Typography>
                 <Stack direction="row" gap={1.2}>
-                    <TextField fullWidth size="small" type="number" label="Min" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.min')} inputProps={{ step: "0.001", min: 0 }}
                                value={f.volume_min ?? ""} onChange={setNum("volume_min")}/>
-                    <TextField fullWidth size="small" type="number" label="Max" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.max')} inputProps={{ step: "0.001", min: 0 }}
                                value={f.volume_max ?? ""} onChange={setNum("volume_max")}/>
                 </Stack>
 
                 <Stack direction="row" gap={1} sx={{ mt: 3 }}>
-                    <Button fullWidth variant="contained" startIcon={<FiFilter />} onClick={() => onApply(f)}>Apply</Button>
-                    <Button fullWidth variant="outlined" startIcon={<FiRefreshCw />} onClick={onReset}>Reset</Button>
+                    <Button fullWidth variant="contained" startIcon={<FiFilter />} onClick={() => onApply(f)}>{t('shipments.filters.apply')}</Button>
+                    <Button fullWidth variant="outlined" startIcon={<FiRefreshCw />} onClick={onReset}>{t('shipments.filters.reset')}</Button>
                 </Stack>
             </Box>
         </Drawer>

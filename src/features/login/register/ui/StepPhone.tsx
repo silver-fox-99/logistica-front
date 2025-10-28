@@ -3,20 +3,23 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import parsePhoneNumber from "libphonenumber-js";
 import { authApi } from "@/shared/api/authApi";
 import { firebasePhone } from "@/shared/lib/firebasePhone";
 
-const schema = z.object({
-    phone: z.string().min(1, "Введите номер телефона")
-        .refine(v => matchIsValidTel(v), "Введите корректный номер телефона"),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = { phone: string };
 type StepPhoneProps = { defaultCountry?: string; onNext?: (e164: string, raw: string) => void; };
 
 export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhoneProps) {
+    const { t } = useTranslation();
+
+    const schema = z.object({
+        phone: z.string().min(1, t("register.phoneRequired"))
+            .refine(v => matchIsValidTel(v), t("register.phoneInvalid")),
+    });
+
     const { control, handleSubmit, setError, formState: { isSubmitting } } =
         useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { phone: "" }, mode: "onTouched" });
 
@@ -27,15 +30,15 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
 
             const { existing } = await authApi.checkPhone(e164);
             if (existing) {
-                setError("phone", { message: "Этот номер телефона уже зарегистрирован" });
+                setError("phone", { message: t("register.phoneExists") });
                 return;
             }
 
             await firebasePhone.sendCode(e164);
-            toast.success('Код отправлен на ваш номер телефона');
+            toast.success(t("register.codeSent"));
             onNext?.(e164, data.phone);
         } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || 'Не удалось отправить код';
+            const message = error?.response?.data?.message || error?.message || t("register.codeSendError");
             toast.error(message);
         }
     };
@@ -48,18 +51,18 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
                 render={({ field, fieldState }) => (
                     <MuiTelInput
                         {...field}
-                        label="Номер телефона"
+                        label={t("register.phoneLabel")}
                         // @ts-ignore
                         defaultCountry={defaultCountry}
                         forceCallingCode
-                        placeholder="+1 (555) 000-0000"
+                        placeholder={t("register.phonePlaceholder")}
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message}
                         sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                     />
                 )}
             />
-            <Button type="submit" variant="contained" disabled={isSubmitting}>Отправить код</Button>
+            <Button type="submit" variant="contained" disabled={isSubmitting}>{t("register.sendCodeButton")}</Button>
         </Box>
     );
 }

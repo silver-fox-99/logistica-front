@@ -5,6 +5,7 @@ import {
 import Grid from "@mui/material/Grid";
 import { FiSliders } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 import { useShipments } from "@/entities/shipment/model/useShipments";
 import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
@@ -46,6 +47,7 @@ function ListBody({
     filters: Partial<PublicFilters>;
     onRequestReload?: () => void;
 }) {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const limit = 10;
 
@@ -87,14 +89,14 @@ function ListBody({
             } else if (kind === "transport") {
                 await shipmentCopy(kind, copyId, payload);
             } else {
-                toast.error('Неверный тип заказа');
+                toast.error(t('shipments.messages.invalidOrderType'));
                 return;
             }
-            toast.success('Заказ успешно скопирован!');
+            toast.success(t('shipments.messages.orderCopied'));
             setCopyId(null);
             onRequestReload?.();
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Ошибка при копировании заказа';
+            const message = error?.response?.data?.message || t('shipments.messages.orderCopyError');
             toast.error(message);
         }
     };
@@ -122,13 +124,13 @@ function ListBody({
             } else if (kind === "transport") {
                 await transportUp(id);
             } else {
-                toast.error('Неверный тип заказа');
+                toast.error(t('shipments.messages.invalidOrderType'));
                 return;
             }
-            toast.success('Заказ поднят!');
+            toast.success(t('shipments.messages.orderRaised'));
             reload();
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Ошибка при поднятии заказа';
+            const message = error?.response?.data?.message || t('shipments.messages.orderRaiseError');
             toast.error(message);
         }
     };
@@ -146,15 +148,15 @@ function ListBody({
             } else if (kind === "transport") {
                 await transportDelete(deleteId);
             } else {
-                toast.error('Неверный тип заказа');
+                toast.error(t('shipments.messages.invalidOrderType'));
                 closeDelete();
                 return;
             }
-            toast.success('Заказ успешно удален!');
+            toast.success(t('shipments.messages.orderDeleted'));
             closeDelete();
             reload();
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Ошибка при удалении заказа';
+            const message = error?.response?.data?.message || t('shipments.messages.orderDeleteError');
             toast.error(message);
         }
     };
@@ -171,14 +173,14 @@ function ListBody({
             } else if (kind === "transport") {
                 await transportPatch(editItem.id, prune(payload));
             } else {
-                toast.error('Неверный тип заказа');
+                toast.error(t('shipments.messages.invalidOrderType'));
                 return;
             }
-            toast.success('Заказ успешно обновлен!');
+            toast.success(t('shipments.messages.orderUpdated'));
             setEditItem(null);
             reload();
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Ошибка при обновлении заказа';
+            const message = error?.response?.data?.message || t('shipments.messages.orderUpdateError');
             toast.error(message);
         }
     };
@@ -218,15 +220,15 @@ function ListBody({
                 ))}
                 {loading && (
                     <Grid size={{ xs: 12 }}>
-                        <Typography variant="body2" color="text.secondary">Loading...</Typography>
+                        <Typography variant="body2" color="text.secondary">{t('shipments.actions.loading')}</Typography>
                     </Grid>
                 )}
             </Grid>
 
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 2 }}>
-                <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>Back</Button>
+                <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{t('shipments.actions.back')}</Button>
                 <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />
-                <Button variant="text" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>Next</Button>
+                <Button variant="text" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>{t('shipments.actions.next')}</Button>
             </Stack>
 
             <FullEditDialog
@@ -269,10 +271,10 @@ function ListBody({
 
             <ConfirmDialog
                 open={deleteOpen}
-                title="Подтверждение удаления"
-                message="Вы уверены, что хотите удалить этот заказ? Это действие нельзя отменить."
-                confirmText="Удалить"
-                cancelText="Отмена"
+                title={t('shipments.deleteDialog.title')}
+                message={t('shipments.deleteDialog.message')}
+                confirmText={t('shipments.deleteDialog.confirm')}
+                cancelText={t('shipments.deleteDialog.cancel')}
                 onClose={closeDelete}
                 onConfirm={confirmDelete}
             />
@@ -281,6 +283,7 @@ function ListBody({
 }
 
 export default function ShipmentsListPage({ scope }: Props) {
+    const { t } = useTranslation();
     const [period, setPeriod] = useState("all");
     const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -309,12 +312,12 @@ export default function ShipmentsListPage({ scope }: Props) {
                     </Box>
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h6" mb={1} className="shipments-page__title">
-                            {scope === "my" ? "My shipments" : "Search orders"}
+                            {scope === "my" ? t('shipments.myShipments.title') : t('shipments.myShipments.searchTitle')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" mb={2} className="shipments-page__subtitle">
                             {scope === "my"
-                                ? "Your created orders with transport and cargo."
-                                : "Find suitable orders from other users."}
+                                ? t('shipments.myShipments.description')
+                                : t('shipments.myShipments.searchDescription')}
                         </Typography>
                     </Box>
                 </Box>
@@ -327,11 +330,11 @@ export default function ShipmentsListPage({ scope }: Props) {
                     sx={{ textTransform: "none" }}
                     onClick={() => setDrawerOpen(true)}
                 >
-                    Filter
+                    {t('shipments.filter.button')}
                 </Button>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="body2" color="text.secondary">Period:</Typography>
+                    <Typography variant="body2" color="text.secondary">{t('shipments.filter.period')}</Typography>
                     <Select
                         variant="outlined"
                         size="small"
@@ -339,10 +342,10 @@ export default function ShipmentsListPage({ scope }: Props) {
                         onChange={(e) => setPeriod(e.target.value)}
                         sx={{ minWidth: 160 }}
                     >
-                        <MenuItem value="all">All time</MenuItem>
-                        <MenuItem value="7d">Last 7 days</MenuItem>
-                        <MenuItem value="30d">Last 30 days</MenuItem>
-                        <MenuItem value="ytd">Year to date</MenuItem>
+                        <MenuItem value="all">{t('shipments.filter.allTime')}</MenuItem>
+                        <MenuItem value="7d">{t('shipments.filter.last7Days')}</MenuItem>
+                        <MenuItem value="30d">{t('shipments.filter.last30Days')}</MenuItem>
+                        <MenuItem value="ytd">{t('shipments.filter.yearToDate')}</MenuItem>
                     </Select>
                 </Stack>
             </Stack>

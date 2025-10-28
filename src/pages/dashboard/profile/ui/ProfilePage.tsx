@@ -1,5 +1,6 @@
 import {Stack} from "@mui/material";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import ProfileOverviewCard from "@/features/profile/ui/ProfileOverviewCard.tsx";
 import ContactInfoCard, {type ContactInfo} from "@/features/profile/ui/ContactInfoCard.tsx";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
@@ -10,7 +11,8 @@ import {profileApi} from "@/shared/api/profileApi.ts";
 export default function ProfilePage() {
     const user = useUserStore(s => s.user)
     const setUser = useUserStore(s => s.setUser)
-    const [userDate, setUserDate] = useState<string>('Unknown')
+    const { t } = useTranslation()
+    const [userDate, setUserDate] = useState<string>(t('profile.overview.unknown'))
 
     useEffect(() => {
         if (user) {
@@ -39,9 +41,9 @@ export default function ProfilePage() {
             }
             const res = await profileApi.updateProfile(preparedData)
             setUser(res.data)
-            toast.success('Информация профиля успешно обновлена')
+            toast.success(t('profile.messages.updateSuccess'))
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Не удалось обновить информацию профиля'
+            const message = error?.response?.data?.message || t('profile.messages.updateError')
             toast.error(message)
         }
     }
@@ -50,8 +52,8 @@ export default function ProfilePage() {
         <Stack spacing={3}>
             <ProfileOverviewCard
                 fullName={user?.first_name + " " + user?.last_name}
-                location={user?.meta?.geo || 'Unknown'}
-                registeredAt={userDate || 'Unknown'}
+                location={user?.meta?.geo || t('profile.overview.unknown')}
+                registeredAt={userDate || t('profile.overview.unknown')}
             />
             <ContactInfoCard
                 data={{

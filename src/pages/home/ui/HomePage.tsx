@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Box, Paper, Stack, Typography, Button, Tabs, Tab, Pagination, Chip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiFilter, FiTruck, FiPackage, FiChevronRight } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import { usePublicShipments } from "@/entities/public-shipment/model/usePublicShipmets";
 import { PublicShipmentCard } from "@/widgets/public/PublicShipmentCard";
 import { PublicFiltersDrawer } from "@/widgets/public/PublicFiltersDrawer";
@@ -10,6 +11,7 @@ import type {PublicFilters} from "@/entities/public-shipment/model/types.ts";
 type TabKind = "cargo" | "transport";
 
 export default function HomePage() {
+    const { t } = useTranslation();
     const [tab, setTab] = useState<TabKind>("cargo");
     const [page, setPage] = useState(1);
     const limit = 10;
@@ -29,9 +31,9 @@ export default function HomePage() {
             <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 2 }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
                     <Stack>
-                        <Typography variant="h5" fontWeight={700}>Find shipments</Typography>
+                        <Typography variant="h5" fontWeight={700}>{t("homePage.title")}</Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Browse public cargo and available transport. Sign in to see full details.
+                            {t("homePage.subtitle")}
                         </Typography>
                     </Stack>
 
@@ -42,12 +44,12 @@ export default function HomePage() {
                             sx={{ textTransform: "none" }}
                             onClick={() => setDrawerOpen(true)}
                         >
-                            Filters
+                            {t("homePage.filtersButton")}
                         </Button>
                         {activeFiltersCount > 0 && (
-                            <Chip size="small" color="primary" variant="outlined" label={`Filters: ${activeFiltersCount}`} />
+                            <Chip size="small" color="primary" variant="outlined" label={t("homePage.filtersCount", { count: activeFiltersCount })} />
                         )}
-                        <Chip size="small" color="default" variant="outlined" label={`Total: ${total}`} />
+                        <Chip size="small" color="default" variant="outlined" label={t("homePage.totalCount", { count: total })} />
                     </Stack>
                 </Stack>
 
@@ -59,8 +61,8 @@ export default function HomePage() {
                     }}
                     sx={{ mt: 1 }}
                 >
-                    <Tab value="cargo" icon={<FiPackage />} iconPosition="start" label="Cargo" />
-                    <Tab value="transport" icon={<FiTruck />} iconPosition="start" label="Transport" />
+                    <Tab value="cargo" icon={<FiPackage />} iconPosition="start" label={t("homePage.cargoTab")} />
+                    <Tab value="transport" icon={<FiTruck />} iconPosition="start" label={t("homePage.transportTab")} />
                 </Tabs>
             </Paper>
 
@@ -70,7 +72,7 @@ export default function HomePage() {
                         <PublicShipmentCard
                             data={item}
                             cta={{
-                                label: "More details",
+                                label: t("homePage.moreDetails"),
                                 href: `/login?next=/${tab}/${item.id}`,
                                 icon: <FiChevronRight />,
                             }}
@@ -81,16 +83,16 @@ export default function HomePage() {
 
                 {loading && (
                     <Grid size={{ xs: 12 }}>
-                        <Typography variant="body2" color="text.secondary">Loading...</Typography>
+                        <Typography variant="body2" color="text.secondary">{t("homePage.loading")}</Typography>
                     </Grid>
                 )}
 
                 {!loading && list.length === 0 && (
                     <Grid size={{ xs: 12 }}>
                         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                            <Typography>No results</Typography>
+                            <Typography>{t("homePage.noResults")}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Try switching a tab or adjusting filters.
+                                {t("homePage.noResultsHint")}
                             </Typography>
                         </Paper>
                     </Grid>

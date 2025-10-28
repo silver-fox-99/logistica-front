@@ -1,17 +1,15 @@
-
 import { useState } from "react";
 import { Button, Stack, TextField, Alert, InputAdornment, IconButton } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
-const schema = z.object({
-    password: z.string().min(8, "Пароль должен быть не короче 8 символов"),
-    confirm: z.string().min(1, "Подтвердите пароль"),
-}).refine(v => v.password === v.confirm, { path: ["confirm"], message: "Пароли не совпадают" });
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = {
+    password: string;
+    confirm: string;
+};
 
 export default function StepNewPassword({
                                             onSubmit,
@@ -20,6 +18,13 @@ export default function StepNewPassword({
     onSubmit?: () => void;
     submitWith: (password: string) => Promise<void>;
 }) {
+    const { t } = useTranslation();
+
+    const schema = z.object({
+        password: z.string().min(8, t("forgotPassword.newPasswordRequired")),
+        confirm: z.string().min(1, t("forgotPassword.confirmPasswordRequired")),
+    }).refine(v => v.password === v.confirm, { path: ["confirm"], message: t("forgotPassword.confirmPasswordMismatch") });
+
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: { password: "", confirm: "" },
@@ -37,11 +42,11 @@ export default function StepNewPassword({
         setSuccess(null);
         try {
             await submitWith(v.password);
-            setSuccess("Ваш пароль был обновлен");
+            setSuccess(t("forgotPassword.passwordUpdated"));
             reset({ password: "", confirm: "" });
             onSubmit?.();
         } catch (e: any) {
-            setError(e?.response?.data?.message ?? "Не удалось обновить пароль");
+            setError(e?.response?.data?.message ?? t("forgotPassword.passwordUpdateError"));
         } finally {
             setLoading(false);
         }
@@ -51,7 +56,7 @@ export default function StepNewPassword({
         <form onSubmit={handleSubmit(submit)}>
             <Stack spacing={2}>
                 <TextField
-                    label="Новый пароль"
+                    label={t("forgotPassword.newPasswordLabel")}
                     type={show1 ? "text" : "password"}
                     {...register("password")}
                     error={!!errors.password}
@@ -65,7 +70,7 @@ export default function StepNewPassword({
                     }}
                 />
                 <TextField
-                    label="Подтвердите новый пароль"
+                    label={t("forgotPassword.confirmPasswordLabel")}
                     type={show2 ? "text" : "password"}
                     {...register("confirm")}
                     error={!!errors.confirm}
@@ -83,7 +88,7 @@ export default function StepNewPassword({
                 {error && <Alert severity="error">{error}</Alert>}
 
                 <Button type="submit" variant="contained" disabled={loading}>
-                    {loading ? "Пожалуйста, подождите..." : "Сохранить новый пароль"}
+                    {loading ? t("forgotPassword.pleaseWait") : t("forgotPassword.savePasswordButton")}
                 </Button>
             </Stack>
         </form>

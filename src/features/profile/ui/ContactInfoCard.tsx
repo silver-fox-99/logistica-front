@@ -6,6 +6,7 @@ import Grid from "@mui/material/Grid";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import {FiGlobe, FiMail} from "react-icons/fi";
 import { FaTelegramPlane } from "react-icons/fa";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
@@ -26,17 +27,18 @@ type Props = {
     saving?: boolean;
 };
 
-const schema = z.object({
-    phoneMain: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Введите корректный номер телефона"),
-    phoneAlt: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Введите корректный номер телефона"),
-    telegram: z.string().optional(),
-    geo: z.string().optional(),
-    whatsapp: z.string().optional().refine((v) => !v || matchIsValidTel(v), "Введите корректный номер телефона"),
-    email: z.string().optional().refine((v) => !v || z.string().email().safeParse(v).success, "Введите корректный email"),
-});
-
 export default function ContactInfoCard({ data, onSave, saving }: Props) {
     const [editing, setEditing] = useState(false);
+    const { t } = useTranslation();
+    
+    const schema = z.object({
+        phoneMain: z.string().optional().refine((v) => !v || matchIsValidTel(v), t('profile.validation.invalidPhone')),
+        phoneAlt: z.string().optional().refine((v) => !v || matchIsValidTel(v), t('profile.validation.invalidPhone')),
+        telegram: z.string().optional(),
+        geo: z.string().optional(),
+        whatsapp: z.string().optional().refine((v) => !v || matchIsValidTel(v), t('profile.validation.invalidPhone')),
+        email: z.string().optional().refine((v) => !v || z.string().email().safeParse(v).success, t('profile.validation.invalidEmail')),
+    });
 
     const { control, register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
@@ -94,17 +96,17 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Box>
                         <Box sx={{ flex: 1 }}>
                             <Typography variant="h6" mb={1} className="contact-info-card__title">
-                                Общая информация
+                                {t('profile.contactInfo.title')}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" mb={2} className="contact-info-card__subtitle">
-                                Здесь отображается основная информация о вашем профиле. Эти данные видны другим пользователям.
+                                {t('profile.contactInfo.description')}
                             </Typography>
                         </Box>
                     </Box>
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Основной телефон</Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.phoneMain')}</Typography>
                             <Controller
                                 name="phoneMain"
                                 control={control}
@@ -124,7 +126,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.phoneAlt')}</Typography>
                             <Controller
                                 name="phoneAlt"
                                 control={control}
@@ -144,7 +146,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Telegram чат</Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.telegram')}</Typography>
                             <TextField
                                 placeholder="@username"
                                 fullWidth
@@ -164,7 +166,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>WhatsApp</Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.whatsapp')}</Typography>
                             <Controller
                                 name="whatsapp"
                                 control={control}
@@ -184,7 +186,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>E-mail</Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.email')}</Typography>
                             <TextField
                                 placeholder="email@example.com"
                                 fullWidth
@@ -204,9 +206,9 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Геолокация</Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.geo')}</Typography>
                             <TextField
-                                placeholder="Узбекистан"
+                                placeholder={t('profile.contactInfo.geoPlaceholder')}
                                 fullWidth
                                 disabled={!editing}
                                 {...register("geo")}
@@ -236,7 +238,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                                     disabled={isSubmitting || saving}
                                     sx={{ textTransform: "none" }}
                                 >
-                                    Отмена
+                                    {t('profile.contactInfo.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
@@ -244,7 +246,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                                     disabled={isSubmitting || saving}
                                     sx={{ textTransform: "none" }}
                                 >
-                                    Сохранить
+                                    {t('profile.contactInfo.save')}
                                 </Button>
                             </>
                         ) : (
@@ -253,7 +255,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                                 onClick={() => setEditing(true)}
                                 sx={{ textTransform: "none" }}
                             >
-                                Редактировать
+                                {t('profile.contactInfo.edit')}
                             </Button>
                         )}
                     </Stack>

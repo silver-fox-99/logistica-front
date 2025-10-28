@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 import { cargoApi, type CreateCargoDto } from "@/shared/api/cargoApi";
 import {useNavigate} from "react-router-dom";
@@ -122,6 +123,7 @@ type PlaceRowProps = {
 function PlaceRow({
                       labelPrefix, place, onChange, geos, errorText, showRemove, onRemove
                   }: PlaceRowProps) {
+    const { t } = useTranslation();
     const maps = useMemo(() => (geos ? buildGeoMaps(geos) : null), [geos]);
     const countries = maps?.countries ?? [];
     const regions = place.countryId ? (maps?.regionsByCountry.get(place.countryId) ?? []) : [];
@@ -145,7 +147,7 @@ function PlaceRow({
                 
                 onChange={(_, v) => onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null })}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Страна загрузки" : "Страна выгрузки"} placeholder="Начните вводить страну" />
+                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? t('addCargo.fields.countryLoad') : t('addCargo.fields.countryUnload')} placeholder={t('addCargo.fields.startTypingCountry')} />
                 )}
                 disableClearable={true}
             />
@@ -157,7 +159,7 @@ function PlaceRow({
                 onChange={(_, v) => onChange({ ...place, regionId: v?.id ?? null, cityId: null })}
                 disabled={!countryValue || regions.length === 0}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Регион загрузки" : "Регион выгрузки"} placeholder="Начните вводить регион"/>
+                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? t('addCargo.fields.regionLoad') : t('addCargo.fields.regionUnload')} placeholder={t('addCargo.fields.startTypingRegion')}/>
                 )}
             />
 
@@ -168,7 +170,7 @@ function PlaceRow({
                 onChange={(_, v) => onChange({ ...place, cityId: v?.id ?? null })}
                 disabled={!countryValue || mergedCities.length === 0}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? "Город загрузки" : "Город выгрузки"} placeholder="Начните вводить город"/>
+                    <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? t('addCargo.fields.cityLoad') : t('addCargo.fields.cityUnload')} placeholder={t('addCargo.fields.startTypingCity')}/>
                 )}
             />
 
@@ -179,7 +181,7 @@ function PlaceRow({
                     onClick={onRemove}
                     sx={{ alignSelf: "flex-start", minWidth: 40, mt: 0.5, textTransform: "none" }}
                 >
-                    Remove point
+                    {t('addCargo.fields.removePoint')}
                 </Button>
             )}
 
@@ -190,6 +192,7 @@ function PlaceRow({
 
 /* ===================== PAGE ===================== */
 export default function AddCargoPage() {
+    const { t } = useTranslation();
     const [init, setInit] = useState<Awaited<ReturnType<typeof cargoApi.init>> | null>(null);
     const [loadingInit, setLoadingInit] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
@@ -235,11 +238,11 @@ export default function AddCargoPage() {
 
 
     const steps = [
-        'Даты и маршруты',
-        'Информация о грузе', 
-        'Размеры и вес',
-        'Цена и оплата',
-        'Контакты'
+        t('addCargo.steps.datesRoutes'),
+        t('addCargo.steps.cargoInfo'), 
+        t('addCargo.steps.dimensions'),
+        t('addCargo.steps.payment'),
+        t('addCargo.steps.contacts')
     ];
 
     useEffect(() => {
@@ -272,19 +275,19 @@ export default function AddCargoPage() {
     /* ===== validation ===== */
     const validate = () => {
         const e: Record<string, string> = {};
-        if (!form.dateFrom) e.dateFrom = "Обязательно";
-        if (!form.dateTo) e.dateTo = "Обязательно";
+        if (!form.dateFrom) e.dateFrom = t('addCargo.errors.required');
+        if (!form.dateTo) e.dateTo = t('addCargo.errors.required');
 
-        if (!form.pickups[0]?.countryId) e.pickups = "Выберите хотя бы страну для первой точки погрузки";
-        if (!form.dropoffs[0]?.countryId) e.dropoffs = "Выберите хотя бы страну для первой точки выгрузки";
+        if (!form.pickups[0]?.countryId) e.pickups = t('addCargo.errors.selectCountryLoad');
+        if (!form.dropoffs[0]?.countryId) e.dropoffs = t('addCargo.errors.selectCountryUnload');
 
-        if (!form.cargoType) e.cargoType = "Выберите тип груза";
-        if (!form.vehicleType) e.vehicleType = "Выберите тип транспорта";
-        if (!form.loadType) e.loadType = "Выберите тип загрузки";
-        if (!form.paymentMethod) e.paymentMethod = "Выберите способ оплаты";
+        if (!form.cargoType) e.cargoType = t('addCargo.errors.selectCargoType');
+        if (!form.vehicleType) e.vehicleType = t('addCargo.errors.selectVehicleType');
+        if (!form.loadType) e.loadType = t('addCargo.errors.selectLoadType');
+        if (!form.paymentMethod) e.paymentMethod = t('addCargo.errors.selectPaymentMethod');
 
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
-            e.contactSecondary = "Неверный формат телефона. Используйте + и цифры, всего 10-20 цифр";
+            e.contactSecondary = t('addCargo.errors.invalidPhone');
         }
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -374,16 +377,16 @@ export default function AddCargoPage() {
     const onSubmit = async (ev: React.FormEvent) => {
         ev.preventDefault();
         if (!validate()) {
-            toast.warning('Заполните все обязательные поля');
+            toast.warning(t('addCargo.validationWarning'));
             return;
         }
         try {
             const payload = toDto(form);
             await cargoApi.create(payload);
-            toast.success('Груз успешно создан!');
+            toast.success(t('addCargo.successMessage'));
             navigate("/dashboard/requests");
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Ошибка при создании груза';
+            const message = error?.response?.data?.message || t('addCargo.errorMessage');
             toast.error(message);
         }
     };
@@ -404,18 +407,18 @@ export default function AddCargoPage() {
                         <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/><path d="M20.833 13.889c.48 0 .868.388.868.868v5.208h5.209a.868.868 0 1 1 0 1.736H21.7v5.209a.868.868 0 1 1-1.736 0V21.7h-5.208a.868.868 0 0 1 0-1.736h5.208v-5.208c0-.48.389-.868.868-.868" fill="#4472B8"/></svg>
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" mb={1} className="add-cargo-page__title">Добавление заявки на перевозку груза</Typography>
+                        <Typography variant="h6" mb={1} className="add-cargo-page__title">{t('addCargo.pageTitle')}</Typography>
                         <Typography variant="body2" color="text.secondary" mb={2} className="add-cargo-page__subtitle">
-                            Укажите, пожалуйста, пункты загрузки и выгрузки, параметры груза и контактную информацию.
+                            {t('addCargo.pageSubtitle')}
                         </Typography>
                     </Box>
                 </Box>
             </Paper>
 
             <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }} className="add-cargo-page__content-paper">
-            <Typography variant="h6" mb={1} className="add-cargo-page__title">Информация о грузе</Typography>
+            <Typography variant="h6" mb={1} className="add-cargo-page__title">{t('addCargo.infoTitle')}</Typography>
                 <Typography variant="body2" color="text.secondary" mb={2} className="add-cargo-page__subtitle">
-                    Укажите как можно подробнее доступную информацию о грузе.
+                    {t('addCargo.infoSubtitle')}
                 </Typography>
 
                 {/* Мобильная версия - Stepper экранами */}
@@ -443,14 +446,14 @@ export default function AddCargoPage() {
                     <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label="Дата загрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                            label={t('addCargo.fields.dateFrom')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                             value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
                                             error={!!errors.dateFrom} helperText={errors.dateFrom}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label="Дата выгрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                            label={t('addCargo.fields.dateTo')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                             value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
                                             error={!!errors.dateTo} helperText={errors.dateTo}
                                         />
@@ -493,7 +496,7 @@ export default function AddCargoPage() {
                             {activeStep === 1 && (
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип груза</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.cargoType')}</Typography>
                                         <Select
                                             variant="outlined"
                                             fullWidth 
@@ -502,7 +505,7 @@ export default function AddCargoPage() {
                                             onChange={(e) => setField("cargoType", e.target.value as string)}
                                             renderValue={(selected) => {
                                                 if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите тип груза</em>;
+                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectCargoType')}</em>;
                                                 }
                                                 return findLabel(cargoOpts, selected as string);
                                             }}
@@ -515,7 +518,7 @@ export default function AddCargoPage() {
                                     </Grid>
 
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип автомобиля</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.vehicleType')}</Typography>
                                         <Select
                                             fullWidth 
                                             displayEmpty
@@ -523,13 +526,13 @@ export default function AddCargoPage() {
                                             onChange={(e) => setField("vehicleType", e.target.value as string)}
                                             renderValue={(selected) => {
                                                 if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите тип</em>;
+                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectVehicleType')}</em>;
                                                 }
                                                 return selected;
                                             }}
                                         >
                                             <MenuItem value="">
-                                                <em style={{ color: '#999' }}>Выберите тип</em>
+                                                <em style={{ color: '#999' }}>{t('addCargo.fields.selectVehicleType')}</em>
                                             </MenuItem>
                                             {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
                                         </Select>
@@ -537,7 +540,7 @@ export default function AddCargoPage() {
                                     </Grid>
 
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип загрузки</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.loadType')}</Typography>
                                         <Select
                                             fullWidth 
                                             displayEmpty
@@ -545,7 +548,7 @@ export default function AddCargoPage() {
                                             onChange={(e) => setField("loadType", e.target.value as string)}
                                             renderValue={(selected) => {
                                                 if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите тип загрузки</em>;
+                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectLoadType')}</em>;
                                                 }
                                                 return selected;
                                             }}
@@ -556,7 +559,7 @@ export default function AddCargoPage() {
                                     </Grid>
 
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дозагрузка</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.allowPartial')}</Typography>
                                         <FormControlLabel
                                             control={
                                                 <Checkbox
@@ -564,7 +567,7 @@ export default function AddCargoPage() {
                                                     onChange={(e) => setField("allowPartial", e.target.checked)}
                                                 />
                                             }
-                                            label="Возможность догрузки"
+                                            label={t('addCargo.fields.allowPartialLabel')}
                                         />
                                     </Grid>
                                 </Grid>
@@ -573,57 +576,57 @@ export default function AddCargoPage() {
                             {activeStep === 2 && (
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Вес груза (т)</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.weightTons')}</Typography>
                                         <TextField
                                             type="number" 
                                             fullWidth
-                                            placeholder="Укажите вес"
+                                            placeholder={t('addCargo.fields.weightPlaceholder')}
                                             value={form.weightTons ?? ""} 
                                             onChange={(e) => setField("weightTons", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label="Объём (м³)" type="number" fullWidth placeholder="Укажите объём"
+                                            label={t('addCargo.fields.volume')} type="number" fullWidth placeholder={t('addCargo.fields.volumePlaceholder')}
                                             value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label="Количество автомобилей" type="number" fullWidth placeholder="Укажите количество"
+                                            label={t('addCargo.fields.vehiclesCount')} type="number" fullWidth placeholder={t('addCargo.fields.vehiclesCountPlaceholder')}
                                             value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Количество паллет</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.palletsCount')}</Typography>
                                         <TextField
                                             type="number" 
                                             fullWidth
-                                            placeholder="Введите количество паллет"
+                                            placeholder={t('addCargo.fields.palletsCountPlaceholder')}
                                             value={form.palletsCount ?? ""} 
                                             onChange={(e) => setField("palletsCount", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Размеры груза</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.dimensions')}</Typography>
 
                                         <Grid container spacing={1}>
                                             <Grid size={{ xs:12, lg:4 }}>
                                                 <TextField
-                                                    type="number" placeholder="Длина (м)" fullWidth
+                                                    type="number" placeholder={t('addCargo.fields.length')} fullWidth
                                                     value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
                                                     error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
                                                 />
                                             </Grid>
                                             <Grid size={{ xs:12, lg:4 }}>
                                                 <TextField
-                                                    type="number" placeholder="Ширина (м)" fullWidth
+                                                    type="number" placeholder={t('addCargo.fields.width')} fullWidth
                                                     value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
                                                 />
                                             </Grid>
                                             <Grid size={{ xs:12, lg:4 }}>
                                                 <TextField
-                                                    type="number" placeholder="Высота (м)" fullWidth
+                                                    type="number" placeholder={t('addCargo.fields.height')} fullWidth
                                                     value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
                                                 />
                                             </Grid>
@@ -636,9 +639,9 @@ export default function AddCargoPage() {
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
                                         <FormControl fullWidth>
-                                            <InputLabel shrink>Стоимость</InputLabel>
+                                            <InputLabel shrink>{t('addCargo.fields.price')}</InputLabel>
                                             <OutlinedInput
-                                                label="Стоимость"
+                                                label={t('addCargo.fields.price')}
                                                 value={form.price ?? ""}
                                                 onChange={(e) => setField("price", num(e.target.value))}
                                                 type="number"
@@ -669,7 +672,7 @@ export default function AddCargoPage() {
                                         </FormControl>
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.paymentMethod')}</Typography>
                                         <Select
                                             fullWidth 
                                             displayEmpty
@@ -677,7 +680,7 @@ export default function AddCargoPage() {
                                             onChange={(e) => setField("paymentMethod", e.target.value as string)}
                                             renderValue={(selected) => {
                                                 if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите метод оплаты</em>;
+                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectPaymentMethod')}</em>;
                                                 }
                                                 return selected;
                                             }}
@@ -687,7 +690,7 @@ export default function AddCargoPage() {
                                         {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Срок оплаты</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.paymentTerm')}</Typography>
                                         <Select
                                             fullWidth 
                                             displayEmpty
@@ -695,7 +698,7 @@ export default function AddCargoPage() {
                                             onChange={(e) => setField("paymentTerm", e.target.value as string)}
                                             renderValue={(selected) => {
                                                 if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>Выберите срок оплаты</em>;
+                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectPaymentTerm')}</em>;
                                                 }
                                                 return selected;
                                             }}
@@ -705,7 +708,7 @@ export default function AddCargoPage() {
                                         {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Торг</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.bargaining')}</Typography>
                                         <Select
                                             fullWidth 
                                             displayEmpty
@@ -713,13 +716,13 @@ export default function AddCargoPage() {
                                             onChange={(e) => setField("bargaining", e.target.value as FormValues["bargaining"])}
                                             renderValue={(selected) => {
                                                 if (!selected) {
-                                                    return <em style={{ color: '#999' }}>Выберите возможность торга</em>;
+                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectBargaining')}</em>;
                                                 }
-                                                return selected === "possible" ? "Возможен торг" : "Торг невозможен";
+                                                return selected === "possible" ? t('addCargo.fields.bargainingPossible') : t('addCargo.fields.bargainingNone');
                                             }}
                                         >
-                                            <MenuItem value="possible">Возможен торг</MenuItem>
-                                            <MenuItem value="none">Торг невозможен</MenuItem>
+                                            <MenuItem value="possible">{t('addCargo.fields.bargainingPossible')}</MenuItem>
+                                            <MenuItem value="none">{t('addCargo.fields.bargainingNone')}</MenuItem>
                                         </Select>
                                     </Grid>
                                 </Grid>
@@ -728,13 +731,13 @@ export default function AddCargoPage() {
                             {activeStep === 4 && (
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>Выберите контакты, которые будут видны в заказе</Typography>
+                                        <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>{t('addCargo.fields.contactsTitle')}</Typography>
                                         <Typography variant="body2" color="text.secondary" mb={2}>
-                                            Здесь отображаются доступные контакты, добавленные вами в разделе "Профиль". Вы можете изменить или добавить их в личном кабинете.
+                                            {t('addCargo.fields.contactsSubtitle')}
                                         </Typography>
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
+                                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.additionalPhone')}</Typography>
                                         <TextField
                                             placeholder="+380971234567"
                                             fullWidth
@@ -748,12 +751,12 @@ export default function AddCargoPage() {
                                             sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
                                             onClick={() => setField("contactSecondary", "")}
                                         >
-                                            Очистить телефон
+                                            {t('addCargo.fields.clearPhone')}
                                         </Button>
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label="Дополнительная информация" placeholder="Укажите дополнительную информацию"
+                                            label={t('addCargo.fields.additionalInfo')} placeholder={t('addCargo.fields.additionalInfoPlaceholder')}
                                             fullWidth multiline minRows={3}
                                             value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
                                         />
@@ -774,7 +777,7 @@ export default function AddCargoPage() {
                                 disabled={activeStep === 0}
                                 sx={{ minWidth: 100 }}
                             >
-                                Назад
+                                {t('addCargo.buttons.back')}
                             </Button>
                             
                             <Typography variant="body2" color="text.secondary">
@@ -788,7 +791,7 @@ export default function AddCargoPage() {
                                     sx={{ minWidth: 100 }}
                                     disabled={loadingInit}
                                 >
-                                    Отправить
+                                    {t('addCargo.buttons.submit')}
                                 </Button>
                             ) : (
                                 <Button
@@ -796,7 +799,7 @@ export default function AddCargoPage() {
                                     onClick={handleNext}
                                     sx={{ minWidth: 100 }}
                                 >
-                                    Продолжить
+                                    {t('addCargo.buttons.continue')}
                                 </Button>
                             )}
                         </Box>
@@ -809,14 +812,14 @@ export default function AddCargoPage() {
                         <Grid container spacing={2}>
                         <Grid size={{ xs:12, sm:6 }}>
                             <TextField
-                                    label="Дата загрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                    label={t('addCargo.fields.dateFrom')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                 value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
                                 error={!!errors.dateFrom} helperText={errors.dateFrom}
                             />
                         </Grid>
                         <Grid size={{ xs:12, sm:6 }}>
                             <TextField
-                                    label="Дата выгрузки" type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                    label={t('addCargo.fields.dateTo')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                 value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}
                                 error={!!errors.dateTo} helperText={errors.dateTo}
                             />
@@ -861,7 +864,7 @@ export default function AddCargoPage() {
                             </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип груза</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.cargoType')}</Typography>
                             <Select
                                     fullWidth 
                                     displayEmpty
@@ -869,7 +872,7 @@ export default function AddCargoPage() {
                                     onChange={(e) => setField("cargoType", e.target.value as string)}
                                     renderValue={(selected) => {
                                         if (!selected || selected === "") {
-                                            return <em style={{ color: '#999' }}>Выберите тип груза</em>;
+                                            return <em style={{ color: '#999' }}>{t('addCargo.fields.selectCargoType')}</em>;
                                         }
                                         return selected;
                                     }}
@@ -882,7 +885,7 @@ export default function AddCargoPage() {
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип автомобиля</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.vehicleType')}</Typography>
                             <Select
                                     fullWidth 
                                     displayEmpty
@@ -890,13 +893,13 @@ export default function AddCargoPage() {
                                     onChange={(e) => setField("vehicleType", e.target.value as string)}
                                     renderValue={(selected) => {
                                         if (!selected || selected === "") {
-                                            return <em style={{ color: '#999' }}>Выберите тип</em>;
+                                            return <em style={{ color: '#999' }}>{t('addCargo.fields.selectVehicleType')}</em>;
                                         }
                                         return selected;
                                     }}
                                 >
                                     <MenuItem value="">
-                                        <em style={{ color: '#999' }}>Выберите тип</em>
+                                        <em style={{ color: '#999' }}>{t('addCargo.fields.selectVehicleType')}</em>
                                     </MenuItem>
                                 {vehicleOpts.map((o: LookupOpt) => (
                                     <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>
@@ -906,7 +909,7 @@ export default function AddCargoPage() {
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Тип загрузки</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.loadType')}</Typography>
                             <Select
                                     fullWidth 
                                     displayEmpty
@@ -914,7 +917,7 @@ export default function AddCargoPage() {
                                     onChange={(e) => setField("loadType", e.target.value as string)}
                                     renderValue={(selected) => {
                                         if (!selected || selected === "") {
-                                            return <em style={{ color: '#999' }}>Выберите тип загрузки</em>;
+                                            return <em style={{ color: '#999' }}>{t('addCargo.fields.selectLoadType')}</em>;
                                         }
                                         return selected;
                                     }}
@@ -927,7 +930,7 @@ export default function AddCargoPage() {
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дозагрузка</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.allowPartial')}</Typography>
                             <FormControlLabel
                                 control={
                                     <Checkbox
@@ -935,66 +938,66 @@ export default function AddCargoPage() {
                                         onChange={(e) => setField("allowPartial", e.target.checked)}
                                     />
                                 }
-                                    label="Возможность догрузки"
+                                    label={t('addCargo.fields.allowPartialLabel')}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Вес груза (т)</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.weightTons')}</Typography>
                             <TextField
                                     type="number" 
                                     fullWidth
-                                    placeholder="Укажите вес"
+                                    placeholder={t('addCargo.fields.weightPlaceholder')}
                                     value={form.weightTons ?? ""} 
                                     onChange={(e) => setField("weightTons", num(e.target.value))}
                             />
                         </Grid>
                         <Grid size={{ xs:12, sm:6 }}>
                             <TextField
-                                    label="Объём (м³)" type="number" fullWidth placeholder="Укажите объём"
+                                    label={t('addCargo.fields.volume')} type="number" fullWidth placeholder={t('addCargo.fields.volumePlaceholder')}
                                 value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
                             <TextField
-                                    label="Количество автомобилей" type="number" fullWidth placeholder="Укажите количество"
+                                    label={t('addCargo.fields.vehiclesCount')} type="number" fullWidth placeholder={t('addCargo.fields.vehiclesCountPlaceholder')}
                                 value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Количество паллет</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.palletsCount')}</Typography>
                             <TextField
                                     type="number" 
                                     fullWidth
-                                    placeholder="Введите количество паллет"
+                                    placeholder={t('addCargo.fields.palletsCountPlaceholder')}
                                     value={form.palletsCount ?? ""} 
                                     onChange={(e) => setField("palletsCount", num(e.target.value))}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Длина (м)</Typography>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.length')}</Typography>
                             <TextField
-                                type="number" placeholder="Длина (м)" fullWidth
+                                type="number" placeholder={t('addCargo.fields.length')} fullWidth
                                 value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
                                 error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Ширина (м)</Typography>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.width')}</Typography>
                             <TextField
-                                type="number" placeholder="Ширина (м)" fullWidth
+                                type="number" placeholder={t('addCargo.fields.width')} fullWidth
                                 value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Высота (м)</Typography>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.height')}</Typography>
                             <TextField
-                                type="number" placeholder="Высота (м)" fullWidth
+                                type="number" placeholder={t('addCargo.fields.height')} fullWidth
                                 value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
                             />
                         </Grid>
@@ -1005,9 +1008,9 @@ export default function AddCargoPage() {
 
                         <Grid size={{ xs:12, sm:6 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel shrink>Стоимость</InputLabel>
+                                    <InputLabel shrink>{t('addCargo.fields.price')}</InputLabel>
                                     <OutlinedInput
-                                        label="Стоимость"
+                                        label={t('addCargo.fields.price')}
                                         value={form.price ?? ""}
                                         onChange={(e) => setField("price", num(e.target.value))}
                                         type="number"
@@ -1039,7 +1042,7 @@ export default function AddCargoPage() {
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Метод оплаты</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.paymentMethod')}</Typography>
                             <Select
                                     fullWidth 
                                     displayEmpty
@@ -1047,7 +1050,7 @@ export default function AddCargoPage() {
                                     onChange={(e) => setField("paymentMethod", e.target.value as string)}
                                     renderValue={(selected) => {
                                         if (!selected || selected === "") {
-                                            return <em style={{ color: '#999' }}>Выберите метод оплаты</em>;
+                                            return <em style={{ color: '#999' }}>{t('addCargo.fields.selectPaymentMethod')}</em>;
                                         }
                                         return selected;
                                     }}
@@ -1060,7 +1063,7 @@ export default function AddCargoPage() {
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Срок оплаты</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.paymentTerm')}</Typography>
                             <Select
                                     fullWidth 
                                     displayEmpty
@@ -1068,7 +1071,7 @@ export default function AddCargoPage() {
                                     onChange={(e) => setField("paymentTerm", e.target.value as string)}
                                     renderValue={(selected) => {
                                         if (!selected || selected === "") {
-                                            return <em style={{ color: '#999' }}>Выберите срок оплаты</em>;
+                                            return <em style={{ color: '#999' }}>{t('addCargo.fields.selectPaymentTerm')}</em>;
                                         }
                                         return selected;
                                     }}
@@ -1081,7 +1084,7 @@ export default function AddCargoPage() {
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Торг</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.bargaining')}</Typography>
                             <Select
                                 fullWidth
                                     displayEmpty
@@ -1089,26 +1092,26 @@ export default function AddCargoPage() {
                                 onChange={(e) => setField("bargaining", e.target.value as FormValues["bargaining"])}
                                     renderValue={(selected) => {
                                         if (!selected) {
-                                            return <em style={{ color: '#999' }}>Выберите возможность торга</em>;
+                                            return <em style={{ color: '#999' }}>{t('addCargo.fields.selectBargaining')}</em>;
                                         }
-                                        return selected === "possible" ? "Возможен торг" : "Торг невозможен";
+                                        return selected === "possible" ? t('addCargo.fields.bargainingPossible') : t('addCargo.fields.bargainingNone');
                                     }}
                                 >
-                                    <MenuItem value="possible">Возможен торг</MenuItem>
-                                    <MenuItem value="none">Торг невозможен</MenuItem>
+                                    <MenuItem value="possible">{t('addCargo.fields.bargainingPossible')}</MenuItem>
+                                    <MenuItem value="none">{t('addCargo.fields.bargainingNone')}</MenuItem>
                             </Select>
                         </Grid>
 
                         <Grid size={{ xs:12 }}>
                                 <Divider sx={{ my: 4 }} />
-                                <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>Выберите контакты, которые будут видны в заказе</Typography>
+                                <Typography variant="h6" mt={1} sx={{ fontWeight: 'bold', mb: '10px' }}>{t('addCargo.fields.contactsTitle')}</Typography>
                             <Typography variant="body2" color="text.secondary" mb={2}>
-                                Здесь отображаются доступные контакты, добавленные вами в разделе "Профиль". Вы можете изменить или добавить их в личном кабинете.
+                                {t('addCargo.fields.contactsSubtitle')}
                             </Typography>
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Дополнительный телефон</Typography>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.additionalPhone')}</Typography>
                             <TextField
                                 placeholder="+380971234567"
                                 fullWidth
@@ -1122,13 +1125,13 @@ export default function AddCargoPage() {
                                 sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
                                 onClick={() => setField("contactSecondary", "")}
                             >
-                                    Очистить телефон
+                                    {t('addCargo.fields.clearPhone')}
                             </Button>
                         </Grid>
 
                         <Grid size={{ xs:12 }}>
                             <TextField
-                                    label="Дополнительная информация" placeholder="Укажите дополнительную информацию" className="additional-info-field"
+                                    label={t('addCargo.fields.additionalInfo')} placeholder={t('addCargo.fields.additionalInfoPlaceholder')} className="additional-info-field"
                                 fullWidth multiline minRows={3}
                                 value={form.note ?? ""} onChange={(e) => setField("note", e.target.value || undefined)}
                             />
@@ -1137,7 +1140,7 @@ export default function AddCargoPage() {
                         <Grid size={{ xs:12 }}>
                             <Stack direction="row" justifyContent="center" mt={1.5}>
                                 <Button type="submit" variant="contained" sx={{ minWidth: 280 }} disabled={loadingInit}>
-                                        Добавить груз
+                                        {t('addCargo.buttonSubmit')}
                                 </Button>
                             </Stack>
                         </Grid>

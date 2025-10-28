@@ -11,9 +11,11 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiBriefcase, FiHome, FiPlus } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import animation from "./BusinessTeam.json";
 
 export default function CompanyPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return (
@@ -50,25 +52,24 @@ export default function CompanyPage() {
                         <Stack spacing={1}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <FiBriefcase />
-                                <Typography variant="h5" fontWeight={700}>Companies</Typography>
+                                <Typography variant="h5" fontWeight={700}>{t('company.title')}</Typography>
                             </Stack>
 
                             <Typography variant="body1" color="text.secondary">
-                                This section is currently under development. Soon you will be able to create a company,
-                                invite teammates, manage roles and billing, and connect services.
+                                {t('company.description')}
                             </Typography>
 
                             <Typography variant="body2" color="text.secondary">
-                                Meanwhile, you can return to the dashboard or start by creating your first company.
+                                {t('company.meanwhile')}
                             </Typography>
                         </Stack>
 
                         <Stack direction="row" spacing={1.5} flexWrap="wrap" sx={{ mt: 3 }}>
                             <Button variant="contained" startIcon={<FiPlus />} onClick={() => navigate("/dashboard/company/create")}>
-                                Create company
+                                {t('company.createButton')}
                             </Button>
                             <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
-                                Back to dashboard
+                                {t('company.backButton')}
                             </Button>
                         </Stack>
                     </Grid>

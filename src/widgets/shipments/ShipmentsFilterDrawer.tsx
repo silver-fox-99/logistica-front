@@ -4,6 +4,7 @@ import {
     Button, Divider, TextField
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTranslation } from "react-i18next";
 
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type {ShipmentsKind} from "@/entities/shipment/model/type.ts";
@@ -40,6 +41,7 @@ type Props = {
 export default function ShipmentsFilterDrawer({
                                                   open, value, onChange, filters, onFiltersChange, onClose, onApply, onReset
                                               }: Props) {
+    const { t } = useTranslation();
     const [data, setData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOption[] }>(null);
 
     // при открытии можно подмешать актуальные (если не загружали раньше)
@@ -125,38 +127,38 @@ export default function ShipmentsFilterDrawer({
     return (
         <Drawer anchor="right" open={open} onClose={onClose}>
             <Box sx={{ width: 360, p: 2 }}>
-                <Typography variant="h6" mb={1}>Filter</Typography>
+                <Typography variant="h6" mb={1}>{t('shipments.filters.title')}</Typography>
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                    Select what to show and refine results.
+                    {t('shipments.filters.searchLabel')}
                 </Typography>
 
                 {/* тип списка */}
                 <Stack spacing={1.5}>
-                    <Typography variant="subtitle2">Type</Typography>
+                    <Typography variant="subtitle2">{t('shipments.filters.title')}</Typography>
                     <RadioGroup value={value} onChange={(e) => onChange(e.target.value as ShipmentsKind)}>
-                        <FormControlLabel value="cargo" control={<Radio />} label="Cargo" />
-                        <FormControlLabel value="transport" control={<Radio />} label="Transport" />
+                        <FormControlLabel value="cargo" control={<Radio />} label={t('shipments.filters.cargo')} />
+                        <FormControlLabel value="transport" control={<Radio />} label={t('shipments.filters.transport')} />
                     </RadioGroup>
                 </Stack>
 
                 <Divider sx={{ my: 2 }} />
 
                 {/* PICKUP */}
-                <Typography variant="subtitle2" gutterBottom>Pickup</Typography>
+                <Typography variant="subtitle2" gutterBottom>{t('shipments.filters.pickup')}</Typography>
                 <Stack gap={1.2}>
                     <Autocomplete
                         options={countriesOpts}
                         value={pickupCountryValue}
                         onChange={(_, opt) => handlePickupCountry(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Country" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.country')} />}
                     />
                     <Autocomplete
                         options={asOptions(pickupRegions)}
                         value={pickupRegionValue}
                         onChange={(_, opt) => handlePickupRegion(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Region" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.region')} />}
                         disabled={pickupRegionsDisabled}
                     />
                     <Autocomplete
@@ -164,34 +166,34 @@ export default function ShipmentsFilterDrawer({
                         value={pickupCityValue}
                         onChange={(_, opt) => setF({ pickup_city: opt?.id })}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="City" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.city')} />}
                         disabled={pickupCitiesDisabled}
                     />
 
                     <Stack direction="row" gap={1.2}>
-                        <TextField fullWidth size="small" type="date" label="From" InputLabelProps={{ shrink: true }}
+                        <TextField fullWidth size="small" type="date" label={t('shipments.filters.from')} InputLabelProps={{ shrink: true }}
                                    value={filters.pickup_date_from ?? ""} onChange={(e) => setF({ pickup_date_from: e.target.value || undefined })}/>
-                        <TextField fullWidth size="small" type="date" label="To" InputLabelProps={{ shrink: true }}
+                        <TextField fullWidth size="small" type="date" label={t('shipments.filters.to')} InputLabelProps={{ shrink: true }}
                                    value={filters.pickup_date_to ?? ""} onChange={(e) => setF({ pickup_date_to: e.target.value || undefined })}/>
                     </Stack>
                 </Stack>
 
                 {/* DROPOFF */}
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Dropoff</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.dropoff')}</Typography>
                 <Stack gap={1.2}>
                     <Autocomplete
                         options={countriesOpts}
                         value={dropoffCountryValue}
                         onChange={(_, opt) => handleDropoffCountry(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Country" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.country')} />}
                     />
                     <Autocomplete
                         options={asOptions(dropoffRegions)}
                         value={dropoffRegionValue}
                         onChange={(_, opt) => handleDropoffRegion(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="Region" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.region')} />}
                         disabled={dropoffRegionsDisabled}
                     />
                     <Autocomplete
@@ -199,7 +201,7 @@ export default function ShipmentsFilterDrawer({
                         value={dropoffCityValue}
                         onChange={(_, opt) => setF({ dropoff_city: opt?.id })}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderInput={(params) => <TextField {...params} size="small" label="City" />}
+                        renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.city')} />}
                         disabled={dropoffCitiesDisabled}
                     />
 
@@ -212,36 +214,36 @@ export default function ShipmentsFilterDrawer({
                 </Stack>
 
                 {/* VEHICLE / RANGES */}
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Vehicle</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.vehicle')}</Typography>
                 <Autocomplete
                     options={vehicleOpts}
                     value={vehicleValue}
                     onChange={(_, opt) => setF({ vehicle_type: opt?.id })}
                     isOptionEqualToValue={(o, v) => o.id === v.id}
-                    renderInput={(params) => <TextField {...params} size="small" label="Vehicle type" />}
+                    renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.vehicleType')} />}
                 />
 
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Weight (t)</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.weight')}</Typography>
                 <Stack direction="row" gap={1.2}>
-                    <TextField fullWidth size="small" type="number" label="Min" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.min')} inputProps={{ step: "0.001", min: 0 }}
                                value={filters.weight_min ?? ""} onChange={setNum("weight_min")}/>
-                    <TextField fullWidth size="small" type="number" label="Max" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.max')} inputProps={{ step: "0.001", min: 0 }}
                                value={filters.weight_max ?? ""} onChange={setNum("weight_max")}/>
                 </Stack>
 
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>Volume (m³)</Typography>
+                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.volume')}</Typography>
                 <Stack direction="row" gap={1.2}>
-                    <TextField fullWidth size="small" type="number" label="Min" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.min')} inputProps={{ step: "0.001", min: 0 }}
                                value={filters.volume_min ?? ""} onChange={setNum("volume_min")}/>
-                    <TextField fullWidth size="small" type="number" label="Max" inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.max')} inputProps={{ step: "0.001", min: 0 }}
                                value={filters.volume_max ?? ""} onChange={setNum("volume_max")}/>
                 </Stack>
 
                 <Divider sx={{ my: 2 }} />
 
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Button variant="text" onClick={onReset}>Reset</Button>
-                    <Button variant="contained" onClick={onApply}>Apply</Button>
+                    <Button variant="text" onClick={onReset}>{t('shipments.filters.reset')}</Button>
+                    <Button variant="contained" onClick={onApply}>{t('shipments.filters.apply')}</Button>
                 </Stack>
             </Box>
         </Drawer>

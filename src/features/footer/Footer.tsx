@@ -4,7 +4,6 @@ import instaLogo from './instagram.svg'
 import facebookLogo from './facebook.svg'
 
 import './footer.scss'
-import LanguageSwitcher from "@/shared/ui/language-switcher/LanguageSwitcher.tsx";
 import {useTranslation} from "react-i18next";
 
 export default function Footer() {
@@ -34,8 +33,6 @@ export default function Footer() {
 
 
                </div>
-
-               <LanguageSwitcher />
            </div>
 
            <div className="footer__column">

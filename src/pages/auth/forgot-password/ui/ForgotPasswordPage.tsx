@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Container, Paper, Step, StepLabel, Stepper } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import AuthTop from "@/shared/ui/auth/auth-top";
 import StepPhoneExisting from "@/features/password-reset/StepPhoneExisting";
 import StepCodeReset from "@/features/password-reset/StepCodeReset";
@@ -8,6 +9,7 @@ import {useNavigate} from "react-router-dom";
 import { authApi } from "@/shared/api/authApi";
 
 export default function ForgotPasswordPage() {
+    const { t } = useTranslation();
     const [activeStep, setActiveStep] = useState(0);
     const [e164, setE164] = useState<string>("");
     const [idToken, setIdToken] = useState<string>("");
@@ -17,12 +19,12 @@ export default function ForgotPasswordPage() {
 
     const header = useMemo(() => {
         switch (activeStep) {
-            case 0: return { title: "Reset your password", subtitle: "Enter your phone number to receive an SMS code." };
-            case 1: return { title: "Enter the code", subtitle: `We sent an SMS to ${e164 || "your phone"}.` };
-            case 2: return { title: "Set a new password", subtitle: "Choose a strong password for your account." };
+            case 0: return { title: t("forgotPassword.step1Title"), subtitle: t("forgotPassword.step1Subtitle") };
+            case 1: return { title: t("forgotPassword.step2Title"), subtitle: t("forgotPassword.step2Subtitle", { phone: e164 || "your phone" }) };
+            case 2: return { title: t("forgotPassword.step3Title"), subtitle: t("forgotPassword.step3Subtitle") };
             default: return { title: "", subtitle: "" };
         }
-    }, [activeStep, e164]);
+    }, [activeStep, e164, t]);
 
     return (
         <Container maxWidth="sm" sx={{ py: 5 }}>

@@ -11,10 +11,12 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiUsers, FiHome, FiUserPlus } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import animation from "./SearchForUsers.json";
 
 export default function StaffPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     return (
         <Box sx={{ minHeight: "calc(100dvh - 120px)", display: "grid", alignItems: "start", py: 3 }}>
@@ -36,25 +38,24 @@ export default function StaffPage() {
                         <Stack spacing={1}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <FiUsers />
-                                <Typography variant="h5" fontWeight={700}>Staff</Typography>
+                                <Typography variant="h5" fontWeight={700}>{t("staff.title")}</Typography>
                             </Stack>
 
                             <Typography variant="body1" color="text.secondary">
-                                Team management is under development. Soon you will be able to invite teammates,
-                                assign roles and permissions, and manage access across your company.
+                                {t("staff.description")}
                             </Typography>
 
                             <Typography variant="body2" color="text.secondary">
-                                You can go back to the dashboard or prepare to invite your first teammate.
+                                {t("staff.meanwhile")}
                             </Typography>
                         </Stack>
 
                         <Stack direction="row" spacing={1.5} flexWrap="wrap" sx={{ mt: 3 }}>
                             <Button variant="contained" startIcon={<FiUserPlus />} onClick={() => navigate("/dashboard/staff/invite")}>
-                                Invite teammate
+                                {t("staff.inviteButton")}
                             </Button>
                             <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
-                                Back to dashboard
+                                {t("staff.backButton")}
                             </Button>
                         </Stack>
                     </Grid>

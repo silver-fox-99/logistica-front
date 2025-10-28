@@ -3,17 +3,21 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import parsePhoneNumber from "libphonenumber-js";
 import { authApi } from "@/shared/api/authApi";
 import { firebasePhone } from "@/shared/lib/firebasePhone";
 
-const schema = z.object({
-    phone: z.string().min(1, "Введите номер телефона").refine(v => matchIsValidTel(v), "Введите корректный номер телефона"),
-});
+type FormValues = { phone: string };
 
-type FormValues = z.infer<typeof schema>;
 export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) => void }) {
+    const { t } = useTranslation();
+
+    const schema = z.object({
+        phone: z.string().min(1, t("forgotPassword.phoneRequired")).refine(v => matchIsValidTel(v), t("forgotPassword.phoneInvalid")),
+    });
+
     const { control, handleSubmit, setError, formState: { isSubmitting } } =
         useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { phone: "" }, mode: "onTouched" });
 
@@ -24,15 +28,15 @@ export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) =
 
             const { existing } = await authApi.checkPhone(e164);
             if (!existing) {
-                setError("phone", { message: "Этот номер телефона не зарегистрирован" });
+                setError("phone", { message: t("forgotPassword.phoneNotFound") });
                 return;
             }
 
             await firebasePhone.sendCode(e164);
-            toast.success('Код отправлен на ваш номер телефона');
+            toast.success(t("forgotPassword.codeSent"));
             onNext(e164);
         } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || 'Не удалось отправить код';
+            const message = error?.response?.data?.message || error?.message || t("forgotPassword.codeSendError");
             toast.error(message);
         }
     };
@@ -45,17 +49,17 @@ export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) =
                 render={({ field, fieldState }) => (
                     <MuiTelInput
                         {...field}
-                        label="Номер телефона"
+                        label={t("forgotPassword.phoneLabel")}
                         defaultCountry="UZ"
                         forceCallingCode
-                        placeholder="+1 (555) 000-0000"
+                        placeholder={t("forgotPassword.phonePlaceholder")}
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message}
                         sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                     />
                 )}
             />
-            <Button type="submit" variant="contained" disabled={isSubmitting}>Отправить код</Button>
+            <Button type="submit" variant="contained" disabled={isSubmitting}>{t("forgotPassword.sendCodeButton")}</Button>
         </Box>
     );
 }

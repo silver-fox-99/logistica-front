@@ -46,8 +46,7 @@ export default function LanguageSwitcher() {
                 <Button
                     onClick={handleOpen}
                     variant="outlined"
-                    startIcon={<Avatar src={currentFlag} alt={currentLang} sx={{ width: 20, height: 20 }} />}
-                    endIcon={<FiGlobe />}
+                    startIcon={<FiGlobe />}
                     sx={{ textTransform: "none", borderRadius: 3, px: 1.5, py: 0.75 }}
                 >
                     {currentLang.toUpperCase()}

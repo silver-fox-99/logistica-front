@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid";
 import { FiCalendar, FiMapPin, FiTag } from "react-icons/fi";
 import type { PublicShipmentBase, PublicPoint, PublicPointType } from "@/entities/public-shipment/model/types";
 import { Link as RouterLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     data: PublicShipmentBase;
@@ -26,6 +27,7 @@ const ORDER: Record<PublicPointType, number> = {
 const MAX_VISIBLE_POINTS = 4;
 
 export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind }: Props) {
+    const { t } = useTranslation();
 
     const labels = useMemo(() => {
         const pts = (data.points ?? []).slice();
@@ -65,7 +67,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                                 </Stack>
                             ))}
                             {labels.overflow > 0 && (
-                                <Chip size="small" variant="outlined" label={`+${labels.overflow} more`} />
+                                <Chip size="small" variant="outlined" label={`+${labels.overflow} ${t('shipments.shipmentCard.morePoints')}`} />
                             )}
 
                             <Chip
@@ -79,7 +81,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                                 size="small"
                                 color="primary"
                                 variant="filled"
-                                label={kind === "cargo" ? "Cargo" : "Transport"}
+                                label={kind === "cargo" ? t('shipments.shipmentCard.cargo') : t('shipments.shipmentCard.transport')}
                             />
                         </Stack>
 
@@ -117,7 +119,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                         justifyContent="space-between"
                     >
                         <Typography variant="caption" color="text.secondary">
-                            Updated: {data.createdAt?.slice(0, 10) ?? ""}
+                            {t('shipments.shipmentCard.updated')} {data.createdAt?.slice(0, 10) ?? ""}
                         </Typography>
 
                         <Button
@@ -132,7 +134,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                         </Button>
 
                         <Typography variant="caption" color="text.secondary" textAlign={{ md: "right" }}>
-                            Sign in to view contacts and details.
+                            {t('shipments.shipmentCard.signInToView')}
                         </Typography>
                     </Stack>
                 </Grid>

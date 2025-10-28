@@ -7,6 +7,7 @@ import {
     FiClock, FiMapPin, FiPackage, FiTruck, FiBookmark,
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone
 } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 import type {ShipmentRowData, ShipmentsKind} from "@/entities/shipment/model/type";
 import "./ShipmentRow.scss";
@@ -27,6 +28,7 @@ type Props = {
 export default function ShipmentRow({
                                         data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy
                                     }: Props) {
+    const { t } = useTranslation();
     const [expanded, setExpanded] = useState(false);
 
     const openMore = () => {
@@ -69,7 +71,7 @@ export default function ShipmentRow({
                             <Chip
                                 size="small"
                                 icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}
-                                label={kind === "cargo" ? "Cargo" : "Transport"}
+                                label={kind === "cargo" ? t('shipments.shipmentCard.cargo') : t('shipments.shipmentCard.transport')}
                                 className={`shipment-row__chip ${kind === "cargo" ? "shipment-row__chip--cargo" : "shipment-row__chip--transport"}`}
                             />
                             <Chip
@@ -142,14 +144,14 @@ export default function ShipmentRow({
                             {typeof data.repeats === "number" && data.repeats > 0 && (
                                 <Chip
                                     size="small"
-                                    label={`Repeats: ${data.repeats}`}
+                                    label={`${t('shipments.shipmentCard.repeats')} ${data.repeats}`}
                                     className="shipment-row__chip shipment-row__chip--repeats"
                                 />
                             )}
                             {typeof data.views === "number" && data.views > 0 && (
                                 <Chip
                                     size="small"
-                                    label={`Views: ${data.views}`}
+                                    label={`${t('shipments.shipmentCard.views')} ${data.views}`}
                                     className="shipment-row__chip shipment-row__chip--views"
                                 />
                             )}
@@ -181,7 +183,7 @@ export default function ShipmentRow({
                         </Stack>
 
                         <Stack direction="row" spacing={1} alignItems="center">
-                            <Tooltip title="Save to favorites">
+                            <Tooltip title={t('shipments.shipmentCard.saveToFavorites')}>
                                 <IconButton onClick={() => onBookmark?.(data.id)}>
                                     <FiBookmark />
                                 </IconButton>
@@ -194,7 +196,7 @@ export default function ShipmentRow({
                                 endIcon={expanded ? <FiChevronUp /> : <FiChevronDown />}
                                 sx={{ textTransform: "none" }}
                             >
-                                {expanded ? "Collapse" : "More"}
+                                {expanded ? t('shipments.shipmentCard.collapse') : t('shipments.shipmentCard.more')}
                             </Button>
                         </Stack>
 
@@ -213,7 +215,7 @@ export default function ShipmentRow({
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Typography variant="subtitle2" fontWeight={600} mb={1}>
-                                Контактная информация
+                                {t('shipments.shipmentCard.contactInfo')}
                             </Typography>
                             <Stack spacing={1} color="text.secondary">
                                 {data.contact?.name && (
@@ -243,77 +245,75 @@ export default function ShipmentRow({
                                 {data.contactExtraPhone && (
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FiPhone />
-                                        <Typography>Доп. телефон: {data.contactExtraPhone}</Typography>
+                                        <Typography>{t('shipments.shipmentCard.additionalPhone')} {data.contactExtraPhone}</Typography>
                                     </Stack>
                                 )}
                                 {data.contact?.telegram && <Typography>{data.contact.telegram}</Typography>}
                             </Stack>
                         </Grid>
 
-                        {/* Правая колонка - Детали заказа */}
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Typography variant="subtitle2" fontWeight={600} mb={1}>
-                                Детали заказа
+                                {t('shipments.shipmentCard.orderDetails')}
                             </Typography>
                             <Stack spacing={0.75} color="text.secondary">
                                 {data.vehicleType && (
                                     <Typography variant="body2">
-                                        <strong>Тип автомобиля:</strong> {data.vehicleType}
+                                        <strong>{t('shipments.shipmentCard.vehicleType')}</strong> {data.vehicleType}
                                     </Typography>
                                 )}
                                 {data.cargoType && (
                                     <Typography variant="body2">
-                                        <strong>Тип груза:</strong> {data.cargoType}
+                                        <strong>{t('shipments.shipmentCard.cargoType')}</strong> {data.cargoType}
                                     </Typography>
                                 )}
                                 {data.loadType && (
                                     <Typography variant="body2">
-                                        <strong>Тип загрузки:</strong> {data.loadType}
+                                        <strong>{t('shipments.shipmentCard.loadType')}</strong> {data.loadType}
                                     </Typography>
                                 )}
                                 {data.carsCount != null && data.carsCount > 0 && (
                                     <Typography variant="body2">
-                                        <strong>Количество автомобилей:</strong> {data.carsCount}
+                                        <strong>{t('shipments.shipmentCard.carsCount')}</strong> {data.carsCount}
                                     </Typography>
                                 )}
                                 {data.palletsCount != null && data.palletsCount > 0 && (
                                     <Typography variant="body2">
-                                        <strong>Количество паллет:</strong> {data.palletsCount}
+                                        <strong>{t('shipments.shipmentCard.palletsCount')}</strong> {data.palletsCount}
                                     </Typography>
                                 )}
                                 {data.weightT != null && data.weightT > 0 && (
                                     <Typography variant="body2">
-                                        <strong>Вес:</strong> {data.weightT} т
+                                        <strong>{t('shipments.shipmentCard.weight')}</strong> {data.weightT} т
                                     </Typography>
                                 )}
                                 {data.volumeM3 != null && data.volumeM3 > 0 && (
                                     <Typography variant="body2">
-                                        <strong>Объем:</strong> {data.volumeM3} м³
+                                        <strong>{t('shipments.shipmentCard.volume')}</strong> {data.volumeM3} м³
                                     </Typography>
                                 )}
                                 {data.allowPartialLoad != null && (
                                     <Typography variant="body2">
-                                        <strong>Дозагрузка:</strong> {data.allowPartialLoad ? "Возможна" : "Невозможна"}
+                                        <strong>{t('shipments.shipmentCard.partialLoad')}</strong> {data.allowPartialLoad ? t('shipments.shipmentCard.partialLoadYes') : t('shipments.shipmentCard.partialLoadNo')}
                                     </Typography>
                                 )}
                                 {data.paymentTerm && (
                                     <Typography variant="body2">
-                                        <strong>Срок оплаты:</strong> {data.paymentTerm}
+                                        <strong>{t('shipments.shipmentCard.paymentTerm')}</strong> {data.paymentTerm}
                                     </Typography>
                                 )}
                                 {data.bargain && (
                                     <Typography variant="body2">
-                                        <strong>Торг:</strong> {data.bargain === "ALLOWED" ? "Возможен" : "Невозможен"}
+                                        <strong>{t('shipments.shipmentCard.bargain')}</strong> {data.bargain === "ALLOWED" ? t('shipments.shipmentCard.bargainAllowed') : t('shipments.shipmentCard.bargainNotAllowed')}
                                     </Typography>
                                 )}
                             </Stack>
                         </Grid>
 
-                        {/* Дополнительная информация (примечания) */}
                         {data.note && (
                             <Grid size={{ xs: 12 }}>
                                 <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                                    Дополнительная информация
+                                    {t('shipments.shipmentCard.additionalInfo')}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
                                     {data.note}
@@ -321,7 +321,6 @@ export default function ShipmentRow({
                             </Grid>
                         )}
 
-                        {/* Кнопки действий для "my" scope */}
                         {scope === "my" && (
                             <Grid size={{ xs: 12 }}>
                                 <Divider sx={{ my: 1 }} />
@@ -330,22 +329,22 @@ export default function ShipmentRow({
                                     spacing={1}
                                     justifyContent={{ xs: "flex-start", md: "flex-end" }}
                                 >
-                                    <Tooltip title="Поднять вверх">
+                                    <Tooltip title={t('shipments.shipmentCard.raiseUp')}>
                                         <IconButton onClick={() => onUp?.(data.id)}>
                                             <FiRepeat />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Редактировать">
+                                    <Tooltip title={t('shipments.shipmentCard.edit')}>
                                         <IconButton onClick={() => onEdit?.(data.id)}>
                                             <FiEdit2 />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Копировать">
+                                    <Tooltip title={t('shipments.shipmentCard.copy')}>
                                         <IconButton onClick={() => onCopy?.(data.id)}>
                                             <FiCopy />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Удалить">
+                                    <Tooltip title={t('shipments.shipmentCard.delete')}>
                                         <IconButton color="error" onClick={() => onDelete?.(data.id)}>
                                             <FiTrash2 />
                                         </IconButton>

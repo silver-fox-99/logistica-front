@@ -11,25 +11,12 @@ import {
     FiLogOut, FiUsers, FiSearch
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
+import { useTranslation } from "react-i18next";
 
 import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
 import { useUserStore } from "@/entities/user/model/user.store";
 import "./DashboardLayout.scss";
-
-const mainNav = [
-    { to: "/dashboard/search",   icon: <FiSearch />,      label: "Поиск заказов" },
-    { to: "/dashboard/profile",  icon: <FiUser />,        label: "Профиль" },
-    { to: "/dashboard/company",  icon: <FiPackage />,     label: "Компании" },
-    { to: "/dashboard/staff",    icon: <FiUsers />,       label: "Сотрудники" },
-    { to: "/dashboard/payments", icon: <FiCreditCard />,  label: "Платежи" },
-    { to: "/dashboard/requests", icon: <FiTruck />,       label: "Мои заказы" },
-];
-
-const bottomNav = [
-    { to: "/dashboard/security", icon: <FiShield />,      label: "Безопасность" },
-    { to: "/dashboard/help",     icon: <FiHelpCircle />,  label: "Помощь и поддержка" },
-];
 
 function NavItem({ to, icon, label, onClick }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void }) {
     return (
@@ -44,6 +31,21 @@ function SidebarContent({
                             onItemClick,
                         }: { onItemClick?: () => void }) {
     const user = useUserStore(state => state.user);
+    const { t } = useTranslation();
+
+    const mainNav = [
+        { to: "/dashboard/search",   icon: <FiSearch />,      label: t('dashboard.menu.search') },
+        { to: "/dashboard/profile",  icon: <FiUser />,        label: t('dashboard.menu.profile') },
+        { to: "/dashboard/company",  icon: <FiPackage />,     label: t('dashboard.menu.company') },
+        { to: "/dashboard/staff",    icon: <FiUsers />,       label: t('dashboard.menu.staff') },
+        { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
+        { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },
+    ];
+
+    const bottomNav = [
+        { to: "/dashboard/security", icon: <FiShield />,      label: t('dashboard.menu.security') },
+        { to: "/dashboard/help",     icon: <FiHelpCircle />,  label: t('dashboard.menu.helpSupport') },
+    ];
 
     const logout = () => {
         localStorage.removeItem("accessToken");
@@ -71,7 +73,7 @@ function SidebarContent({
                     startIcon={<Add sx={{ fontSize: 16 }} />}
                     onClick={onItemClick}
                 >
-                    Добавить груз
+                    {t('dashboard.menu.addCargo')}
                 </Button>
                 <Button
                     variant="outlined"
@@ -83,7 +85,7 @@ function SidebarContent({
                     startIcon={<Add sx={{ fontSize: 16 }} />}
                     onClick={onItemClick}
                 >
-                    Добавить транспорт
+                    {t('dashboard.menu.addTransport')}
                 </Button>
             </Stack>
 
@@ -96,7 +98,7 @@ function SidebarContent({
                         className="dashboard-buttons dashboard-buttons__logout"
                     >
                         <ListItemIcon><RiAdminFill /></ListItemIcon>
-                        <ListItemText primary="Админ панель" primaryTypographyProps={{ fontSize: 16 }} />
+                        <ListItemText primary={t('dashboard.menu.adminPanel')} primaryTypographyProps={{ fontSize: 16 }} />
                     </ListItemButton>
                 )}
 
@@ -109,7 +111,7 @@ function SidebarContent({
                     className="dashboard-buttons dashboard-buttons__logout"
                 >
                     <ListItemIcon><FiLogOut /></ListItemIcon>
-                    <ListItemText primary="Выйти из аккаунта" primaryTypographyProps={{ fontSize: 16 }} />
+                    <ListItemText primary={t('dashboard.menu.logout')} primaryTypographyProps={{ fontSize: 16 }} />
                 </ListItemButton>
             </List>
         </Fragment>

@@ -1,5 +1,6 @@
 import { Paper, Stack, Avatar, Typography, Chip } from "@mui/material";
 import { FiUser } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 import "./ProfilePage.scss";
 
@@ -18,6 +19,8 @@ export default function ProfileOverviewCard({
                                                     { label: "★", value: 4.7, color: "success" },
                                                 ],
                                             }: ProfileOverviewCardProps) {
+    const { t } = useTranslation();
+    
     return (
         <Paper
             elevation={0}
@@ -31,9 +34,9 @@ export default function ProfileOverviewCard({
             className="profile-overview-card"
         >
             <Stack spacing={1}>
-                <Typography variant="h6">Обзор профиля</Typography>
+                <Typography variant="h6">{t('profile.overview.title')}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                    В этом разделе отображается основная информация о вашем профиле. Эти данные видны другим пользователям.
+                    {t('profile.overview.description')}
                 </Typography>
 
                 <Stack direction="row" spacing={2} alignItems="center" mt={1.5}>
@@ -59,8 +62,8 @@ export default function ProfileOverviewCard({
                         </Stack>
 
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ color: "text.secondary", mt: 0.5 }}>
-                            <Typography variant="body2"><b>Местоположение:</b> {location}</Typography>
-                            <Typography variant="body2"><b>Дата регистрации:</b> {registeredAt}</Typography>
+                            <Typography variant="body2"><b>{t('profile.overview.location')}</b> {location}</Typography>
+                            <Typography variant="body2"><b>{t('profile.overview.registeredAt')}</b> {registeredAt}</Typography>
                         </Stack>
                     </Stack>
                 </Stack>

@@ -11,10 +11,12 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiCreditCard, FiHome, FiLink } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import animation from "./PaymentSystem.json";
 
 export default function PaymentsPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     return (
         <Box sx={{ minHeight: "calc(100dvh - 120px)", display: "grid", alignItems: "start", py: 3 }}>
@@ -36,16 +38,15 @@ export default function PaymentsPage() {
                         <Stack spacing={1}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <FiCreditCard />
-                                <Typography variant="h5" fontWeight={700}>Payments</Typography>
+                                <Typography variant="h5" fontWeight={700}>{t("payments.title")}</Typography>
                             </Stack>
 
                             <Typography variant="body1" color="text.secondary">
-                                This section is under development. Soon you will be able to connect payment providers,
-                                manage payouts and invoices, and view detailed transaction history.
+                                {t("payments.description")}
                             </Typography>
 
                             <Typography variant="body2" color="text.secondary">
-                                For now you can return to the dashboard or proceed to connect a provider once it becomes available.
+                                {t("payments.meanwhile")}
                             </Typography>
                         </Stack>
 
@@ -55,14 +56,14 @@ export default function PaymentsPage() {
                                 startIcon={<FiLink />}
                                 onClick={() => navigate("/dashboard/payments/connect")}
                             >
-                                Connect provider
+                                {t("payments.connectButton")}
                             </Button>
                             <Button
                                 variant="outlined"
                                 startIcon={<FiHome />}
                                 onClick={() => navigate("/dashboard")}
                             >
-                                Back to dashboard
+                                {t("payments.backButton")}
                             </Button>
                         </Stack>
                     </Grid>

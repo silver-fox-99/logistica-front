@@ -4,6 +4,7 @@ import {
     Stack, TextField, Button
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     open: boolean;
@@ -15,6 +16,7 @@ type Props = {
 const toStr = (v?: string | null) => (v ?? "");
 
 export default function CopyShipmentDialog({ open, onClose, onSubmit, initial }: Props) {
+    const { t } = useTranslation();
     const [dateFrom, setDateFrom] = useState<string>("");
     const [dateTo, setDateTo] = useState<string>("");
 
@@ -25,10 +27,10 @@ export default function CopyShipmentDialog({ open, onClose, onSubmit, initial }:
     }, [open, initial?.dateFrom, initial?.dateTo]);
 
     const errorMsg = useMemo(() => {
-        if (!dateFrom || !dateTo) return "Both dates are required";
-        if (dateFrom > dateTo) return "Loading date must be before or equal to unloading date";
+        if (!dateFrom || !dateTo) return t('shipments.copyDialog.errorBothDates');
+        if (dateFrom > dateTo) return t('shipments.copyDialog.errorDateOrder');
         return "";
-    }, [dateFrom, dateTo]);
+    }, [dateFrom, dateTo, t]);
 
     const handleSubmit = async () => {
         if (errorMsg) return;
@@ -38,13 +40,13 @@ export default function CopyShipmentDialog({ open, onClose, onSubmit, initial }:
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>Copy order</DialogTitle>
+            <DialogTitle>{t('shipments.copyDialog.title')}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} mt={0.5}>
                     <Grid container spacing={1.5}>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <TextField
-                                label="Loading date from"
+                                label={t('shipments.copyDialog.dateFrom')}
                                 type="date"
                                 InputLabelProps={{ shrink: true }}
                                 value={dateFrom}
@@ -54,7 +56,7 @@ export default function CopyShipmentDialog({ open, onClose, onSubmit, initial }:
                         </Grid>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <TextField
-                                label="Unloading date to"
+                                label={t('shipments.copyDialog.dateTo')}
                                 type="date"
                                 InputLabelProps={{ shrink: true }}
                                 value={dateTo}
@@ -70,9 +72,9 @@ export default function CopyShipmentDialog({ open, onClose, onSubmit, initial }:
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} variant="text">Cancel</Button>
+                <Button onClick={onClose} variant="text">{t('shipments.copyDialog.cancel')}</Button>
                 <Button onClick={handleSubmit} variant="contained" disabled={!!errorMsg}>
-                    Create copy
+                    {t('shipments.copyDialog.confirm')}
                 </Button>
             </DialogActions>
         </Dialog>

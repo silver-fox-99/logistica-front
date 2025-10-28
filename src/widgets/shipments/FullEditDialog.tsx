@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type { GeoPoint } from "@/entities/shipment/model/type";
 
@@ -133,6 +134,8 @@ const findCityIdLoose = (geos: Geo[], countryId: string, regionId: string, name?
 
 /** ===== Component ===== */
 export default function FullEditDialog({ open, kind, initial, onClose, onSubmit }: Props) {
+    const { t } = useTranslation();
+    
     // Справочники
     const [filtersData, setFiltersData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOpt[] }>(null);
     const [loadingFilters, setLoadingFilters] = useState(false);
@@ -332,14 +335,14 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             await onSubmit(payload);
             onClose();
         } catch (error: any) {
-            const message = error?.response?.data?.message || 'Ошибка при обновлении заказа';
+            const message = error?.response?.data?.message || t('shipments.editDialog.errorUpdate');
             toast.error(message);
         }
     };
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>{kind === "cargo" ? "Edit cargo order" : "Edit transport order"}</DialogTitle>
+            <DialogTitle>{kind === "cargo" ? t('shipments.editDialog.titleCargo') : t('shipments.editDialog.titleTransport')}</DialogTitle>
             <DialogContent>
                 {loadingFilters && !filtersData ? (
                     <Stack alignItems="center" justifyContent="center" sx={{ py: 6 }}>
@@ -351,7 +354,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             {/* Dates */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
-                                    label="Loading date from"
+                                    label={t('shipments.editDialog.loadingDateFrom')}
                                     type="date"
                                     InputLabelProps={{ shrink: true }}
                                     value={form.dateFrom}
@@ -361,7 +364,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
-                                    label="Loading date to"
+                                    label={t('shipments.editDialog.loadingDateTo')}
                                     type="date"
                                     InputLabelProps={{ shrink: true }}
                                     value={form.dateTo}
@@ -373,9 +376,9 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             {/* Vehicle type (from backend) */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Vehicle type</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.vehicleType')}</InputLabel>
                                     <Select
-                                        label="Vehicle type"
+                                        label={t('shipments.editDialog.vehicleType')}
                                         value={form.vehicleType}
                                         onChange={handleChange("vehicleType")}
                                     >
@@ -391,34 +394,34 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                 <>
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <FormControl fullWidth>
-                                            <InputLabel>Load type</InputLabel>
+                                            <InputLabel>{t('shipments.editDialog.loadType')}</InputLabel>
                                             <Select
-                                                label="Load type"
+                                                label={t('shipments.editDialog.loadType')}
                                                 value={form.loadType}
                                                 onChange={handleChange("loadType")}
                                             >
-                                                <MenuItem value="ANY">Any</MenuItem>
-                                                <MenuItem value="FULL">Full</MenuItem>
-                                                <MenuItem value="PARTIAL">Partial</MenuItem>
-                                                <MenuItem value="CONSOLIDATED">Consolidated</MenuItem>
+                                                <MenuItem value="ANY">{t('shipments.editDialog.loadTypeAny')}</MenuItem>
+                                                <MenuItem value="FULL">{t('shipments.editDialog.loadTypeFull')}</MenuItem>
+                                                <MenuItem value="PARTIAL">{t('shipments.editDialog.loadTypePartial')}</MenuItem>
+                                                <MenuItem value="CONSOLIDATED">{t('shipments.editDialog.loadTypeConsolidated')}</MenuItem>
                                             </Select>
                                         </FormControl>
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <FormControl fullWidth>
-                                            <InputLabel>Cargo type</InputLabel>
+                                            <InputLabel>{t('shipments.editDialog.cargoType')}</InputLabel>
                                             <Select
-                                                label="Cargo type"
+                                                label={t('shipments.editDialog.cargoType')}
                                                 value={form.cargoType}
                                                 onChange={handleChange("cargoType")}
                                             >
-                                                <MenuItem value="GENERAL">General</MenuItem>
-                                                <MenuItem value="DANGEROUS">Dangerous</MenuItem>
-                                                <MenuItem value="OVERSIZED">Oversized</MenuItem>
-                                                <MenuItem value="FRAGILE">Fragile</MenuItem>
-                                                <MenuItem value="LIQUID">Liquid</MenuItem>
-                                                <MenuItem value="BULK">Bulk</MenuItem>
-                                                <MenuItem value="PALLETS">Pallets</MenuItem>
+                                                <MenuItem value="GENERAL">{t('shipments.editDialog.cargoTypeGeneral')}</MenuItem>
+                                                <MenuItem value="DANGEROUS">{t('shipments.editDialog.cargoTypeDangerous')}</MenuItem>
+                                                <MenuItem value="OVERSIZED">{t('shipments.editDialog.cargoTypeOversized')}</MenuItem>
+                                                <MenuItem value="FRAGILE">{t('shipments.editDialog.cargoTypeFragile')}</MenuItem>
+                                                <MenuItem value="LIQUID">{t('shipments.editDialog.cargoTypeLiquid')}</MenuItem>
+                                                <MenuItem value="BULK">{t('shipments.editDialog.cargoTypeBulk')}</MenuItem>
+                                                <MenuItem value="PALLETS">{t('shipments.editDialog.cargoTypePallets')}</MenuItem>
                                             </Select>
                                         </FormControl>
                                     </Grid>
@@ -430,12 +433,12 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                                     onChange={toggleBool("allowPartialLoad")}
                                                 />
                                             }
-                                            label="Allow partial load"
+                                            label={t('shipments.editDialog.allowPartialLoad')}
                                         />
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <TextField
-                                            label="Pallets count"
+                                            label={t('shipments.editDialog.palletsCount')}
                                             type="number"
                                             value={form.palletsCount}
                                             onChange={handleChange("palletsCount")}
@@ -450,7 +453,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                 <>
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <TextField
-                                            label="Vehicles count"
+                                            label={t('shipments.editDialog.vehiclesCount')}
                                             type="number"
                                             value={form.carsCount}
                                             onChange={handleChange("carsCount")}
@@ -459,14 +462,14 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <FormControl fullWidth>
-                                            <InputLabel>Bargain</InputLabel>
+                                            <InputLabel>{t('shipments.editDialog.bargain')}</InputLabel>
                                             <Select
-                                                label="Bargain"
+                                                label={t('shipments.editDialog.bargain')}
                                                 value={form.bargain}
                                                 onChange={handleChange("bargain")}
                                             >
-                                                <MenuItem value="ALLOWED">Allowed</MenuItem>
-                                                <MenuItem value="FORBIDDEN">Forbidden</MenuItem>
+                                                <MenuItem value="ALLOWED">{t('shipments.editDialog.bargainAllowed')}</MenuItem>
+                                                <MenuItem value="FORBIDDEN">{t('shipments.editDialog.bargainForbidden')}</MenuItem>
                                             </Select>
                                         </FormControl>
                                     </Grid>
@@ -476,7 +479,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             {/* Weight/Volume */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
-                                    label="Weight, t"
+                                    label={t('shipments.editDialog.weight')}
                                     type="number"
                                     value={form.weightT}
                                     onChange={handleChange("weightT")}
@@ -485,7 +488,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
-                                    label="Volume, m³"
+                                    label={t('shipments.editDialog.volume')}
                                     type="number"
                                     value={form.volumeM3}
                                     onChange={handleChange("volumeM3")}
@@ -502,7 +505,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                             onChange={toggleBool("hasDimensions")}
                                         />
                                     }
-                                    label="Specify body dimensions"
+                                    label={t('shipments.editDialog.specifyDimensions')}
                                 />
                             </Grid>
 
@@ -510,7 +513,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                 <>
                                     <Grid size={{ xs: 12, md: 4 }}>
                                         <TextField
-                                            label="Length, m"
+                                            label={t('shipments.editDialog.length')}
                                             type="number"
                                             value={form.lengthM}
                                             onChange={handleChange("lengthM")}
@@ -519,7 +522,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 4 }}>
                                         <TextField
-                                            label="Width, m"
+                                            label={t('shipments.editDialog.width')}
                                             type="number"
                                             value={form.widthM}
                                             onChange={handleChange("widthM")}
@@ -528,7 +531,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                     </Grid>
                                     <Grid size={{ xs: 12, md: 4 }}>
                                         <TextField
-                                            label="Height, m"
+                                            label={t('shipments.editDialog.height')}
                                             type="number"
                                             value={form.heightM}
                                             onChange={handleChange("heightM")}
@@ -541,9 +544,9 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             {/* Price */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Currency</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.currency')}</InputLabel>
                                     <Select
-                                        label="Currency"
+                                        label={t('shipments.editDialog.currency')}
                                         value={form.priceCurrency}
                                         onChange={handleChange("priceCurrency")}
                                     >
@@ -557,7 +560,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
-                                    label="Price amount"
+                                    label={t('shipments.editDialog.priceAmount')}
                                     type="number"
                                     value={form.priceAmount}
                                     onChange={handleChange("priceAmount")}
@@ -571,13 +574,13 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
                             {/* FROM */}
                             <Grid size={{ xs: 12 }}>
-                                <strong>From</strong>
+                                <strong>{t('shipments.editDialog.from')}</strong>
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Country</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.country')}</InputLabel>
                                     <Select
-                                        label="Country"
+                                        label={t('shipments.editDialog.country')}
                                         value={form.p1_countryId}
                                         onChange={handleChange("p1_countryId")}
                                     >
@@ -587,9 +590,9 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Region</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.region')}</InputLabel>
                                     <Select
-                                        label="Region"
+                                        label={t('shipments.editDialog.region')}
                                         value={form.p1_regionId}
                                         onChange={handleChange("p1_regionId")}
                                     >
@@ -600,9 +603,9 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>City</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.city')}</InputLabel>
                                     <Select
-                                        label="City"
+                                        label={t('shipments.editDialog.city')}
                                         value={form.p1_cityId}
                                         onChange={handleChange("p1_cityId")}
                                     >
@@ -614,13 +617,13 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
                             {/* TO */}
                             <Grid size={{ xs: 12 }}>
-                                <strong>To</strong>
+                                <strong>{t('shipments.editDialog.to')}</strong>
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Country</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.country')}</InputLabel>
                                     <Select
-                                        label="Country"
+                                        label={t('shipments.editDialog.country')}
                                         value={form.p2_countryId}
                                         onChange={handleChange("p2_countryId")}
                                     >
@@ -630,9 +633,9 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Region</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.region')}</InputLabel>
                                     <Select
-                                        label="Region"
+                                        label={t('shipments.editDialog.region')}
                                         value={form.p2_regionId}
                                         onChange={handleChange("p2_regionId")}
                                     >
@@ -643,9 +646,9 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>City</InputLabel>
+                                    <InputLabel>{t('shipments.editDialog.city')}</InputLabel>
                                     <Select
-                                        label="City"
+                                        label={t('shipments.editDialog.city')}
                                         value={form.p2_cityId}
                                         onChange={handleChange("p2_cityId")}
                                     >
@@ -657,7 +660,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
                             <Grid size={{ xs: 12 }}>
                                 <TextField
-                                    label="Note"
+                                    label={t('shipments.editDialog.note')}
                                     value={form.note}
                                     onChange={handleChange("note")}
                                     fullWidth
@@ -670,8 +673,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} variant="text">Cancel</Button>
-                <Button onClick={submit} variant="contained" disabled={!filtersData}>Save</Button>
+                <Button onClick={onClose} variant="text">{t('shipments.editDialog.cancel')}</Button>
+                <Button onClick={submit} variant="contained" disabled={!filtersData}>{t('shipments.editDialog.save')}</Button>
             </DialogActions>
         </Dialog>
     );

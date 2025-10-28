@@ -1,10 +1,11 @@
 import logo from "./logo.svg"
 import { Link } from "react-router-dom";
-import {Avatar, IconButton} from "@mui/material";
+import {Avatar, IconButton, useMediaQuery, Box} from "@mui/material";
 import {FiMenu} from "react-icons/fi";
 import './header.scss'
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 import {useTranslation} from "react-i18next";
+import LanguageSwitcher from "@/shared/ui/language-switcher/LanguageSwitcher";
 
 export default function Header({
     isAuthenticated, 
@@ -17,6 +18,7 @@ export default function Header({
 }) {
     const user = useUserStore((s) => s.user);
     const {t} = useTranslation()
+    const isMobile = useMediaQuery("(max-width:860px)");
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -56,15 +58,19 @@ export default function Header({
             </div>
 
             {isAuthenticated && <div className="header__column header__column--user">
-                {user?.first_name} {user?.last_name} <Avatar {...stringAvatar(`${user?.first_name} ${user?.last_name}`)} />
+                {!isMobile && <Box component="span">{user?.first_name} {user?.last_name}</Box>}
+                <Avatar {...stringAvatar(`${user?.first_name} ${user?.last_name}`)} />
+                <LanguageSwitcher />
                 {showBurger && (
                     <IconButton
-                        aria-label="Открыть меню"
+                        aria-label={t('dashboard.menu.openMenu')}
                         onClick={onMenuClick}
                         size="large"
                         sx={{
                             color: '#fff',
                             ml: 1,
+                            p: 0,
+                            marginLeft: 0,
                         }}
                     >
                         <FiMenu />
@@ -75,6 +81,7 @@ export default function Header({
             {!isAuthenticated && <div className="header__column">
                 <Link to="/login" className="header__button button button--transparent" >{t('header.login')}</Link>
                 <Link to="/register" className="header__button button" >{t('header.register')}</Link>
+                <LanguageSwitcher />
             </div>}
         </div>
 
