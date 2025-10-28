@@ -1,23 +1,28 @@
-import { useState, useMemo } from "react";
-import { Button, Menu, MenuItem, ListItemIcon, ListItemText, Avatar, Tooltip } from "@mui/material";
+import React, { useMemo, useState } from "react";
+import { Button, Menu, MenuItem, ListItemIcon, ListItemText, Avatar, Tooltip, Box } from "@mui/material";
 import { FiGlobe } from "react-icons/fi";
 import i18n from "@/app/providers/i18n/i18n";
 import { useTranslation } from "react-i18next";
 
 const langToCountry: Record<string, string> = {
-    en: "GB",
-    ru: "RU",
-    uz: "UZ"
+    en: "gb",
+    ru: "ru",
+    uz: "uz",
 };
 
-function flagUrl(countryCode: string, size: 24 | 32 | 48 = 24) {
-    return `https://flagcdn.com/w${size}/${countryCode.toLowerCase()}.png`;
+
+function flagUrlCircle(cc: string) {
+    return `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${cc.toLowerCase()}.svg`;
 }
+
+// function flagUrlRect(cc: string) {
+//   return `https://cdn.jsdelivr.net/npm/flag-icons/flags/4x3/${cc.toLowerCase()}.svg`;
+// }
 
 const LANG_OPTIONS = [
     { code: "en", labelKey: "english" },
     { code: "ru", labelKey: "russian" },
-    { code: "uz", labelKey: "uzbek" }
+    { code: "uz", labelKey: "uzbek" },
 ];
 
 export default function LanguageSwitcher() {
@@ -25,11 +30,11 @@ export default function LanguageSwitcher() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
-    const currentLang = i18n.resolvedLanguage || i18n.language || "uz";
-    const currentFlag = useMemo(
-        () => flagUrl(langToCountry[currentLang] || "GB", 24),
-        [currentLang]
-    );
+    const rawLang = i18n.resolvedLanguage || i18n.language || "uz";
+    const currentLang = (rawLang.split?.("-")?.[0] || rawLang) as keyof typeof langToCountry;
+
+    const currentFlag = useMemo(() => flagUrlCircle(langToCountry[currentLang] ?? "gb"), [currentLang]);
+    const [flagError, setFlagError] = useState(false);
 
     const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget);
     const handleClose = () => setAnchorEl(null);
@@ -37,6 +42,7 @@ export default function LanguageSwitcher() {
     const changeLang = async (lng: string) => {
         await i18n.changeLanguage(lng);
         localStorage.setItem("i18nextLng", lng);
+        setFlagError(false);
         handleClose();
     };
 
@@ -46,20 +52,44 @@ export default function LanguageSwitcher() {
                 <Button
                     onClick={handleOpen}
                     variant="outlined"
-                    startIcon={<FiGlobe />}
+                    startIcon={
+                        flagError ? (
+                            <FiGlobe />
+                        ) : (
+                            <Box
+                                component="img"
+                                src={currentFlag}
+                                alt={String(currentLang)}
+                                sx={{ width: 18, height: 18, borderRadius: "50%" }}
+                                onError={() => setFlagError(true)}
+                                crossOrigin="anonymous"
+                                referrerPolicy="no-referrer"
+                            />
+                        )
+                    }
                     sx={{ textTransform: "none", borderRadius: 3, px: 1.5, py: 0.75 }}
                 >
-                    {currentLang.toUpperCase()}
+                    {String(currentLang).toUpperCase()}
                 </Button>
             </Tooltip>
 
             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
                 {LANG_OPTIONS.map(({ code, labelKey }) => {
-                    const url = flagUrl(langToCountry[code] || "GB", 24);
+                    const cc = langToCountry[code] || "gb";
+                    const url = flagUrlCircle(cc);
                     return (
                         <MenuItem key={code} selected={currentLang === code} onClick={() => changeLang(code)}>
                             <ListItemIcon>
-                                <Avatar src={url} alt={code} sx={{ width: 20, height: 20 }} />
+                                <Avatar
+                                    src={url}
+                                    alt={code}
+                                    sx={{ width: 20, height: 20 }}
+                                    imgProps={{
+                                        crossOrigin: "anonymous",
+                                        referrerPolicy: "no-referrer",
+                                        onError: (e) => { (e.currentTarget as HTMLImageElement).src = flagUrlCircle("gb"); }
+                                    }}
+                                />
                             </ListItemIcon>
                             <ListItemText>{t(labelKey)}</ListItemText>
                         </MenuItem>
