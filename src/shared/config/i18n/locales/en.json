@@ -40,6 +40,8 @@
     "successMessage": "Cargo successfully created!",
     "errorMessage": "Error creating cargo",
     "validationWarning": "Fill in all required fields",
+    "step": "Step",
+    "of": "of",
     "steps": {
       "datesRoutes": "Dates and Routes",
       "cargoInfo": "Cargo Information",
@@ -531,5 +533,29 @@
     "loading": "Loading...",
     "noResults": "No results",
     "noResultsHint": "Try switching a tab or adjusting filters."
-  }
+  },
+  "helpSupport": {
+    "title": "Help & Support",
+    "description": "This section is currently under development. Soon you will find a searchable knowledge base, FAQs, and direct support channels.",
+    "contactSupport": "Contact support",
+    "backToDashboard": "Back to dashboard",
+    "searchPlaceholder": "Search articles, FAQs, keywords…",
+    "quickLinks": "Quick links",
+    "gettingStarted": {
+      "title": "Getting started",
+      "description": "First steps and onboarding"
+    },
+    "accountSecurity": {
+      "title": "Account & security",
+      "description": "Login, 2FA, passwords"
+    },
+    "billingPayments": {
+      "title": "Billing & payments",
+      "description": "Invoices, providers, refunds"
+    }
+  },
+  "language": "Language",
+  "english": "English",
+  "russian": "Russian",
+  "uzbek": "Uzbek"
 }

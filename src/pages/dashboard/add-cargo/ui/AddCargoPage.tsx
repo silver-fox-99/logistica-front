@@ -426,7 +426,7 @@ export default function AddCargoPage() {
                 <Box component="form" noValidate onSubmit={onSubmit}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                Шаг {activeStep + 1} из {steps.length}: {steps[activeStep]}
+                                {t('addCargo.step')} {activeStep + 1} {t('addCargo.of')} {steps.length}: {steps[activeStep]}
                             </Typography>
                             <Box sx={{ width: '100%', bgcolor: '#E0E0E0', borderRadius: 1, height: 8 }}>
                                 <Box 

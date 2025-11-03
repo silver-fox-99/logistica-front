@@ -17,10 +17,12 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiLifeBuoy, FiMail, FiHome, FiSearch, FiMessageSquare } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import animation from "./HelpCenter.json";
 
 export default function HelpSupportPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     return (
         <Box sx={{ minHeight: "calc(100dvh - 120px)", display: "grid", alignItems: "start", py: 3 }}>
@@ -37,11 +39,10 @@ export default function HelpSupportPage() {
                                 <Stack spacing={1.5} sx={{ mt: 2 }}>
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FiLifeBuoy />
-                                        <Typography variant="h6" fontWeight={700}>Help & Support</Typography>
+                                        <Typography variant="h6" fontWeight={700}>{t("helpSupport.title")}</Typography>
                                     </Stack>
                                     <Typography variant="body2" color="text.secondary">
-                                        This section is currently under development. Soon you will find a searchable knowledge base,
-                                        FAQs, and direct support channels.
+                                        {t("helpSupport.description")}
                                     </Typography>
 
                                     <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1 }}>
@@ -50,14 +51,14 @@ export default function HelpSupportPage() {
                                             startIcon={<FiMail />}
                                             onClick={() => navigate("/dashboard/help/contact")}
                                         >
-                                            Contact support
+                                            {t("helpSupport.contactSupport")}
                                         </Button>
                                         <Button
                                             variant="outlined"
                                             startIcon={<FiHome />}
                                             onClick={() => navigate("/dashboard")}
                                         >
-                                            Back to dashboard
+                                            {t("helpSupport.backToDashboard")}
                                         </Button>
                                     </Stack>
                                 </Stack>
@@ -71,27 +72,36 @@ export default function HelpSupportPage() {
                             <CardContent sx={{ p: 3 }}>
                                 <Stack spacing={1.5}>
                                     <TextField
-                                        placeholder="Search articles, FAQs, keywords…"
+                                        placeholder={t("helpSupport.searchPlaceholder")}
                                         InputProps={{ startAdornment: <FiSearch style={{ marginRight: 8 }} /> as any }}
                                     />
 
                                     <Divider />
 
                                     <Typography variant="subtitle2" color="text.secondary">
-                                        Quick links
+                                        {t("helpSupport.quickLinks")}
                                     </Typography>
                                     <List dense disablePadding>
                                         <ListItemButton onClick={() => navigate("/dashboard/help/getting-started")}>
                                             <ListItemIcon><FiMessageSquare /></ListItemIcon>
-                                            <ListItemText primary="Getting started" secondary="First steps and onboarding" />
+                                            <ListItemText 
+                                                primary={t("helpSupport.gettingStarted.title")} 
+                                                secondary={t("helpSupport.gettingStarted.description")} 
+                                            />
                                         </ListItemButton>
                                         <ListItemButton onClick={() => navigate("/dashboard/help/account-security")}>
                                             <ListItemIcon><FiMessageSquare /></ListItemIcon>
-                                            <ListItemText primary="Account & security" secondary="Login, 2FA, passwords" />
+                                            <ListItemText 
+                                                primary={t("helpSupport.accountSecurity.title")} 
+                                                secondary={t("helpSupport.accountSecurity.description")} 
+                                            />
                                         </ListItemButton>
                                         <ListItemButton onClick={() => navigate("/dashboard/help/billing")}>
                                             <ListItemIcon><FiMessageSquare /></ListItemIcon>
-                                            <ListItemText primary="Billing & payments" secondary="Invoices, providers, refunds" />
+                                            <ListItemText 
+                                                primary={t("helpSupport.billingPayments.title")} 
+                                                secondary={t("helpSupport.billingPayments.description")} 
+                                            />
                                         </ListItemButton>
                                     </List>
                                 </Stack>

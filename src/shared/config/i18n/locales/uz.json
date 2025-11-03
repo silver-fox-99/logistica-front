@@ -40,6 +40,8 @@
     "successMessage": "Yuk muvaffaqiyatli yaratildi!",
     "errorMessage": "Yuk yaratishda xatolik",
     "validationWarning": "Barcha majburiy maydonlarni to'ldiring",
+    "step": "Qadam",
+    "of": "dan",
     "steps": {
       "datesRoutes": "Sanalar va marshrutlar",
       "cargoInfo": "Yuk haqida ma'lumot",
@@ -531,5 +533,29 @@
     "loading": "Yuklanmoqda...",
     "noResults": "Natija yo'q",
     "noResultsHint": "Varaqni o'zgartirib ko'ring yoki filtrlarni sozlang."
-  }
+  },
+  "helpSupport": {
+    "title": "Yordam va qo'llab-quvvatlash",
+    "description": "Bu bo'lim hozirda ishlab chiqilmoqda. Tez orada qidiriladigan bilim bazasi, tez-tez beriladigan savollar va to'g'ridan-to'g'ri yordam kanallari paydo bo'ladi.",
+    "contactSupport": "Yordam bilan bog'lanish",
+    "backToDashboard": "Boshqaruv paneliga qaytish",
+    "searchPlaceholder": "Maqolalar, FAQ, kalit so'zlarni qidirish…",
+    "quickLinks": "Tezkor havolalar",
+    "gettingStarted": {
+      "title": "Boshlash",
+      "description": "Birinchi qadamlar va kirish"
+    },
+    "accountSecurity": {
+      "title": "Hisob va xavfsizlik",
+      "description": "Kirish, 2FA, parollar"
+    },
+    "billingPayments": {
+      "title": "To'lov va hisob-kitoblar",
+      "description": "Hisob-fakturalar, provayderlar, qaytarilmalar"
+    }
+  },
+  "language": "Til",
+  "english": "Inglizcha",
+  "russian": "Ruscha",
+  "uzbek": "O'zbekcha"
 }
