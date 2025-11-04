@@ -27,7 +27,7 @@ function CompanyPageButtons({
     direction = "row", 
     gap = 12, 
     marginTop = 3,
-    desktopSpacing = 1.5,
+
     desktopAlignItems = "flex-start"
 }: CompanyPageButtonsProps) {
     const { t } = useTranslation();

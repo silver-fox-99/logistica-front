@@ -27,7 +27,7 @@ function PageButtons({
     direction = "row", 
     gap = 12, 
     marginTop = 3,
-    desktopSpacing = 1.5,
+ //   desktopSpacing = 1.5,
     desktopAlignItems = "flex-start",
     children 
 }: PageButtonsProps & { children: React.ReactNode }) {
