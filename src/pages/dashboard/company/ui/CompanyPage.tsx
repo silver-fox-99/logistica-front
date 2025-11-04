@@ -163,7 +163,6 @@ export default function CompanyPage() {
                         <CompanyPageButtons 
                             direction={{ xs: "column", md: "row" }} 
                             gap={12}
-                            desktopSpacing={2}
                             desktopAlignItems="flex-start"
                         />
                     </Grid>
