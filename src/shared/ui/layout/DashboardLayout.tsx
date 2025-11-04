@@ -132,9 +132,33 @@ export default function DashboardLayout() {
                 showBurger={isMobile}
                 onMenuClick={() => toggle(true)}
             />
-            <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32 }}>
-                <Container maxWidth="lg">
-                    <Stack direction="row" spacing={3} alignItems="flex-start">
+            <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32, overflow: "hidden" }}>
+                <Container 
+                    maxWidth="lg"
+                    sx={{ 
+                        maxWidth: { xs: "100%", md: "lg" },
+                        px: { xs: "16px", md: 3 },
+                        overflow: "hidden",
+                        width: "100%",
+                        boxSizing: "border-box",
+                        "& > *": {
+                            maxWidth: "100%",
+                            boxSizing: "border-box"
+                        }
+                    }}
+                >
+                    <Stack 
+                        direction="row" 
+                        spacing={3} 
+                        alignItems="flex-start" 
+                        sx={{ 
+                            width: "100%", 
+                            maxWidth: "100%", 
+                            minWidth: 0,
+                            boxSizing: "border-box",
+                            overflow: "hidden"
+                        }}
+                    >
 
                         {isMobile ? (
                             <Drawer
@@ -152,7 +176,16 @@ export default function DashboardLayout() {
                             </Paper>
                         )}
 
-                        <Box flexGrow={1}>
+                        <Box 
+                            flexGrow={1} 
+                            sx={{ 
+                                width: "100%", 
+                                maxWidth: "100%", 
+                                minWidth: 0,
+                                overflow: "hidden", 
+                                boxSizing: "border-box" 
+                            }}
+                        >
                             <Outlet />
                         </Box>
                     </Stack>

@@ -48,19 +48,27 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
     }, [data.points]);
 
     return (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, width: "100%", maxWidth: "100%", overflow: "hidden", boxSizing: "border-box", margin: 0 }}>
-            <Grid container spacing={0} alignItems="center" sx={{ width: "100%", maxWidth: "100%", margin: "0 !important", marginLeft: "0 !important", marginRight: "0 !important" }}>
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+            <Grid container spacing={1.5} alignItems="center">
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
                         {/* Маршрут: точки из points[] */}
-                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                        <Stack 
+                            direction="row" 
+                            spacing={1} 
+                            alignItems="center" 
+                            useFlexGap
+                            sx={{ 
+                                flexWrap: { xs: "wrap", md: "nowrap" }
+                            }}
+                        >
                             {labels.visible.map((label, idx) => (
                                 <Stack key={`${label}-${idx}`} direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
                                     {idx > 0 && <Typography color="text.secondary" sx={{ mx: 0.25 }}>→</Typography>}
                                     <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0 }}>
                                         <FiMapPin />
                                         <MuiTooltip title={label}>
-                                            <Typography fontWeight={700} noWrap sx={{ maxWidth: { xs: 220, md: 360 } }}>
+                                            <Typography fontWeight={700} noWrap>
                                                 {label || "—"}
                                             </Typography>
                                         </MuiTooltip>
@@ -114,10 +122,17 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
 
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Stack
-                        direction={{ xs: mobileLayout, md: "row" }}
+                        direction={{ xs: mobileLayout === "column" ? "column" : "row", md: "row" }}
                         spacing={1}
                         alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "flex-start", md: "flex-end" }}
-                        justifyContent={{ xs: mobileLayout === "column" ? "flex-start" : "space-between", md: "space-between" }}
+                        justifyContent="space-between"
+                        sx={{
+                            "@media (min-width: 900px)": {
+                                alignItems: "flex-end",
+                                flexDirection: "column",
+                                gap: "12px"
+                            }
+                        }}
                     >
                         <Typography variant="caption" color="text.secondary">
                             {t('shipments.shipmentCard.updated')} {data.createdAt?.slice(0, 10) ?? ""}
@@ -134,7 +149,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                             {cta.label}
                         </Button>
 
-                        <Typography variant="caption" color="text.secondary" textAlign={{ xs: "left", md: "right" }}>
+                        <Typography variant="caption" color="text.secondary" textAlign={{ md: "right" }}>
                             {t('shipments.shipmentCard.signInToView')}
                         </Typography>
                     </Stack>

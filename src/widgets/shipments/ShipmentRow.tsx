@@ -46,7 +46,14 @@ export default function ShipmentRow({
                 {/* ЛЕВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
-                        <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
+                        <Stack 
+                            direction="row" 
+                            spacing={1.5} 
+                            alignItems="center"
+                            sx={{ 
+                                flexWrap: { xs: "wrap", md: "nowrap" }
+                            }}
+                        >
                             <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, flexShrink: 0 }}>
                                 <FiMapPin />
                                 <Tooltip title={data.routeFrom}>

@@ -14,7 +14,6 @@ export default function AppLayout() {
             minHeight="100dvh" 
             sx={{ 
                 width: "100%", 
-                maxWidth: { xs: "100vw", md: "100%" },
                 overflow: "hidden",
                 boxSizing: "border-box"
             }}
@@ -25,12 +24,11 @@ export default function AppLayout() {
                 className="container" 
                 sx={{ 
                     width: "100%", 
-                    maxWidth: { xs: "100vw", md: "100%" },
                     overflow: "hidden", 
                     boxSizing: "border-box"
                 }}
             >
-                <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
+                <Box sx={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}>
                     <Outlet />
                 </Box>
             </Box>

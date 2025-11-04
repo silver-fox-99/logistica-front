@@ -302,8 +302,8 @@ export default function ShipmentsListPage({ scope }: Props) {
     const requestReload = () => setReloadKey((k) => k + 1);
 
     return (
-        <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2, width: "100%", maxWidth: { xs: "100vw", md: "100%" }, boxSizing: "border-box" }}>
+        <>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2, width: "100%", boxSizing: "border-box" }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box className="shipments-page__icon">
                         <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -388,7 +388,6 @@ export default function ShipmentsListPage({ scope }: Props) {
                     setReloadKey((k) => k + 1); // also reload when type changes or filters applied
                 }}
             />
-
-        </Box>
+        </>
     );
 }

@@ -27,8 +27,8 @@ export default function HomePage() {
     }, [filters]);
 
     return (
-        <Box sx={{ py: 2, width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 2, width: "100%", maxWidth: { xs: "100vw", md: "100%" }, boxSizing: "border-box" }}>
+        <Box sx={{ py: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 2 }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
                     <Stack>
                         <Typography variant="h5" fontWeight={700}>{t("homePage.title")}</Typography>
@@ -66,38 +66,53 @@ export default function HomePage() {
                 </Tabs>
             </Paper>
 
-            <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
-                <Grid container spacing={0} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: "0 !important", marginLeft: "0 !important", marginRight: "0 !important" }}>
+            <Box sx={{ 
+                width: "100%", 
+                overflow: { xs: "hidden", md: "visible" }, 
+                boxSizing: "border-box" 
+            }}>
+                <Grid container spacing={{ xs: 0, md: 1.5 }} sx={{ 
+                    width: "100%", 
+                    margin: { xs: "0 !important", md: 0 }, 
+                    marginLeft: { xs: "0 !important", md: 0 }, 
+                    marginRight: { xs: "0 !important", md: 0 } 
+                }}>
                     {list.map((item) => (
-                        <Grid key={item.id} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-                        <PublicShipmentCard
-                            data={item}
-                            cta={{
-                                label: t("homePage.moreDetails"),
-                                href: `/login?next=/${tab}/${item.id}`,
-                                icon: <FiChevronRight />,
-                            }}
-                            kind={tab}
-                        />
-                    </Grid>
-                ))}
+                        <Grid key={item.id} size={{ xs: 12 }} sx={{ 
+                            padding: { xs: "0 0 12px 0", md: 0 }, 
+                            width: "100%", 
+                            maxWidth: "100%", 
+                            boxSizing: "border-box" 
+                        }}>
+                            <PublicShipmentCard
+                                data={item}
+                                cta={{
+                                    label: t("homePage.moreDetails"),
+                                    href: `/login?next=/${tab}/${item.id}`,
+                                    icon: <FiChevronRight />,
+                                }}
+                                kind={tab}
+                                mobileLayout="column"
+                            />
+                        </Grid>
+                    ))}
 
-                {!loading && list.length === 0 && (
-                    <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" } }}>
-                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, width: "100%", maxWidth: "100%" }}>
-                            <Typography>{t("homePage.noResults")}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {t("homePage.noResultsHint")}
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                )}
-                {loading && (
-                    <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" } }}>
-                        <Typography variant="body2" color="text.secondary">{t("homePage.loading")}</Typography>
-                    </Grid>
-                )}
-            </Grid>
+                    {!loading && list.length === 0 && (
+                        <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: 0 } }}>
+                            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                                <Typography>{t("homePage.noResults")}</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {t("homePage.noResultsHint")}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                    )}
+                    {loading && (
+                        <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: 0 } }}>
+                            <Typography variant="body2" color="text.secondary">{t("homePage.loading")}</Typography>
+                        </Grid>
+                    )}
+                </Grid>
             </Box>
 
             <Stack direction="row" alignItems="center" justifyContent="center" sx={{ mt: 2 }}>
