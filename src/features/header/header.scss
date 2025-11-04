@@ -35,6 +35,7 @@
   &__column {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
     
     @media (max-width: 480px) {

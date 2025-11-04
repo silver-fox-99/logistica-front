@@ -12,11 +12,54 @@ import {
 import Grid from "@mui/material/Grid";
 import { FiBriefcase, FiHome, FiPlus } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import type { StackProps } from "@mui/material";
 import animation from "./BusinessTeam.json";
+
+type CompanyPageButtonsProps = {
+    direction?: StackProps["direction"];
+    gap?: number;
+    marginTop?: number;
+};
+
+function CompanyPageButtons({ direction = "row", gap = 12, marginTop = 3 }: CompanyPageButtonsProps) {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: direction,
+                gap: `${gap}px`,
+                mt: marginTop,
+                width: "100%",
+                "& > *": {
+                    marginTop: "0 !important",
+                    marginLeft: "0 !important",
+                    marginRight: "0 !important",
+                    marginBottom: "0 !important",
+                },
+                "& .MuiButton-root": {
+                    width: { xs: "100%", md: "auto" },
+                    marginTop: "0 !important",
+                    marginLeft: "0 !important",
+                    marginRight: "0 !important",
+                    marginBottom: "0 !important",
+                }
+            }}
+        >
+            <Button variant="contained" startIcon={<FiPlus />} onClick={() => navigate("/dashboard/company/create")}>
+                {t('company.createButton')}
+            </Button>
+            <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
+                {t('company.backButton')}
+            </Button>
+        </Box>
+    );
+}
 
 export default function CompanyPage() {
     const { t } = useTranslation();
-    const navigate = useNavigate();
 
     return (
         <Box
@@ -48,7 +91,7 @@ export default function CompanyPage() {
                     </Grid>
 
                     {/* Текст и действия */}
-                    <Grid size={{ xs: 12, md: 6 }}>
+                    <Grid size={{ xs: 12, md: 6 }} sx={{ marginLeft: { xs: 0, md: "auto" } }}>
                         <Stack spacing={1}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <FiBriefcase />
@@ -64,14 +107,7 @@ export default function CompanyPage() {
                             </Typography>
                         </Stack>
 
-                        <Stack direction="row" spacing={1.5} flexWrap="wrap" sx={{ mt: 3 }}>
-                            <Button variant="contained" startIcon={<FiPlus />} onClick={() => navigate("/dashboard/company/create")}>
-                                {t('company.createButton')}
-                            </Button>
-                            <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
-                                {t('company.backButton')}
-                            </Button>
-                        </Stack>
+                        <CompanyPageButtons direction={{ xs: "column", md: "row" }} gap={12} />
                     </Grid>
                 </Grid>
             </Container>

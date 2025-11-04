@@ -1,7 +1,8 @@
 import logo from "./logo.svg"
 import { Link } from "react-router-dom";
-import {Avatar, IconButton, useMediaQuery, Box} from "@mui/material";
+import {Avatar, IconButton, useMediaQuery, Box, Drawer, Stack, Button} from "@mui/material";
 import {FiMenu} from "react-icons/fi";
+import { useState } from "react";
 import './header.scss'
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 import {useTranslation} from "react-i18next";
@@ -19,6 +20,7 @@ export default function Header({
     const user = useUserStore((s) => s.user);
     const {t} = useTranslation()
     const isMobile = useMediaQuery("(max-width:860px)");
+    const [menuOpen, setMenuOpen] = useState(false);
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -78,11 +80,66 @@ export default function Header({
                 )}
             </div>}
 
-            {!isAuthenticated && <div className="header__column">
-                <Link to="/login" className="header__button button button--transparent" >{t('header.login')}</Link>
-                <Link to="/register" className="header__button button" >{t('header.register')}</Link>
-                <LanguageSwitcher />
-            </div>}
+            {!isAuthenticated && (
+                <>
+                    <div className="header__column">
+                        {!isMobile && (
+                            <>
+                                <Link to="/login" className="header__button button button--transparent" >{t('header.login')}</Link>
+                                <Link to="/register" className="header__button button" >{t('header.register')}</Link>
+                            </>
+                        )}
+                        <LanguageSwitcher />
+                        {isMobile && (
+                            <IconButton
+                                aria-label="Open menu"
+                                onClick={() => setMenuOpen(true)}
+                                size="large"
+                                sx={{
+                                    color: '#fff',
+                                    p: 0,
+                                }}
+                            >
+                                <FiMenu />
+                            </IconButton>
+                        )}
+                    </div>
+
+                    <Drawer
+                        anchor="right"
+                        open={menuOpen}
+                        onClose={() => setMenuOpen(false)}
+                        PaperProps={{ sx: { width: 280, p: 2 } }}
+                        ModalProps={{ keepMounted: true }}
+                    >
+                        <Stack spacing={2}>
+                            <Button
+                                component={Link}
+                                to="/login"
+                                variant="outlined"
+                                fullWidth
+                                onClick={() => setMenuOpen(false)}
+                                sx={{ textTransform: "none" }}
+                            >
+                                {t('header.login')}
+                            </Button>
+                            <Button
+                                component={Link}
+                                to="/register"
+                                variant="contained"
+                                fullWidth
+                                onClick={() => setMenuOpen(false)}
+                                sx={{ textTransform: "none" }}
+                            >
+                                {t('header.register')}
+                            </Button>
+                            <Box sx={{ mt: 2 }}>
+                                <LanguageSwitcher />
+                            </Box>
+                        </Stack>
+                    </Drawer>
+                </>
+            )}
         </div>
 
 

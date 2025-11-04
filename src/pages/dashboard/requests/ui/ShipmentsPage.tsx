@@ -202,9 +202,10 @@ function ListBody({
 
     return (
         <>
-            <Grid container spacing={1.5}>
-                {list.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12 }}>
+            <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
+                <Grid container spacing={0} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: "0 !important", marginLeft: "0 !important", marginRight: "0 !important" }}>
+                    {list.map((item) => (
+                        <Grid key={item.id} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
                         <ShipmentRow
                             scope={scope}
                             data={item}
@@ -219,11 +220,12 @@ function ListBody({
                     </Grid>
                 ))}
                 {loading && (
-                    <Grid size={{ xs: 12 }}>
+                    <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" } }}>
                         <Typography variant="body2" color="text.secondary">{t('shipments.actions.loading')}</Typography>
                     </Grid>
                 )}
             </Grid>
+            </Box>
 
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 2 }}>
                 <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{t('shipments.actions.back')}</Button>
@@ -300,8 +302,8 @@ export default function ShipmentsListPage({ scope }: Props) {
     const requestReload = () => setReloadKey((k) => k + 1);
 
     return (
-        <Box>
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2 }}>
+        <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2, width: "100%", maxWidth: { xs: "100vw", md: "100%" }, boxSizing: "border-box" }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box className="shipments-page__icon">
                         <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -323,24 +325,35 @@ export default function ShipmentsListPage({ scope }: Props) {
                 </Box>
             </Paper>
 
-            <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+            <Stack 
+                direction={{ xs: "column", sm: "row" }} 
+                spacing={1} 
+                alignItems={{ xs: "stretch", sm: "center" }} 
+                justifyContent="space-between" 
+                sx={{ mb: 1, width: "100%" }}
+            >
                 <Button
                     variant="contained"
                     startIcon={<FiSliders />}
-                    sx={{ textTransform: "none" }}
+                    sx={{ textTransform: "none", width: { xs: "100%", sm: "auto" } }}
                     onClick={() => setDrawerOpen(true)}
                 >
                     {t('shipments.filter.button')}
                 </Button>
 
-                <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="body2" color="text.secondary">{t('shipments.filter.period')}</Typography>
+                <Stack 
+                    direction={{ xs: "column", sm: "row" }} 
+                    alignItems={{ xs: "stretch", sm: "center" }} 
+                    spacing={1} 
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
+                >
+                    <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>{t('shipments.filter.period')}</Typography>
                     <Select
                         variant="outlined"
                         size="small"
                         value={period}
                         onChange={(e) => setPeriod(e.target.value)}
-                        sx={{ minWidth: 160 }}
+                        sx={{ minWidth: { xs: "100%", sm: 160 }, width: { xs: "100%", sm: "auto" } }}
                     >
                         <MenuItem value="all">{t('shipments.filter.allTime')}</MenuItem>
                         <MenuItem value="7d">{t('shipments.filter.last7Days')}</MenuItem>

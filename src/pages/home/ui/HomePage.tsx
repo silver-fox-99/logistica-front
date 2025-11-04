@@ -27,8 +27,8 @@ export default function HomePage() {
     }, [filters]);
 
     return (
-        <Box sx={{ py: 2 }}>
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 2 }}>
+        <Box sx={{ py: 2, width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 2, width: "100%", maxWidth: { xs: "100vw", md: "100%" }, boxSizing: "border-box" }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
                     <Stack>
                         <Typography variant="h5" fontWeight={700}>{t("homePage.title")}</Typography>
@@ -66,9 +66,10 @@ export default function HomePage() {
                 </Tabs>
             </Paper>
 
-            <Grid container spacing={1.5}>
-                {list.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12 }}>
+            <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
+                <Grid container spacing={0} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: "0 !important", marginLeft: "0 !important", marginRight: "0 !important" }}>
+                    {list.map((item) => (
+                        <Grid key={item.id} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
                         <PublicShipmentCard
                             data={item}
                             cta={{
@@ -81,15 +82,9 @@ export default function HomePage() {
                     </Grid>
                 ))}
 
-                {loading && (
-                    <Grid size={{ xs: 12 }}>
-                        <Typography variant="body2" color="text.secondary">{t("homePage.loading")}</Typography>
-                    </Grid>
-                )}
-
                 {!loading && list.length === 0 && (
-                    <Grid size={{ xs: 12 }}>
-                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                    <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" } }}>
+                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, width: "100%", maxWidth: "100%" }}>
                             <Typography>{t("homePage.noResults")}</Typography>
                             <Typography variant="body2" color="text.secondary">
                                 {t("homePage.noResultsHint")}
@@ -97,7 +92,13 @@ export default function HomePage() {
                         </Paper>
                     </Grid>
                 )}
+                {loading && (
+                    <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" } }}>
+                        <Typography variant="body2" color="text.secondary">{t("homePage.loading")}</Typography>
+                    </Grid>
+                )}
             </Grid>
+            </Box>
 
             <Stack direction="row" alignItems="center" justifyContent="center" sx={{ mt: 2 }}>
                 <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />

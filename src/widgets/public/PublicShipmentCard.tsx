@@ -10,6 +10,7 @@ type Props = {
     data: PublicShipmentBase;
     kind: "cargo" | "transport";
     cta: { label: string; href: string; icon?: React.ReactNode };
+    mobileLayout?: "column" | "row";
 };
 
 const fmtPoint = (p?: PublicPoint) => p
@@ -26,7 +27,7 @@ const ORDER: Record<PublicPointType, number> = {
 // максимум видимых точек
 const MAX_VISIBLE_POINTS = 4;
 
-export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind }: Props) {
+export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind, mobileLayout = "column" }: Props) {
     const { t } = useTranslation();
 
     const labels = useMemo(() => {
@@ -47,8 +48,8 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
     }, [data.points]);
 
     return (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Grid container spacing={1.5} alignItems="center">
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, width: "100%", maxWidth: "100%", overflow: "hidden", boxSizing: "border-box", margin: 0 }}>
+            <Grid container spacing={0} alignItems="center" sx={{ width: "100%", maxWidth: "100%", margin: "0 !important", marginLeft: "0 !important", marginRight: "0 !important" }}>
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
                         {/* Маршрут: точки из points[] */}
@@ -113,10 +114,10 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
 
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Stack
-                        direction={{ xs: "row", md: "column" }}
+                        direction={{ xs: mobileLayout, md: "column" }}
                         spacing={1}
-                        alignItems={{ xs: "flex-start", md: "flex-end" }}
-                        justifyContent="space-between"
+                        alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "flex-start", md: "flex-end" }}
+                        justifyContent={mobileLayout === "column" ? "flex-start" : "space-between"}
                     >
                         <Typography variant="caption" color="text.secondary">
                             {t('shipments.shipmentCard.updated')} {data.createdAt?.slice(0, 10) ?? ""}
@@ -133,7 +134,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                             {cta.label}
                         </Button>
 
-                        <Typography variant="caption" color="text.secondary" textAlign={{ md: "right" }}>
+                        <Typography variant="caption" color="text.secondary" textAlign={{ xs: "left", md: "right" }}>
                             {t('shipments.shipmentCard.signInToView')}
                         </Typography>
                     </Stack>

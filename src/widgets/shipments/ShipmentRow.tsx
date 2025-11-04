@@ -23,10 +23,11 @@ type Props = {
     onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
     onCopy?: (id: string) => void;
+    mobileLayout?: "column" | "row";
 };
 
 export default function ShipmentRow({
-                                        data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy
+                                        data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
                                     }: Props) {
     const { t } = useTranslation();
     const [expanded, setExpanded] = useState(false);
@@ -38,10 +39,10 @@ export default function ShipmentRow({
 
     return (
         <Box
-            sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
+            sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper", width: "100%", maxWidth: "100%", overflow: "hidden", boxSizing: "border-box" }}
             className="shipment-row"
         >
-            <Grid container spacing={1.5} alignItems="center">
+            <Grid container spacing={0} alignItems="center" sx={{ width: "100%", margin: 0 }}>
                 {/* ЛЕВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
@@ -135,12 +136,19 @@ export default function ShipmentRow({
                 {/* ПРАВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Stack
-                        direction={{ xs: "row", md: "column" }}
+                        direction={{ xs: mobileLayout, md: "column" }}
                         spacing={1}
-                        alignItems={{ xs: "flex-start", md: "flex-end" }}
-                        justifyContent="space-between"
+                        alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "flex-start", md: "flex-end" }}
+                        justifyContent={mobileLayout === "column" ? "flex-start" : "space-between"}
                     >
-                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" justifyContent="flex-end">
+                        <Stack 
+                            direction={mobileLayout === "column" ? "column" : "row"} 
+                            spacing={1} 
+                            alignItems={mobileLayout === "column" ? "flex-start" : "center"} 
+                            flexWrap="wrap" 
+                            justifyContent={mobileLayout === "column" ? "flex-start" : "flex-end"}
+                            sx={{ width: mobileLayout === "column" ? "100%" : "auto" }}
+                        >
                             {typeof data.repeats === "number" && data.repeats > 0 && (
                                 <Chip
                                     size="small"
@@ -157,7 +165,13 @@ export default function ShipmentRow({
                             )}
                         </Stack>
 
-                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                        <Stack 
+                            direction={mobileLayout === "column" ? "column" : "row"} 
+                            spacing={1} 
+                            alignItems={mobileLayout === "column" ? "flex-start" : "center"} 
+                            flexWrap="wrap"
+                            sx={{ width: mobileLayout === "column" ? "100%" : "auto" }}
+                        >
                             {data.paymentType && (
                                 <Chip
                                     size="small"
@@ -182,7 +196,12 @@ export default function ShipmentRow({
                             )}
                         </Stack>
 
-                        <Stack direction="row" spacing={1} alignItems="center">
+                        <Stack 
+                            direction={mobileLayout === "column" ? "column" : "row"} 
+                            spacing={1} 
+                            alignItems={mobileLayout === "column" ? "flex-start" : "center"}
+                            sx={{ width: mobileLayout === "column" ? "100%" : "auto" }}
+                        >
                             <Tooltip title={t('shipments.shipmentCard.saveToFavorites')}>
                                 <IconButton onClick={() => onBookmark?.(data.id)}>
                                     <FiBookmark />
@@ -194,7 +213,7 @@ export default function ShipmentRow({
                                 variant="contained"
                                 onClick={openMore}
                                 endIcon={expanded ? <FiChevronUp /> : <FiChevronDown />}
-                                sx={{ textTransform: "none" }}
+                                sx={{ textTransform: "none", width: mobileLayout === "column" ? "100%" : "auto" }}
                             >
                                 {expanded ? t('shipments.shipmentCard.collapse') : t('shipments.shipmentCard.more')}
                             </Button>
