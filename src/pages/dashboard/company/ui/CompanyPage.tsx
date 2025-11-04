@@ -19,7 +19,6 @@ type CompanyPageButtonsProps = {
     direction?: StackProps["direction"];
     gap?: number;
     marginTop?: number;
-    desktopSpacing?: number;
     desktopAlignItems?: "flex-start" | "center" | "flex-end";
 };
 
@@ -27,7 +26,6 @@ function CompanyPageButtons({
     direction = "row", 
     gap = 12, 
     marginTop = 3,
-    desktopSpacing = 1.5,
     desktopAlignItems = "flex-start"
 }: CompanyPageButtonsProps) {
     const { t } = useTranslation();
@@ -163,7 +161,6 @@ export default function CompanyPage() {
                         <CompanyPageButtons 
                             direction={{ xs: "column", md: "row" }} 
                             gap={12}
-                            desktopSpacing={2}
                             desktopAlignItems="flex-start"
                         />
                     </Grid>
