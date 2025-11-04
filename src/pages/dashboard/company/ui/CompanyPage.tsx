@@ -19,42 +19,95 @@ type CompanyPageButtonsProps = {
     direction?: StackProps["direction"];
     gap?: number;
     marginTop?: number;
+    desktopSpacing?: number;
+    desktopAlignItems?: "flex-start" | "center" | "flex-end";
 };
 
-function CompanyPageButtons({ direction = "row", gap = 12, marginTop = 3 }: CompanyPageButtonsProps) {
+function CompanyPageButtons({ 
+    direction = "row", 
+    gap = 12, 
+    marginTop = 3,
+    desktopSpacing = 1.5,
+    desktopAlignItems = "flex-start"
+}: CompanyPageButtonsProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: direction,
-                gap: `${gap}px`,
-                mt: marginTop,
-                width: "100%",
-                "& > *": {
-                    marginTop: "0 !important",
-                    marginLeft: "0 !important",
-                    marginRight: "0 !important",
-                    marginBottom: "0 !important",
-                },
-                "& .MuiButton-root": {
-                    width: { xs: "100%", md: "auto" },
-                    marginTop: "0 !important",
-                    marginLeft: "0 !important",
-                    marginRight: "0 !important",
-                    marginBottom: "0 !important",
-                }
-            }}
-        >
-            <Button variant="contained" startIcon={<FiPlus />} onClick={() => navigate("/dashboard/company/create")}>
-                {t('company.createButton')}
-            </Button>
-            <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
-                {t('company.backButton')}
-            </Button>
-        </Box>
+        <>
+            {/* Десктоп: Stack с улучшенными стилями */}
+            <Stack 
+                direction="row" 
+                flexWrap="wrap" 
+                alignItems={desktopAlignItems}
+                sx={{ 
+                    mt: marginTop,
+                    display: { xs: "none", md: "flex" },
+                    gap: "12px",
+                    "& > *": {
+                        marginLeft: "0 !important"
+                    }
+                }}
+            >
+                <Button 
+                    variant="contained" 
+                    startIcon={<FiPlus />} 
+                    onClick={() => navigate("/dashboard/company/create")}
+                    sx={{ 
+                        textTransform: "none",
+                        borderRadius: 2,
+                        px: 3,
+                        py: 1
+                    }}
+                >
+                    {t('company.createButton')}
+                </Button>
+                <Button 
+                    variant="outlined" 
+                    startIcon={<FiHome />} 
+                    onClick={() => navigate("/dashboard")}
+                    sx={{ 
+                        textTransform: "none",
+                        borderRadius: 2,
+                        px: 3,
+                        py: 1
+                    }}
+                >
+                    {t('company.backButton')}
+                </Button>
+            </Stack>
+
+            {/* Мобилка: Box с gap */}
+            <Box
+                sx={{
+                    display: { xs: "flex", md: "none" },
+                    flexDirection: direction,
+                    gap: `${gap}px`,
+                    mt: marginTop,
+                    width: "100%",
+                    "& > *": {
+                        marginTop: "0 !important",
+                        marginLeft: "0 !important",
+                        marginRight: "0 !important",
+                        marginBottom: "0 !important",
+                    },
+                    "& .MuiButton-root": {
+                        width: "100%",
+                        marginTop: "0 !important",
+                        marginLeft: "0 !important",
+                        marginRight: "0 !important",
+                        marginBottom: "0 !important",
+                    }
+                }}
+            >
+                <Button variant="contained" startIcon={<FiPlus />} onClick={() => navigate("/dashboard/company/create")}>
+                    {t('company.createButton')}
+                </Button>
+                <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
+                    {t('company.backButton')}
+                </Button>
+            </Box>
+        </>
     );
 }
 
@@ -91,7 +144,7 @@ export default function CompanyPage() {
                     </Grid>
 
                     {/* Текст и действия */}
-                    <Grid size={{ xs: 12, md: 6 }} sx={{ marginLeft: { xs: 0, md: "auto" } }}>
+                    <Grid size={{ xs: 12, md: 6 }} sx={{ marginLeft: { xs: 0 } }}>
                         <Stack spacing={1}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <FiBriefcase />
@@ -107,7 +160,12 @@ export default function CompanyPage() {
                             </Typography>
                         </Stack>
 
-                        <CompanyPageButtons direction={{ xs: "column", md: "row" }} gap={12} />
+                        <CompanyPageButtons 
+                            direction={{ xs: "column", md: "row" }} 
+                            gap={12}
+                            desktopSpacing={2}
+                            desktopAlignItems="flex-start"
+                        />
                     </Grid>
                 </Grid>
             </Container>

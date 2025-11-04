@@ -139,15 +139,15 @@ export default function ShipmentRow({
                         direction={{ xs: mobileLayout, md: "column" }}
                         spacing={1}
                         alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "flex-start", md: "flex-end" }}
-                        justifyContent={mobileLayout === "column" ? "flex-start" : "space-between"}
+                        justifyContent={{ xs: mobileLayout === "column" ? "flex-start" : "space-between", md: "flex-start" }}
                     >
                         <Stack 
-                            direction={mobileLayout === "column" ? "column" : "row"} 
+                            direction={{ xs: mobileLayout === "column" ? "column" : "row", md: "row" }} 
                             spacing={1} 
-                            alignItems={mobileLayout === "column" ? "flex-start" : "center"} 
+                            alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "center", md: "center" }} 
                             flexWrap="wrap" 
-                            justifyContent={mobileLayout === "column" ? "flex-start" : "flex-end"}
-                            sx={{ width: mobileLayout === "column" ? "100%" : "auto" }}
+                            justifyContent={{ xs: mobileLayout === "column" ? "flex-start" : "flex-end", md: "flex-end" }}
+                            sx={{ width: { xs: mobileLayout === "column" ? "100%" : "auto", md: "auto" } }}
                         >
                             {typeof data.repeats === "number" && data.repeats > 0 && (
                                 <Chip
@@ -166,11 +166,11 @@ export default function ShipmentRow({
                         </Stack>
 
                         <Stack 
-                            direction={mobileLayout === "column" ? "column" : "row"} 
+                            direction={{ xs: mobileLayout === "column" ? "column" : "row", md: "row" }} 
                             spacing={1} 
-                            alignItems={mobileLayout === "column" ? "flex-start" : "center"} 
+                            alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "center", md: "center" }} 
                             flexWrap="wrap"
-                            sx={{ width: mobileLayout === "column" ? "100%" : "auto" }}
+                            sx={{ width: { xs: mobileLayout === "column" ? "100%" : "auto", md: "auto" } }}
                         >
                             {data.paymentType && (
                                 <Chip
@@ -197,10 +197,10 @@ export default function ShipmentRow({
                         </Stack>
 
                         <Stack 
-                            direction={mobileLayout === "column" ? "column" : "row"} 
+                            direction={{ xs: mobileLayout === "column" ? "column" : "row", md: "row" }} 
                             spacing={1} 
-                            alignItems={mobileLayout === "column" ? "flex-start" : "center"}
-                            sx={{ width: mobileLayout === "column" ? "100%" : "auto" }}
+                            alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "center", md: "center" }}
+                            sx={{ width: { xs: mobileLayout === "column" ? "100%" : "auto", md: "auto" } }}
                         >
                             <Tooltip title={t('shipments.shipmentCard.saveToFavorites')}>
                                 <IconButton onClick={() => onBookmark?.(data.id)}>
@@ -213,7 +213,7 @@ export default function ShipmentRow({
                                 variant="contained"
                                 onClick={openMore}
                                 endIcon={expanded ? <FiChevronUp /> : <FiChevronDown />}
-                                sx={{ textTransform: "none", width: mobileLayout === "column" ? "100%" : "auto" }}
+                                sx={{ textTransform: "none", width: { xs: mobileLayout === "column" ? "100%" : "auto", md: "auto" } }}
                             >
                                 {expanded ? t('shipments.shipmentCard.collapse') : t('shipments.shipmentCard.more')}
                             </Button>

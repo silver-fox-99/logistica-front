@@ -203,9 +203,9 @@ function ListBody({
     return (
         <>
             <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
-                <Grid container spacing={0} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: "0 !important", marginLeft: "0 !important", marginRight: "0 !important" }}>
+                <Grid container spacing={{ xs: 0, md: 1.5 }} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: { xs: "0 !important", md: 0 }, marginLeft: { xs: "0 !important", md: 0 }, marginRight: { xs: "0 !important", md: 0 } }}>
                     {list.map((item) => (
-                        <Grid key={item.id} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
+                        <Grid key={item.id} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: 0 }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
                         <ShipmentRow
                             scope={scope}
                             data={item}

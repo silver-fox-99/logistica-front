@@ -37,6 +37,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    max-width: 220px;
     
     @media (max-width: 480px) {
       gap: 8px;

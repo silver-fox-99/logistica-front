@@ -114,10 +114,10 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
 
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Stack
-                        direction={{ xs: mobileLayout, md: "column" }}
+                        direction={{ xs: mobileLayout, md: "row" }}
                         spacing={1}
                         alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "flex-start", md: "flex-end" }}
-                        justifyContent={mobileLayout === "column" ? "flex-start" : "space-between"}
+                        justifyContent={{ xs: mobileLayout === "column" ? "flex-start" : "space-between", md: "space-between" }}
                     >
                         <Typography variant="caption" color="text.secondary">
                             {t('shipments.shipmentCard.updated')} {data.createdAt?.slice(0, 10) ?? ""}
