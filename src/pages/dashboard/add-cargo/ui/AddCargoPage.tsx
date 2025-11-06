@@ -9,7 +9,8 @@ import { useTranslation } from "react-i18next";
 
 import { cargoApi, type CreateCargoDto } from "@/shared/api/cargoApi";
 import {useNavigate} from "react-router-dom";
-import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useLocalizedLookup, type LookupOpt } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 import './AddCargoPage.scss';
 
@@ -25,10 +26,6 @@ type Geo = {
     created_at: string;
     updated_at: string;
 };
-
-type LookupOpt = { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; };
-
-type InitData = Awaited<ReturnType<typeof cargoApi.init>> | null;
 
 type Place = {
     countryId?: string | null;
@@ -66,25 +63,6 @@ type FormValues = {
 
     contactSecondary?: string;
     note?: string;
-};
-
-const normalizeLookupOpt = (opt: any): LookupOpt => {
-    if (!opt) return opt;
-    return {
-        slug: opt.slug,
-        label: opt.label,
-        label_ru: opt.label_ru ?? opt.ru ?? null,
-        label_uz: opt.label_uz ?? opt.uz ?? null,
-    };
-};
-
-const getOpts = (
-    name: keyof NonNullable<NonNullable<InitData>["lookups"]>,
-    initData: InitData
-): LookupOpt[] => {
-    if (!initData?.lookups) return [];
-    const raw = initData.lookups[name] as any[];
-    return raw.map(normalizeLookupOpt);
 };
 
 function buildGeoMaps(geos: Geo[]) {
@@ -202,16 +180,19 @@ function PlaceRow({
 export default function AddCargoPage() {
     const { t, i18n } = useTranslation();
     const { getLocalizedLabel, findLocalizedLabel } = useLocalizedLookup();
-    const [init, setInit] = useState<Awaited<ReturnType<typeof cargoApi.init>> | null>(null);
-    const [loadingInit, setLoadingInit] = useState(true);
+    const { lookups, geos, loadInit, loading: loadingInit } = useInitStore();
     const [activeStep, setActiveStep] = useState(0);
 
-    const currencyOpts   = useMemo(() => getOpts("currency", init),        [init]);
-    const vehicleOpts    = useMemo(() => getOpts("vehicleType", init),     [init]);
-    const loadOpts       = useMemo(() => getOpts("loadType", init),        [init]);
-    const cargoOpts      = useMemo(() => getOpts("cargoTypes", init),      [init]);
-    const payMethodOpts  = useMemo(() => getOpts("paymentMethods", init),  [init]);
-    const payTermOpts    = useMemo(() => getOpts("paymentTerms", init),    [init]);
+    useEffect(() => {
+        loadInit();
+    }, [loadInit]);
+
+    const currencyOpts   = useMemo(() => lookups?.currency ?? [],        [lookups]);
+    const vehicleOpts    = useMemo(() => lookups?.vehicleType ?? [],     [lookups]);
+    const loadOpts       = useMemo(() => lookups?.loadType ?? [],        [lookups]);
+    const cargoOpts      = useMemo(() => lookups?.cargoTypes ?? [],      [lookups]);
+    const payMethodOpts  = useMemo(() => lookups?.paymentMethods ?? [],  [lookups]);
+    const payTermOpts    = useMemo(() => lookups?.paymentTerms ?? [],    [lookups]);
 
 
     const [form, setForm] = useState<FormValues>({
@@ -255,18 +236,14 @@ export default function AddCargoPage() {
     ];
 
     useEffect(() => {
-        (async () => {
-            setLoadingInit(true);
-            const data = await cargoApi.init();
-            setInit(data);
-            const currency = data.lookups.currency[0]?.slug   ?? "";
-            const vehicle  = data.lookups.vehicleType[0]?.slug ?? "";
-            const loadType = data.lookups.loadType[0]?.slug    ?? "";
-            const cargo    = data.lookups.cargoTypes[0]?.slug  ?? "";
+        if (lookups && !loadingInit) {
+            const currency = lookups.currency[0]?.slug   ?? "";
+            const vehicle  = lookups.vehicleType[0]?.slug ?? "";
+            const loadType = lookups.loadType?.[0]?.slug    ?? "";
+            const cargo    = lookups.cargoTypes?.[0]?.slug  ?? "";
             setForm((s) => ({ ...s, currency, vehicleType: vehicle, loadType, cargoType: cargo }));
-            setLoadingInit(false);
-        })();
-    }, []);
+        }
+    }, [lookups, loadingInit]);
 
     const setField = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
         setForm((s) => ({ ...s, [key]: value }));
@@ -304,9 +281,9 @@ export default function AddCargoPage() {
     /* ===== geo id -> name ===== */
     const geoById = useMemo(() => {
         const m = new Map<string, Geo>();
-        if (init?.geos) for (const g of init.geos) m.set(g.id, g);
+        if (geos) for (const g of geos) m.set(g.id, g);
         return m;
-    }, [init]);
+    }, [geos]);
 
     /* ===== UI -> DTO ===== */
     const toDto = (v: FormValues): CreateCargoDto => {
@@ -473,7 +450,7 @@ export default function AddCargoPage() {
                                                     key={i}
                                                     labelPrefix={i === 0 ? "Страна загрузки" : `Страна загрузки ${i + 1}`}
                                                     place={p}
-                                                    geos={init?.geos ?? null}
+                                                    geos={geos ?? null}
                                                     errorText={i === 0 ? errors.pickups : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmPickup(i)}
@@ -489,7 +466,7 @@ export default function AddCargoPage() {
                                                     key={i}
                                                     labelPrefix={i === 0 ? "Страна выгрузки" : `Страна выгрузки ${i + 1}`}
                                                     place={p}
-                                                    geos={init?.geos ?? null}
+                                                    geos={geos ?? null}
                                                     errorText={i === 0 ? errors.dropoffs : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmDropoff(i)}
@@ -845,7 +822,7 @@ export default function AddCargoPage() {
                                         key={i}
                                             labelPrefix={i === 0 ? "Страна загрузки" : `Страна загрузки ${i + 1}`}
                                         place={p}
-                                        geos={init?.geos ?? null}
+                                        geos={geos ?? null}
                                         errorText={i === 0 ? errors.pickups : undefined}
                                         showRemove={i > 0}
                                         onRemove={() => rmPickup(i)}
@@ -862,7 +839,7 @@ export default function AddCargoPage() {
                                         key={i}
                                             labelPrefix={i === 0 ? "Страна выгрузки" : `Страна выгрузки ${i + 1}`}
                                         place={p}
-                                        geos={init?.geos ?? null}
+                                        geos={geos ?? null}
                                         errorText={i === 0 ? errors.dropoffs : undefined}
                                         showRemove={i > 0}
                                         onRemove={() => rmDropoff(i)}

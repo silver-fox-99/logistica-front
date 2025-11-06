@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Box, Stack, Chip, Typography, IconButton, Button, Tooltip, Divider
 } from "@mui/material";
@@ -10,6 +10,8 @@ import {
 import { useTranslation } from "react-i18next";
 
 import type {ShipmentRowData, ShipmentsKind} from "@/entities/shipment/model/type";
+import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 import "./ShipmentRow.scss";
 
 type Props = {
@@ -30,7 +32,13 @@ export default function ShipmentRow({
                                         data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
                                     }: Props) {
     const { t } = useTranslation();
+    const { findLocalizedLabel } = useLocalizedLookup();
+    const { lookups, loadInit } = useInitStore();
     const [expanded, setExpanded] = useState(false);
+
+    useEffect(() => {
+        loadInit();
+    }, [loadInit]);
 
     const openMore = () => {
         if (!expanded) onMoreOpen?.(data.id);
@@ -285,17 +293,17 @@ export default function ShipmentRow({
                             <Stack spacing={0.75} color="text.secondary">
                                 {data.vehicleType && (
                                     <Typography variant="body2">
-                                        <strong>{t('shipments.shipmentCard.vehicleType')}</strong> {data.vehicleType}
+                                        <strong>{t('shipments.shipmentCard.vehicleType')}</strong> {findLocalizedLabel(lookups?.vehicleType ?? [], data.vehicleType) || data.vehicleType}
                                     </Typography>
                                 )}
                                 {data.cargoType && (
                                     <Typography variant="body2">
-                                        <strong>{t('shipments.shipmentCard.cargoType')}</strong> {data.cargoType}
+                                        <strong>{t('shipments.shipmentCard.cargoType')}</strong> {findLocalizedLabel(lookups?.cargoTypes ?? [], data.cargoType) || data.cargoType}
                                     </Typography>
                                 )}
                                 {data.loadType && (
                                     <Typography variant="body2">
-                                        <strong>{t('shipments.shipmentCard.loadType')}</strong> {data.loadType}
+                                        <strong>{t('shipments.shipmentCard.loadType')}</strong> {findLocalizedLabel(lookups?.loadType ?? [], data.loadType) || data.loadType}
                                     </Typography>
                                 )}
                                 {data.carsCount != null && data.carsCount > 0 && (
@@ -325,7 +333,7 @@ export default function ShipmentRow({
                                 )}
                                 {data.paymentTerm && (
                                     <Typography variant="body2">
-                                        <strong>{t('shipments.shipmentCard.paymentTerm')}</strong> {data.paymentTerm}
+                                        <strong>{t('shipments.shipmentCard.paymentTerm')}</strong> {findLocalizedLabel(lookups?.paymentTerms ?? [], data.paymentTerm) || data.paymentTerm}
                                     </Typography>
                                 )}
                                 {data.bargain && (

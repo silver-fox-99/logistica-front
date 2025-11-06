@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
 import {useNavigate} from "react-router-dom";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 import './AddTransportPage.scss';
 
@@ -65,25 +66,6 @@ type FormValues = {
     contactSecondary?: string;
     email?: string;
     note?: string;
-};
-
-type Init = Awaited<ReturnType<typeof transportApi.init>> | null;
-type Opt  = { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; };
-
-const normalizeLookupOpt = (opt: any): Opt => {
-    if (!opt) return opt;
-    return {
-        slug: opt.slug,
-        label: opt.label,
-        label_ru: opt.label_ru ?? opt.ru ?? null,
-        label_uz: opt.label_uz ?? opt.uz ?? null,
-    };
-};
-
-const getOpts = (name: keyof NonNullable<Init>["lookups"], initData: Init): Opt[] => {
-    if (!initData?.lookups) return [];
-    const raw = initData.lookups[name] as any[];
-    return raw.map(normalizeLookupOpt);
 };
 
 function buildGeoMaps(geos: Geo[]) {
@@ -226,14 +208,17 @@ function PlaceRow({
 export default function AddTransportPage() {
     const { t, i18n } = useTranslation();
     const { getLocalizedLabel, findLocalizedLabel } = useLocalizedLookup();
-    const [init, setInit] = useState<Awaited<ReturnType<typeof transportApi.init>> | null>(null);
-    const [loadingInit, setLoadingInit] = useState(true);
+    const { lookups, geos, loadInit, loading: loadingInit } = useInitStore();
     const [activeStep, setActiveStep] = useState(0);
 
-    const vehicleOpts   = useMemo(() => getOpts("vehicleType", init),    [init]);
-    const payMethodOpts = useMemo(() => getOpts("paymentMethods", init), [init]);
-    const payTermOpts   = useMemo(() => getOpts("paymentTerms", init),   [init]);
-    const currencyOpts  = useMemo(() => getOpts("currency", init),       [init]);
+    useEffect(() => {
+        loadInit();
+    }, [loadInit]);
+
+    const vehicleOpts   = useMemo(() => lookups?.vehicleType ?? [],    [lookups]);
+    const payMethodOpts = useMemo(() => lookups?.paymentMethods ?? [], [lookups]);
+    const payTermOpts   = useMemo(() => lookups?.paymentTerms ?? [],   [lookups]);
+    const currencyOpts  = useMemo(() => lookups?.currency ?? [],       [lookups]);
 
 
     const [form, setForm] = useState<FormValues>({
@@ -269,18 +254,12 @@ export default function AddTransportPage() {
     ];
 
     useEffect(() => {
-        (async () => {
-            setLoadingInit(true);
-            const data = await transportApi.init();
-            setInit(data);
-
-            const currency = data.lookups.currency[0]?.slug     ?? "";
-            const vehicle  = data.lookups.vehicleType[0]?.slug  ?? "";
+        if (lookups && !loadingInit) {
+            const currency = lookups.currency[0]?.slug     ?? "";
+            const vehicle  = lookups.vehicleType[0]?.slug  ?? "";
             setForm(s => ({ ...s, currency, vehicleType: vehicle }));
-
-            setLoadingInit(false);
-        })();
-    }, []);
+        }
+    }, [lookups, loadingInit]);
 
 
 
@@ -320,9 +299,9 @@ export default function AddTransportPage() {
 
     const geoById = useMemo(() => {
         const m = new Map<string, Geo>();
-        if (init?.geos) for (const g of init.geos) m.set(g.id, g);
+        if (geos) for (const g of geos) m.set(g.id, g);
         return m;
-    }, [init]);
+    }, [geos]);
 
     const placeToPoint = (p: Place, type: "DEPARTURE" | "ARRIVAL"): CreateTransportDto["points"][number] => {
         const countryName = p.countryId ? geoById.get(p.countryId)?.name ?? "" : "";
@@ -479,7 +458,7 @@ export default function AddTransportPage() {
                                                     key={i}
                                                     labelPrefix={i === 0 ? "загрузки" : `загрузки ${i + 1}`}
                                                     place={p}
-                                                    geos={init?.geos ?? null}
+                                                    geos={geos ?? null}
                                                     errorKey={i === 0 ? errors.loadPlaces : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmLoad(i)}
@@ -495,7 +474,7 @@ export default function AddTransportPage() {
                                                     key={i}
                                                     labelPrefix={i === 0 ? "выгрузки" : `выгрузки ${i + 1}`}
                                                     place={p}
-                                                    geos={init?.geos ?? null}
+                                                    geos={geos ?? null}
                                                     errorKey={i === 0 ? errors.unloadPlaces : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmUnload(i)}
@@ -806,7 +785,7 @@ export default function AddTransportPage() {
                                             key={i}
                                             labelPrefix={i === 0 ? "загрузки" : `загрузки ${i + 1}`}
                                             place={p}
-                                            geos={init?.geos ?? null}
+                                            geos={geos ?? null}
                                             errorKey={i === 0 ? errors.loadPlaces : undefined}
                                             showRemove={i > 0}
                                             onRemove={() => rmLoad(i)}
@@ -823,7 +802,7 @@ export default function AddTransportPage() {
                                             key={i}
                                             labelPrefix={i === 0 ? "выгрузки" : `выгрузки ${i + 1}`}
                                             place={p}
-                                            geos={init?.geos ?? null}
+                                            geos={geos ?? null}
                                             errorKey={i === 0 ? errors.unloadPlaces : undefined}
                                             showRemove={i > 0}
                                             onRemove={() => rmUnload(i)}
