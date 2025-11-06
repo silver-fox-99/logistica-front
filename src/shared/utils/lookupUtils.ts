@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 export type LookupOpt = { 
     slug: string; 
     label: string;
-    ru?: string | null;
-    uz?: string | null;
+    label_ru?: string | null;
+    label_uz?: string | null;
 };
 
 export function useLocalizedLookup() {
@@ -13,12 +13,12 @@ export function useLocalizedLookup() {
     const getLocalizedLabel = (opt: LookupOpt): string => {
         const lang = i18n.resolvedLanguage || i18n.language || "uz";
         
-        if (lang === "ru" && opt.ru) {
-            return opt.ru;
+        if (lang === "ru" && opt.label_ru) {
+            return opt.label_ru;
         }
         
-        if (lang === "uz" && opt.uz) {
-            return opt.uz;
+        if (lang === "uz" && opt.label_uz) {
+            return opt.label_uz;
         }
         
         return opt.label;

@@ -26,7 +26,7 @@ type Geo = {
     updated_at: string;
 };
 
-type LookupOpt = { slug: string; label: string; ru?: string | null; uz?: string | null; };
+type LookupOpt = { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; };
 
 type InitData = Awaited<ReturnType<typeof cargoApi.init>> | null;
 
@@ -68,10 +68,24 @@ type FormValues = {
     note?: string;
 };
 
+const normalizeLookupOpt = (opt: any): LookupOpt => {
+    if (!opt) return opt;
+    return {
+        slug: opt.slug,
+        label: opt.label,
+        label_ru: opt.label_ru ?? opt.ru ?? null,
+        label_uz: opt.label_uz ?? opt.uz ?? null,
+    };
+};
+
 const getOpts = (
     name: keyof NonNullable<NonNullable<InitData>["lookups"]>,
     initData: InitData
-): LookupOpt[] => initData?.lookups ? (initData.lookups[name] as LookupOpt[]) : [];
+): LookupOpt[] => {
+    if (!initData?.lookups) return [];
+    const raw = initData.lookups[name] as any[];
+    return raw.map(normalizeLookupOpt);
+};
 
 function buildGeoMaps(geos: Geo[]) {
     const byId = new Map<string, Geo>();

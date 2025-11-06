@@ -68,10 +68,23 @@ type FormValues = {
 };
 
 type Init = Awaited<ReturnType<typeof transportApi.init>> | null;
-type Opt  = { slug: string; label: string; ru?: string | null; uz?: string | null; };
+type Opt  = { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; };
 
-const getOpts = (name: keyof NonNullable<Init>["lookups"], initData: Init): Opt[] =>
-    initData?.lookups ? (initData.lookups[name] as Opt[]) : [];
+const normalizeLookupOpt = (opt: any): Opt => {
+    if (!opt) return opt;
+    return {
+        slug: opt.slug,
+        label: opt.label,
+        label_ru: opt.label_ru ?? opt.ru ?? null,
+        label_uz: opt.label_uz ?? opt.uz ?? null,
+    };
+};
+
+const getOpts = (name: keyof NonNullable<Init>["lookups"], initData: Init): Opt[] => {
+    if (!initData?.lookups) return [];
+    const raw = initData.lookups[name] as any[];
+    return raw.map(normalizeLookupOpt);
+};
 
 function buildGeoMaps(geos: Geo[]) {
     const byId = new Map<string, Geo>();

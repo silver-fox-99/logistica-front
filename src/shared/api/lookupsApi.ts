@@ -6,8 +6,8 @@ export type LookupGroup = {
 };
 export type LookupItem = {
     id: string; group_id: string; slug: string; label: string;
-    ru?: string | null;
-    uz?: string | null;
+    label_ru?: string | null;
+    label_uz?: string | null;
     active: boolean; sort_order: number; meta?: any;
     created_at: string; updated_at: string;
 };
@@ -33,11 +33,11 @@ export const lookupsApi = {
         const { data } = await api.get<{ status: boolean; data: LookupItem[] }>(`/lookups/${groupCode}`);
         return data.data;
     },
-    createItem: async (groupCode: string, payload: { slug: string; label: string; ru?: string | null; uz?: string | null; active?: boolean; sort_order?: number; meta?: any }) => {
+    createItem: async (groupCode: string, payload: { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; active?: boolean; sort_order?: number; meta?: any }) => {
         const { data } = await api.post(`/lookups/${groupCode}`, payload);
         return data.data as LookupItem;
     },
-    updateItem: async (groupCode: string, id: string, payload: Partial<{ slug: string; label: string; ru: string | null; uz: string | null; active: boolean; sort_order: number; meta: any }>) => {
+    updateItem: async (groupCode: string, id: string, payload: Partial<{ slug: string; label: string; label_ru: string | null; label_uz: string | null; active: boolean; sort_order: number; meta: any }>) => {
         const { data } = await api.patch(`/lookups/${groupCode}/${id}`, payload);
         return data.data as LookupItem;
     },

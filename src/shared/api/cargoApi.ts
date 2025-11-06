@@ -12,7 +12,7 @@ export type GeoItem = {
     updated_at: string;
 };
 
-export type LookupOpt = { slug: string; label: string; ru?: string | null; uz?: string | null; };
+export type LookupOpt = { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; };
 
 export type LookupDict = Record<string, string>;
 
