@@ -9,18 +9,11 @@ import { useTranslation } from "react-i18next";
 
 import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
 import {useNavigate} from "react-router-dom";
+import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 
 import './AddTransportPage.scss';
 
-const VEHICLE_TYPES_LABELS: Record<string, string> = {
-    ANY: "Any",
-    TENT: "Curtain (Tautliner)",
-    REFRIGERATOR: "Reefer",
-    VAN: "Box/Van",
-    PLATFORM: "Platform/Flatbed",
-};
-
- const PRICE_UNITS = ["Total", "Per ton", "Per km"] as const;
+const PRICE_UNITS = ["Total", "Per ton", "Per km"] as const;
 
 type Geo = {
     id: string;
@@ -75,13 +68,10 @@ type FormValues = {
 };
 
 type Init = Awaited<ReturnType<typeof transportApi.init>> | null;
-type Opt  = { slug: string; label: string };
+type Opt  = { slug: string; label: string; ru?: string | null; uz?: string | null; };
 
 const getOpts = (name: keyof NonNullable<Init>["lookups"], initData: Init): Opt[] =>
     initData?.lookups ? (initData.lookups[name] as Opt[]) : [];
-
-const findLabel = (opts: Opt[], slug?: string) =>
-    opts.find(o => o.slug === slug)?.label ?? slug ?? "";
 
 function buildGeoMaps(geos: Geo[]) {
     const byId = new Map<string, Geo>();
@@ -221,7 +211,8 @@ function PlaceRow({
 }
 
 export default function AddTransportPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { getLocalizedLabel, findLocalizedLabel } = useLocalizedLookup();
     const [init, setInit] = useState<Awaited<ReturnType<typeof transportApi.init>> | null>(null);
     const [loadingInit, setLoadingInit] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
@@ -237,13 +228,13 @@ export default function AddTransportPage() {
         loadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
         unloadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
 
-        vehicleType: "ANY",
+        vehicleType: "",
         vehiclesCount: 1,
 
         capacityTons: undefined, volumeM3: undefined,
         dimsEnabled: false, bodyLength: undefined, bodyWidth: undefined, bodyHeight: undefined,
 
-        currency: "USD", price: undefined, priceUnit: "Total",
+        currency: "", price: undefined, priceUnit: "Total",
 
         tax: "", paymentMethod: "", paymentTerm: "", bargaining: "possible",
 
@@ -270,8 +261,8 @@ export default function AddTransportPage() {
             const data = await transportApi.init();
             setInit(data);
 
-            const currency = data.lookups.currency[0]?.slug     ?? "USD";
-            const vehicle  = data.lookups.vehicleType[0]?.slug  ?? "ANY";
+            const currency = data.lookups.currency[0]?.slug     ?? "";
+            const vehicle  = data.lookups.vehicleType[0]?.slug  ?? "";
             setForm(s => ({ ...s, currency, vehicleType: vehicle }));
 
             setLoadingInit(false);
@@ -287,10 +278,7 @@ export default function AddTransportPage() {
         setField("loadPlaces", form.loadPlaces.map((x, i) => (i === idx ? p : x)));
     const updateUnload = (idx: number, p: Place) =>
         setField("unloadPlaces", form.unloadPlaces.map((x, i) => (i === idx ? p : x)));
-
-  //  const addLoad = () => setField("loadPlaces", [...form.loadPlaces, { } as Place]);
     const rmLoad = (i: number) => setField("loadPlaces", form.loadPlaces.filter((_, idx) => idx !== i));
-  //  const addUnload = () => setField("unloadPlaces", [...form.unloadPlaces, { } as Place]);
     const rmUnload = (i: number) => setField("unloadPlaces", form.unloadPlaces.filter((_, idx) => idx !== i));
 
     const num = (v: string) => (v === "" ? undefined : Number(v));
@@ -298,7 +286,6 @@ export default function AddTransportPage() {
     const validate = () => {
         const e: Record<string, string> = {};
         if (!form.dateFrom) e.dateFrom = t('addTransport.errors.required');
-        if (!form.dateTo) e.dateTo = t('addTransport.errors.required');
 
         if (!form.loadPlaces[0]?.countryId) e.loadPlaces = t('addTransport.errors.selectCountryLoad');
         if (!form.unloadPlaces[0]?.countryId) e.unloadPlaces = t('addTransport.errors.selectCountryUnload');
@@ -512,19 +499,20 @@ export default function AddTransportPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.vehicleType')}</Typography>
                                         <Select
+                                            key={`vehicleType-${i18n.language}`}
                                             fullWidth
                                             displayEmpty
                                             value={form.vehicleType}
                                             onChange={(e) => setField("vehicleType", e.target.value as string)}
                                             renderValue={selected =>
                                                 !selected ? <em style={{color:'#999'}}>{t('addTransport.fields.selectVehicleType')}</em>
-                                                    : findLabel(vehicleOpts, selected as string)
+                                                    : findLocalizedLabel(vehicleOpts, selected as string)
                                             }
                                         >
                                             <MenuItem value="">
                                                 <em style={{ color: '#999' }}>{t('addTransport.fields.selectVehicleType')}</em>
                                             </MenuItem>
-                                            {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                            {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
                                         </Select>
                                         {errors.vehicleType && (
                                             <Typography variant="caption" color="error">{errors.vehicleType}</Typography>
@@ -625,7 +613,7 @@ export default function AddTransportPage() {
                                                             disabled={currencyOpts.length === 0}
                                                         >
                                                             {currencyOpts.length
-                                                                ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)
+                                                                ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)
                                                                 : <MenuItem value="USD">USD</MenuItem>}
                                                         </Select>
                                                     </InputAdornment>
@@ -637,16 +625,17 @@ export default function AddTransportPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.paymentMethod')}</Typography>
                                         <Select
+                                            key={`paymentMethod-${i18n.language}`}
                                             fullWidth
                                             displayEmpty
                                             value={form.paymentMethod || ""}
                                             onChange={e => setField("paymentMethod", e.target.value as string)}
                                             renderValue={sel => !sel
                                                 ? <em style={{color:'#999'}}>{t('addTransport.fields.selectPaymentMethod')}</em>
-                                                : findLabel(payMethodOpts, sel as string)}
+                                                : findLocalizedLabel(payMethodOpts, sel as string)}
                                         >
                                             <MenuItem value=""><em style={{color:'#999'}}>{t('addTransport.fields.selectPaymentMethod')}</em></MenuItem>
-                                            {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                            {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
                                         </Select>
 
                                         {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
@@ -654,16 +643,17 @@ export default function AddTransportPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.paymentTerm')}</Typography>
                                         <Select
+                                            key={`paymentTerm-${i18n.language}`}
                                             fullWidth
                                             displayEmpty
                                             value={form.paymentTerm || ""}
                                             onChange={e => setField("paymentTerm", e.target.value as string)}
                                             renderValue={sel => !sel
                                                 ? <em style={{color:'#999'}}>{t('addTransport.fields.selectPaymentTerm')}</em>
-                                                : findLabel(payTermOpts, sel as string)}
+                                                : findLocalizedLabel(payTermOpts, sel as string)}
                                         >
                                             <MenuItem value=""><em style={{color:'#999'}}>{t('addTransport.fields.selectPaymentTerm')}</em></MenuItem>
-                                            {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                            {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
                                         </Select>
 
                                         {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
@@ -837,6 +827,7 @@ export default function AddTransportPage() {
                         <Grid size={{xs:12, sm:6}}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.vehicleType')}</Typography>
                             <Select
+                                key={`vehicleType-desktop-${i18n.language}`}
                                 fullWidth 
                                 displayEmpty
                                 value={form.vehicleType}
@@ -845,13 +836,13 @@ export default function AddTransportPage() {
                                     if (!selected || selected === "") {
                                         return <em style={{ color: '#999' }}>{t('addTransport.fields.selectVehicleType')}</em>;
                                     }
-                                    return VEHICLE_TYPES_LABELS[selected] ?? selected;
+                                    return findLocalizedLabel(vehicleOpts, selected as string);
                                 }}
                             >
                                 <MenuItem value="">
                                     <em style={{ color: '#999' }}>{t('addTransport.fields.selectVehicleType')}</em>
                                 </MenuItem>
-                                {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
                             </Select>
                             {errors.vehicleType && (
                                 <Typography variant="caption" color="error">{errors.vehicleType}</Typography>
@@ -930,7 +921,7 @@ export default function AddTransportPage() {
                                                     disabled={currencyOpts.length === 0}
                                                 >
                                                     {currencyOpts.length
-                                                        ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)
+                                                        ? currencyOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)
                                                         : <MenuItem value="USD">USD</MenuItem>}
                                                 </Select>
                                             </InputAdornment>
@@ -944,6 +935,7 @@ export default function AddTransportPage() {
                             <Grid size={{xs:12, sm:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.paymentMethod')}</Typography>
                                 <Select
+                                    key={`paymentMethod-desktop-${i18n.language}`}
                                     fullWidth 
                                     displayEmpty
                                     value={form.paymentMethod} 
@@ -952,13 +944,13 @@ export default function AddTransportPage() {
                                         if (!selected || selected === "") {
                                             return <em style={{ color: '#999' }}>{t('addTransport.fields.selectPaymentMethod')}</em>;
                                         }
-                                        return selected;
+                                        return findLocalizedLabel(payMethodOpts, selected as string);
                                     }}
                                 >
                                     <MenuItem value="">
                                         <em style={{ color: '#999' }}>{t('addTransport.fields.selectPaymentMethod')}</em>
                                     </MenuItem>
-                                    {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                    {payMethodOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
                                 </Select>
                                 {errors.paymentMethod && <Typography variant="caption" color="error">{errors.paymentMethod}</Typography>}
                             </Grid>
@@ -966,6 +958,7 @@ export default function AddTransportPage() {
                             <Grid size={{xs:12, sm:6}}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.paymentTerm')}</Typography>
                                 <Select
+                                    key={`paymentTerm-desktop-${i18n.language}`}
                                     fullWidth 
                                     displayEmpty
                                     value={form.paymentTerm} 
@@ -974,13 +967,13 @@ export default function AddTransportPage() {
                                         if (!selected || selected === "") {
                                             return <em style={{ color: '#999' }}>{t('addTransport.fields.selectPaymentTerm')}</em>;
                                         }
-                                        return selected;
+                                        return findLocalizedLabel(payTermOpts, selected as string);
                                     }}
                                 >
                                     <MenuItem value="">
                                         <em style={{ color: '#999' }}>{t('addTransport.fields.selectPaymentTerm')}</em>
                                     </MenuItem>
-                                    {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{o.label}</MenuItem>)}
+                                    {payTermOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
                                 </Select>
                                 {errors.paymentTerm && <Typography variant="caption" color="error">{errors.paymentTerm}</Typography>}
                             </Grid>

@@ -1,7 +1,4 @@
-// cargoApi.ts
 import api from "@/shared/api/axios";
-
-/** ---------- INIT types ---------- */
 export type GeoItem = {
     id: string;
     parent_id: string | null;
@@ -15,15 +12,13 @@ export type GeoItem = {
     updated_at: string;
 };
 
-export type LookupOpt = { slug: string; label: string };
+export type LookupOpt = { slug: string; label: string; ru?: string | null; uz?: string | null; };
 
-export type LookupDict = Record<string, string>; // slug -> label
+export type LookupDict = Record<string, string>;
 
 export type CargoInitData = {
     geos: GeoItem[];
-    cargoPoints: LookupDict; // PICKUP/DROPOFF (как раньше)
-
-    // новое:
+    cargoPoints: LookupDict;
     lookups: {
         vehicleType: LookupOpt[];
         cargoTypes: LookupOpt[];
@@ -33,8 +28,6 @@ export type CargoInitData = {
         bargainOptions: LookupOpt[];
         currency: LookupOpt[];
     };
-
-    // карты для удобного отображения (slug -> label)
     maps: {
         vehicleType: LookupDict;
         cargoTypes: LookupDict;
@@ -52,7 +45,6 @@ type InitResponse = {
     message: string;
 };
 
-/** ---------- CREATE DTO ---------- */
 export type CargoPointDto = {
     type: "PICKUP" | "DROPOFF";
     country: string;
@@ -67,9 +59,9 @@ export type CreateCargoDto = {
 
     country_from: string;
 
-    vehicle_type: string; // slug из lookups.vehicleType
-    load_type: string;    // slug из lookups.loadType
-    cargo_type: string;   // slug из lookups.cargoTypes
+    vehicle_type: string;
+    load_type: string;
+    cargo_type: string;
     allow_partial_load: boolean;
 
     weight_t: number | null;
@@ -82,11 +74,10 @@ export type CreateCargoDto = {
     width_m?: number;
     height_m?: number;
 
-    price_currency: string;  // slug из lookups.currency
+    price_currency: string;
     price_amount: number;
-
-    payment_method: string;  // slug из lookups.paymentMethods
-    payment_term: string | null; // slug или null
+    payment_method: string;
+    payment_term: string | null;
 
     bargain: "ALLOWED" | "NOT_ALLOWED";
 
@@ -102,11 +93,10 @@ type CreateResponse<T = unknown> = {
     message: string;
 };
 
-/** ---------- API ---------- */
 export const cargoApi = {
     async init() {
         const { data } = await api.get<InitResponse>("/cargo/init");
-        return data.data; // CargoInitData
+        return data.data;
     },
     async create(payload: CreateCargoDto) {
         const { data } = await api.post<CreateResponse>("/cargo/create", payload);

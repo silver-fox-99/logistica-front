@@ -6,18 +6,24 @@ export function ItemDialog({
                            }: {
     open: boolean;
     onClose: () => void;
-    initial?: { slug?: string; label?: string; sort_order?: number; active?: boolean; meta?: any };
-    onSubmit: (v: { slug: string; label: string; sort_order: number; active: boolean; meta?: any }) => Promise<void> | void;
+    initial?: { slug?: string; label?: string; ru?: string | null; uz?: string | null; sort_order?: number; active?: boolean; meta?: any };
+    onSubmit: (v: { slug: string; label: string; ru?: string | null; uz?: string | null; sort_order: number; active: boolean; meta?: any }) => Promise<void> | void;
 }) {
     const [slug, setSlug] = useState(initial?.slug ?? "");
     const [label, setLabel] = useState(initial?.label ?? "");
+    const [ru, setRu] = useState(initial?.ru ?? "");
+    const [uz, setUz] = useState(initial?.uz ?? "");
     const [sortOrder, setSortOrder] = useState<number>(initial?.sort_order ?? 0);
     const [active, setActive] = useState(initial?.active ?? true);
     const [meta, setMeta] = useState<string>(initial?.meta ? JSON.stringify(initial.meta, null, 2) : "");
 
     useEffect(() => {
-        setSlug(initial?.slug ?? ""); setLabel(initial?.label ?? "");
-        setSortOrder(initial?.sort_order ?? 0); setActive(initial?.active ?? true);
+        setSlug(initial?.slug ?? ""); 
+        setLabel(initial?.label ?? "");
+        setRu(initial?.ru ?? "");
+        setUz(initial?.uz ?? "");
+        setSortOrder(initial?.sort_order ?? 0); 
+        setActive(initial?.active ?? true);
         setMeta(initial?.meta ? JSON.stringify(initial.meta, null, 2) : "");
     }, [initial, open]);
 
@@ -29,6 +35,8 @@ export function ItemDialog({
         await onSubmit({
             slug: slug.trim().toUpperCase(),
             label: label.trim(),
+            ru: ru.trim() || null,
+            uz: uz.trim() || null,
             sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
             active,
             meta: metaObj,
@@ -42,7 +50,9 @@ export function ItemDialog({
             <DialogContent>
                 <Stack spacing={2} mt={1}>
                     <TextField label="Код (Введите в верхнем регистре)" value={slug} onChange={(e) => setSlug(e.target.value)} disabled={!!initial}/>
-                    <TextField label="Название" value={label} onChange={(e) => setLabel(e.target.value)} />
+                    <TextField label="Название (английский) *" value={label} onChange={(e) => setLabel(e.target.value)} required />
+                    <TextField label="Название (русский)" value={ru} onChange={(e) => setRu(e.target.value)} placeholder="Опционально" />
+                    <TextField label="Название (узбекский)" value={uz} onChange={(e) => setUz(e.target.value)} placeholder="Опционально" />
                     <TextField label="Порядок сортировки" type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value || "0", 10))} />
                     <FormControlLabel control={<Switch checked={active} onChange={(_, v) => setActive(v)} />} label="Активен" />
                     <TextField label="Мета (JSON)" value={meta} onChange={(e) => setMeta(e.target.value)} multiline minRows={4} />

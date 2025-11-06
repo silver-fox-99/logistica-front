@@ -25,7 +25,6 @@ import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
 import FullEditDialog from "@/widgets/shipments/FullEditDialog.tsx";
 import CopyShipmentDialog from "@/widgets/shipments/CopyShipmentDialog.tsx";
 
-/** Helper: parse "1 250 EUR" -> 1250 */
 function parsePriceAmount(price?: string | null): number | null {
     if (!price) return null;
     const num = price.replace(/[^\d.,]/g, "").replace(",", ".");
@@ -35,7 +34,6 @@ function parsePriceAmount(price?: string | null): number | null {
 
 type Props = { scope: "public" | "my" };
 
-/** Inner list body. Remounted by a key to force refetch */
 function ListBody({
                       scope,
                       kind,
@@ -54,7 +52,6 @@ function ListBody({
     const { items, pages, loading } = useShipments(kind, scope, page, limit, filters);
     const list = useMemo(() => items, [items]);
 
-    // Edit
     const [editOpen, setEditOpen] = useState(false);
     const [editItem, setEditItem] = useState<ShipmentRowData | null>(null);
 
