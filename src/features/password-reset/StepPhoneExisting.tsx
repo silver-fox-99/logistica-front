@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import parsePhoneNumber from "libphonenumber-js";
 import { authApi } from "@/shared/api/authApi";
-import { firebasePhone } from "@/shared/lib/firebasePhone";
 
 type FormValues = { phone: string };
 
@@ -32,7 +31,8 @@ export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) =
                 return;
             }
 
-            await firebasePhone.sendCode(e164);
+            await authApi.sendRestorePhoneCode(e164);
+
             toast.success(t("forgotPassword.codeSent"));
             onNext(e164);
         } catch (error: any) {

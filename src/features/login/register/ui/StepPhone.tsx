@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import parsePhoneNumber from "libphonenumber-js";
 import { authApi } from "@/shared/api/authApi";
-import { firebasePhone } from "@/shared/lib/firebasePhone";
+
 
 type FormValues = { phone: string };
 type StepPhoneProps = { defaultCountry?: string; onNext?: (e164: string, raw: string) => void; };
@@ -33,8 +33,7 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
                 setError("phone", { message: t("register.phoneExists") });
                 return;
             }
-
-            await firebasePhone.sendCode(e164);
+            await authApi.sendPhoneCode(e164);
             toast.success(t("register.codeSent"));
             onNext?.(e164, data.phone);
         } catch (error: any) {

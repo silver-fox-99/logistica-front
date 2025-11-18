@@ -3,16 +3,16 @@ import { Box, Button, Stack } from "@mui/material";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import OtpInput from "@/shared/ui/inputs/OtpInput";
-import { firebasePhone } from "@/shared/lib/firebasePhone";
+import {authApi} from "@/shared/api/authApi.ts";
+
 
 type Props = {
     length?: number;
-    phoneE164: string;
-    onVerified: (idToken: string) => void;
+    onVerified: () => void;
     onBack?: () => void;
 };
 
-export default function StepCodeReset({ length = 6, phoneE164, onVerified, onBack }: Props) {
+export default function StepCodeReset({ length = 6, onVerified, onBack }: Props) {
     const { t } = useTranslation();
     const [code, setCode] = useState("");
     const [busy, setBusy] = useState(false);
@@ -21,9 +21,9 @@ export default function StepCodeReset({ length = 6, phoneE164, onVerified, onBac
         if (code.length !== length) return;
         setBusy(true);
         try {
-            const idToken = await firebasePhone.confirmCode(code);
+            await authApi.verifyRestoreCode(code);
             toast.success(t("forgotPassword.codeVerified"));
-            onVerified(idToken);
+            onVerified();
         } catch (error: any) {
             const message = error?.message || t("forgotPassword.codeInvalid");
             toast.error(message);
@@ -34,7 +34,7 @@ export default function StepCodeReset({ length = 6, phoneE164, onVerified, onBac
 
     const resend = async () => {
         try {
-            await firebasePhone.sendCode(phoneE164);
+        await authApi.sendAgainPhoneCode();
             toast.success(t("forgotPassword.codeSentAgain"));
         } catch (error: any) {
             const message = error?.message || t("forgotPassword.codeSendError");

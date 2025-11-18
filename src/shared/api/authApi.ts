@@ -6,14 +6,56 @@ export const authApi = {
         return { existing: !!data?.data?.existing };
     },
 
-    verifyFirebaseIdToken: async (idToken: string) => {
-        const res = await api.post("/auth/phone/verify-firebase", { idToken });
+    sendPhoneCode: async (phone: string) => {
+        const res = await api.post("/auth/phone/send-code", { phone });
 
         const bodyAccess  = res.data?.data?.accessToken;
         const bodyRefresh = res.data?.data?.refreshToken;
 
         if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
         if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
+    },
+
+    verifyPhoneCode: async (code: string) => {
+        const res = await api.post("/auth/phone/verify-code", { code });
+
+        const bodyAccess  = res.data?.data?.accessToken;
+        const bodyRefresh = res.data?.data?.refreshToken;
+
+        if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
+        if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
+    },
+
+    sendAgainPhoneCode: async () => {
+        const res = await api.get("/auth/phone/send-code");
+
+        const bodyAccess  = res.data?.data?.accessToken;
+        const bodyRefresh = res.data?.data?.refreshToken;
+
+        if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
+        if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
+    },
+
+    sendRestorePhoneCode: async (phone: string) => {
+        const res = await api.post("/auth/phone/restore/send-code", { phone });
+
+        const bodyAccess  = res.data?.data?.accessToken;
+        const bodyRefresh = res.data?.data?.refreshToken;
+
+        if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
+        if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
+    },
+
+    verifyRestoreCode: async (code: string) => {
+        const res = await api.post("/auth/phone/restore/verify-code", { code });
 
         return res.data;
     },
@@ -35,8 +77,8 @@ export const authApi = {
         return data;
     },
 
-    resetPasswordWithIdToken: async (idToken: string, password: string) => {
-        const { data } = await api.post("/auth/phone/verify-restore-password", { idToken, password });
+    resetPassword: async (password: string) => {
+        const { data } = await api.post("/auth/phone/restore-password", { password });
         return data;
     },
 };

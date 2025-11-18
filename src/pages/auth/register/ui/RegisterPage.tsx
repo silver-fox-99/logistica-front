@@ -6,7 +6,6 @@ import AuthTop from "@/shared/ui/auth/auth-top";
 import StepPhone from "@/features/login/register/ui/StepPhone";
 import StepCode from "@/features/login/register/ui/StepCode";
 import StepProfile from "@/features/login/register/ui/StepProfile";
-import { firebasePhone } from "@/shared/lib/firebasePhone";
 import {authApi} from "@/shared/api/authApi.ts";
 
 export default function RegisterPage() {
@@ -36,7 +35,6 @@ export default function RegisterPage() {
                     <StepCode
                         length={6}
                         onSubmit={next}
-                        onResend={async () => { if (e164) await firebasePhone.sendCode(e164); }}
                     />
                 );
             case 2:

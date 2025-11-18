@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import {authApi} from "@/shared/api/authApi.ts";
 
 type FormValues = {
     password: string;
@@ -13,10 +14,8 @@ type FormValues = {
 
 export default function StepNewPassword({
                                             onSubmit,
-                                            submitWith,
                                         }: {
     onSubmit?: () => void;
-    submitWith: (password: string) => Promise<void>;
 }) {
     const { t } = useTranslation();
 
@@ -41,7 +40,7 @@ export default function StepNewPassword({
         setError(null);
         setSuccess(null);
         try {
-            await submitWith(v.password);
+            await authApi.resetPassword(v.password);
             setSuccess(t("forgotPassword.passwordUpdated"));
             reset({ password: "", confirm: "" });
             onSubmit?.();

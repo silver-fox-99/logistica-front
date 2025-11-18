@@ -1,24 +1,24 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Box, Button, Stack } from "@mui/material";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import OtpInput from "@/shared/ui/inputs/OtpInput";
-import { firebasePhone } from "@/shared/lib/firebasePhone";
+
 import { authApi } from "@/shared/api/authApi";
 
-type StepCodeProps = { length?: number; onSubmit?: () => void; onResend?: () => void; };
+type StepCodeProps = { length?: number; onSubmit?: () => void; };
 
-export default function StepCode({ length = 6, onSubmit, onResend }: StepCodeProps) {
+export default function StepCode({ length = 6, onSubmit }: StepCodeProps) {
     const { t } = useTranslation();
     const [code, setCode] = useState("");
     const [busy, setBusy] = useState(false);
+    const [timer, setTimer] = useState(0)
 
     const handleVerify = async () => {
         if (code.length !== length) return;
         setBusy(true);
         try {
-            const idToken = await firebasePhone.confirmCode(code);
-            await authApi.verifyFirebaseIdToken(idToken);
+            await authApi.verifyPhoneCode(code);
             toast.success(t("register.codeVerified"));
             onSubmit?.();
         } catch (error: any) {
@@ -29,6 +29,24 @@ export default function StepCode({ length = 6, onSubmit, onResend }: StepCodePro
         }
     };
 
+    const handleResend = async () => {
+        try {
+            await authApi.sendAgainPhoneCode();
+            setTimer(60);
+            toast.success(t("register.codeSent"));
+        } catch (error: any) {
+            const message = error?.response?.data?.message || error?.message || t("register.codeSendError");
+            toast.error(message);
+        }
+    };
+
+    useEffect(() => {
+        if (timer > 0) {
+            setTimeout(() => setTimer(timer - 1), 1000);
+        }
+    }, [timer])
+
+
     return (
         <Stack spacing={2}>
             <OtpInput length={length} value={code} onChange={setCode} autoFocus />
@@ -37,9 +55,7 @@ export default function StepCode({ length = 6, onSubmit, onResend }: StepCodePro
                     {t("register.verifyButton")}
                 </Button>
             </Box>
-            {onResend && (
-                <Button onClick={onResend} variant="text">{t("register.resendCodeButton")}</Button>
-            )}
+            <Button disabled={timer > 0} onClick={handleResend} variant="text">{t("register.resendCodeButton")} {timer > 0 && `(${timer}s)`}</Button>
         </Stack>
     );
 }

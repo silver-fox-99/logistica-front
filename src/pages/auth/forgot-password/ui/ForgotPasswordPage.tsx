@@ -6,13 +6,11 @@ import StepPhoneExisting from "@/features/password-reset/StepPhoneExisting";
 import StepCodeReset from "@/features/password-reset/StepCodeReset";
 import StepNewPassword from "@/features/password-reset/StepNewPassword";
 import {useNavigate} from "react-router-dom";
-import { authApi } from "@/shared/api/authApi";
 
 export default function ForgotPasswordPage() {
     const { t } = useTranslation();
     const [activeStep, setActiveStep] = useState(0);
     const [e164, setE164] = useState<string>("");
-    const [idToken, setIdToken] = useState<string>("");
     const navigate = useNavigate()
 
     const steps = useMemo(() => ["", "", ""], []);
@@ -44,18 +42,14 @@ export default function ForgotPasswordPage() {
                 {activeStep === 1 && (
                     <StepCodeReset
                         length={6}
-                        phoneE164={e164}
-                        onVerified={(token) => { setIdToken(token); setActiveStep(2); }}
+                        onVerified={() => setActiveStep(2)}
                         onBack={() => setActiveStep(0)}
                     />
                 )}
 
                 {activeStep === 2 && (
                     <StepNewPassword
-                        onSubmit={() => navigate('/login')}
-                        submitWith={async (password) => {
-                            await authApi.resetPasswordWithIdToken(idToken, password);
-                        }}
+                        onSubmit={() => navigate('/dashboard')}
                     />
                 )}
             </Paper>
