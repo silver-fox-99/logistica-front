@@ -341,16 +341,16 @@ export default function AddCargoPage() {
             points: [
                 {
                     type: "PICKUP",
-                    country: countryFromName,
-                    region: getName(firstPickup.regionId) || null,
-                    city:   getName(firstPickup.cityId)   || null,
+                    country: firstPickup.countryId!,
+                    region: firstPickup.regionId || null,
+                    city:   firstPickup.cityId   || null,
                     address: firstPickup.address ?? null,
                 },
                 {
                     type: "DROPOFF",
-                    country: getName(firstDrop.countryId) || "Unknown",
-                    region:  getName(firstDrop.regionId)  || null,
-                    city:    getName(firstDrop.cityId)    || null,
+                    country: firstDrop.countryId || "Unknown",
+                    region:  firstDrop.regionId  || null,
+                    city:    firstDrop.cityId  || null,
                     address: firstDrop.address ?? null,
                 }
             ],

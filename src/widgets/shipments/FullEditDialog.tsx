@@ -296,8 +296,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
     const vehicleTypeOptions = filtersData?.vehicle_types ?? [];
 
-    const nameOf = (id?: string) =>
-        id ? geoIdx?.byId.get(id)?.name ?? null : null;
+  //  const nameOf = (id?: string) =>
+  //      id ? geoIdx?.byId.get(id)?.name ?? null : null;
 
     const submit = async () => {
         if (!filtersData || !geoIdx) return;
@@ -316,8 +316,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             price_amount: toOptionalNumber(form.priceAmount),
             note: form.note || null,
             points: [
-                {id: initial?.points?.[0]?.id, type: initial?.points?.[0]?.type, cargo_id: initial?.id, country: nameOf(form.p1_countryId), region: nameOf(form.p1_regionId), city: nameOf(form.p1_cityId) },
-                {id: initial?.points?.[1]?.id, type: initial?.points?.[1]?.type, cargo_id: initial?.id, country: nameOf(form.p2_countryId), region: nameOf(form.p2_regionId), city: nameOf(form.p2_cityId) },
+                {id: initial?.points?.[0]?.id, type: initial?.points?.[0]?.type, cargo_id: initial?.id, country: form.p1_countryId, region: form.p1_regionId, city: form.p1_cityId },
+                {id: initial?.points?.[1]?.id, type: initial?.points?.[1]?.type, cargo_id: initial?.id, country: form.p2_countryId, region: form.p2_regionId, city: form.p2_cityId },
             ],
         };
 

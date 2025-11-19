@@ -297,21 +297,12 @@ export default function AddTransportPage() {
         return Object.keys(e).length === 0;
     };
 
-    const geoById = useMemo(() => {
-        const m = new Map<string, Geo>();
-        if (geos) for (const g of geos) m.set(g.id, g);
-        return m;
-    }, [geos]);
-
     const placeToPoint = (p: Place, type: "DEPARTURE" | "ARRIVAL"): CreateTransportDto["points"][number] => {
-        const countryName = p.countryId ? geoById.get(p.countryId)?.name ?? "" : "";
-        const regionName = p.regionId ? geoById.get(p.regionId)?.name ?? null : null;
-        const cityName = p.cityId ? geoById.get(p.cityId)?.name ?? null : null;
         return {
             type,
-            country: countryName || "Unknown",
-            region: regionName,
-            city: cityName,
+            country: p.countryId || "Unknown",
+            region: p.regionId,
+            city: p.cityId,
             address: p.address ?? null,
         };
     };
