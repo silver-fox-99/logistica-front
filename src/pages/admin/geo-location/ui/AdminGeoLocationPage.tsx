@@ -6,6 +6,7 @@ import { FiMapPin, FiPlus, FiRefreshCw, FiSearch, FiTrash2, FiEdit3, FiChevronRi
 import { useGeoLocations } from "@/features/admin/geo-locations/model/useGeoLocations";
 import GeoLocationDialog from "@/features/admin/geo-locations/ui/GeoLocationDialog";
 import type { GeoLocation, LocationType } from "@/shared/api/adminGeoApi";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
 const TYPES: (LocationType | "")[] = ["", "COUNTRY", "REGION", "CITY", "DISTRICT", "OTHER"];
 
@@ -17,12 +18,13 @@ function buildChain(node: GeoLocation | null, byId: Map<string, GeoLocation>) {
     while (p) { chain.unshift(p); p = p.parent_id ? byId.get(p.parent_id) : null; }
     return chain;
 }
-const getAncestorName = (row: GeoLocation, byId: Map<string, GeoLocation>, t: LocationType) =>
-    buildChain(row, byId).find(n => n.type === t)?.name ?? "—";
+const getAncestorName = (row: GeoLocation, byId: Map<string, GeoLocation>, t: LocationType, getLocalizedGeoName: (geo: GeoLocation) => string) =>
+    buildChain(row, byId).find(n => n.type === t) ? getLocalizedGeoName(buildChain(row, byId).find(n => n.type === t)!) : "—";
 
 type FlatRow = { node: GeoLocation; depth: number };
 
 export default function AdminGeoLocationsPage() {
+    const { getLocalizedGeoName } = useLocalizedGeo();
     const {
         items, loading, error,
         search, setSearch,
@@ -105,7 +107,7 @@ export default function AdminGeoLocationsPage() {
     };
 
     const handleDelete = async (row: GeoLocation) => {
-        if (!confirm(`Delete "${row.name}"?`)) return;
+        if (!confirm(`Delete "${getLocalizedGeoName(row)}"?`)) return;
         const wasSelected = selectedId === row.id;
         await remove(row.id);
         if (wasSelected) setSelectedId(null);
@@ -160,8 +162,8 @@ export default function AdminGeoLocationsPage() {
                                        onClick={() => setSelectedId(root.id)}
                                 >
                                     <Stack direction="row" alignItems="center" spacing={1}>
-                                        <Avatar sx={{ width: 24, height: 24 }}>{(root.name?.[0] ?? "?").toUpperCase()}</Avatar>
-                                        <Typography variant="body2" fontWeight={600}>{root.name || "Без названия"}</Typography>
+                                        <Avatar sx={{ width: 24, height: 24 }}>{(getLocalizedGeoName(root)?.[0] ?? "?").toUpperCase()}</Avatar>
+                                        <Typography variant="body2" fontWeight={600}>{getLocalizedGeoName(root) || "Без названия"}</Typography>
                                         <Chip size="small" label={root.type} variant="outlined" />
                                     </Stack>
                                     <Typography variant="caption" color="text.secondary" sx={{ pl: 4 }}>
@@ -186,7 +188,7 @@ export default function AdminGeoLocationsPage() {
                                     <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap">
                                         {buildChain(current, byId).map((n, i) => (
                                             <Stack key={n.id} direction="row" spacing={0.5} alignItems="center">
-                                                {i > 0 && <FiChevronRight size={14} />}<Chip size="small" label={`${n.name} (${n.type})`} />
+                                                {i > 0 && <FiChevronRight size={14} />}<Chip size="small" label={`${getLocalizedGeoName(n)} (${n.type})`} />
                                             </Stack>
                                         ))}
                                     </Stack>
@@ -216,13 +218,13 @@ export default function AdminGeoLocationsPage() {
                                         <TableCell>
                                             <Stack direction="row" alignItems="center" spacing={1}>
                                                 <Box sx={{ width: depth * 16 }} />
-                                                <span>{node.name || "Без названия"}</span>
+                                                <span>{getLocalizedGeoName(node) || "Без названия"}</span>
                                             </Stack>
                                         </TableCell>
                                         <TableCell><Chip size="small" label={node.type} /></TableCell>
-                                        <TableCell>{getAncestorName(node, byId, "COUNTRY")}</TableCell>
-                                        <TableCell>{getAncestorName(node, byId, "REGION")}</TableCell>
-                                        <TableCell>{node.parent_id ? (byId.get(node.parent_id)?.name ?? node.parent_id) : "—"}</TableCell>
+                                        <TableCell>{getAncestorName(node, byId, "COUNTRY", getLocalizedGeoName)}</TableCell>
+                                        <TableCell>{getAncestorName(node, byId, "REGION", getLocalizedGeoName)}</TableCell>
+                                        <TableCell>{node.parent_id ? (byId.get(node.parent_id) ? getLocalizedGeoName(byId.get(node.parent_id)!) : node.parent_id) : "—"}</TableCell>
                                         <TableCell>{node.code || "—"}</TableCell>
                                         <TableCell>{node.iso2 || "—"}</TableCell>
                                         <TableCell>{node.slug || "—"}</TableCell>
@@ -251,7 +253,7 @@ export default function AdminGeoLocationsPage() {
                 key={`${dlgMode}-${editing?.id ?? "new"}`}
                 open={dlgOpen}
                 mode={dlgMode}
-                title={dlgMode === "create" ? "Добавить гео-локацию" : `Редактировать: ${editing?.name}`}
+                title={dlgMode === "create" ? "Добавить гео-локацию" : `Редактировать: ${editing ? getLocalizedGeoName(editing) : ""}`}
                 all={items}
                 initial={dlgMode === "edit" ? editing ?? undefined : { parent_id: selectedId ?? undefined }}
                 onClose={() => { setDlgOpen(false); setEditing(null); }}

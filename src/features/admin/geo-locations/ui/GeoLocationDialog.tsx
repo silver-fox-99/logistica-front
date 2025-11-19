@@ -4,6 +4,7 @@ import {
     MenuItem, Select, InputLabel, FormControl, FormHelperText, Autocomplete
 } from "@mui/material";
 import type { GeoLocation, LocationType, CreateLocationDto, UpdateLocationDto } from "@/shared/api/adminGeoApi";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
 const TYPES: LocationType[] = ["COUNTRY", "REGION", "CITY", "DISTRICT", "OTHER"];
 
@@ -21,8 +22,11 @@ type Props = {
 export default function GeoLocationDialog({
                                               open, mode, title, all, initial, onClose, onSubmit, submitting
                                           }: Props) {
+    const { getLocalizedGeoName } = useLocalizedGeo();
     const [type, setType] = useState<LocationType>("CITY");
     const [name, setName] = useState("");
+    const [nameRu, setNameRu] = useState<string>("");
+    const [nameUz, setNameUz] = useState<string>("");
     const [code, setCode] = useState<string>("");
     const [iso2, setIso2] = useState<string>("");
     const [slug, setSlug] = useState<string>("");
@@ -34,6 +38,8 @@ export default function GeoLocationDialog({
     useEffect(() => {
         setType((initial?.type as LocationType) ?? "CITY");
         setName(initial?.name ?? "");
+        setNameRu(initial?.name_ru ?? "");
+        setNameUz(initial?.name_uz ?? "");
         setCode((initial?.code as string) ?? "");
         setIso2((initial?.iso2 as string) ?? "");
         setSlug((initial?.slug as string) ?? "");
@@ -87,6 +93,8 @@ export default function GeoLocationDialog({
             const dto: CreateLocationDto = {
                 type,
                 name: name.trim(),
+                name_ru: nameRu.trim() || null,
+                name_uz: nameUz.trim() || null,
                 parent_id: parent?.id || undefined,
                 code: code || undefined,
                 iso2: iso2 || undefined,
@@ -97,6 +105,8 @@ export default function GeoLocationDialog({
             const dto: UpdateLocationDto = {
                 type,
                 name: name.trim(),
+                name_ru: nameRu.trim() || null,
+                name_uz: nameUz.trim() || null,
                 parent_id: parent ? parent.id : null,
                 code: code || null,
                 iso2: iso2 || null,
@@ -121,14 +131,24 @@ export default function GeoLocationDialog({
                     </FormControl>
 
                     <TextField
-                        size="small" label="Название" value={name}
+                        size="small" label="Название (английский)" value={name}
                         onChange={(e) => setName(e.target.value)}
                         error={!!errors.name} helperText={errors.name}
                     />
 
+                    <TextField
+                        size="small" label="Название (русский)" value={nameRu}
+                        onChange={(e) => setNameRu(e.target.value)}
+                    />
+
+                    <TextField
+                        size="small" label="Название (узбекский)" value={nameUz}
+                        onChange={(e) => setNameUz(e.target.value)}
+                    />
+
                     <Autocomplete
                         options={parentOptions}
-                        getOptionLabel={(o) => `${o.name} (${o.type})`}
+                        getOptionLabel={(o) => `${getLocalizedGeoName(o)} (${o.type})`}
                         value={parent}
                         onChange={(_, v) => setParent(v)}
                         renderInput={(p) => <TextField {...p} size="small" label="Локация (опционально)" />}

@@ -9,6 +9,7 @@ import dagre from "dagre";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import { FiMapPin } from "react-icons/fi";
 import type { GeoLocation, LocationType } from "@/shared/api/adminGeoApi";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
 type Props = {
     items: GeoLocation[];
@@ -51,10 +52,10 @@ const DagreLayout = (nodes: Node[], edges: Edge[]) => {
     });
 };
 
-function makeNodesEdges(items: GeoLocation[]): { nodes: Node[]; edges: Edge[] } {
+function makeNodesEdges(items: GeoLocation[], getLocalizedGeoName: (geo: { name: string; name_ru?: string | null; name_uz?: string | null }) => string): { nodes: Node[]; edges: Edge[] } {
     const nodes: Node[] = items.map((it) => ({
         id: it.id,
-        data: { label: it.name, type: it.type },
+        data: { label: getLocalizedGeoName(it), type: it.type },
         position: { x: 0, y: 0 },
         style: {
             width: WIDTH,
@@ -108,15 +109,16 @@ const DefaultNode = ({ data }: any) => {
 const nodeTypes: NodeTypes = { default: DefaultNode };
 
 export function GeoTreeFlow({ items, selectedId, onSelect, onAddCity, onEditCity }: Props) {
-    const { nodes: initNodes, edges: initEdges } = useMemo(() => makeNodesEdges(items), [items]);
+    const { getLocalizedGeoName } = useLocalizedGeo();
+    const { nodes: initNodes, edges: initEdges } = useMemo(() => makeNodesEdges(items, getLocalizedGeoName), [items, getLocalizedGeoName]);
     const [nodes, setNodes, onNodesChange] = useNodesState(initNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges);
 
     useEffect(() => {
-        const { nodes: n, edges: e } = makeNodesEdges(items);
+        const { nodes: n, edges: e } = makeNodesEdges(items, getLocalizedGeoName);
         setEdges(e);
         setNodes(DagreLayout(n, e));
-    }, [items, setNodes, setEdges]);
+    }, [items, getLocalizedGeoName]);
 
     useEffect(() => {
         setNodes((ns) =>

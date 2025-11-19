@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
 
 export type LookupOpt = { 
     slug: string; 
@@ -31,5 +32,32 @@ export function useLocalizedLookup() {
     };
 
     return { getLocalizedLabel, findLocalizedLabel };
+}
+
+export type GeoItem = {
+    id?: string;
+    name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
+};
+
+export function useLocalizedGeo() {
+    const { i18n } = useTranslation();
+    
+    const getLocalizedGeoName = useCallback((geo: GeoItem | { name: string; name_ru?: string | null; name_uz?: string | null }): string => {
+        const lang = i18n.resolvedLanguage || i18n.language || "uz";
+        
+        if (lang === "ru" && geo.name_ru) {
+            return geo.name_ru;
+        }
+        
+        if (lang === "uz" && geo.name_uz) {
+            return geo.name_uz;
+        }
+        
+        return geo.name;
+    }, [i18n.resolvedLanguage, i18n.language]);
+
+    return { getLocalizedGeoName };
 }
 

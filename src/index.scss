@@ -53,20 +53,11 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 1216px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0px 24px;
   box-sizing: border-box;
-  
-  @media (max-width: 600px) {
-    padding: 0 12px;
-  }
-  
-  > * {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
 }
 
 .button {

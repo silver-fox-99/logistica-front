@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
 import {useNavigate} from "react-router-dom";
-import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useLocalizedLookup, useLocalizedGeo } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 
 import './AddTransportPage.scss';
@@ -21,6 +21,8 @@ type Geo = {
     parent_id: string | null;
     type: "COUNTRY" | "REGION" | "CITY";
     name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
     code: string | null;
     iso2: string | null;
     slug: string | null;
@@ -112,6 +114,7 @@ function PlaceRow({
                       labelPrefix, place, onChange, geos, errorKey, showRemove, onRemove
                   }: PlaceRowProps) {
     const { t } = useTranslation();
+    const { getLocalizedGeoName } = useLocalizedGeo();
     const { countries, regionsByCountry, citiesByParent } = useMemo(() => {
         if (!geos) return { countries: [] as Geo[], regionsByCountry: new Map<string, Geo[]>(), citiesByParent: new Map<string, Geo[]>() };
         return buildGeoMaps(geos);
@@ -124,8 +127,8 @@ function PlaceRow({
     const mergedCities = useMemo(() => {
         const map = new Map<string, Geo>();
         [...citiesFromCountry, ...citiesFromRegion].forEach((c) => map.set(c.id, c));
-        return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
-    }, [citiesFromCountry, citiesFromRegion]);
+        return Array.from(map.values()).sort((a, b) => getLocalizedGeoName(a).localeCompare(getLocalizedGeoName(b)));
+    }, [citiesFromCountry, citiesFromRegion, getLocalizedGeoName]);
 
     const countryValue = selectedCountry ?? null;
     const regionValue = place.regionId ? regions.find(r => r.id === place.regionId) ?? null : null;
@@ -140,7 +143,7 @@ function PlaceRow({
         <Stack spacing={1.25}>
             <Autocomplete
                 options={countries}
-                getOptionLabel={(o) => o.name}
+                getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={countryValue}
                 onChange={(_, v) => {
                     onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null });
@@ -157,7 +160,7 @@ function PlaceRow({
 
             <Autocomplete
                 options={regions}
-                getOptionLabel={(o) => o.name}
+                getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={regionValue}
                 onChange={(_, v) => {
                     onChange({ ...place, regionId: v?.id ?? null, cityId: null });
@@ -175,7 +178,7 @@ function PlaceRow({
 
             <Autocomplete
                 options={mergedCities}
-                getOptionLabel={(o) => o.name}
+                getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={cityValue}
                 onChange={(_, v) => onChange({ ...place, cityId: v?.id ?? null })}
                 renderInput={(params) => (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
     Box, Stack, Chip, Typography, IconButton, Button, Tooltip, Divider
 } from "@mui/material";
@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import type {ShipmentRowData, ShipmentsKind} from "@/entities/shipment/model/type";
-import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useLocalizedLookup, useLocalizedGeo } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import "./ShipmentRow.scss";
 
@@ -33,8 +33,70 @@ export default function ShipmentRow({
                                     }: Props) {
     const { t } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
-    const { lookups, loadInit } = useInitStore();
+    const { getLocalizedGeoName } = useLocalizedGeo();
+    const { lookups, geos, loadInit } = useInitStore();
     const [expanded, setExpanded] = useState(false);
+    
+    const geoById = useMemo(() => {
+        const map = new Map();
+        if (geos) {
+            geos.forEach(g => {
+                map.set(g.id, g);
+                if (g.name) map.set(g.name.toLowerCase(), g);
+                if (g.name_ru) map.set(g.name_ru.toLowerCase(), g);
+                if (g.name_uz) map.set(g.name_uz.toLowerCase(), g);
+            });
+        }
+        return map;
+    }, [geos]);
+    
+    const formatRoute = useCallback((point?: { country?: string | null; region?: string | null; city?: string | null }) => {
+        if (!point) return "—";
+        const parts: string[] = [];
+        
+        const findGeo = (value?: string | null) => {
+            if (!value) return null;
+            if (geoById.has(value)) return geoById.get(value);
+            return geoById.get(value.toLowerCase()) || null;
+        };
+        
+        const cityGeo = findGeo(point.city);
+        if (cityGeo) {
+            parts.push(getLocalizedGeoName(cityGeo));
+        } else if (point.city) {
+            parts.push(point.city);
+        }
+        
+        const regionGeo = findGeo(point.region);
+        if (regionGeo) {
+            parts.push(getLocalizedGeoName(regionGeo));
+        } else if (point.region) {
+            parts.push(point.region);
+        }
+        
+        const countryGeo = findGeo(point.country);
+        if (countryGeo) {
+            parts.push(getLocalizedGeoName(countryGeo));
+        } else if (point.country) {
+            parts.push(point.country);
+        }
+        
+        return parts.length > 0 ? parts.join(", ") : "—";
+    }, [geoById, getLocalizedGeoName]);
+    
+    const routeFrom = useMemo(() => {
+        if (data.points && data.points[0] && geos) {
+            return formatRoute(data.points[0]);
+        }
+        return data.routeFrom || "—";
+    }, [data.points, data.routeFrom, formatRoute, geos]);
+    
+    const routeTo = useMemo(() => {
+        if (data.points && data.points[1] && geos) {
+            return formatRoute(data.points[1]);
+        }
+        return data.routeTo || "—";
+    }, [data.points, data.routeTo, formatRoute, geos]);
 
     useEffect(() => {
         loadInit();
@@ -64,18 +126,18 @@ export default function ShipmentRow({
                         >
                             <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, flexShrink: 0 }}>
                                 <FiMapPin />
-                                <Tooltip title={data.routeFrom}>
+                                <Tooltip title={routeFrom}>
                                     <Typography fontWeight={700} noWrap sx={{ maxWidth: { xs: 180, md: 300 } }}>
-                                        {data.routeFrom}
+                                        {routeFrom}
                                     </Typography>
                                 </Tooltip>
                             </Box>
                             <Typography color="text.secondary" sx={{ flexShrink: 0 }}>→</Typography>
                             <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, flexShrink: 0 }}>
                                 <FiMapPin />
-                                <Tooltip title={data.routeTo}>
+                                <Tooltip title={routeTo}>
                                     <Typography fontWeight={700} noWrap sx={{ maxWidth: { xs: 180, md: 300 } }}>
-                                        {data.routeTo}
+                                        {routeTo}
                                     </Typography>
                                 </Tooltip>
                             </Box>
@@ -94,7 +156,7 @@ export default function ShipmentRow({
                                 size="small"
                                 icon={<FiClock />}
                                 variant="outlined"
-                                label={`${data.dates.from} – ${data.dates.to}`}
+                                label={data.dates.to ? `${data.dates.from} – ${data.dates.to}` : data.dates.from}
                                 className="shipment-row__chip shipment-row__chip--dates"
                             />
                         </Stack>

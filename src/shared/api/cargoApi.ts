@@ -4,6 +4,8 @@ export type GeoItem = {
     parent_id: string | null;
     type: "COUNTRY" | "REGION" | "CITY";
     name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
     code: string | null;
     iso2: string | null;
     slug: string | null;

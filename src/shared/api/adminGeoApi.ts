@@ -26,6 +26,8 @@ export type GeoListResponse = {
 export type CreateLocationDto = {
     type: LocationType;
     name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
     parent_id?: string;
     code?: string;
     iso2?: string; // только для стран (2 буквы)
@@ -35,6 +37,8 @@ export type CreateLocationDto = {
 export type UpdateLocationDto = Partial<{
     type: LocationType;
     name: string;
+    name_ru: string | null;
+    name_uz: string | null;
     parent_id: string | null;
     code: string | null;
     iso2: string | null;

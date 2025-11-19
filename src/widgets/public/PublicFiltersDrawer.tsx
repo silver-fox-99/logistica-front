@@ -6,6 +6,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { FiFilter, FiRefreshCw } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi.ts";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
 export type PublicFilters = {
     pickup_country?: string;
@@ -40,6 +41,8 @@ type Geo = {
     parent_id: string | null;
     type: "COUNTRY" | "REGION" | "CITY";
     name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
     code: string | null;
     iso2: string | null;
     slug: string | null;
@@ -54,6 +57,7 @@ type Option = { id: string; label: string };
 
 export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: Props) {
     const { t } = useTranslation();
+    const { getLocalizedGeoName } = useLocalizedGeo();
     const [f, setF] = useState<PublicFilters>(initial ?? {});
     const [filtersData, setFiltersData] = useState<null | {
         geos: Geo[];
@@ -85,7 +89,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
         geos.filter(g => g.type === "CITY" && g.parent_id === (parentId ?? "") && g.is_active);
 
     // options mappers
-    const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: i.name }));
+    const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: getLocalizedGeoName(i) }));
     const countriesOpts = useMemo(() => asOptions(countries), [countries]);
 
     // PICKUP lists + disable rules

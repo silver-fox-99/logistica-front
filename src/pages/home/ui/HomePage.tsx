@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Box, Paper, Stack, Typography, Button, Tabs, Tab, Pagination, Chip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiFilter, FiTruck, FiPackage, FiChevronRight } from "react-icons/fi";
@@ -7,17 +7,23 @@ import { usePublicShipments } from "@/entities/public-shipment/model/usePublicSh
 import { PublicShipmentCard } from "@/widgets/public/PublicShipmentCard";
 import { PublicFiltersDrawer } from "@/widgets/public/PublicFiltersDrawer";
 import type {PublicFilters} from "@/entities/public-shipment/model/types.ts";
+import { useInitStore } from "@/shared/store/initStore";
 
 type TabKind = "cargo" | "transport";
 
 export default function HomePage() {
     const { t } = useTranslation();
+    const { loadInit } = useInitStore();
     const [tab, setTab] = useState<TabKind>("cargo");
     const [page, setPage] = useState(1);
     const limit = 10;
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [filters, setFilters] = useState<PublicFilters>({});
+
+    useEffect(() => {
+        loadInit();
+    }, [loadInit]);
 
     const { items, pages, total, loading } = usePublicShipments(tab, page, limit, filters);
     const list = useMemo(() => items, [items]);

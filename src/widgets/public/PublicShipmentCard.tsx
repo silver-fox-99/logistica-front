@@ -1,10 +1,12 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useCallback, useEffect } from "react";
 import { Box, Stack, Typography, Chip, Button, Paper, Tooltip as MuiTooltip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiCalendar, FiMapPin, FiTag } from "react-icons/fi";
 import type { PublicShipmentBase, PublicPoint, PublicPointType } from "@/entities/public-shipment/model/types";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 type Props = {
     data: PublicShipmentBase;
@@ -13,9 +15,6 @@ type Props = {
     mobileLayout?: "column" | "row";
 };
 
-const fmtPoint = (p?: PublicPoint) => p
-    ? [p.city, p.region, p.country].filter(Boolean).join(", ")
-    : "";
 
 // порядок для сортировки: pickup/departure → waypoints → dropoff/arrival
 const ORDER: Record<PublicPointType, number> = {
@@ -29,23 +28,74 @@ const MAX_VISIBLE_POINTS = 4;
 
 export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind, mobileLayout = "column" }: Props) {
     const { t } = useTranslation();
+    const { getLocalizedGeoName } = useLocalizedGeo();
+    const { geos, loadInit } = useInitStore();
+    
+    useEffect(() => {
+        loadInit();
+    }, [loadInit]);
+    
+    const geoById = useMemo(() => {
+        const map = new Map();
+        if (geos) {
+            geos.forEach(g => {
+                map.set(g.id, g);
+                if (g.name) map.set(g.name.toLowerCase(), g);
+                if (g.name_ru) map.set(g.name_ru.toLowerCase(), g);
+                if (g.name_uz) map.set(g.name_uz.toLowerCase(), g);
+            });
+        }
+        return map;
+    }, [geos]);
+    
+    const fmtPoint = useCallback((p?: PublicPoint) => {
+        if (!p) return "";
+        const parts: string[] = [];
+        
+        const findGeo = (value?: string | null) => {
+            if (!value || !geos || geoById.size === 0) return null;
+            if (geoById.has(value)) return geoById.get(value);
+            return geoById.get(value.toLowerCase()) || null;
+        };
+        
+        const cityGeo = findGeo(p.city);
+        if (cityGeo) {
+            parts.push(getLocalizedGeoName(cityGeo));
+        } else if (p.city) {
+            parts.push(p.city);
+        }
+        
+        const regionGeo = findGeo(p.region);
+        if (regionGeo) {
+            parts.push(getLocalizedGeoName(regionGeo));
+        } else if (p.region) {
+            parts.push(p.region);
+        }
+        
+        const countryGeo = findGeo(p.country);
+        if (countryGeo) {
+            parts.push(getLocalizedGeoName(countryGeo));
+        } else if (p.country) {
+            parts.push(p.country);
+        }
+        
+        return parts.join(", ");
+    }, [geoById, getLocalizedGeoName, geos]);
 
     const labels = useMemo(() => {
         const pts = (data.points ?? []).slice();
 
-        // стабильная сортировка: по ORDER, при равенстве — как пришло из API
         pts.sort((a, b) => (ORDER[a.type] ?? 1) - (ORDER[b.type] ?? 1));
 
         const seq = pts.map(fmtPoint).filter(Boolean);
 
-        // если вдруг поинты пустые — просто ничего не выводим (или можно fallback-строку)
         const clean = seq.length ? seq : [];
 
         const overflow = clean.length > MAX_VISIBLE_POINTS ? clean.length - MAX_VISIBLE_POINTS : 0;
         const visible = overflow > 0 ? clean.slice(0, MAX_VISIBLE_POINTS) : clean;
 
         return { visible, overflow };
-    }, [data.points]);
+    }, [data.points, fmtPoint, geos]);
 
     return (
         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
@@ -83,7 +133,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                                 size="small"
                                 icon={<FiCalendar />}
                                 variant="outlined"
-                                label={`${data.dates?.from ?? ""} – ${data.dates?.to ?? ""}`}
+                                label={data.dates?.to ? `${data.dates?.from ?? ""} – ${data.dates.to}` : (data.dates?.from ?? "")}
                                 sx={{ ml: 0.5 }}
                             />
                             <Chip

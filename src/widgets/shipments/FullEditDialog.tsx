@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type { GeoPoint } from "@/entities/shipment/model/type";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
 type Kind = "cargo" | "transport";
 
@@ -19,6 +20,8 @@ type Geo = {
     parent_id: string | null;
     type: GeoType;
     name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
     code: string | null;
     iso2: string | null;
     slug: string | null;
@@ -135,6 +138,7 @@ const findCityIdLoose = (geos: Geo[], countryId: string, regionId: string, name?
 /** ===== Component ===== */
 export default function FullEditDialog({ open, kind, initial, onClose, onSubmit }: Props) {
     const { t } = useTranslation();
+    const { getLocalizedGeoName } = useLocalizedGeo();
     
     // Справочники
     const [filtersData, setFiltersData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOpt[] }>(null);
@@ -584,7 +588,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         value={form.p1_countryId}
                                         onChange={handleChange("p1_countryId")}
                                     >
-                                        {countries.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+                                        {countries.map(c => <MenuItem key={c.id} value={c.id}>{getLocalizedGeoName(c)}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -597,7 +601,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         onChange={handleChange("p1_regionId")}
                                     >
                                         <MenuItem value="">—</MenuItem>
-                                        {p1_regions.map(r => <MenuItem key={r.id} value={r.id}>{r.name}</MenuItem>)}
+                                        {p1_regions.map(r => <MenuItem key={r.id} value={r.id}>{getLocalizedGeoName(r)}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -610,7 +614,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         onChange={handleChange("p1_cityId")}
                                     >
                                         <MenuItem value="">—</MenuItem>
-                                        {p1_cities.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+                                        {p1_cities.map(c => <MenuItem key={c.id} value={c.id}>{getLocalizedGeoName(c)}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -627,7 +631,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         value={form.p2_countryId}
                                         onChange={handleChange("p2_countryId")}
                                     >
-                                        {countries.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+                                        {countries.map(c => <MenuItem key={c.id} value={c.id}>{getLocalizedGeoName(c)}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -640,7 +644,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         onChange={handleChange("p2_regionId")}
                                     >
                                         <MenuItem value="">—</MenuItem>
-                                        {p2_regions.map(r => <MenuItem key={r.id} value={r.id}>{r.name}</MenuItem>)}
+                                        {p2_regions.map(r => <MenuItem key={r.id} value={r.id}>{getLocalizedGeoName(r)}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -653,7 +657,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         onChange={handleChange("p2_cityId")}
                                     >
                                         <MenuItem value="">—</MenuItem>
-                                        {p2_cities.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+                                        {p2_cities.map(c => <MenuItem key={c.id} value={c.id}>{getLocalizedGeoName(c)}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </Grid>

@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type {ShipmentsKind} from "@/entities/shipment/model/type.ts";
 import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
 
 type Geo = {
@@ -16,6 +17,8 @@ type Geo = {
     parent_id: string | null;
     type: "COUNTRY" | "REGION" | "CITY";
     name: string;
+    name_ru?: string | null;
+    name_uz?: string | null;
     code: string | null;
     iso2: string | null;
     slug: string | null;
@@ -42,6 +45,7 @@ export default function ShipmentsFilterDrawer({
                                                   open, value, onChange, filters, onFiltersChange, onClose, onApply, onReset
                                               }: Props) {
     const { t } = useTranslation();
+    const { getLocalizedGeoName } = useLocalizedGeo();
     const [data, setData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOption[] }>(null);
 
     // при открытии можно подмешать актуальные (если не загружали раньше)
@@ -65,7 +69,7 @@ export default function ShipmentsFilterDrawer({
     const regionsByCountry = (countryId?: string) => geos.filter(g => g.type === "REGION" && g.parent_id === (countryId ?? "") && g.is_active);
     const citiesByParent = (parentId?: string) => geos.filter(g => g.type === "CITY" && g.parent_id === (parentId ?? "") && g.is_active);
 
-    const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: i.name }));
+    const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: getLocalizedGeoName(i) }));
     const countriesOpts = useMemo(() => asOptions(countries), [countries]);
 
     const pickupRegions = useMemo(() => regionsByCountry(filters.pickup_country), [geos, filters.pickup_country]);
