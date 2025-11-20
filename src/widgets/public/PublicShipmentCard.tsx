@@ -1,12 +1,10 @@
-import { memo, useMemo, useCallback, useEffect } from "react";
+import { memo, useMemo, useCallback } from "react";
 import { Box, Stack, Typography, Chip, Button, Paper, Tooltip as MuiTooltip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiCalendar, FiMapPin, FiTag } from "react-icons/fi";
 import type { PublicShipmentBase, PublicPoint, PublicPointType } from "@/entities/public-shipment/model/types";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
-import { useInitStore } from "@/shared/store/initStore";
 
 type Props = {
     data: PublicShipmentBase;
@@ -27,60 +25,32 @@ const ORDER: Record<PublicPointType, number> = {
 const MAX_VISIBLE_POINTS = 4;
 
 export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind, mobileLayout = "column" }: Props) {
-    const { t } = useTranslation();
-    const { getLocalizedGeoName } = useLocalizedGeo();
-    const { geos, loadInit } = useInitStore();
-    
-    useEffect(() => {
-        loadInit();
-    }, [loadInit]);
-    
-    const geoById = useMemo(() => {
-        const map = new Map();
-        if (geos) {
-            geos.forEach(g => {
-                map.set(g.id, g);
-                if (g.name) map.set(g.name.toLowerCase(), g);
-                if (g.name_ru) map.set(g.name_ru.toLowerCase(), g);
-                if (g.name_uz) map.set(g.name_uz.toLowerCase(), g);
-            });
-        }
-        return map;
-    }, [geos]);
+    const { t, i18n } = useTranslation();
     
     const fmtPoint = useCallback((p?: PublicPoint) => {
         if (!p) return "";
         const parts: string[] = [];
         
-        const findGeo = (value?: string | null) => {
-            if (!value || !geos || geoById.size === 0) return null;
-            if (geoById.has(value)) return geoById.get(value);
-            return geoById.get(value.toLowerCase()) || null;
+        const lang = i18n.resolvedLanguage || i18n.language || "uz";
+        
+        const getLocalized = (base?: string | null, ru?: string | null, uz?: string | null) => {
+            if (!base) return null;
+            if (lang === "ru" && ru) return ru;
+            if (lang === "uz" && uz) return uz;
+            return base;
         };
         
-        const cityGeo = findGeo(p.city);
-        if (cityGeo) {
-            parts.push(getLocalizedGeoName(cityGeo));
-        } else if (p.city) {
-            parts.push(p.city);
-        }
+        const city = getLocalized(p.city, p.city_ru, p.city_uz);
+        if (city) parts.push(city);
         
-        const regionGeo = findGeo(p.region);
-        if (regionGeo) {
-            parts.push(getLocalizedGeoName(regionGeo));
-        } else if (p.region) {
-            parts.push(p.region);
-        }
+        const region = getLocalized(p.region, p.region_ru, p.region_uz);
+        if (region) parts.push(region);
         
-        const countryGeo = findGeo(p.country);
-        if (countryGeo) {
-            parts.push(getLocalizedGeoName(countryGeo));
-        } else if (p.country) {
-            parts.push(p.country);
-        }
+        const country = getLocalized(p.country, p.country_ru, p.country_uz);
+        if (country) parts.push(country);
         
         return parts.join(", ");
-    }, [geoById, getLocalizedGeoName, geos]);
+    }, [i18n.resolvedLanguage, i18n.language]);
 
     const labels = useMemo(() => {
         const pts = (data.points ?? []).slice();
@@ -95,7 +65,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
         const visible = overflow > 0 ? clean.slice(0, MAX_VISIBLE_POINTS) : clean;
 
         return { visible, overflow };
-    }, [data.points, fmtPoint, geos]);
+    }, [data.points, fmtPoint]);
 
     return (
         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>

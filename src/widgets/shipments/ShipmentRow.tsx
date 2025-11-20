@@ -31,72 +31,49 @@ type Props = {
 export default function ShipmentRow({
                                         data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
                                     }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
-    const { getLocalizedGeoName } = useLocalizedGeo();
-    const { lookups, geos, loadInit } = useInitStore();
+    const { lookups, loadInit } = useInitStore();
     const [expanded, setExpanded] = useState(false);
     
-    const geoById = useMemo(() => {
-        const map = new Map();
-        if (geos) {
-            geos.forEach(g => {
-                map.set(g.id, g);
-                if (g.name) map.set(g.name.toLowerCase(), g);
-                if (g.name_ru) map.set(g.name_ru.toLowerCase(), g);
-                if (g.name_uz) map.set(g.name_uz.toLowerCase(), g);
-            });
-        }
-        return map;
-    }, [geos]);
-    
-    const formatRoute = useCallback((point?: { country?: string | null; region?: string | null; city?: string | null }) => {
+    const formatRoute = useCallback((point?: GeoPoint) => {
         if (!point) return "—";
         const parts: string[] = [];
         
-        const findGeo = (value?: string | null) => {
-            if (!value) return null;
-            if (geoById.has(value)) return geoById.get(value);
-            return geoById.get(value.toLowerCase()) || null;
+        const lang = i18n.resolvedLanguage || i18n.language || "uz";
+        
+        const getLocalized = (base?: string | null, ru?: string | null, uz?: string | null) => {
+            if (!base) return null;
+            if (lang === "ru" && ru) return ru;
+            if (lang === "uz" && uz) return uz;
+            return base;
         };
         
-        const cityGeo = findGeo(point.city);
-        if (cityGeo) {
-            parts.push(getLocalizedGeoName(cityGeo));
-        } else if (point.city) {
-            parts.push(point.city);
-        }
+        const city = getLocalized(point.city, point.city_ru, point.city_uz);
+        if (city) parts.push(city);
         
-        const regionGeo = findGeo(point.region);
-        if (regionGeo) {
-            parts.push(getLocalizedGeoName(regionGeo));
-        } else if (point.region) {
-            parts.push(point.region);
-        }
+        const region = getLocalized(point.region, point.region_ru, point.region_uz);
+        if (region) parts.push(region);
         
-        const countryGeo = findGeo(point.country);
-        if (countryGeo) {
-            parts.push(getLocalizedGeoName(countryGeo));
-        } else if (point.country) {
-            parts.push(point.country);
-        }
+        const country = getLocalized(point.country, point.country_ru, point.country_uz);
+        if (country) parts.push(country);
         
         return parts.length > 0 ? parts.join(", ") : "—";
-    }, [geoById, getLocalizedGeoName]);
+    }, [i18n.resolvedLanguage, i18n.language]);
     
     const routeFrom = useMemo(() => {
-        if (data.points && data.points[0] && geos) {
+        if (data.points && data.points[0]) {
             return formatRoute(data.points[0]);
         }
         return data.routeFrom || "—";
-    }, [data.points, data.routeFrom, formatRoute, geos]);
+    }, [data.points, data.routeFrom, formatRoute]);
     
     const routeTo = useMemo(() => {
-        if (data.points && data.points[1] && geos) {
+        if (data.points && data.points[1]) {
             return formatRoute(data.points[1]);
         }
         return data.routeTo || "—";
-    }, [data.points, data.routeTo, formatRoute, geos]);
+    }, [data.points, data.routeTo, formatRoute]);
 
     useEffect(() => {
         loadInit();

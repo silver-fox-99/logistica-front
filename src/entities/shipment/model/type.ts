@@ -3,8 +3,14 @@ export type ShipmentsKind = "cargo" | "transport";
 
 export type GeoPoint = {
     country?: string | null;
+    country_ru?: string | null;
+    country_uz?: string | null;
     region?: string | null;
+    region_ru?: string | null;
+    region_uz?: string | null;
     city?: string | null;
+    city_ru?: string | null;
+    city_uz?: string | null;
     type?: string | null;
     id?: string;
 };
@@ -46,7 +52,17 @@ export type ShipmentRowData = {
 export type CargoApiItem = {
     id: string;
     user?: { first_name?: string; last_name?: string; email?: string; phone?: string; };
-    points: { country?: string; region?: string; city?: string }[];
+    points: { 
+        country?: string; 
+        country_ru?: string | null;
+        country_uz?: string | null;
+        region?: string; 
+        region_ru?: string | null;
+        region_uz?: string | null;
+        city?: string;
+        city_ru?: string | null;
+        city_uz?: string | null;
+    }[];
     date_from: string;
     date_to: string;
     has_dimensions: boolean;

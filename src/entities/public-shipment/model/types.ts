@@ -6,8 +6,14 @@ export type PublicPoint = {
     id?: string;
     type: PublicPointType;
     country?: string | null;
+    country_ru?: string | null;
+    country_uz?: string | null;
     region?: string | null;
+    region_ru?: string | null;
+    region_uz?: string | null;
     city?: string | null;
+    city_ru?: string | null;
+    city_uz?: string | null;
     address?: string | null;
 };
 
