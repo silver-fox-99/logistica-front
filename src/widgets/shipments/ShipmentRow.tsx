@@ -9,8 +9,8 @@ import {
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
-import type {ShipmentRowData, ShipmentsKind} from "@/entities/shipment/model/type";
-import { useLocalizedLookup, useLocalizedGeo } from "@/shared/utils/lookupUtils";
+import type {ShipmentRowData, ShipmentsKind, GeoPoint} from "@/entities/shipment/model/type";
+import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import "./ShipmentRow.scss";
 
