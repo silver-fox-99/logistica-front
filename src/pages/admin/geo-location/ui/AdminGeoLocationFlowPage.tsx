@@ -20,15 +20,37 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material";
-import {FiMapPin, FiPlus, FiRefreshCw, FiSearch, FiTrash2, FiEdit3, FiDownload} from "react-icons/fi";
+import {
+    FiMapPin,
+    FiPlus,
+    FiRefreshCw,
+    FiSearch,
+    FiTrash2,
+    FiEdit3,
+    FiDownload,
+} from "react-icons/fi";
 import type { GeoLocation, LocationType } from "@/shared/api/adminGeoApi";
 import { useGeoLocations } from "@/features/admin/geo-locations/model/useGeoLocations";
 import GeoLocationDialog from "@/features/admin/geo-locations/ui/GeoLocationDialog";
 import GeoTreeFlow from "@/features/admin/geo-locations/ui/GeoTreeFlow";
 import GeoImportDialog from "@/features/admin/geo-locations/ui/GeoDatasetPanel.tsx";
 
+const TYPES: (LocationType | "")[] = [
+    "",
+    "COUNTRY",
+    "REGION",
+    "CITY",
+    "DISTRICT",
+    "OTHER",
+];
 
-const TYPES: (LocationType | "")[] = ["", "COUNTRY", "REGION", "CITY", "DISTRICT", "OTHER"];
+// максимально допустимое количество нод в дереве
+const MAX_FLOW_NODES = 400;
+
+type FlowInfo = {
+    items: GeoLocation[];
+    totalInSubtree: number;
+};
 
 export default function AdminGeoLocationFlowPage() {
     const {
@@ -56,10 +78,68 @@ export default function AdminGeoLocationFlowPage() {
     const [busy, setBusy] = useState(false);
     const [createParentId, setCreateParentId] = useState<string | null>(null);
     const [importOpen, setImportOpen] = useState(false);
+
     const rows = useMemo(() => {
         if (!selectedId) return treeRoots;
         return childrenOf(selectedId);
     }, [selectedId, childrenOf, treeRoots]);
+
+    // --- поддерево для выбранной локации (для дерева Flow) ---
+    const { items: flowItems, totalInSubtree }: FlowInfo = useMemo(() => {
+        if (!selectedId) return { items: [], totalInSubtree: 0 };
+
+        const root = byId.get(selectedId);
+        if (!root) return { items: [], totalInSubtree: 0 };
+
+        // какие типы считаем корневым элементом для дерева
+        const allowedRootTypes: LocationType[] = [
+            "COUNTRY",
+            "REGION",
+            "CITY",
+            "DISTRICT",
+        ];
+        if (!allowedRootTypes.includes(root.type)) {
+            return { items: [], totalInSubtree: 0 };
+        }
+
+        const byParent = new Map<string | null, GeoLocation[]>();
+        for (const it of items) {
+            const pid = it.parent_id ?? null;
+            if (!byParent.has(pid)) byParent.set(pid, []);
+            byParent.get(pid)!.push(it);
+        }
+
+        const result: GeoLocation[] = [];
+        const visited = new Set<string>();
+        const stack: string[] = [root.id];
+        let total = 0;
+
+        while (stack.length) {
+            const id = stack.pop()!;
+            if (visited.has(id)) continue;
+            visited.add(id);
+
+            const node = byId.get(id);
+            if (!node) continue;
+
+            total += 1;
+            if (result.length < MAX_FLOW_NODES) {
+                result.push(node);
+            }
+
+            const children = byParent.get(id);
+            if (children) {
+                for (const ch of children) {
+                    stack.push(ch.id);
+                }
+            }
+        }
+
+        return { items: result, totalInSubtree: total };
+    }, [selectedId, byId, items]);
+
+    const flowTooLarge =
+        totalInSubtree > 0 && totalInSubtree > MAX_FLOW_NODES && flowItems.length > 0;
 
     const openCreateCity = (parentId: string) => {
         setDlgMode("create");
@@ -145,11 +225,11 @@ export default function AdminGeoLocationFlowPage() {
                         Догрузить данные
                     </Button>
                     <Tooltip title="Обновить">
-                        <span>
-                            <IconButton onClick={reload}>
-                                <FiRefreshCw />
-                            </IconButton>
-                        </span>
+            <span>
+              <IconButton onClick={reload}>
+                <FiRefreshCw />
+              </IconButton>
+            </span>
                     </Tooltip>
                 </Stack>
             </Stack>
@@ -165,7 +245,7 @@ export default function AdminGeoLocationFlowPage() {
                     <Stack direction="row" spacing={1.5} flexWrap="wrap">
                         <TextField
                             size="small"
-                            placeholder="Поиск по названию/коду/ISO2…"
+                            placeholder="Search by name/code/ISO2…"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             InputProps={{
@@ -180,32 +260,66 @@ export default function AdminGeoLocationFlowPage() {
                         <Select
                             size="small"
                             value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value as LocationType | "")}
+                            onChange={(e) =>
+                                setTypeFilter(e.target.value as LocationType | "")
+                            }
                             sx={{ minWidth: 180 }}
                             displayEmpty
                         >
                             {TYPES.map((t) => (
                                 <MenuItem key={t || "ALL"} value={t}>
-                                    {t || "Все типы"}
+                                    {t || "All types"}
                                 </MenuItem>
                             ))}
                         </Select>
                     </Stack>
                     <Typography variant="caption" color="text.secondary">
-                        Подсказка: двойной клик по Стране/Региону для добавления Города, двойной клик по Городу для
-                        редактирования.
+                        Hint: double click on Country/Region to add City, double click on
+                        City to edit.
                     </Typography>
                 </Stack>
             </Paper>
 
-            {/* Flow */}
-            <GeoTreeFlow
-                items={items}
-                selectedId={selectedId}
-                onSelect={(id) => setSelectedId(id)}
-                onAddCity={openCreateCity}
-                onEditCity={openEditCity}
-            />
+            {/* Flow + подсказки */}
+            <Stack spacing={0.5}>
+                <Typography variant="subtitle2">Иерархия (дерево)</Typography>
+                {!selectedId ? (
+                    <Paper
+                        variant="outlined"
+                        sx={{ p: 2, borderRadius: 2, textAlign: "center" }}
+                    >
+                        <Typography variant="body2" color="text.secondary">
+                            Select a location in the table below to display its hierarchy
+                            tree.
+                        </Typography>
+                    </Paper>
+                ) : flowItems.length === 0 ? (
+                    <Paper
+                        variant="outlined"
+                        sx={{ p: 2, borderRadius: 2, textAlign: "center" }}
+                    >
+                        <Typography variant="body2" color="text.secondary">
+                            This location has no children to build a tree.
+                        </Typography>
+                    </Paper>
+                ) : (
+                    <>
+                        {flowTooLarge && (
+                            <Typography variant="caption" color="text.secondary">
+                                Subtree contains {totalInSubtree.toLocaleString()} nodes. Only
+                                first {MAX_FLOW_NODES} are shown in the diagram.
+                            </Typography>
+                        )}
+                        <GeoTreeFlow
+                            items={flowItems}
+                            selectedId={selectedId}
+                            onSelect={(id) => setSelectedId(id)}
+                            onAddCity={openCreateCity}
+                            onEditCity={openEditCity}
+                        />
+                    </>
+                )}
+            </Stack>
 
             {/* Children table */}
             <Paper variant="outlined" sx={{ borderRadius: 2 }}>
@@ -237,37 +351,56 @@ export default function AdminGeoLocationFlowPage() {
                         </TableHead>
                         <TableBody>
                             {rows.map((row) => (
-                                <TableRow key={row.id} hover>
+                                <TableRow
+                                    key={row.id}
+                                    hover
+                                    selected={row.id === selectedId}
+                                    onClick={() => setSelectedId(row.id)}
+                                    sx={{ cursor: "pointer" }}
+                                >
                                     <TableCell>{row.name || "Без названия"}</TableCell>
                                     <TableCell>
                                         <Chip size="small" label={row.type} />
                                     </TableCell>
                                     <TableCell>
-                                        {row.parent_id ? byId.get(row.parent_id)?.name ?? row.parent_id : "—"}
+                                        {row.parent_id
+                                            ? byId.get(row.parent_id)?.name ?? row.parent_id
+                                            : "—"}
                                     </TableCell>
                                     <TableCell>{row.code || "—"}</TableCell>
                                     <TableCell>{row.iso2 || "—"}</TableCell>
                                     <TableCell>{row.slug || "—"}</TableCell>
-                                    <TableCell>{row.is_active === false ? "Нет" : "Да"}</TableCell>
+                                    <TableCell>
+                                        {row.is_active === false ? "Нет" : "Да"}
+                                    </TableCell>
                                     <TableCell align="right">
                                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                                             <Tooltip title="Редактировать">
-                                                <span>
-                                                    <IconButton size="small" onClick={() => openEditCity(row.id)}>
-                                                        <FiEdit3 />
-                                                    </IconButton>
-                                                </span>
+                        <span>
+                          <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  openEditCity(row.id);
+                              }}
+                          >
+                            <FiEdit3 />
+                          </IconButton>
+                        </span>
                                             </Tooltip>
                                             <Tooltip title="Удалить">
-                                                <span>
-                                                    <IconButton
-                                                        size="small"
-                                                        color="error"
-                                                        onClick={() => handleDelete(row)}
-                                                    >
-                                                        <FiTrash2 />
-                                                    </IconButton>
-                                                </span>
+                        <span>
+                          <IconButton
+                              size="small"
+                              color="error"
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(row);
+                              }}
+                          >
+                            <FiTrash2 />
+                          </IconButton>
+                        </span>
                                             </Tooltip>
                                         </Stack>
                                     </TableCell>
@@ -276,7 +409,11 @@ export default function AdminGeoLocationFlowPage() {
                             {!loading && rows.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={8}>
-                                        <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
+                                        <Typography
+                                            align="center"
+                                            color="text.secondary"
+                                            sx={{ py: 4 }}
+                                        >
                                             Локации не найдены
                                         </Typography>
                                     </TableCell>
@@ -285,7 +422,11 @@ export default function AdminGeoLocationFlowPage() {
                             {loading && (
                                 <TableRow>
                                     <TableCell colSpan={8}>
-                                        <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
+                                        <Typography
+                                            align="center"
+                                            color="text.secondary"
+                                            sx={{ py: 4 }}
+                                        >
                                             Загрузка…
                                         </Typography>
                                     </TableCell>
@@ -305,7 +446,7 @@ export default function AdminGeoLocationFlowPage() {
                 </Box>
             </Paper>
 
-            {/* Dataset / Import panel (отдельный модуль) */}
+            {/* Dialog создать/редактировать */}
             <GeoLocationDialog
                 key={`${dlgMode}-${editing?.id ?? "new"}-${createParentId ?? "none"}`}
                 open={dlgOpen}
@@ -333,7 +474,7 @@ export default function AdminGeoLocationFlowPage() {
                 submitting={busy}
             />
 
-            {/* Диалог импорта из датасета */}
+            {/* Диалог импорта */}
             <GeoImportDialog
                 open={importOpen}
                 onClose={() => setImportOpen(false)}
