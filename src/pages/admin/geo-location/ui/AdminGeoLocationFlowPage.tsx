@@ -27,7 +27,7 @@ import {
     FiSearch,
     FiTrash2,
     FiEdit3,
-    FiDownload,
+    FiDownload, FiArrowLeft,
 } from "react-icons/fi";
 import type { GeoLocation, LocationType } from "@/shared/api/adminGeoApi";
 import { useGeoLocations } from "@/features/admin/geo-locations/model/useGeoLocations";
@@ -83,6 +83,13 @@ export default function AdminGeoLocationFlowPage() {
         if (!selectedId) return treeRoots;
         return childrenOf(selectedId);
     }, [selectedId, childrenOf, treeRoots]);
+
+       const parentLocation = useMemo(() => {
+               if (!selectedId) return null;
+               const current = byId.get(selectedId);
+               if (!current?.parent_id) return null;
+               return byId.get(current.parent_id) ?? null;
+           }, [selectedId, byId]);
 
     // --- поддерево для выбранной локации (для дерева Flow) ---
     const { items: flowItems, totalInSubtree }: FlowInfo = useMemo(() => {
@@ -283,6 +290,27 @@ export default function AdminGeoLocationFlowPage() {
             {/* Flow + подсказки */}
             <Stack spacing={0.5}>
                 <Typography variant="subtitle2">Иерархия (дерево)</Typography>
+                {selectedId && (
+                    <Stack direction="row" spacing={1}>
+                        {parentLocation && (
+                            <Button
+                                size="small"
+                                variant="text"
+                                onClick={() => setSelectedId(parentLocation.id)}
+                            >
+                                To parent: {parentLocation.name || parentLocation.code || parentLocation.type}
+                            </Button>
+                        )}
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            startIcon={<FiArrowLeft />}
+                            onClick={() => setSelectedId(null)}
+                        >
+                            All locations
+                        </Button>
+                    </Stack>
+                )}
                 {!selectedId ? (
                     <Paper
                         variant="outlined"
