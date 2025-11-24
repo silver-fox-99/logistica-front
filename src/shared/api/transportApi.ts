@@ -67,6 +67,7 @@ export type CreateTransportDto = {
     payment_term: "PREPAID" | "ON_LOAD" | "ON_UNLOAD" | "POSTPAID" | null;
     bargain: "ALLOWED" | "NOT_ALLOWED";
     contact_extra_phone?: string | null;
+    extra_phone_as_main: boolean;
     note?: string | null;
     points: TransportPointDto[]; // минимум 2 (DEPARTURE, ARRIVAL)
 };

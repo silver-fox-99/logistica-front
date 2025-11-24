@@ -46,6 +46,7 @@ export type ShipmentRowData = {
     bargain?: string;
     note?: string;
     contactExtraPhone?: string;
+    extraPhoneAsMain?: boolean;
 };
 
 
@@ -86,6 +87,7 @@ export type CargoApiItem = {
     bargain?: string;
     note?: string;
     contact_extra_phone?: string;
+    extra_phone_as_main?: boolean;
 };
 
 export type TransportApiItem = CargoApiItem;

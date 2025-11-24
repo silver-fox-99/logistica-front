@@ -303,13 +303,13 @@ export default function ShipmentRow({
                                         <Typography>{data.contact.email}</Typography>
                                     </Stack>
                                 )}
-                                {data.contact?.phone1 && (
+                                {!data?.extraPhoneAsMain && data.contact?.phone1 && (
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FiPhone />
                                         <Typography>{data.contact.phone1}</Typography>
                                     </Stack>
                                 )}
-                                {data.contact?.phone2 && (
+                                {!data?.extraPhoneAsMain &&data.contact?.phone2 && (
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FiPhone />
                                         <Typography>{data.contact.phone2}</Typography>
@@ -318,7 +318,7 @@ export default function ShipmentRow({
                                 {data.contactExtraPhone && (
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FiPhone />
-                                        <Typography>{t('shipments.shipmentCard.additionalPhone')} {data.contactExtraPhone}</Typography>
+                                        <Typography>{!data?.extraPhoneAsMain ? t('shipments.shipmentCard.additionalPhone') : null} {data.contactExtraPhone}</Typography>
                                     </Stack>
                                 )}
                                 {data.contact?.telegram && <Typography>{data.contact.telegram}</Typography>}

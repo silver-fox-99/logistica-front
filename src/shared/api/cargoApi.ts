@@ -84,6 +84,7 @@ export type CreateCargoDto = {
     bargain: "ALLOWED" | "NOT_ALLOWED";
 
     contact_extra_phone: string | null;
+    extra_phone_as_main: boolean;
     note: string | null;
 
     points: CargoPointDto[];

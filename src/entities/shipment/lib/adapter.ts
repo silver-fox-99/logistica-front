@@ -83,6 +83,7 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
         bargain: i.bargain,
         note: i.note ?? undefined,
         contactExtraPhone: i.contact_extra_phone ?? undefined,
+        extraPhoneAsMain: i.extra_phone_as_main ?? false,
     };
 }
 

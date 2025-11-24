@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Box, Paper, Stack, Typography, TextField, Button, Divider,
-    Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, FormControl, InputAdornment
+    Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, FormControl, InputAdornment, FormControlLabel, Checkbox
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { toast } from "react-toastify";
@@ -68,6 +68,7 @@ type FormValues = {
     contactSecondary?: string;
     email?: string;
     note?: string;
+    extraPhoneAsMain: boolean;
 };
 
 function buildGeoMaps(geos: Geo[]) {
@@ -242,6 +243,7 @@ export default function AddTransportPage() {
         contactSecondary: "",
         email: "",
         note: "",
+        extraPhoneAsMain: false,
     });
 
     const currentCurrency = form.currency || currencyOpts[0]?.slug || "USD";
@@ -354,6 +356,7 @@ export default function AddTransportPage() {
             bargain,
 
             contact_extra_phone: v.contactSecondary ? v.contactSecondary : null,
+            extra_phone_as_main: v.extraPhoneAsMain,
             note: v.note || null,
 
             points,
@@ -683,6 +686,16 @@ export default function AddTransportPage() {
                                             helperText={errors.contactSecondary ? errors.contactSecondary : ""}
                                             error={!!errors.contactSecondary}
                                         />
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={form.extraPhoneAsMain}
+                                                    onChange={(e) => setField("extraPhoneAsMain", e.target.checked)}
+                                                />
+                                            }
+                                            label={t('addTransport.fields.extraPhoneAsMainLabel')}
+                                            sx={{ mt: 0.5 }}
+                                        />
                                         <Button
                                             variant="text"
                                             sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
@@ -1000,6 +1013,16 @@ export default function AddTransportPage() {
                                     onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
                                     helperText={errors.contactSecondary ? errors.contactSecondary : ""}
                                     error={!!errors.contactSecondary}
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={form.extraPhoneAsMain}
+                                            onChange={(e) => setField("extraPhoneAsMain", e.target.checked)}
+                                        />
+                                    }
+                                    label={t('addTransport.fields.extraPhoneAsMainLabel')}
+                                    sx={{ mt: 0.5 }}
                                 />
                                 <Button
                                     variant="text"

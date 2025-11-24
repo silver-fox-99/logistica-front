@@ -64,6 +64,7 @@ type FormValues = {
     bargaining: "possible" | "none";
 
     contactSecondary?: string;
+    extraPhoneAsMain: boolean;
     note?: string;
 };
 
@@ -223,6 +224,7 @@ export default function AddCargoPage() {
 
         contactSecondary: "",
         note: "",
+        extraPhoneAsMain: false,
     });
 
     const currentCurrency = form.currency || currencyOpts[0]?.slug || "USD";
@@ -340,6 +342,7 @@ export default function AddCargoPage() {
 
             contact_extra_phone: v.contactSecondary ? v.contactSecondary : null,
             note: v.note || null,
+            extra_phone_as_main: v.extraPhoneAsMain,
 
             points: [
                 {
@@ -739,6 +742,16 @@ export default function AddCargoPage() {
                                             helperText={errors.contactSecondary ? errors.contactSecondary : ""}
                                             error={!!errors.contactSecondary}
                                         />
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={form.extraPhoneAsMain}
+                                                    onChange={(e) => setField("extraPhoneAsMain", e.target.checked)}
+                                                />
+                                            }
+                                            label={t('addCargo.fields.extraPhoneAsMainLabel')}
+                                            sx={{ mt: 0.5 }}
+                                        />
                                         <Button
                                             variant="text"
                                             sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
@@ -1117,6 +1130,16 @@ export default function AddCargoPage() {
                                 onChange={(e) => setField("contactSecondary", e.target.value || undefined)}
                                     helperText={errors.contactSecondary ? errors.contactSecondary : ""}
                                 error={!!errors.contactSecondary}
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={form.extraPhoneAsMain}
+                                        onChange={(e) => setField("extraPhoneAsMain", e.target.checked)}
+                                    />
+                                }
+                                label={t('addCargo.fields.extraPhoneAsMainLabel')}
+                                sx={{ mt: 0.5 }}
                             />
                             <Button
                                 variant="text"
