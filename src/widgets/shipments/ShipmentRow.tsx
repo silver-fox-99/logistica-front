@@ -92,7 +92,6 @@ export default function ShipmentRow({
     const views = () => {
         if (scope === 'public') {
 
-            console.log(kind)
             if (kind === 'cargo') {
                 cargoApi.viewCount(data.id).then()
             } else if (kind === 'transport') {
