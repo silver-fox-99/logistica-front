@@ -5,7 +5,7 @@ import {
 import Grid from "@mui/material/Grid";
 import {
     FiClock, FiMapPin, FiPackage, FiTruck, FiBookmark,
-    FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone
+    FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiEye
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
@@ -13,6 +13,8 @@ import type {ShipmentRowData, ShipmentsKind, GeoPoint} from "@/entities/shipment
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import "./ShipmentRow.scss";
+import {cargoApi} from "@/shared/api/cargoApi.ts";
+import {transportApi} from "@/shared/api/transportApi.ts";
 
 type Props = {
     data: ShipmentRowData;
@@ -80,9 +82,25 @@ export default function ShipmentRow({
     }, [loadInit]);
 
     const openMore = () => {
-        if (!expanded) onMoreOpen?.(data.id);
+        if (!expanded) {
+            views()
+            onMoreOpen?.(data.id);
+        }
         setExpanded((s) => !s);
     };
+
+    const views = () => {
+        if (scope === 'public') {
+
+            console.log(kind)
+            if (kind === 'cargo') {
+                cargoApi.viewCount(data.id).then()
+            } else if (kind === 'transport') {
+                transportApi.viewCount(data.id).then()
+            }
+        }
+
+    }
 
     return (
         <Box
@@ -134,6 +152,14 @@ export default function ShipmentRow({
                                 icon={<FiClock />}
                                 variant="outlined"
                                 label={data.dates.to ? `${data.dates.from} – ${data.dates.to}` : data.dates.from}
+                                className="shipment-row__chip shipment-row__chip--dates"
+                            />
+
+                            <Chip
+                                size="small"
+                                icon={<FiEye />}
+                                variant="outlined"
+                                label={data.viewCount}
                                 className="shipment-row__chip shipment-row__chip--dates"
                             />
                         </Stack>

@@ -38,6 +38,10 @@ export const transportApi = {
         const { data } = await api.post("/transport/create", payload);
         return data;
     },
+    async viewCount(id: string) {
+        const { data } = await api.get(`/transport/${id}/view-count`);
+        return data;
+    },
 };
 
 /** ----- DTO из бек-описания ----- */
