@@ -23,7 +23,7 @@ const paymentMap: Record<string, "Cash" | "Bank" | "Card" | undefined> = {
 
 function asRouteString(p?: GeoPoint): string {
     if (!p) return "—";
-    return [p.city, p.region, p.country].filter(Boolean).join(", ") || "—";
+    return [p.country, p.region, p.city].filter(Boolean).join(", ") || "—";
 }
 
 export function adaptCargo(i: CargoApiItem): ShipmentRowData {

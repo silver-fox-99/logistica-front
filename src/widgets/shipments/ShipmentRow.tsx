@@ -4,7 +4,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import {
-    FiClock, FiMapPin, FiPackage, FiTruck, FiBookmark,
+    FiClock, FiMapPin, FiPackage, FiTruck,
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiEye
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,6 @@ import {transportApi} from "@/shared/api/transportApi.ts";
 type Props = {
     data: ShipmentRowData;
     scope: "public" | "my";
-    onBookmark?: (id: string) => void;
     onMoreOpen?: (id: string) => void;
     kind: ShipmentsKind;
     /** Экшены для scope="my" */
@@ -31,7 +30,7 @@ type Props = {
 };
 
 export default function ShipmentRow({
-                                        data, kind, onBookmark, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
+                                        data, kind, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
                                     }: Props) {
     const { t, i18n } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
@@ -51,14 +50,14 @@ export default function ShipmentRow({
             return base;
         };
         
-        const city = getLocalized(point.city, point.city_ru, point.city_uz);
-        if (city) parts.push(city);
+        const country = getLocalized(point.country, point.country_ru, point.country_uz);
+        if (country) parts.push(country);
         
         const region = getLocalized(point.region, point.region_ru, point.region_uz);
         if (region) parts.push(region);
         
-        const country = getLocalized(point.country, point.country_ru, point.country_uz);
-        if (country) parts.push(country);
+        const city = getLocalized(point.city, point.city_ru, point.city_uz);
+        if (city) parts.push(city);
         
         return parts.length > 0 ? parts.join(", ") : "—";
     }, [i18n.resolvedLanguage, i18n.language]);
@@ -281,12 +280,6 @@ export default function ShipmentRow({
                             alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "center", md: "center" }}
                             sx={{ width: { xs: mobileLayout === "column" ? "100%" : "auto", md: "auto" } }}
                         >
-                            <Tooltip title={t('shipments.shipmentCard.saveToFavorites')}>
-                                <IconButton onClick={() => onBookmark?.(data.id)}>
-                                    <FiBookmark />
-                                </IconButton>
-                            </Tooltip>
-
                             <Button
                                 size="small"
                                 variant="contained"
@@ -367,7 +360,19 @@ export default function ShipmentRow({
                                 )}
                                 {data.loadType && (
                                     <Typography variant="body2">
-                                        <strong>{t('shipments.shipmentCard.loadType')}</strong> {findLocalizedLabel(lookups?.loadType ?? [], data.loadType) || data.loadType}
+                                        <strong>{t('shipments.shipmentCard.loadType')}</strong> {
+                                            findLocalizedLabel(lookups?.loadType ?? [], data.loadType) !== data.loadType 
+                                                ? findLocalizedLabel(lookups?.loadType ?? [], data.loadType)
+                                                : (() => {
+                                                    const loadTypeMap: Record<string, string> = {
+                                                        "ANY": t('shipments.editDialog.loadTypeAny'),
+                                                        "FULL": t('shipments.editDialog.loadTypeFull'),
+                                                        "PARTIAL": t('shipments.editDialog.loadTypePartial'),
+                                                        "CONSOLIDATED": t('shipments.editDialog.loadTypeConsolidated')
+                                                    };
+                                                    return loadTypeMap[data.loadType] || data.loadType;
+                                                })()
+                                        }
                                     </Typography>
                                 )}
                                 {data.carsCount != null && data.carsCount > 0 && (

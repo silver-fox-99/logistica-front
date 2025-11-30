@@ -2,7 +2,7 @@ import { memo, useMemo, useCallback } from "react";
 import { Box, Stack, Typography, Chip, Button, Paper, Tooltip as MuiTooltip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiCalendar, FiMapPin, FiTag } from "react-icons/fi";
-import type { PublicShipmentBase, PublicPoint, PublicPointType } from "@/entities/public-shipment/model/types";
+import type { PublicShipmentBase, PublicPoint } from "@/entities/public-shipment/model/types";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -11,14 +11,6 @@ type Props = {
     kind: "cargo" | "transport";
     cta: { label: string; href: string; icon?: React.ReactNode };
     mobileLayout?: "column" | "row";
-};
-
-
-// порядок для сортировки: pickup/departure → waypoints → dropoff/arrival
-const ORDER: Record<PublicPointType, number> = {
-    PICKUP: 0, DEPARTURE: 0,
-    WAYPOINT: 1,
-    DROPOFF: 2, ARRIVAL: 2,
 };
 
 // максимум видимых точек
@@ -40,14 +32,14 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
             return base;
         };
         
-        const city = getLocalized(p.city, p.city_ru, p.city_uz);
-        if (city) parts.push(city);
+        const country = getLocalized(p.country, p.country_ru, p.country_uz);
+        if (country) parts.push(country);
         
         const region = getLocalized(p.region, p.region_ru, p.region_uz);
         if (region) parts.push(region);
         
-        const country = getLocalized(p.country, p.country_ru, p.country_uz);
-        if (country) parts.push(country);
+        const city = getLocalized(p.city, p.city_ru, p.city_uz);
+        if (city) parts.push(city);
         
         return parts.join(", ");
     }, [i18n.resolvedLanguage, i18n.language]);
@@ -55,9 +47,16 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
     const labels = useMemo(() => {
         const pts = (data.points ?? []).slice();
 
-        pts.sort((a, b) => (ORDER[a.type] ?? 1) - (ORDER[b.type] ?? 1));
+        const pickup = pts.find(p => p.type === "PICKUP" || p.type === "DEPARTURE");
+        const dropoff = pts.find(p => p.type === "DROPOFF" || p.type === "ARRIVAL");
+        const waypoints = pts.filter(p => p.type === "WAYPOINT");
+        
+        const ordered = [];
+        if (pickup) ordered.push(pickup);
+        if (dropoff) ordered.push(dropoff);
+        ordered.push(...waypoints);
 
-        const seq = pts.map(fmtPoint).filter(Boolean);
+        const seq = ordered.map(fmtPoint).filter(Boolean);
 
         const clean = seq.length ? seq : [];
 

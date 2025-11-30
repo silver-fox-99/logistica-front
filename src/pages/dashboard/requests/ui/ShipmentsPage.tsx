@@ -207,7 +207,6 @@ function ListBody({
                             scope={scope}
                             data={item}
                             kind={kind}
-                            onBookmark={(id) => console.log("bookmark", id)}
                             onMoreOpen={(id) => console.log("more", id)}
                             onUp={scope === "my" ? handleUp : undefined}
                             onEdit={scope === "my" ? openEdit : undefined}
