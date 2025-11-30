@@ -9,9 +9,10 @@ export type GeoItem = {
     code: string | null;
     iso2: string | null;
     slug: string | null;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
+    order?: number;
+    is_active?: boolean;
+    created_at?: string;
+    updated_at?: string;
 };
 
 export type LookupOpt = { slug: string; label: string; label_ru?: string | null; label_uz?: string | null; };
@@ -50,14 +51,14 @@ type InitResponse = {
 export type CargoPointDto = {
     type: "PICKUP" | "DROPOFF";
     country: string;
-    region: string | null;
-    city: string | null;
-    address: string | null;
+    region: string;
+    city: string;
+    address: string;
 };
 
 export type CreateCargoDto = {
-    date_from: string | null;
-    date_to: string | null;
+    date_from: string;
+    date_to: string;
 
     country_from: string;
 
@@ -66,10 +67,10 @@ export type CreateCargoDto = {
     cargo_type: string;
     allow_partial_load: boolean;
 
-    weight_t: number | null;
-    volume_m3: number | null;
-    cars_count: number | null;
-    pallets_count: number | null;
+    weight_t: number;
+    volume_m3: number;
+    cars_count: number;
+    pallets_count: number;
 
     has_dimensions: boolean;
     length_m?: number;
@@ -78,14 +79,14 @@ export type CreateCargoDto = {
 
     price_currency: string;
     price_amount: number;
-    payment_method: string | null;
-    payment_term: string | null;
+    payment_method: string;
+    payment_term: string;
 
     bargain: "ALLOWED" | "NOT_ALLOWED";
 
-    contact_extra_phone: string | null;
+    contact_extra_phone?: string;
     extra_phone_as_main: boolean;
-    note: string | null;
+    note?: string;
 
     points: CargoPointDto[];
 };
@@ -100,6 +101,24 @@ export const cargoApi = {
     async init() {
         const { data } = await api.get<InitResponse>("/cargo/init");
         return data.data;
+    },
+    async getGeos(): Promise<GeoItem[]> {
+        try {
+            const response = await api.get("/geo-location");
+            let geos: GeoItem[] = [];
+            
+            if (response.data?.data && Array.isArray(response.data.data)) {
+                geos = response.data.data;
+            } else if (Array.isArray(response.data)) {
+                geos = response.data;
+            } else if (response.data?.status && Array.isArray(response.data.data)) {
+                geos = response.data.data;
+            }
+            
+            return geos;
+        } catch (error) {
+            return [];
+        }
     },
     async create(payload: CreateCargoDto) {
         const { data } = await api.post<CreateResponse>("/cargo/create", payload);

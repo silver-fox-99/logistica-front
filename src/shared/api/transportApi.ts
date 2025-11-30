@@ -48,30 +48,30 @@ export const transportApi = {
 export type TransportPointDto = {
     type: "DEPARTURE" | "ARRIVAL";
     country: string;
-    region?: string | null;
-    city?: string | null;
-    address?: string | null;
+    region: string;
+    city: string;
+    address: string;
 };
 
 export type CreateTransportDto = {
     images?: string[];
-    date_from: string | null;
-    date_to: string | null;
+    date_from: string;
+    date_to: string;
     vehicle_type: "ANY" | "TENT" | "REFRIGERATOR" | "VAN" | "PLATFORM"; // из init.vehicleType
-    cars_count: number | null;
-    weight_t: number | null;
-    volume_m3: number | null;
+    cars_count: number;
+    weight_t: number;
+    volume_m3: number;
     has_dimensions: boolean;
     length_m?: number;
     width_m?: number;
     height_m?: number;
     price_currency: string; // из init.currency ключ (USD/EUR/…)
     price_amount: number;
-    payment_method: "CASH" | "BANK_TRANSFER" | "CARD" | null;
-    payment_term: "PREPAID" | "ON_LOAD" | "ON_UNLOAD" | "POSTPAID" | null;
+    payment_method: string;
+    payment_term: string;
     bargain: "ALLOWED" | "NOT_ALLOWED";
-    contact_extra_phone?: string | null;
+    contact_extra_phone?: string;
     extra_phone_as_main: boolean;
-    note?: string | null;
+    note?: string;
     points: TransportPointDto[]; // минимум 2 (DEPARTURE, ARRIVAL)
 };

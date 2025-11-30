@@ -24,9 +24,10 @@ type Geo = {
     code: string | null;
     iso2: string | null;
     slug: string | null;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
+    order?: number;
+    is_active?: boolean;
+    created_at?: string;
+    updated_at?: string;
 };
 
 type Place = {
@@ -69,6 +70,10 @@ type FormValues = {
 };
 
 function buildGeoMaps(geos: Geo[]) {
+    if (!geos || geos.length === 0) {
+        return { byId: new Map(), countries: [], regionsByCountry: new Map(), citiesByParent: new Map() };
+    }
+
     const byId = new Map<string, Geo>();
     const countries: Geo[] = [];
     const regionsByCountry = new Map<string, Geo[]>();
@@ -76,16 +81,19 @@ function buildGeoMaps(geos: Geo[]) {
 
     for (const g of geos) {
         byId.set(g.id, g);
-        if (g.type === "COUNTRY") countries.push(g);
+        const isActive = g.is_active !== undefined ? g.is_active : true;
+        if (g.type === "COUNTRY" && isActive) countries.push(g);
     }
     for (const g of geos) {
-        if (g.type === "REGION" && g.parent_id) {
+        const isActive = g.is_active !== undefined ? g.is_active : true;
+        if (g.type === "REGION" && g.parent_id && isActive) {
             if (!regionsByCountry.has(g.parent_id)) regionsByCountry.set(g.parent_id, []);
             regionsByCountry.get(g.parent_id)!.push(g);
         }
     }
     for (const g of geos) {
-        if (g.type === "CITY" && g.parent_id) {
+        const isActive = g.is_active !== undefined ? g.is_active : true;
+        if (g.type === "CITY" && g.parent_id && isActive) {
             if (!citiesByParent.has(g.parent_id)) citiesByParent.set(g.parent_id, []);
             citiesByParent.get(g.parent_id)!.push(g);
         }
@@ -98,23 +106,26 @@ function buildGeoMaps(geos: Geo[]) {
     return { byId, countries, regionsByCountry, citiesByParent };
 }
 
-/* ===== vertical PlaceRow (country → region → city) ===== */
 type PlaceRowProps = {
     labelPrefix: string;
     place: Place;
     onChange: (p: Place) => void;
     geos: Geo[] | null;
+    loading?: boolean;
     errorText?: string;
     showRemove?: boolean;
     onRemove?: () => void;
 };
 
 function PlaceRow({
-                      labelPrefix, place, onChange, geos, errorText, showRemove, onRemove
+                      labelPrefix, place, onChange, geos, loading, errorText, showRemove, onRemove
                   }: PlaceRowProps) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
-    const maps = useMemo(() => (geos ? buildGeoMaps(geos) : null), [geos]);
+    const maps = useMemo(() => {
+        if (!geos || !Array.isArray(geos) || geos.length === 0) return null;
+        return buildGeoMaps(geos);
+    }, [geos]);
     const countries = maps?.countries ?? [];
     const regions = place.countryId ? (maps?.regionsByCountry.get(place.countryId) ?? []) : [];
     const citiesFromCountry = place.countryId ? (maps?.citiesByParent.get(place.countryId) ?? []) : [];
@@ -133,19 +144,22 @@ function PlaceRow({
         <Stack spacing={1.25}>
             <Autocomplete
                 options={countries}
-                getOptionLabel={(o) => getLocalizedGeoName(o)}
-                
+                getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
+                value={countryValue}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null })}
+                noOptionsText={loading ? "Загрузка..." : (geos && geos.length > 0 ? (t('addCargo.fields.noOptions') || "Нет вариантов") : "Данные не загружены")}
+                loading={loading}
                 renderInput={(params) => (
                     <TextField {...params} fullWidth label={labelPrefix.includes("загрузки") ? t('addCargo.fields.countryLoad') : t('addCargo.fields.countryUnload')} placeholder={t('addCargo.fields.startTypingCountry')} />
                 )}
-                disableClearable={true}
             />
 
             <Autocomplete
                 options={regions}
                 getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={regionValue}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => onChange({ ...place, regionId: v?.id ?? null, cityId: null })}
                 disabled={!countryValue || regions.length === 0}
                 renderInput={(params) => (
@@ -157,6 +171,7 @@ function PlaceRow({
                 options={mergedCities}
                 getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={cityValue}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => onChange({ ...place, cityId: v?.id ?? null })}
                 disabled={!countryValue || mergedCities.length === 0}
                 renderInput={(params) => (
@@ -180,7 +195,6 @@ function PlaceRow({
     );
 }
 
-/* ===================== PAGE ===================== */
 export default function AddCargoPage() {
     const { t, i18n } = useTranslation();
     const { getLocalizedLabel, findLocalizedLabel } = useLocalizedLookup();
@@ -312,8 +326,8 @@ export default function AddCargoPage() {
         const countryFromName = getName(firstPickup.countryId) || "Unknown";
 
         return {
-            date_from: v.dateFrom || null,
-            date_to: v.dateTo || null,
+            date_from: v.dateFrom || "",
+            date_to: v.dateTo || "",
 
             country_from: countryFromName,
 
@@ -322,10 +336,10 @@ export default function AddCargoPage() {
             cargo_type: (v.cargoType as CreateCargoDto["cargo_type"]) || "GENERAL",
             allow_partial_load: !!v.allowPartial,
 
-            weight_t: v.weightTons ?? null,
-            volume_m3: v.volumeM3 ?? null,
-            cars_count: v.vehiclesCount ?? null,
-            pallets_count: v.palletsCount ?? null,
+            weight_t: v.weightTons ?? 0,
+            volume_m3: v.volumeM3 ?? 0,
+            cars_count: v.vehiclesCount ?? 0,
+            pallets_count: v.palletsCount ?? 0,
 
             has_dimensions: anyDim,
             ...(anyDim
@@ -336,32 +350,32 @@ export default function AddCargoPage() {
                 }
                 : {}),
 
-            price_currency: v.currency,
+            price_currency: v.currency || "",
             price_amount: v.price ?? 0,
 
-            payment_method: (v.paymentMethod || null) as CreateCargoDto["payment_method"],
-            payment_term: (v.paymentTerm || null) as CreateCargoDto["payment_term"],
+            payment_method: v.paymentMethod || "",
+            payment_term: v.paymentTerm || "",
 
             bargain,
 
-            contact_extra_phone: v.contactSecondary ? v.contactSecondary : null,
-            note: v.note || null,
+            contact_extra_phone: v.contactSecondary || undefined,
+            note: v.note || undefined,
             extra_phone_as_main: v.extraPhoneAsMain,
 
             points: [
                 {
                     type: "PICKUP",
-                    country: firstPickup.countryId!,
-                    region: firstPickup.regionId || null,
-                    city:   firstPickup.cityId   || null,
-                    address: firstPickup.address ?? null,
+                    country: firstPickup.countryId || "",
+                    region: firstPickup.regionId || "",
+                    city:   firstPickup.cityId   || "",
+                    address: firstPickup.address || "",
                 },
                 {
                     type: "DROPOFF",
-                    country: firstDrop.countryId || "Unknown",
-                    region:  firstDrop.regionId  || null,
-                    city:    firstDrop.cityId  || null,
-                    address: firstDrop.address ?? null,
+                    country: firstDrop.countryId || "",
+                    region:  firstDrop.regionId  || "",
+                    city:    firstDrop.cityId  || "",
+                    address: firstDrop.address || "",
                 }
             ],
         };
@@ -461,6 +475,7 @@ export default function AddCargoPage() {
                                                     labelPrefix={i === 0 ? "Страна загрузки" : `Страна загрузки ${i + 1}`}
                                                     place={p}
                                                     geos={geos ?? null}
+                                                    loading={loadingInit}
                                                     errorText={i === 0 ? errors.pickups : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmPickup(i)}
@@ -477,6 +492,7 @@ export default function AddCargoPage() {
                                                     labelPrefix={i === 0 ? "Страна выгрузки" : `Страна выгрузки ${i + 1}`}
                                                     place={p}
                                                     geos={geos ?? null}
+                                                    loading={loadingInit}
                                                     errorText={i === 0 ? errors.dropoffs : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmDropoff(i)}
@@ -845,6 +861,7 @@ export default function AddCargoPage() {
                                             labelPrefix={i === 0 ? "Страна загрузки" : `Страна загрузки ${i + 1}`}
                                         place={p}
                                         geos={geos ?? null}
+                                        loading={loadingInit}
                                         errorText={i === 0 ? errors.pickups : undefined}
                                         showRemove={i > 0}
                                         onRemove={() => rmPickup(i)}
@@ -862,6 +879,7 @@ export default function AddCargoPage() {
                                             labelPrefix={i === 0 ? "Страна выгрузки" : `Страна выгрузки ${i + 1}`}
                                         place={p}
                                         geos={geos ?? null}
+                                        loading={loadingInit}
                                         errorText={i === 0 ? errors.dropoffs : undefined}
                                         showRemove={i > 0}
                                         onRemove={() => rmDropoff(i)}

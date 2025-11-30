@@ -26,9 +26,10 @@ type Geo = {
     code: string | null;
     iso2: string | null;
     slug: string | null;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
+    order?: number;
+    is_active?: boolean;
+    created_at?: string;
+    updated_at?: string;
 };
 
 type Place = {
@@ -72,6 +73,10 @@ type FormValues = {
 };
 
 function buildGeoMaps(geos: Geo[]) {
+    if (!geos || geos.length === 0) {
+        return { byId: new Map(), countries: [], regionsByCountry: new Map(), citiesByParent: new Map() };
+    }
+
     const byId = new Map<string, Geo>();
     const countries: Geo[] = [];
     const regionsByCountry = new Map<string, Geo[]>();
@@ -79,16 +84,19 @@ function buildGeoMaps(geos: Geo[]) {
 
     for (const g of geos) {
         byId.set(g.id, g);
-        if (g.type === "COUNTRY") countries.push(g);
+        const isActive = g.is_active !== undefined ? g.is_active : true;
+        if (g.type === "COUNTRY" && isActive) countries.push(g);
     }
     for (const g of geos) {
-        if (g.type === "REGION" && g.parent_id) {
+        const isActive = g.is_active !== undefined ? g.is_active : true;
+        if (g.type === "REGION" && g.parent_id && isActive) {
             if (!regionsByCountry.has(g.parent_id)) regionsByCountry.set(g.parent_id, []);
             regionsByCountry.get(g.parent_id)!.push(g);
         }
     }
     for (const g of geos) {
-        if (g.type === "CITY" && g.parent_id) {
+        const isActive = g.is_active !== undefined ? g.is_active : true;
+        if (g.type === "CITY" && g.parent_id && isActive) {
             if (!citiesByParent.has(g.parent_id)) citiesByParent.set(g.parent_id, []);
             citiesByParent.get(g.parent_id)!.push(g);
         }
@@ -106,18 +114,21 @@ type PlaceRowProps = {
     place: Place;
     onChange: (p: Place) => void;
     geos: Geo[] | null;
+    loading?: boolean;
     errorKey?: string;
     showRemove?: boolean;
     onRemove?: () => void;
 };
 
 function PlaceRow({
-                      labelPrefix, place, onChange, geos, errorKey, showRemove, onRemove
+                      labelPrefix, place, onChange, geos, loading, errorKey, showRemove, onRemove
                   }: PlaceRowProps) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { countries, regionsByCountry, citiesByParent } = useMemo(() => {
-        if (!geos) return { countries: [] as Geo[], regionsByCountry: new Map<string, Geo[]>(), citiesByParent: new Map<string, Geo[]>() };
+        if (!geos || !Array.isArray(geos) || geos.length === 0) {
+            return { countries: [] as Geo[], regionsByCountry: new Map<string, Geo[]>(), citiesByParent: new Map<string, Geo[]>() };
+        }
         return buildGeoMaps(geos);
     }, [geos]);
 
@@ -144,11 +155,14 @@ function PlaceRow({
         <Stack spacing={1.25}>
             <Autocomplete
                 options={countries}
-                getOptionLabel={(o) => getLocalizedGeoName(o)}
+                getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
                 value={countryValue}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => {
                     onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null });
                 }}
+                noOptionsText={loading ? "Загрузка..." : (geos && geos.length > 0 ? (t('addTransport.fields.noOptions') || "Нет вариантов") : "Данные не загружены")}
+                loading={loading}
                 renderInput={(params) => (
                     <TextField 
                         {...params} 
@@ -163,6 +177,7 @@ function PlaceRow({
                 options={regions}
                 getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={regionValue}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => {
                     onChange({ ...place, regionId: v?.id ?? null, cityId: null });
                 }}
@@ -181,6 +196,7 @@ function PlaceRow({
                 options={mergedCities}
                 getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={cityValue}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => onChange({ ...place, cityId: v?.id ?? null })}
                 renderInput={(params) => (
                     <TextField 
@@ -309,10 +325,10 @@ export default function AddTransportPage() {
     const placeToPoint = (p: Place, type: "DEPARTURE" | "ARRIVAL"): CreateTransportDto["points"][number] => {
         return {
             type,
-            country: p.countryId || "Unknown",
-            region: p.regionId,
-            city: p.cityId,
-            address: p.address ?? null,
+            country: p.countryId || "",
+            region: p.regionId || "",
+            city: p.cityId || "",
+            address: p.address || "",
         };
     };
 
@@ -335,14 +351,14 @@ export default function AddTransportPage() {
         return {
             images: undefined,
 
-            date_from: v.dateFrom || null,
-            date_to: v.dateTo || null,
+            date_from: v.dateFrom || "",
+            date_to: v.dateTo || "",
 
             vehicle_type: (v.vehicleType as CreateTransportDto["vehicle_type"]) || "ANY",
 
             cars_count: Number.isFinite(v.vehiclesCount) ? v.vehiclesCount : 1,
-            weight_t: v.capacityTons ?? null,
-            volume_m3: v.volumeM3 ?? null,
+            weight_t: v.capacityTons ?? 0,
+            volume_m3: v.volumeM3 ?? 0,
 
             has_dimensions: hasDims,
             ...(hasDims ? {
@@ -351,17 +367,17 @@ export default function AddTransportPage() {
                 height_m: v.bodyHeight || undefined,
             } : {}),
 
-            price_currency: v.currency,
+            price_currency: v.currency || "",
             price_amount: v.price ?? 0,
 
-            payment_method: (v.paymentMethod || null) as CreateTransportDto["payment_method"],
-            payment_term: (v.paymentTerm || null) as CreateTransportDto["payment_term"],
+            payment_method: v.paymentMethod || "",
+            payment_term: v.paymentTerm || "",
 
             bargain,
 
-            contact_extra_phone: v.contactSecondary ? v.contactSecondary : null,
+            contact_extra_phone: v.contactSecondary || undefined,
             extra_phone_as_main: v.extraPhoneAsMain,
-            note: v.note || null,
+            note: v.note || undefined,
 
             points,
         };
@@ -460,6 +476,7 @@ export default function AddTransportPage() {
                                                     labelPrefix={i === 0 ? "загрузки" : `загрузки ${i + 1}`}
                                                     place={p}
                                                     geos={geos ?? null}
+                                                    loading={loadingInit}
                                                     errorKey={i === 0 ? errors.loadPlaces : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmLoad(i)}
@@ -476,6 +493,7 @@ export default function AddTransportPage() {
                                                     labelPrefix={i === 0 ? "выгрузки" : `выгрузки ${i + 1}`}
                                                     place={p}
                                                     geos={geos ?? null}
+                                                    loading={loadingInit}
                                                     errorKey={i === 0 ? errors.unloadPlaces : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmUnload(i)}
@@ -797,6 +815,7 @@ export default function AddTransportPage() {
                                             labelPrefix={i === 0 ? "загрузки" : `загрузки ${i + 1}`}
                                             place={p}
                                             geos={geos ?? null}
+                                            loading={loadingInit}
                                             errorKey={i === 0 ? errors.loadPlaces : undefined}
                                             showRemove={i > 0}
                                             onRemove={() => rmLoad(i)}
@@ -814,6 +833,7 @@ export default function AddTransportPage() {
                                             labelPrefix={i === 0 ? "выгрузки" : `выгрузки ${i + 1}`}
                                             place={p}
                                             geos={geos ?? null}
+                                            loading={loadingInit}
                                             errorKey={i === 0 ? errors.unloadPlaces : undefined}
                                             showRemove={i > 0}
                                             onRemove={() => rmUnload(i)}

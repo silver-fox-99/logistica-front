@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { commonInitApi, type CommonInitData } from "@/shared/api/commonInitApi";
-import type { GeoItem } from "@/shared/api/cargoApi";
+import { cargoApi, type GeoItem } from "@/shared/api/cargoApi";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 
 interface InitStore {
@@ -37,7 +37,13 @@ export const useInitStore = create<InitStore>((set, get) => ({
 
         set({ loading: true, error: null });
         try {
-            const data = await commonInitApi.load();
+            const [data, geosFromRoute] = await Promise.all([
+                commonInitApi.load(),
+                cargoApi.getGeos().catch(() => [])
+            ]);
+            
+            const allGeos = geosFromRoute.length > 0 ? geosFromRoute : (data.geos || []);
+            
             const normalizedLookups: CommonInitData["lookups"] = {
                 vehicleType: data.lookups.vehicleType.map(normalizeLookupOpt),
                 paymentMethods: data.lookups.paymentMethods.map(normalizeLookupOpt),
@@ -48,7 +54,7 @@ export const useInitStore = create<InitStore>((set, get) => ({
                 loadType: data.lookups.loadType?.map(normalizeLookupOpt),
             };
             set({
-                geos: data.geos,
+                geos: allGeos,
                 lookups: normalizedLookups,
                 cargoPoints: data.cargoPoints,
                 transportPoints: data.transportPoints,
