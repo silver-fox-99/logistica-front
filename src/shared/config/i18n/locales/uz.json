@@ -93,6 +93,7 @@
       "contactsTitle": "Buyurtmada ko'rinadigan kontaktlarni tanlang",
       "contactsSubtitle": "Bu yerda \"Profil\" bo'limida qo'shgan mavjud kontaktlaringiz ko'rsatilgan. Ularni shaxsiy kabinetingizda o'zgartirishingiz yoki qo'shishingiz mumkin.",
       "additionalPhone": "Qo'shimcha telefon",
+      "extraPhoneAsMainLabel": "Asosiy sifatida ishlatish",
       "clearPhone": "Telefonni tozalash",
       "additionalInfo": "Qo'shimcha ma'lumot",
       "additionalInfoPlaceholder": "Qo'shimcha ma'lumot kiriting",

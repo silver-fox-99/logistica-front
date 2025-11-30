@@ -778,10 +778,18 @@ export default function AddCargoPage() {
                                                 <Checkbox
                                                     checked={form.extraPhoneAsMain}
                                                     onChange={(e) => setField("extraPhoneAsMain", e.target.checked)}
+                                                    size="small"
                                                 />
                                             }
                                             label={t('addCargo.fields.extraPhoneAsMainLabel')}
-                                            sx={{ mt: 0.5 }}
+                                            sx={{ 
+                                                mt: 1.5,
+                                                ml: 0,
+                                                backgroundColor: 'transparent',
+                                                '& .MuiFormControlLabel-label': {
+                                                    fontSize: '0.875rem'
+                                                }
+                                            }}
                                         />
                                         <Button
                                             variant="text"
@@ -1171,10 +1179,18 @@ export default function AddCargoPage() {
                                     <Checkbox
                                         checked={form.extraPhoneAsMain}
                                         onChange={(e) => setField("extraPhoneAsMain", e.target.checked)}
+                                        size="small"
                                     />
                                 }
                                 label={t('addCargo.fields.extraPhoneAsMainLabel')}
-                                sx={{ mt: 0.5 }}
+                                sx={{ 
+                                    mt: 1.5,
+                                    ml: 0,
+                                    backgroundColor: 'transparent',
+                                    '& .MuiFormControlLabel-label': {
+                                        fontSize: '0.875rem'
+                                    }
+                                }}
                             />
                             <Button
                                 variant="text"
