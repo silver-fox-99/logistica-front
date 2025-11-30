@@ -58,13 +58,47 @@ type Option = { id: string; label: string };
 export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: Props) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
-    const [f, setF] = useState<PublicFilters>(initial ?? {});
+    
+    const getTodayDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    const getDefaultDatePlus30 = () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 30);
+        return date.toISOString().split('T')[0];
+    };
+
+    const getInitialFilters = (init?: PublicFilters): PublicFilters => {
+        if (init && Object.keys(init).length > 0) {
+            // Если есть переданные фильтры, но нет дефолтных дат, добавляем их
+            const result = { ...init };
+            if (!result.pickup_date_from) {
+                result.pickup_date_from = getTodayDate();
+            }
+            if (!result.pickup_date_to) {
+                result.pickup_date_to = getDefaultDatePlus30();
+            }
+            return result;
+        }
+        return {
+            pickup_date_from: getTodayDate(),
+            pickup_date_to: getDefaultDatePlus30()
+        };
+    };
+
+    const [f, setF] = useState<PublicFilters>(getInitialFilters(initial));
     const [filtersData, setFiltersData] = useState<null | {
         geos: Geo[];
         vehicle_types: VehicleTypeOption[];
     }>(null);
 
-    useEffect(() => { if (open) setF(initial ?? {}); }, [open, initial]);
+    useEffect(() => { 
+        if (open) {
+            setF(getInitialFilters(initial));
+        }
+    }, [open, initial]);
 
     useEffect(() => {
         (async () => {
@@ -78,7 +112,10 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
         setF(v => ({ ...v, [key]: raw === "" ? undefined : Number(raw) }));
     };
 
-    const onReset = () => setF({});
+    const onReset = () => setF({
+        pickup_date_from: getTodayDate(),
+        pickup_date_to: getDefaultDatePlus30()
+    });
 
     // ===== GEO helpers =====
     const geos = filtersData?.geos ?? [];

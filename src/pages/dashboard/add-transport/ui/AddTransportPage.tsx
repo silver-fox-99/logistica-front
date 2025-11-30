@@ -225,8 +225,13 @@ export default function AddTransportPage() {
     const currencyOpts  = useMemo(() => lookups?.currency ?? [],       [lookups]);
 
 
+    const getTodayDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
     const [form, setForm] = useState<FormValues>({
-        dateFrom: "", dateTo: "",
+        dateFrom: getTodayDate(), dateTo: getTodayDate(),
         loadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
         unloadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
 
@@ -288,7 +293,6 @@ export default function AddTransportPage() {
         if (!form.unloadPlaces[0]?.countryId) e.unloadPlaces = t('addTransport.errors.selectCountryUnload');
 
         if (!form.vehicleType) e.vehicleType = t('addTransport.errors.selectVehicleType');
-        if (!form.paymentMethod) e.paymentMethod = t('addTransport.errors.selectPaymentMethod');
         if (!form.paymentTerm) e.paymentTerm = t('addTransport.errors.selectPaymentTerm');
         if (form.dimsEnabled) {
             if (form.bodyLength == null || form.bodyWidth == null || form.bodyHeight == null) {

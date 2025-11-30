@@ -285,13 +285,23 @@ export default function ShipmentsListPage({ scope }: Props) {
     const [period, setPeriod] = useState("all");
     const [drawerOpen, setDrawerOpen] = useState(false);
 
+    const getDefaultFilters = (): PublicFilters => {
+        const today = new Date();
+        const datePlus30 = new Date();
+        datePlus30.setDate(datePlus30.getDate() + 30);
+        return {
+            pickup_date_from: today.toISOString().split('T')[0],
+            pickup_date_to: datePlus30.toISOString().split('T')[0]
+        };
+    };
+
     // kind: draft/applied
     const [draftKind, setDraftKind] = useState<ShipmentsKind>("cargo");
     const [appliedKind, setAppliedKind] = useState<ShipmentsKind>("cargo");
 
     // filters: draft/applied
-    const [draftFilters, setDraftFilters] = useState<PublicFilters>({});
-    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>({});
+    const [draftFilters, setDraftFilters] = useState<PublicFilters>(getDefaultFilters());
+    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(getDefaultFilters());
 
     /** Key to remount ListBody -> guaranteed refetch */
     const [reloadKey, setReloadKey] = useState(0);
@@ -376,7 +386,7 @@ export default function ShipmentsListPage({ scope }: Props) {
                 filters={draftFilters}
                 onFiltersChange={setDraftFilters}
                 onClose={() => setDrawerOpen(false)}
-                onReset={() => { setDraftKind("cargo"); setDraftFilters({}); }}
+                onReset={() => { setDraftKind("cargo"); setDraftFilters(getDefaultFilters()); }}
                 onApply={() => {
                     setDrawerOpen(false);
                     setAppliedKind(draftKind);

@@ -78,7 +78,7 @@ export type CreateCargoDto = {
 
     price_currency: string;
     price_amount: number;
-    payment_method: string;
+    payment_method: string | null;
     payment_term: string | null;
 
     bargain: "ALLOWED" | "NOT_ALLOWED";

@@ -199,8 +199,13 @@ export default function AddCargoPage() {
     const payTermOpts    = useMemo(() => lookups?.paymentTerms ?? [],    [lookups]);
 
 
+    const getTodayDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
     const [form, setForm] = useState<FormValues>({
-        dateFrom: "", dateTo: "",
+        dateFrom: getTodayDate(), dateTo: getTodayDate(),
         pickups:  [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
         dropoffs: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
 
@@ -274,7 +279,6 @@ export default function AddCargoPage() {
         if (!form.cargoType) e.cargoType = t('addCargo.errors.selectCargoType');
         if (!form.vehicleType) e.vehicleType = t('addCargo.errors.selectVehicleType');
         if (!form.loadType || form.loadType.length === 0) e.loadType = t('addCargo.errors.selectLoadType');
-        if (!form.paymentMethod) e.paymentMethod = t('addCargo.errors.selectPaymentMethod');
 
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
             e.contactSecondary = t('addCargo.errors.invalidPhone');
@@ -335,7 +339,7 @@ export default function AddCargoPage() {
             price_currency: v.currency,
             price_amount: v.price ?? 0,
 
-            payment_method: (v.paymentMethod || undefined) as CreateCargoDto["payment_method"],
+            payment_method: (v.paymentMethod || null) as CreateCargoDto["payment_method"],
             payment_term: (v.paymentTerm || null) as CreateCargoDto["payment_term"],
 
             bargain,

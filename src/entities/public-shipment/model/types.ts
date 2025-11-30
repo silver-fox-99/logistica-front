@@ -24,10 +24,16 @@ export type PublicFilters = {
     dropoff_country?: string;
     dropoff_region?: string;
     dropoff_city?: string;
-    date_from?: string;
-    date_to?: string;
+    pickup_date_from?: string;
+    pickup_date_to?: string;
+    dropoff_date_from?: string;
+    dropoff_date_to?: string;
     vehicle_type?: string;
     q?: string;
+    weight_min?: number;
+    weight_max?: number;
+    volume_min?: number;
+    volume_max?: number;
 
     // allow_partial_load?: boolean;
     // price_currency?: string;
