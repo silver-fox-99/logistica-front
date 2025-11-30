@@ -49,7 +49,7 @@ function ListBody({
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const { items, pages, loading } = useShipments(kind, scope, page, limit, filters);
+    const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
     const list = useMemo(() => items, [items]);
 
     const [editOpen, setEditOpen] = useState(false);
@@ -223,10 +223,15 @@ function ListBody({
             </Grid>
             </Box>
 
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 2 }}>
-                <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{t('shipments.actions.back')}</Button>
-                <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />
-                <Button variant="text" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>{t('shipments.actions.next')}</Button>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 2, flexWrap: "wrap", gap: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                    {t('shipments.total', { count: total })}
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                    <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{t('shipments.actions.back')}</Button>
+                    <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />
+                    <Button variant="text" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>{t('shipments.actions.next')}</Button>
+                </Stack>
             </Stack>
 
             <FullEditDialog

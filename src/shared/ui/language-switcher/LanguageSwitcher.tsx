@@ -15,14 +15,10 @@ function flagUrlCircle(cc: string) {
     return `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${cc.toLowerCase()}.svg`;
 }
 
-// function flagUrlRect(cc: string) {
-//   return `https://cdn.jsdelivr.net/npm/flag-icons/flags/4x3/${cc.toLowerCase()}.svg`;
-// }
-
 const LANG_OPTIONS = [
-    { code: "en", labelKey: "english" },
-    { code: "ru", labelKey: "russian" },
-    { code: "uz", labelKey: "uzbek" },
+    { code: "en", label: "English" },
+    { code: "ru", label: "Русский" },
+    { code: "uz", label: "O'zbek" },
 ];
 
 export default function LanguageSwitcher() {
@@ -74,7 +70,7 @@ export default function LanguageSwitcher() {
             </Tooltip>
 
             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                {LANG_OPTIONS.map(({ code, labelKey }) => {
+                {LANG_OPTIONS.map(({ code, label }) => {
                     const cc = langToCountry[code] || "gb";
                     const url = flagUrlCircle(cc);
                     return (
@@ -91,7 +87,7 @@ export default function LanguageSwitcher() {
                                     }}
                                 />
                             </ListItemIcon>
-                            <ListItemText>{t(labelKey)}</ListItemText>
+                            <ListItemText>{label}</ListItemText>
                         </MenuItem>
                     );
                 })}

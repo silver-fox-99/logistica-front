@@ -298,6 +298,7 @@
       "next": "Вперед",
       "loading": "Загрузка..."
     },
+    "total": "Всего: {{count}}",
     "messages": {
       "invalidOrderType": "Неверный тип заказа",
       "orderCopied": "Заказ успешно скопирован!",

@@ -22,10 +22,20 @@ type Geo = {
     code: string | null;
     iso2: string | null;
     slug: string | null;
+    order?: number;
     is_active: boolean;
     created_at: string;
     updated_at: string;
 };
+
+function sortByOrder(a: Geo, b: Geo): number {
+    const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+    const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+    if (orderA !== orderB) {
+        return orderA - orderB;
+    }
+    return a.name.localeCompare(b.name);
+}
 
 type VehicleTypeOption = { value: string; label: string };
 type Option = { id: string; label: string };
@@ -63,11 +73,19 @@ export default function ShipmentsFilterDrawer({
         setF({ [key]: raw === "" ? undefined : Number(raw) } as any);
     };
 
-    // GEO helpers
     const geos = data?.geos ?? [];
-    const countries = useMemo(() => geos.filter(g => g.type === "COUNTRY" && g.is_active), [geos]);
-    const regionsByCountry = (countryId?: string) => geos.filter(g => g.type === "REGION" && g.parent_id === (countryId ?? "") && g.is_active);
-    const citiesByParent = (parentId?: string) => geos.filter(g => g.type === "CITY" && g.parent_id === (parentId ?? "") && g.is_active);
+    const countries = useMemo(() => {
+        const filtered = geos.filter(g => g.type === "COUNTRY" && g.is_active);
+        return [...filtered].sort(sortByOrder);
+    }, [geos]);
+    const regionsByCountry = (countryId?: string) => {
+        const filtered = geos.filter(g => g.type === "REGION" && g.parent_id === (countryId ?? "") && g.is_active);
+        return [...filtered].sort(sortByOrder);
+    };
+    const citiesByParent = (parentId?: string) => {
+        const filtered = geos.filter(g => g.type === "CITY" && g.parent_id === (parentId ?? "") && g.is_active);
+        return [...filtered].sort(sortByOrder);
+    };
 
     const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: getLocalizedGeoName(i) }));
     const countriesOpts = useMemo(() => asOptions(countries), [countries]);

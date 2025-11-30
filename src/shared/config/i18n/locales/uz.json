@@ -298,6 +298,7 @@
       "next": "Oldinga",
       "loading": "Yuklanmoqda..."
     },
+    "total": "Jami: {{count}}",
     "messages": {
       "invalidOrderType": "Noto'g'ri buyurtma turi",
       "orderCopied": "Buyurtma muvaffaqiyatli nusxalandi!",

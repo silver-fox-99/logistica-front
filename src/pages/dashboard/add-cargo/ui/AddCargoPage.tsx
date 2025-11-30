@@ -69,6 +69,15 @@ type FormValues = {
     note?: string;
 };
 
+function sortByOrder(a: Geo, b: Geo): number {
+    const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+    const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+    if (orderA !== orderB) {
+        return orderA - orderB;
+    }
+    return a.name.localeCompare(b.name);
+}
+
 function buildGeoMaps(geos: Geo[]) {
     if (!geos || geos.length === 0) {
         return { byId: new Map(), countries: [], regionsByCountry: new Map(), citiesByParent: new Map() };
@@ -99,9 +108,9 @@ function buildGeoMaps(geos: Geo[]) {
         }
     }
 
-    countries.sort((a, b) => a.name.localeCompare(b.name));
-    regionsByCountry.forEach((a) => a.sort((x, y) => x.name.localeCompare(y.name)));
-    citiesByParent.forEach((a) => a.sort((x, y) => x.name.localeCompare(y.name)));
+    countries.sort(sortByOrder);
+    regionsByCountry.forEach((a) => a.sort(sortByOrder));
+    citiesByParent.forEach((a) => a.sort(sortByOrder));
 
     return { byId, countries, regionsByCountry, citiesByParent };
 }
@@ -133,8 +142,8 @@ function PlaceRow({
     const mergedCities = useMemo(() => {
         const m = new Map<string, Geo>();
         [...citiesFromCountry, ...citiesFromRegion].forEach((c) => m.set(c.id, c));
-        return Array.from(m.values()).sort((a, b) => getLocalizedGeoName(a).localeCompare(getLocalizedGeoName(b)));
-    }, [citiesFromCountry, citiesFromRegion, getLocalizedGeoName]);
+        return Array.from(m.values()).sort(sortByOrder);
+    }, [citiesFromCountry, citiesFromRegion]);
 
     const countryValue = place.countryId ? countries.find(c => c.id === place.countryId) ?? null : null;
     const regionValue = place.regionId ? regions.find(r => r.id === place.regionId) ?? null : null;

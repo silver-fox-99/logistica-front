@@ -298,6 +298,7 @@
       "next": "Next",
       "loading": "Loading..."
     },
+    "total": "Total: {{count}}",
     "messages": {
       "invalidOrderType": "Invalid order type",
       "orderCopied": "Order successfully copied!",
