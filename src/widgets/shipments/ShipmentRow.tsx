@@ -358,20 +358,22 @@ export default function ShipmentRow({
                                         <strong>{t('shipments.shipmentCard.cargoType')}</strong> {findLocalizedLabel(lookups?.cargoTypes ?? [], data.cargoType) || data.cargoType}
                                     </Typography>
                                 )}
-                                {data.loadType && (
+                                {data.loadType && data.loadType.length > 0 && (
                                     <Typography variant="body2">
                                         <strong>{t('shipments.shipmentCard.loadType')}</strong> {
-                                            findLocalizedLabel(lookups?.loadType ?? [], data.loadType) !== data.loadType 
-                                                ? findLocalizedLabel(lookups?.loadType ?? [], data.loadType)
-                                                : (() => {
-                                                    const loadTypeMap: Record<string, string> = {
-                                                        "ANY": t('shipments.editDialog.loadTypeAny'),
-                                                        "FULL": t('shipments.editDialog.loadTypeFull'),
-                                                        "PARTIAL": t('shipments.editDialog.loadTypePartial'),
-                                                        "CONSOLIDATED": t('shipments.editDialog.loadTypeConsolidated')
-                                                    };
-                                                    return loadTypeMap[data.loadType] || data.loadType;
-                                                })()
+                                            (() => {
+                                                const loadTypeArray = Array.isArray(data.loadType) ? data.loadType : [data.loadType];
+                                                const loadTypeMap: Record<string, string> = {
+                                                    "ANY": t('shipments.editDialog.loadTypeAny'),
+                                                    "FULL": t('shipments.editDialog.loadTypeFull'),
+                                                    "PARTIAL": t('shipments.editDialog.loadTypePartial'),
+                                                    "CONSOLIDATED": t('shipments.editDialog.loadTypeConsolidated')
+                                                };
+                                                return loadTypeArray.map(lt => {
+                                                    const lookupLabel = findLocalizedLabel(lookups?.loadType ?? [], lt);
+                                                    return lookupLabel !== lt ? lookupLabel : (loadTypeMap[lt] || lt);
+                                                }).join(', ');
+                                            })()
                                         }
                                     </Typography>
                                 )}

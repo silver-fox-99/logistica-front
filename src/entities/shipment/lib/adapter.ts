@@ -72,7 +72,7 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
 
         // Дополнительные поля
         vehicleType: i.vehicle_type,
-        loadType: i.load_type,
+        loadType: Array.isArray(i.load_type) ? i.load_type : (i.load_type ? [i.load_type] : undefined),
         cargoType: i.cargo_type,
         allowPartialLoad: i.allow_partial_load ?? undefined,
         carsCount: i.cars_count ?? undefined,

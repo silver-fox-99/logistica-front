@@ -47,7 +47,7 @@ type FormValues = {
 
     cargoType: string;
     vehicleType: string;
-    loadType: string;
+    loadType: string[];
     allowPartial: boolean;
 
     vehiclesCount?: number;
@@ -206,7 +206,7 @@ export default function AddCargoPage() {
 
         cargoType: "",
         vehicleType: "",
-        loadType: "",
+        loadType: [],
         allowPartial: false,
 
         vehiclesCount: 1,
@@ -244,7 +244,7 @@ export default function AddCargoPage() {
         if (lookups && !loadingInit) {
             const currency = lookups.currency[0]?.slug   ?? "";
             const vehicle  = lookups.vehicleType[0]?.slug ?? "";
-            const loadType = lookups.loadType?.[0]?.slug    ?? "";
+            const loadType = lookups.loadType?.[0]?.slug ? [lookups.loadType[0].slug] : [];
             const cargo    = lookups.cargoTypes?.[0]?.slug  ?? "";
             setForm((s) => ({ ...s, currency, vehicleType: vehicle, loadType, cargoType: cargo }));
         }
@@ -273,7 +273,7 @@ export default function AddCargoPage() {
 
         if (!form.cargoType) e.cargoType = t('addCargo.errors.selectCargoType');
         if (!form.vehicleType) e.vehicleType = t('addCargo.errors.selectVehicleType');
-        if (!form.loadType) e.loadType = t('addCargo.errors.selectLoadType');
+        if (!form.loadType || form.loadType.length === 0) e.loadType = t('addCargo.errors.selectLoadType');
         if (!form.paymentMethod) e.paymentMethod = t('addCargo.errors.selectPaymentMethod');
 
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
@@ -314,7 +314,7 @@ export default function AddCargoPage() {
             country_from: countryFromName,
 
             vehicle_type: (v.vehicleType as CreateCargoDto["vehicle_type"]) || "ANY",
-            load_type: (v.loadType as CreateCargoDto["load_type"]) || "FULL",
+            load_type: (v.loadType as CreateCargoDto["load_type"]) || ["FULL"],
             cargo_type: (v.cargoType as CreateCargoDto["cargo_type"]) || "GENERAL",
             allow_partial_load: !!v.allowPartial,
 
@@ -537,14 +537,16 @@ export default function AddCargoPage() {
                                         <Select
                                             key={`loadType-${i18n.language}`}
                                             fullWidth 
+                                            multiple
                                             displayEmpty
-                                            value={form.loadType || ""} 
-                                            onChange={(e) => setField("loadType", e.target.value as string)}
+                                            value={form.loadType || []} 
+                                            onChange={(e) => setField("loadType", typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value as string[])}
                                             renderValue={(selected) => {
-                                                if (!selected || selected === "") {
+                                                if (!selected || (Array.isArray(selected) && selected.length === 0)) {
                                                     return <em style={{ color: '#999' }}>{t('addCargo.fields.selectLoadType')}</em>;
                                                 }
-                                                return findLocalizedLabel(loadOpts, selected as string);
+                                                const selectedArray = Array.isArray(selected) ? selected : [selected];
+                                                return selectedArray.map(slug => findLocalizedLabel(loadOpts, slug as string)).join(', ');
                                             }}
                                         >
                                             {loadOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
@@ -921,14 +923,16 @@ export default function AddCargoPage() {
                             <Select
                                     key={`loadType-desktop-${i18n.language}`}
                                     fullWidth 
+                                    multiple
                                     displayEmpty
-                                    value={form.loadType || ""} 
-                                    onChange={(e) => setField("loadType", e.target.value as string)}
+                                    value={form.loadType || []} 
+                                    onChange={(e) => setField("loadType", typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value as string[])}
                                     renderValue={(selected) => {
-                                        if (!selected || selected === "") {
+                                        if (!selected || (Array.isArray(selected) && selected.length === 0)) {
                                             return <em style={{ color: '#999' }}>{t('addCargo.fields.selectLoadType')}</em>;
                                         }
-                                        return findLocalizedLabel(loadOpts, selected as string);
+                                        const selectedArray = Array.isArray(selected) ? selected : [selected];
+                                        return selectedArray.map(slug => findLocalizedLabel(loadOpts, slug as string)).join(', ');
                                     }}
                             >
                                 {loadOpts.map((o: LookupOpt) => (

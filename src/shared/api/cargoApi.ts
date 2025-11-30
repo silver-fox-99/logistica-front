@@ -62,7 +62,7 @@ export type CreateCargoDto = {
     country_from: string;
 
     vehicle_type: string;
-    load_type: string;
+    load_type: string[];
     cargo_type: string;
     allow_partial_load: boolean;
 

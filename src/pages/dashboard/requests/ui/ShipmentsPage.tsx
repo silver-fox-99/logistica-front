@@ -240,7 +240,7 @@ function ListBody({
                dateTo: editInitial?.dateTo ?? null,
                vehicleType: editItem?.vehicleType ?? "ANY",
                // cargo-only:
-               loadType: (editItem as any)?.loadType ?? "ANY",
+               loadType: (editItem as any)?.loadType ?? ["ANY"],
                cargoType: (editItem as any)?.cargoType ?? "GENERAL",
                allowPartialLoad: (editItem as any)?.allowPartialLoad ?? false,
                palletsCount: (editItem as any)?.palletsCount ?? null,

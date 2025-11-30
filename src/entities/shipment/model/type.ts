@@ -35,7 +35,7 @@ export type ShipmentRowData = {
     
 
     vehicleType?: string;
-    loadType?: string;
+    loadType?: string[];
     cargoType?: string;
     allowPartialLoad?: boolean;
     carsCount?: number;
@@ -79,7 +79,7 @@ export type CargoApiItem = {
     
 
     vehicle_type?: string;
-    load_type?: string;
+    load_type?: string[];
     cargo_type?: string;
     allow_partial_load?: boolean;
     cars_count?: number;

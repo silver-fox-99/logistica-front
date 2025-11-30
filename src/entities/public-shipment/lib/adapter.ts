@@ -6,7 +6,8 @@ export function adaptCargo(a: PublicCargoApi): PublicShipmentBase {
     if (a.volume_m3) metrics.push(`${Number(a.volume_m3)} m³`);
     if (typeof a.cars_count === "number") metrics.push(`${a.cars_count} cars`);
 
-    const tags = [a.vehicle_type, a.load_type, a.cargo_type].filter(Boolean);
+    const loadTypes = Array.isArray(a.load_type) ? a.load_type : (a.load_type ? [a.load_type] : []);
+    const tags = [a.vehicle_type, ...loadTypes, a.cargo_type].filter(Boolean);
 
     const price = a.price_amount && a.price_currency
         ? `${a.price_currency} ${Number(a.price_amount).toFixed(2)}`

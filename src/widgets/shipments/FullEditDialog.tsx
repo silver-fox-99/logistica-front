@@ -37,7 +37,7 @@ type InitialData = {
     dateFrom?: string | null;
     dateTo?: string | null;
     vehicleType?: string | null;
-    loadType?: string | null;           // cargo only
+    loadType?: string[] | null;          // cargo only
     cargoType?: string | null;          // cargo only
     allowPartialLoad?: boolean | null;  // cargo only
     carsCount?: number | string | null; // transport only
@@ -161,7 +161,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         note: toStr(initial?.note),
 
         // cargo only
-        loadType: initial?.loadType || "ANY",
+        loadType: Array.isArray(initial?.loadType) ? initial.loadType : (initial?.loadType ? [initial.loadType] : ["ANY"]),
         cargoType: initial?.cargoType || "GENERAL",
         allowPartialLoad: toBool(initial?.allowPartialLoad, false),
         palletsCount: toStr(initial?.palletsCount),
@@ -213,7 +213,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             priceCurrency: initial?.priceCurrency || "USD",
             priceAmount: toStr(initial?.priceAmount),
             note: toStr(initial?.note),
-            loadType: initial?.loadType || "ANY",
+            loadType: Array.isArray(initial?.loadType) ? initial.loadType : (initial?.loadType ? [initial.loadType] : ["ANY"]),
             cargoType: initial?.cargoType || "GENERAL",
             allowPartialLoad: toBool(initial?.allowPartialLoad, false),
             palletsCount: toStr(initial?.palletsCount),
@@ -326,7 +326,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         };
 
         if (kind === "cargo") {
-            payload.load_type = form.loadType || "ANY";
+            payload.load_type = form.loadType || ["ANY"];
             payload.cargo_type = form.cargoType || "GENERAL";
             payload.allow_partial_load = !!form.allowPartialLoad;
             payload.pallets_count = toOptionalNumber(form.palletsCount);
@@ -401,8 +401,31 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                             <InputLabel>{t('shipments.editDialog.loadType')}</InputLabel>
                                             <Select
                                                 label={t('shipments.editDialog.loadType')}
-                                                value={form.loadType}
-                                                onChange={handleChange("loadType")}
+                                                multiple
+                                                value={Array.isArray(form.loadType) ? form.loadType : (form.loadType ? [form.loadType] : [])}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setForm(prev => ({
+                                                        ...prev,
+                                                        loadType: typeof value === 'string' ? value.split(',') : value as string[]
+                                                    }));
+                                                }}
+                                                renderValue={(selected) => {
+                                                    if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+                                                        return <em style={{ color: '#999' }}>{t('shipments.editDialog.selectLoadType')}</em>;
+                                                    }
+                                                    const selectedArray = Array.isArray(selected) ? selected : [selected];
+                                                    const labels = selectedArray.map(val => {
+                                                        const map: Record<string, string> = {
+                                                            "ANY": t('shipments.editDialog.loadTypeAny'),
+                                                            "FULL": t('shipments.editDialog.loadTypeFull'),
+                                                            "PARTIAL": t('shipments.editDialog.loadTypePartial'),
+                                                            "CONSOLIDATED": t('shipments.editDialog.loadTypeConsolidated')
+                                                        };
+                                                        return map[val] || val;
+                                                    });
+                                                    return labels.join(', ');
+                                                }}
                                             >
                                                 <MenuItem value="ANY">{t('shipments.editDialog.loadTypeAny')}</MenuItem>
                                                 <MenuItem value="FULL">{t('shipments.editDialog.loadTypeFull')}</MenuItem>

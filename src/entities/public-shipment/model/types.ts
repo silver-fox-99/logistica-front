@@ -56,7 +56,7 @@ export type PublicCargoApi = {
     date_from: string;
     date_to: string;
     vehicle_type: string;
-    load_type: string;
+    load_type: string[];
     cargo_type: string;
     allow_partial_load: boolean;
     weight_t: string;
