@@ -145,9 +145,9 @@ function PlaceRow({
         return Array.from(m.values()).sort(sortByOrder);
     }, [citiesFromCountry, citiesFromRegion]);
 
-    const countryValue = place.countryId ? countries.find(c => c.id === place.countryId) ?? null : null;
-    const regionValue = place.regionId ? regions.find(r => r.id === place.regionId) ?? null : null;
-    const cityValue = place.cityId ? mergedCities.find(c => c.id === place.cityId) ?? null : null;
+    const countryValue = place.countryId ? countries.find((c: Geo) => c.id === place.countryId) ?? null : null;
+    const regionValue = place.regionId ? regions.find((r: Geo) => r.id === place.regionId) ?? null : null;
+    const cityValue = place.cityId ? mergedCities.find((c: Geo) => c.id === place.cityId) ?? null : null;
 
     return (
         <Stack spacing={1.25}>
