@@ -431,7 +431,15 @@
       "max": "Maks",
       "apply": "Qo'llash",
       "reset": "Qayta o'rnatish",
-      "searchLabel": "Buyurtmalarni qidirish"
+      "searchLabel": "Buyurtmalarni qidirish",
+      "favorites": "Faqat sevimlilar"
+    },
+    "favorites": {
+      "added": "Sevimlilar ro'yxatiga qo'shildi",
+      "removed": "Sevimlilar ro'yxatidan olib tashlandi",
+      "error": "Sevimlilar bilan ishlashda xatolik",
+      "add": "Sevimlilar ro'yxatiga qo'shish",
+      "remove": "Sevimlilar ro'yxatidan olib tashlash"
     }
   },
   "company": {

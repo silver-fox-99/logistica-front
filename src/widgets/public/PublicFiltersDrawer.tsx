@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-    Drawer, Box, Stack, Typography, Divider, TextField, Button
+    Drawer, Box, Stack, Typography, Divider, TextField, Button, FormControlLabel, Switch
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { FiFilter, FiRefreshCw } from "react-icons/fi";
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi.ts";
 import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 export type PublicFilters = {
     pickup_country?: string;
@@ -27,6 +28,7 @@ export type PublicFilters = {
     volume_min?: number;
     volume_max?: number;
     vehicle_type?: string;
+    favorites_only?: boolean;
 };
 
 type Props = {
@@ -67,10 +69,11 @@ type VehicleTypeOption = { value: string; label: string };
 type Option = { id: string; label: string };
 
 export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups } = useInitStore();
+    const user = useUserStore((s) => s.user);
     
     const getTodayDate = () => {
         const today = new Date();
@@ -146,7 +149,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     };
 
     const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: getLocalizedGeoName(i) }));
-    const countriesOpts = useMemo(() => asOptions(countries), [countries]);
+    const countriesOpts = useMemo(() => asOptions(countries), [countries, getLocalizedGeoName, i18n.resolvedLanguage]);
 
     // PICKUP lists + disable rules
     const pickupRegions = useMemo(() => regionsByCountry(f.pickup_country), [geos, f.pickup_country]);
@@ -166,11 +169,11 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     );
     const pickupRegionValue: Option | null = useMemo(
         () => asOptions(pickupRegions).find(o => o.id === f.pickup_region) ?? null,
-        [pickupRegions, f.pickup_region]
+        [pickupRegions, f.pickup_region, getLocalizedGeoName, i18n.resolvedLanguage]
     );
     const pickupCityValue: Option | null = useMemo(
         () => asOptions(pickupCities).find(o => o.id === f.pickup_city) ?? null,
-        [pickupCities, f.pickup_city]
+        [pickupCities, f.pickup_city, getLocalizedGeoName, i18n.resolvedLanguage]
     );
 
     // DROPOFF lists + disable rules
@@ -191,11 +194,11 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     );
     const dropoffRegionValue: Option | null = useMemo(
         () => asOptions(dropoffRegions).find(o => o.id === f.dropoff_region) ?? null,
-        [dropoffRegions, f.dropoff_region]
+        [dropoffRegions, f.dropoff_region, getLocalizedGeoName, i18n.resolvedLanguage]
     );
     const dropoffCityValue: Option | null = useMemo(
         () => asOptions(dropoffCities).find(o => o.id === f.dropoff_city) ?? null,
-        [dropoffCities, f.dropoff_city]
+        [dropoffCities, f.dropoff_city, getLocalizedGeoName, i18n.resolvedLanguage]
     );
 
     const vehicleTypes = filtersData?.vehicle_types ?? [];
@@ -242,6 +245,19 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                 </Stack>
 
                 <Divider sx={{ my: 2 }} />
+
+                {user && (
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={f.favorites_only ?? false}
+                                onChange={(e) => setF(v => ({ ...v, favorites_only: e.target.checked }))}
+                            />
+                        }
+                        label={t('shipments.filters.favorites')}
+                        sx={{ mb: 2 }}
+                    />
+                )}
 
                 {/* PICKUP */}
                 <Typography variant="subtitle2" gutterBottom>{t('shipments.filters.pickup')}</Typography>

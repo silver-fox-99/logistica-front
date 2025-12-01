@@ -9,9 +9,10 @@ import type { PublicFilters } from "./types";
 function compact<T extends Record<string, unknown>>(obj: T): Partial<T> {
     return (Object.keys(obj) as (keyof T)[]).reduce<Partial<T>>((acc, key) => {
         const v = obj[key];
-        if (v !== undefined && v !== null && v !== "") {
-            acc[key] = v;
+        if (v === undefined || v === null || v === "") {
+            return acc;
         }
+        acc[key] = v;
         return acc;
     }, {});
 }

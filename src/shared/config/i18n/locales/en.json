@@ -430,7 +430,15 @@
       "max": "Max",
       "apply": "Apply",
       "reset": "Reset",
-      "searchLabel": "Search orders"
+      "searchLabel": "Search orders",
+      "favorites": "Favorites only"
+    },
+    "favorites": {
+      "added": "Added to favorites",
+      "removed": "Removed from favorites",
+      "error": "Error working with favorites",
+      "add": "Add to favorites",
+      "remove": "Remove from favorites"
     }
   },
   "company": {

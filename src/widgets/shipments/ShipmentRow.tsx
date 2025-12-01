@@ -5,7 +5,7 @@ import {
 import Grid from "@mui/material/Grid";
 import {
     FiClock, FiMapPin, FiPackage, FiTruck,
-    FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiEye
+    FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiEye, FiStar
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
@@ -15,12 +15,16 @@ import { useInitStore } from "@/shared/store/initStore";
 import "./ShipmentRow.scss";
 import {cargoApi} from "@/shared/api/cargoApi.ts";
 import {transportApi} from "@/shared/api/transportApi.ts";
+import { favoritesApi } from "@/shared/api/favoritesApi";
+import { toast } from "react-toastify";
 
 type Props = {
     data: ShipmentRowData;
     scope: "public" | "my";
     onMoreOpen?: (id: string) => void;
     kind: ShipmentsKind;
+    favoriteIds?: Set<string>;
+    onFavoriteChange?: (id: string, isFavorite: boolean) => void;
     /** Экшены для scope="my" */
     onUp?: (id: string) => void;
     onEdit?: (id: string) => void;
@@ -30,12 +34,14 @@ type Props = {
 };
 
 export default function ShipmentRow({
-                                        data, kind, onMoreOpen, scope, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
+                                        data, kind, onMoreOpen, scope, favoriteIds, onFavoriteChange, onUp, onEdit, onDelete, onCopy, mobileLayout = "column"
                                     }: Props) {
     const { t, i18n } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
     const { lookups, loadInit } = useInitStore();
     const [expanded, setExpanded] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
     
     const formatRoute = useCallback((point?: GeoPoint) => {
         if (!point) return "—";
@@ -79,6 +85,36 @@ export default function ShipmentRow({
     useEffect(() => {
         loadInit();
     }, [loadInit]);
+
+    useEffect(() => {
+        if (scope === "public" && favoriteIds) {
+            setIsFavorite(favoriteIds.has(data.id));
+        } else {
+            setIsFavorite(false);
+        }
+    }, [scope, data.id, favoriteIds]);
+
+    const handleToggleFavorite = async () => {
+        if (scope !== "public") return;
+        setFavoriteLoading(true);
+        try {
+            if (isFavorite) {
+                await favoritesApi.remove(kind, data.id);
+                setIsFavorite(false);
+                onFavoriteChange?.(data.id, false);
+                toast.success(t('shipments.favorites.removed'));
+            } else {
+                await favoritesApi.add(kind, data.id);
+                setIsFavorite(true);
+                onFavoriteChange?.(data.id, true);
+                toast.success(t('shipments.favorites.added'));
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || t('shipments.favorites.error'));
+        } finally {
+            setFavoriteLoading(false);
+        }
+    };
 
     const openMore = () => {
         if (!expanded) {
@@ -280,6 +316,20 @@ export default function ShipmentRow({
                             alignItems={{ xs: mobileLayout === "column" ? "flex-start" : "center", md: "center" }}
                             sx={{ width: { xs: mobileLayout === "column" ? "100%" : "auto", md: "auto" } }}
                         >
+                            {scope === "public" && (
+                                <Tooltip title={isFavorite ? t('shipments.favorites.remove') : t('shipments.favorites.add')}>
+                                    <IconButton
+                                        onClick={handleToggleFavorite}
+                                        disabled={favoriteLoading}
+                                        sx={{
+                                            color: isFavorite ? "#ff9800" : "inherit",
+                                            "&:hover": { color: "#ff9800" }
+                                        }}
+                                    >
+                                        <FiStar fill={isFavorite ? "#ff9800" : "none"} />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
                             <Button
                                 size="small"
                                 variant="contained"

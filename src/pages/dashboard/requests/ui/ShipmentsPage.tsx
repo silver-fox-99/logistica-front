@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
     Box, Paper, Stack, Typography, Button, MenuItem, Select, Pagination
 } from "@mui/material";
@@ -17,6 +17,7 @@ import {
     cargoUp, cargoPatch, cargoDelete,
     transportUp, transportPatch, transportDelete, shipmentCopy
 } from "@/shared/api/shipmentsActions";
+import { favoritesApi } from "@/shared/api/favoritesApi";
 
 
 
@@ -48,9 +49,25 @@ function ListBody({
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const limit = 10;
+    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
     const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
     const list = useMemo(() => items, [items]);
+
+    useEffect(() => {
+        if (scope === "public") {
+            const loadFavorites = async () => {
+                try {
+                    const res = await favoritesApi.list(kind);
+                    const ids = (res?.data ?? []).map((item: any) => item.id || item.cargo_id || item.transport_id).filter(Boolean);
+                    setFavoriteIds(new Set(ids));
+                } catch {
+                    setFavoriteIds(new Set());
+                }
+            };
+            loadFavorites();
+        }
+    }, [scope, kind]);
 
     const [editOpen, setEditOpen] = useState(false);
     const [editItem, setEditItem] = useState<ShipmentRowData | null>(null);
@@ -202,11 +219,23 @@ function ListBody({
             <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
                 <Grid container spacing={{ xs: 0, md: 1.5 }} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: { xs: "0 !important", md: 0 }, marginLeft: { xs: "0 !important", md: 0 }, marginRight: { xs: "0 !important", md: 0 } }}>
                     {list.map((item) => (
-                        <Grid key={item.id} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: 0 }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
+                        <Grid key={`${item.id}-${kind}`} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: 0 }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
                         <ShipmentRow
                             scope={scope}
                             data={item}
                             kind={kind}
+                            favoriteIds={scope === "public" ? favoriteIds : undefined}
+                            onFavoriteChange={scope === "public" ? (id, isFavorite) => {
+                                setFavoriteIds(prev => {
+                                    const next = new Set(prev);
+                                    if (isFavorite) {
+                                        next.add(id);
+                                    } else {
+                                        next.delete(id);
+                                    }
+                                    return next;
+                                });
+                            } : undefined}
                             onMoreOpen={(id) => console.log("more", id)}
                             onUp={scope === "my" ? handleUp : undefined}
                             onEdit={scope === "my" ? openEdit : undefined}

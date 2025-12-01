@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Drawer, Box, Stack, Typography, RadioGroup, FormControlLabel, Radio,
-    Button, Divider, TextField
+    Button, Divider, TextField, Switch
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import type {ShipmentsKind} from "@/entities/shipment/model/type.ts";
 import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
 import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 
 type Geo = {
@@ -55,10 +56,11 @@ type Props = {
 export default function ShipmentsFilterDrawer({
                                                   open, value, onChange, filters, onFiltersChange, onClose, onApply, onReset
                                               }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups } = useInitStore();
+    const user = useUserStore((s) => s.user);
     const [data, setData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOption[] }>(null);
 
     // при открытии можно подмешать актуальные (если не загружали раньше)
@@ -91,7 +93,7 @@ export default function ShipmentsFilterDrawer({
     };
 
     const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: getLocalizedGeoName(i) }));
-    const countriesOpts = useMemo(() => asOptions(countries), [countries]);
+    const countriesOpts = useMemo(() => asOptions(countries), [countries, getLocalizedGeoName, i18n.resolvedLanguage]);
 
     const pickupRegions = useMemo(() => regionsByCountry(filters.pickup_country), [geos, filters.pickup_country]);
     const pickupCities  = useMemo(() => {
@@ -120,20 +122,24 @@ export default function ShipmentsFilterDrawer({
         () => countriesOpts.find(o => o.id === filters.pickup_country) ?? null, [countriesOpts, filters.pickup_country]
     );
     const pickupRegionValue: Option | null = useMemo(
-        () => asOptions(pickupRegions).find(o => o.id === filters.pickup_region) ?? null, [pickupRegions, filters.pickup_region]
+        () => asOptions(pickupRegions).find(o => o.id === filters.pickup_region) ?? null, 
+        [pickupRegions, filters.pickup_region, getLocalizedGeoName, i18n.resolvedLanguage]
     );
     const pickupCityValue: Option | null = useMemo(
-        () => asOptions(pickupCities).find(o => o.id === filters.pickup_city) ?? null, [pickupCities, filters.pickup_city]
+        () => asOptions(pickupCities).find(o => o.id === filters.pickup_city) ?? null, 
+        [pickupCities, filters.pickup_city, getLocalizedGeoName, i18n.resolvedLanguage]
     );
 
     const dropoffCountryValue: Option | null = useMemo(
         () => countriesOpts.find(o => o.id === filters.dropoff_country) ?? null, [countriesOpts, filters.dropoff_country]
     );
     const dropoffRegionValue: Option | null = useMemo(
-        () => asOptions(dropoffRegions).find(o => o.id === filters.dropoff_region) ?? null, [dropoffRegions, filters.dropoff_region]
+        () => asOptions(dropoffRegions).find(o => o.id === filters.dropoff_region) ?? null, 
+        [dropoffRegions, filters.dropoff_region, getLocalizedGeoName, i18n.resolvedLanguage]
     );
     const dropoffCityValue: Option | null = useMemo(
-        () => asOptions(dropoffCities).find(o => o.id === filters.dropoff_city) ?? null, [dropoffCities, filters.dropoff_city]
+        () => asOptions(dropoffCities).find(o => o.id === filters.dropoff_city) ?? null, 
+        [dropoffCities, filters.dropoff_city, getLocalizedGeoName, i18n.resolvedLanguage]
     );
 
     const vehicleTypes = data?.vehicle_types ?? [];
@@ -177,6 +183,19 @@ export default function ShipmentsFilterDrawer({
                 </Stack>
 
                 <Divider sx={{ my: 2 }} />
+
+                {user && (
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={filters.favorites_only ?? false}
+                                onChange={(e) => onFiltersChange({ ...filters, favorites_only: e.target.checked })}
+                            />
+                        }
+                        label={t('shipments.filters.favorites')}
+                        sx={{ mb: 2 }}
+                    />
+                )}
 
                 {/* PICKUP */}
                 <Typography variant="subtitle2" gutterBottom>{t('shipments.filters.pickup')}</Typography>

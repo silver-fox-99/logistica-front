@@ -32,6 +32,7 @@ export default function GeoLocationDialog({
     const [slug, setSlug] = useState<string>("");
     const [parent, setParent] = useState<GeoLocation | null>(null);
     const [isActive, setIsActive] = useState<boolean>(true);
+    const [order, setOrder] = useState<number | "">(0);
 
     const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
@@ -44,6 +45,7 @@ export default function GeoLocationDialog({
         setIso2((initial?.iso2 as string) ?? "");
         setSlug((initial?.slug as string) ?? "");
         setIsActive((initial?.is_active as boolean) ?? true);
+        setOrder(initial?.order ?? "");
         const p = initial?.parent_id ? all.find(i => i.id === initial!.parent_id) ?? null : null;
         setParent(p);
         setErrors({});
@@ -60,10 +62,6 @@ export default function GeoLocationDialog({
         return set;
     }, [all, initial?.id]);
 
-    // лёгкая логика согласованности типов:
-    // - COUNTRY: без родителя
-    // - REGION: родитель — COUNTRY или null
-    // - CITY/DISTRICT/OTHER: родитель — любой (COUNTRY/REGION/…); это даёт гибкость
     const parentOptions = useMemo(() => {
         let opts = all.filter(i => !unavailableIds.has(i.id));
         if (type === "COUNTRY") {
@@ -99,6 +97,7 @@ export default function GeoLocationDialog({
                 code: code || undefined,
                 iso2: iso2 || undefined,
                 slug: slug || undefined,
+                order: order === "" ? undefined : (typeof order === "number" ? order : undefined),
             };
             await onSubmit(dto);
         } else {
@@ -112,6 +111,7 @@ export default function GeoLocationDialog({
                 iso2: iso2 || null,
                 slug: slug || null,
                 is_active: isActive,
+                order: order === "" ? undefined : (typeof order === "number" ? order : undefined),
             };
             await onSubmit(dto);
         }
@@ -175,18 +175,32 @@ export default function GeoLocationDialog({
                     />
 
                     {mode === "edit" && (
-                        <FormControl size="small">
-                            <InputLabel shrink>Активен</InputLabel>
-                            <Select
-                                notched
-                                value={String(isActive)}
-                                onChange={(e) => setIsActive(e.target.value === "true")}
-                                label="Активен"
-                            >
-                                <MenuItem value="true">Активен</MenuItem>
-                                <MenuItem value="false">Неактивен</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <>
+                            <TextField
+                                size="small"
+                                label="Порядок сортировки"
+                                type="number"
+                                value={order}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setOrder(val === "" ? "" : parseInt(val, 10));
+                                }}
+                                inputProps={{ min: 0 }}
+                                helperText="Меньшее значение = выше в списке (например, 0 для Узбекистана)"
+                            />
+                            <FormControl size="small">
+                                <InputLabel shrink>Активен</InputLabel>
+                                <Select
+                                    notched
+                                    value={String(isActive)}
+                                    onChange={(e) => setIsActive(e.target.value === "true")}
+                                    label="Активен"
+                                >
+                                    <MenuItem value="true">Активен</MenuItem>
+                                    <MenuItem value="false">Неактивен</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </>
                     )}
                 </Stack>
             </DialogContent>

@@ -34,11 +34,7 @@ export type PublicFilters = {
     weight_max?: number;
     volume_min?: number;
     volume_max?: number;
-
-    // allow_partial_load?: boolean;
-    // price_currency?: string;
-    // price_min?: number;
-    // price_max?: number;
+    favorites_only?: boolean;
 };
 
 export type PublicShipmentBase = {

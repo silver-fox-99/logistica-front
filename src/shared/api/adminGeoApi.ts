@@ -11,6 +11,7 @@ export type GeoLocation = {
     iso2?: string | null;
     slug?: string | null;
     is_active?: boolean;
+    order?: number;
     name_ru?: string;
     name_uz?: string;
     created_at?: string;
@@ -30,8 +31,9 @@ export type CreateLocationDto = {
     name_uz?: string | null;
     parent_id?: string;
     code?: string;
-    iso2?: string; // только для стран (2 буквы)
+    iso2?: string;
     slug?: string;
+    order?: number;
 };
 
 export type UpdateLocationDto = Partial<{
@@ -44,6 +46,7 @@ export type UpdateLocationDto = Partial<{
     iso2: string | null;
     slug: string | null;
     is_active: boolean;
+    order: number;
 }>;
 
 const BASE = "/geo-location";
