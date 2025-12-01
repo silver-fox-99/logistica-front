@@ -313,6 +313,11 @@ export default function AddTransportPage() {
     const validate = () => {
         const e: Record<string, string> = {};
         if (!form.dateFrom) e.dateFrom = t('addTransport.errors.required');
+        if (!form.dateTo) e.dateTo = t('addTransport.errors.required');
+        
+        if (form.dateFrom && form.dateTo && form.dateTo < form.dateFrom) {
+            e.dateTo = t('addTransport.errors.dateOrder');
+        }
 
         if (!form.loadPlaces[0]?.countryId) e.loadPlaces = t('addTransport.errors.selectCountryLoad');
         if (!form.unloadPlaces[0]?.countryId) e.unloadPlaces = t('addTransport.errors.selectCountryUnload');

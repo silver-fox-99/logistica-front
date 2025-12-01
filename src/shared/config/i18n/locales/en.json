@@ -112,7 +112,8 @@
       "selectVehicleType": "Select vehicle type",
       "selectLoadType": "Select load type",
       "selectPaymentMethod": "Select payment method",
-      "invalidPhone": "Invalid phone format. Use + and digits, total 10-20 digits"
+      "invalidPhone": "Invalid phone format. Use + and digits, total 10-20 digits",
+      "dateOrder": "Unloading date must be later than or equal to loading date"
     }
   },
   "addTransport": {
@@ -197,7 +198,8 @@
       "selectPaymentMethod": "Select payment method",
       "selectPaymentTerm": "Select payment terms",
       "fillAllDimensions": "Fill in all body dimensions",
-      "invalidPhone": "Invalid phone format. Use + and digits, total 10-20 digits"
+      "invalidPhone": "Invalid phone format. Use + and digits, total 10-20 digits",
+      "dateOrder": "Unloading date must be later than or equal to loading date"
     }
   },
   "dashboard": {

@@ -112,7 +112,8 @@
       "selectVehicleType": "Transport turini tanlang",
       "selectLoadType": "Yuklash turini tanlang",
       "selectPaymentMethod": "To'lov usulini tanlang",
-      "invalidPhone": "Telefon formati noto'g'ri. + va raqamlardan foydalaning, jami 10-20 raqam"
+      "invalidPhone": "Telefon formati noto'g'ri. + va raqamlardan foydalaning, jami 10-20 raqam",
+      "dateOrder": "Tushirish sanasi yuklash sanasidan keyin yoki teng bo'lishi kerak"
     }
   },
   "addTransport": {
@@ -197,7 +198,8 @@
       "selectPaymentMethod": "To'lov usulini tanlang",
       "selectPaymentTerm": "To'lov shartlarini tanlang",
       "fillAllDimensions": "Barcha kuzov o'lchamlarini to'ldiring",
-      "invalidPhone": "Telefon formati noto'g'ri. + va raqamlardan foydalaning, jami 10-20 raqam"
+      "invalidPhone": "Telefon formati noto'g'ri. + va raqamlardan foydalaning, jami 10-20 raqam",
+      "dateOrder": "Tushirish sanasi yuklash sanasidan keyin yoki teng bo'lishi kerak"
     }
   },
   "dashboard": {

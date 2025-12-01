@@ -9,7 +9,8 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type { GeoPoint } from "@/entities/shipment/model/type";
-import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
+import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 type Kind = "cargo" | "transport";
 
@@ -139,8 +140,9 @@ const findCityIdLoose = (geos: Geo[], countryId: string, regionId: string, name?
 export default function FullEditDialog({ open, kind, initial, onClose, onSubmit }: Props) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
+    const { getLocalizedLabel } = useLocalizedLookup();
+    const { lookups } = useInitStore();
     
-    // Справочники
     const [filtersData, setFiltersData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOpt[] }>(null);
     const [loadingFilters, setLoadingFilters] = useState(false);
 
@@ -298,13 +300,31 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         [filtersData, form.p2_countryId, form.p2_regionId]
     );
 
-    const vehicleTypeOptions = filtersData?.vehicle_types ?? [];
+    const vehicleTypeOptions = useMemo(() => {
+        if (!filtersData?.vehicle_types) return [];
+        
+        return filtersData.vehicle_types.map(opt => {
+            const lookup = lookups?.vehicleType?.find(l => l.slug === opt.value);
+            if (lookup) {
+                return {
+                    value: opt.value,
+                    label: getLocalizedLabel(lookup)
+                };
+            }
+            return opt;
+        });
+    }, [filtersData, lookups, getLocalizedLabel]);
 
   //  const nameOf = (id?: string) =>
   //      id ? geoIdx?.byId.get(id)?.name ?? null : null;
 
     const submit = async () => {
         if (!filtersData || !geoIdx) return;
+
+        if (form.dateFrom && form.dateTo && form.dateTo < form.dateFrom) {
+            toast.error(t('shipments.copyDialog.errorDateOrder'));
+            return;
+        }
 
         const payload: any = {
             date_from: form.dateFrom || null,
