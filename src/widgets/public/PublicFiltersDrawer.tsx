@@ -6,7 +6,8 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { FiFilter, FiRefreshCw } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi.ts";
-import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
+import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 export type PublicFilters = {
     pickup_country?: string;
@@ -68,6 +69,8 @@ type Option = { id: string; label: string };
 export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: Props) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
+    const { getLocalizedLabel } = useLocalizedLookup();
+    const { lookups } = useInitStore();
     
     const getTodayDate = () => {
         const today = new Date();
@@ -195,12 +198,19 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
         [dropoffCities, f.dropoff_city]
     );
 
-    // VEHICLE
     const vehicleTypes = filtersData?.vehicle_types ?? [];
-    const vehicleOpts: Option[] = useMemo(
-        () => vehicleTypes.map(v => ({ id: v.value, label: v.label })),
-        [vehicleTypes]
-    );
+    const vehicleOpts: Option[] = useMemo(() => {
+        return vehicleTypes.map(v => {
+            const lookup = lookups?.vehicleType?.find(l => l.slug === v.value);
+            if (lookup) {
+                return {
+                    id: v.value,
+                    label: getLocalizedLabel(lookup)
+                };
+            }
+            return { id: v.value, label: v.label };
+        });
+    }, [vehicleTypes, lookups, getLocalizedLabel]);
     const vehicleValue: Option | null = useMemo(
         () => vehicleOpts.find(o => o.id === f.vehicle_type) ?? null,
         [vehicleOpts, f.vehicle_type]

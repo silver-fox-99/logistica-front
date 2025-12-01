@@ -9,7 +9,8 @@ import { useTranslation } from "react-i18next";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type {ShipmentsKind} from "@/entities/shipment/model/type.ts";
 import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
-import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
+import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 
 type Geo = {
@@ -56,6 +57,8 @@ export default function ShipmentsFilterDrawer({
                                               }: Props) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
+    const { getLocalizedLabel } = useLocalizedLookup();
+    const { lookups } = useInitStore();
     const [data, setData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOption[] }>(null);
 
     // при открытии можно подмешать актуальные (если не загружали раньше)
@@ -133,9 +136,19 @@ export default function ShipmentsFilterDrawer({
         () => asOptions(dropoffCities).find(o => o.id === filters.dropoff_city) ?? null, [dropoffCities, filters.dropoff_city]
     );
 
-    // vehicle
     const vehicleTypes = data?.vehicle_types ?? [];
-    const vehicleOpts: Option[] = useMemo(() => vehicleTypes.map(v => ({ id: v.value, label: v.label })), [vehicleTypes]);
+    const vehicleOpts: Option[] = useMemo(() => {
+        return vehicleTypes.map(v => {
+            const lookup = lookups?.vehicleType?.find(l => l.slug === v.value);
+            if (lookup) {
+                return {
+                    id: v.value,
+                    label: getLocalizedLabel(lookup)
+                };
+            }
+            return { id: v.value, label: v.label };
+        });
+    }, [vehicleTypes, lookups, getLocalizedLabel]);
     const vehicleValue: Option | null = useMemo(
         () => vehicleOpts.find(o => o.id === filters.vehicle_type) ?? null, [vehicleOpts, filters.vehicle_type]
     );
