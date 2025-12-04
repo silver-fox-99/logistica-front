@@ -49,6 +49,7 @@ export type PublicShipmentBase = {
     price?: string;     // "USD 500.00"
     note?: string;
     createdAt?: string;
+    isFavorite?: boolean;
 };
 
 export type PublicCargoApi = {

@@ -48,6 +48,7 @@ export type ShipmentRowData = {
     contactExtraPhone?: string;
     extraPhoneAsMain?: boolean;
     viewCount?: string;
+    isFavorite?: boolean;
 };
 
 

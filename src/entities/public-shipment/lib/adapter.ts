@@ -25,6 +25,7 @@ export function adaptCargo(a: PublicCargoApi): PublicShipmentBase {
         points: a.points,
         note: a.note ?? undefined,
         createdAt: a.created_at,
+        isFavorite: Boolean((a as any).is_favorite),
     };
 }
 
@@ -51,5 +52,6 @@ export function adaptTransport(a: PublicTransportApi): PublicShipmentBase {
         points: a.points,
         note: a.note ?? undefined,
         createdAt: a.created_at,
+        isFavorite: Boolean((a as any).is_favorite),
     };
 }

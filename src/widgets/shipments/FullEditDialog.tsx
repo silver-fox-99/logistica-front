@@ -279,6 +279,22 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         });
     }, [filtersData, lookups, getLocalizedLabel]);
 
+    const currencyOptions = useMemo(() => {
+        if (lookups?.currency) {
+            return lookups.currency.map((c) => ({
+                value: c.slug,
+                label: getLocalizedLabel(c),
+            }));
+        }
+        return [
+            { value: "USD", label: "USD" },
+            { value: "EUR", label: "EUR" },
+            { value: "GBP", label: "GBP" },
+            { value: "PLN", label: "PLN" },
+            { value: "UAH", label: "UAH" },
+        ];
+    }, [getLocalizedLabel, lookups?.currency]);
+
   //  const nameOf = (id?: string) =>
   //      id ? geoIdx?.byId.get(id)?.name ?? null : null;
 
@@ -561,11 +577,11 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                         value={form.priceCurrency}
                                         onChange={handleChange("priceCurrency")}
                                     >
-                                        <MenuItem value="USD">USD</MenuItem>
-                                        <MenuItem value="EUR">EUR</MenuItem>
-                                        <MenuItem value="GBP">GBP</MenuItem>
-                                        <MenuItem value="PLN">PLN</MenuItem>
-                                        <MenuItem value="UAH">UAH</MenuItem>
+                                        {currencyOptions.map((c) => (
+                                            <MenuItem key={c.value} value={c.value}>
+                                                {c.label}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>

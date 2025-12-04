@@ -8,6 +8,7 @@ import {
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiEye, FiStar
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import type {ShipmentRowData, ShipmentsKind, GeoPoint} from "@/entities/shipment/model/type";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
@@ -16,7 +17,6 @@ import "./ShipmentRow.scss";
 import {cargoApi} from "@/shared/api/cargoApi.ts";
 import {transportApi} from "@/shared/api/transportApi.ts";
 import { favoritesApi } from "@/shared/api/favoritesApi";
-import { toast } from "react-toastify";
 
 type Props = {
     data: ShipmentRowData;
@@ -42,7 +42,7 @@ export default function ShipmentRow({
     const [expanded, setExpanded] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
-    
+
     const formatRoute = useCallback((point?: GeoPoint) => {
         if (!point) return "—";
         const parts: string[] = [];
@@ -87,12 +87,16 @@ export default function ShipmentRow({
     }, [loadInit]);
 
     useEffect(() => {
-        if (scope === "public" && favoriteIds) {
-            setIsFavorite(favoriteIds.has(data.id));
+        if (scope === "public") {
+            if (favoriteIds) {
+                setIsFavorite(favoriteIds.has(data.id) || !!data.isFavorite);
+            } else {
+                setIsFavorite(!!data.isFavorite);
+            }
         } else {
             setIsFavorite(false);
         }
-    }, [scope, data.id, favoriteIds]);
+    }, [scope, data.id, favoriteIds, data.isFavorite, kind]);
 
     const handleToggleFavorite = async () => {
         if (scope !== "public") return;
@@ -102,12 +106,10 @@ export default function ShipmentRow({
                 await favoritesApi.remove(kind, data.id);
                 setIsFavorite(false);
                 onFavoriteChange?.(data.id, false);
-                toast.success(t('shipments.favorites.removed'));
             } else {
                 await favoritesApi.add(kind, data.id);
                 setIsFavorite(true);
                 onFavoriteChange?.(data.id, true);
-                toast.success(t('shipments.favorites.added'));
             }
         } catch (error: any) {
             toast.error(error?.response?.data?.message || t('shipments.favorites.error'));

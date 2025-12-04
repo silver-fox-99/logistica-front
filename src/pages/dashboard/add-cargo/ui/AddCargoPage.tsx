@@ -247,12 +247,7 @@ export default function AddCargoPage() {
     /* ===== validation ===== */
     const validate = () => {
         const e: Record<string, string> = {};
-        if (!form.dateFrom) e.dateFrom = t('addCargo.errors.required');
-        if (!form.dateTo) e.dateTo = t('addCargo.errors.required');
-        
-        if (form.dateFrom && form.dateTo && form.dateTo < form.dateFrom) {
-            e.dateTo = t('addCargo.errors.dateOrder');
-        }
+        if (form.dateFrom && form.dateTo && form.dateTo < form.dateFrom) e.dateTo = t('addCargo.errors.dateOrder');
 
         if (!form.pickups[0]?.countryId) e.pickups = t('addCargo.errors.selectCountryLoad');
         if (!form.dropoffs[0]?.countryId) e.dropoffs = t('addCargo.errors.selectCountryUnload');

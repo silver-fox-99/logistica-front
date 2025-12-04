@@ -178,6 +178,7 @@
       "contactsTitle": "Select contacts that will be visible in the order",
       "contactsSubtitle": "Here are the available contacts you added in the \"Profile\" section. You can change or add them in your personal account.",
       "additionalPhone": "Additional Phone",
+      "extraPhoneAsMainLabel": "Use as primary",
       "clearPhone": "Clear phone",
       "email": "E-mail",
       "emailPlaceholder": "email@example.com",

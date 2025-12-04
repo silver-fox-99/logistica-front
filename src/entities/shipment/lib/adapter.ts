@@ -85,6 +85,7 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
         contactExtraPhone: i.contact_extra_phone ?? undefined,
         extraPhoneAsMain: i.extra_phone_as_main ?? false,
         viewCount: i.view_count ?? '0',
+        isFavorite: Boolean((i as any).is_favorite),
     };
 }
 
