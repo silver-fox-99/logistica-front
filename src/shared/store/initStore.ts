@@ -1,10 +1,8 @@
 import { create } from 'zustand';
 import { commonInitApi, type CommonInitData } from "@/shared/api/commonInitApi";
-import { cargoApi, type GeoItem } from "@/shared/api/cargoApi";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 
 interface InitStore {
-    geos: GeoItem[] | null;
     lookups: CommonInitData["lookups"] | null;
     cargoPoints: CommonInitData["cargoPoints"] | null;
     transportPoints: CommonInitData["transportPoints"] | null;
@@ -25,7 +23,6 @@ const normalizeLookupOpt = (opt: any): LookupOpt => {
 };
 
 export const useInitStore = create<InitStore>((set, get) => ({
-    geos: null,
     lookups: null,
     cargoPoints: null,
     transportPoints: null,
@@ -37,13 +34,7 @@ export const useInitStore = create<InitStore>((set, get) => ({
 
         set({ loading: true, error: null });
         try {
-            const [data, geosFromRoute] = await Promise.all([
-                commonInitApi.load(),
-                cargoApi.getGeos().catch(() => [])
-            ]);
-            
-            const allGeos = geosFromRoute.length > 0 ? geosFromRoute : (data.geos || []);
-            
+            const data = await commonInitApi.load();
             const normalizedLookups: CommonInitData["lookups"] = {
                 vehicleType: data.lookups.vehicleType.map(normalizeLookupOpt),
                 paymentMethods: data.lookups.paymentMethods.map(normalizeLookupOpt),
@@ -54,7 +45,6 @@ export const useInitStore = create<InitStore>((set, get) => ({
                 loadType: data.lookups.loadType?.map(normalizeLookupOpt),
             };
             set({
-                geos: allGeos,
                 lookups: normalizedLookups,
                 cargoPoints: data.cargoPoints,
                 transportPoints: data.transportPoints,
@@ -73,5 +63,3 @@ export const useInitStore = create<InitStore>((set, get) => ({
         return lookups[type]?.find(opt => opt.slug === slug);
     },
 }));
-
-

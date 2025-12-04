@@ -12,35 +12,11 @@ import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
 import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import { useUserStore } from "@/entities/user/model/user.store";
-
-
-type Geo = {
-    id: string;
-    parent_id: string | null;
-    type: "COUNTRY" | "REGION" | "CITY";
-    name: string;
-    name_ru?: string | null;
-    name_uz?: string | null;
-    code: string | null;
-    iso2: string | null;
-    slug: string | null;
-    order?: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-};
-
-function sortByOrder(a: Geo, b: Geo): number {
-    const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
-    const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
-    if (orderA !== orderB) {
-        return orderA - orderB;
-    }
-    return a.name.localeCompare(b.name);
-}
+import { useGeoCascade } from "@/shared/lib/useGeoCascade";
+import type { GeoImportItem } from "@/shared/api/geoImportApi";
 
 type VehicleTypeOption = { value: string; label: string };
-type Option = { id: string; label: string };
+type Option = { id: string; label: string; code?: string | null; countryCode?: string | null; stateCode?: string | null };
 
 type Props = {
     open: boolean;
@@ -61,16 +37,31 @@ export default function ShipmentsFilterDrawer({
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups } = useInitStore();
     const user = useUserStore((s) => s.user);
-    const [data, setData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOption[] }>(null);
+    const {
+        countries,
+        getRegions,
+        getCities,
+        loadCountries,
+        ensureRegions,
+        ensureCities,
+        loading: geoLoading
+    } = useGeoCascade();
+    const [data, setData] = useState<null | { vehicle_types: VehicleTypeOption[] }>(null);
 
     // при открытии можно подмешать актуальные (если не загружали раньше)
     useEffect(() => {
         if (!open || data) return;
         (async () => {
             const res = await publicShipmentsApi.getFilters();
-            setData(res);
+            setData({ vehicle_types: res?.vehicle_types ?? [] });
         })();
     }, [open, data]);
+
+    useEffect(() => { if (open) void loadCountries(); }, [open]);
+    useEffect(() => { ensureRegions(filters.pickup_country); }, [ensureRegions, filters.pickup_country]);
+    useEffect(() => { ensureRegions(filters.dropoff_country); }, [ensureRegions, filters.dropoff_country]);
+    useEffect(() => { ensureCities(filters.pickup_country, filters.pickup_region); }, [ensureCities, filters.pickup_country, filters.pickup_region]);
+    useEffect(() => { ensureCities(filters.dropoff_country, filters.dropoff_region); }, [ensureCities, filters.dropoff_country, filters.dropoff_region]);
 
     const setF = (patch: Partial<PublicFilters>) => onFiltersChange({ ...filters, ...patch });
     const setNum = (key: keyof PublicFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,44 +69,21 @@ export default function ShipmentsFilterDrawer({
         setF({ [key]: raw === "" ? undefined : Number(raw) } as any);
     };
 
-    const geos = data?.geos ?? [];
-    const countries = useMemo(() => {
-        const filtered = geos.filter(g => g.type === "COUNTRY" && g.is_active);
-        return [...filtered].sort(sortByOrder);
-    }, [geos]);
-    const regionsByCountry = (countryId?: string) => {
-        const filtered = geos.filter(g => g.type === "REGION" && g.parent_id === (countryId ?? "") && g.is_active);
-        return [...filtered].sort(sortByOrder);
-    };
-    const citiesByParent = (parentId?: string) => {
-        const filtered = geos.filter(g => g.type === "CITY" && g.parent_id === (parentId ?? "") && g.is_active);
-        return [...filtered].sort(sortByOrder);
-    };
-
-    const asOptions = (items: Geo[]): Option[] => items.map(i => ({ id: i.id, label: getLocalizedGeoName(i) }));
+    const asOptions = (items: GeoImportItem[]): Option[] =>
+        items.map(i => ({ id: i.id, label: getLocalizedGeoName(i), code: i.iso2 || i.code, countryCode: i.countryCode, stateCode: (i as any).stateCode || i.code }));
     const countriesOpts = useMemo(() => asOptions(countries), [countries, getLocalizedGeoName, i18n.resolvedLanguage]);
 
-    const pickupRegions = useMemo(() => regionsByCountry(filters.pickup_country), [geos, filters.pickup_country]);
-    const pickupCities  = useMemo(() => {
-        if (!filters.pickup_country) return [];
-        if (pickupRegions.length === 0) return [];
-        if (!filters.pickup_region) return [];
-        return citiesByParent(filters.pickup_region);
-    }, [geos, filters.pickup_country, filters.pickup_region, pickupRegions]);
+    const pickupRegions = getRegions(filters.pickup_country);
+    const pickupCities  = getCities(filters.pickup_country, filters.pickup_region);
 
-    const pickupRegionsDisabled = !filters.pickup_country || pickupRegions.length === 0;
-    const pickupCitiesDisabled  = !filters.pickup_country || pickupRegions.length === 0 || !filters.pickup_region;
+    const pickupRegionsDisabled = !filters.pickup_country || (pickupRegions.length === 0 && geoLoading.regionsFor !== (filters.pickup_country || ""));
+    const pickupCitiesDisabled  = !filters.pickup_country || !filters.pickup_region || (pickupCities.length === 0 && geoLoading.citiesFor !== `${filters.pickup_country}/${filters.pickup_region}`);
 
-    const dropoffRegions = useMemo(() => regionsByCountry(filters.dropoff_country), [geos, filters.dropoff_country]);
-    const dropoffCities  = useMemo(() => {
-        if (!filters.dropoff_country) return [];
-        if (dropoffRegions.length === 0) return [];
-        if (!filters.dropoff_region) return [];
-        return citiesByParent(filters.dropoff_region);
-    }, [geos, filters.dropoff_country, filters.dropoff_region, dropoffRegions]);
+    const dropoffRegions = getRegions(filters.dropoff_country);
+    const dropoffCities  = getCities(filters.dropoff_country, filters.dropoff_region);
 
-    const dropoffRegionsDisabled = !filters.dropoff_country || dropoffRegions.length === 0;
-    const dropoffCitiesDisabled  = !filters.dropoff_country || dropoffRegions.length === 0 || !filters.dropoff_region;
+    const dropoffRegionsDisabled = !filters.dropoff_country || (dropoffRegions.length === 0 && geoLoading.regionsFor !== (filters.dropoff_country || ""));
+    const dropoffCitiesDisabled  = !filters.dropoff_country || !filters.dropoff_region || (dropoffCities.length === 0 && geoLoading.citiesFor !== `${filters.dropoff_country}/${filters.dropoff_region}`);
 
     // selected values
     const pickupCountryValue: Option | null = useMemo(
@@ -159,7 +127,6 @@ export default function ShipmentsFilterDrawer({
         () => vehicleOpts.find(o => o.id === filters.vehicle_type) ?? null, [vehicleOpts, filters.vehicle_type]
     );
 
-    // handlers
     const handlePickupCountry = (opt: Option | null) => setF({ pickup_country: opt?.id, pickup_region: undefined, pickup_city: undefined });
     const handlePickupRegion  = (opt: Option | null) => setF({ pickup_region: opt?.id, pickup_city: undefined });
     const handleDropoffCountry = (opt: Option | null) => setF({ dropoff_country: opt?.id, dropoff_region: undefined, dropoff_city: undefined });
@@ -205,6 +172,7 @@ export default function ShipmentsFilterDrawer({
                         value={pickupCountryValue}
                         onChange={(_, opt) => handlePickupCountry(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
+                        loading={geoLoading.countries}
                         renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.country')} />}
                     />
                     <Autocomplete
@@ -213,6 +181,7 @@ export default function ShipmentsFilterDrawer({
                         onChange={(_, opt) => handlePickupRegion(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
                         renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.region')} />}
+                        loading={geoLoading.regionsFor === (filters.pickup_country || "")}
                         disabled={pickupRegionsDisabled}
                     />
                     <Autocomplete
@@ -221,6 +190,7 @@ export default function ShipmentsFilterDrawer({
                         onChange={(_, opt) => setF({ pickup_city: opt?.id })}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
                         renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.city')} />}
+                        loading={geoLoading.citiesFor === `${filters.pickup_country}/${filters.pickup_region}`}
                         disabled={pickupCitiesDisabled}
                     />
 
@@ -240,6 +210,7 @@ export default function ShipmentsFilterDrawer({
                         value={dropoffCountryValue}
                         onChange={(_, opt) => handleDropoffCountry(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
+                        loading={geoLoading.countries}
                         renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.country')} />}
                     />
                     <Autocomplete
@@ -248,6 +219,7 @@ export default function ShipmentsFilterDrawer({
                         onChange={(_, opt) => handleDropoffRegion(opt)}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
                         renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.region')} />}
+                        loading={geoLoading.regionsFor === (filters.dropoff_country || "")}
                         disabled={dropoffRegionsDisabled}
                     />
                     <Autocomplete
@@ -256,6 +228,7 @@ export default function ShipmentsFilterDrawer({
                         onChange={(_, opt) => setF({ dropoff_city: opt?.id })}
                         isOptionEqualToValue={(o, v) => o.id === v.id}
                         renderInput={(params) => <TextField {...params} size="small" label={t('shipments.filters.city')} />}
+                        loading={geoLoading.citiesFor === `${filters.dropoff_country}/${filters.dropoff_region}`}
                         disabled={dropoffCitiesDisabled}
                     />
 

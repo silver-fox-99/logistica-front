@@ -2,7 +2,6 @@ import { cargoApi, type CargoInitData } from "./cargoApi";
 import { transportApi, type TransportInitData } from "./transportApi";
 
 export type CommonInitData = {
-    geos: CargoInitData["geos"];
     lookups: {
         vehicleType: CargoInitData["lookups"]["vehicleType"];
         paymentMethods: CargoInitData["lookups"]["paymentMethods"];
@@ -24,7 +23,6 @@ export const commonInitApi = {
         ]);
 
         return {
-            geos: cargo.geos,
             lookups: {
                 vehicleType: cargo.lookups.vehicleType,
                 paymentMethods: cargo.lookups.paymentMethods,
@@ -39,5 +37,4 @@ export const commonInitApi = {
         };
     }
 };
-
 

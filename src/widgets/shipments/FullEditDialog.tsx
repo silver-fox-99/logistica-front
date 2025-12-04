@@ -7,29 +7,14 @@ import {
 import Grid from "@mui/material/Grid";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 import type { GeoPoint } from "@/entities/shipment/model/type";
 import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import { useGeoCascade } from "@/shared/lib/useGeoCascade";
+import type { GeoImportItem } from "@/shared/api/geoImportApi";
+import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
 
 type Kind = "cargo" | "transport";
-
-/** ===== Types from backend ===== */
-type GeoType = "COUNTRY" | "REGION" | "CITY";
-type Geo = {
-    id: string;
-    parent_id: string | null;
-    type: GeoType;
-    name: string;
-    name_ru?: string | null;
-    name_uz?: string | null;
-    code: string | null;
-    iso2: string | null;
-    slug: string | null;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-};
 
 type VehicleTypeOpt = { value: string; label: string };
 
@@ -97,43 +82,18 @@ const eqLoose = (a?: string | null, b?: string | null) => {
     return A === B || A.startsWith(B) || B.startsWith(A) || A.includes(B) || B.includes(A);
 };
 
-const indexGeos = (geos: Geo[]) => {
-    const byId = new Map<string, Geo>();
-    const byType = {
-        COUNTRY: [] as Geo[],
-        REGION: [] as Geo[],
-        CITY: [] as Geo[],
-    };
-    for (const g of geos) {
-        if (!g.is_active) continue;
-        byId.set(g.id, g);
-        byType[g.type].push(g);
-    }
-    return { byId, byType };
-};
-
-const regionsOf = (geos: Geo[], countryId?: string) =>
-    geos.filter(g => g.type === "REGION" && g.parent_id === countryId);
-
-const citiesOf = (geos: Geo[], countryId?: string, regionId?: string) => {
-    if (regionId) return geos.filter(g => g.type === "CITY" && g.parent_id === regionId);
-    return geos.filter(g => g.type === "CITY" && g.parent_id === countryId);
-};
-
-const findCountryIdLoose = (geos: Geo[], name?: string | null) => {
+const findCountryIdLoose = (geos: GeoImportItem[], name?: string | null) => {
     if (!name) return "";
-    const hit = geos.find(g => g.type === "COUNTRY" && g.is_active && eqLoose(g.name, name));
+    const hit = geos.find(g => g.name && eqLoose(g.name, name));
     return hit?.id ?? "";
 };
-const findRegionIdLoose = (geos: Geo[], countryId: string, name?: string | null) => {
+const findRegionIdLoose = (regions: GeoImportItem[], name?: string | null) => {
     if (!name) return "";
-    const list = regionsOf(geos, countryId);
-    return list.find(r => eqLoose(r.name, name))?.id ?? "";
+    return regions.find(r => r.name && eqLoose(r.name, name))?.id ?? "";
 };
-const findCityIdLoose = (geos: Geo[], countryId: string, regionId: string, name?: string | null) => {
+const findCityIdLoose = (cities: GeoImportItem[], name?: string | null) => {
     if (!name) return "";
-    const list = citiesOf(geos, countryId, regionId);
-    return list.find(c => eqLoose(c.name, name))?.id ?? "";
+    return cities.find(c => c.name && eqLoose(c.name, name))?.id ?? "";
 };
 
 /** ===== Component ===== */
@@ -142,8 +102,16 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups } = useInitStore();
-    
-    const [filtersData, setFiltersData] = useState<null | { geos: Geo[]; vehicle_types: VehicleTypeOpt[] }>(null);
+    const {
+        countries,
+        getRegions,
+        getCities,
+        loadCountries,
+        ensureRegions,
+        ensureCities,
+    } = useGeoCascade();
+
+    const [filtersData, setFiltersData] = useState<null | { vehicle_types: VehicleTypeOpt[] }>(null);
     const [loadingFilters, setLoadingFilters] = useState(false);
 
     // Форма (без RHF): один объект состояния
@@ -191,12 +159,14 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             setLoadingFilters(true);
             try {
                 const res = await publicShipmentsApi.getFilters();
-                setFiltersData(res);
+                setFiltersData({ vehicle_types: res?.vehicle_types ?? [] });
             } finally {
                 setLoadingFilters(false);
             }
         })();
     }, [open, filtersData]);
+
+    useEffect(() => { if (open) void loadCountries(); }, [open, loadCountries]);
 
     // Когда модалка открылась/сменился initial — перельём форму (всегда!)
     useEffect(() => {
@@ -225,23 +195,32 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         }));
     }, [open, initial, kind]);
 
-    // Как только есть geos — сопоставим initial.points -> ids (мягкий матч), не триггеря каскады
+    // Как только есть данные — сопоставим initial.points -> ids (мягкий матч), не триггеря каскады
     useEffect(() => {
-        if (!open || !filtersData) return;
+        if (!open) return;
 
-        const geos = filtersData.geos;
         const p1 = initial?.points?.[0];
         const p2 = initial?.points?.[1];
 
+        if (!p1 && !p2) return;
+
         hydratingRef.current = true;
 
-        const p1_countryId = findCountryIdLoose(geos, p1?.country);
-        const p1_regionId = findRegionIdLoose(geos, p1_countryId, p1?.region);
-        const p1_cityId = findCityIdLoose(geos, p1_countryId, p1_regionId, p1?.city);
+        const p1_countryId = findCountryIdLoose(countries, p1?.country);
+        const p1Regions = getRegions(p1_countryId);
+        if (p1_countryId) ensureRegions(p1_countryId);
+        const p1_regionId = findRegionIdLoose(p1Regions, p1?.region);
+        if (p1_countryId && p1_regionId) ensureCities(p1_countryId, p1_regionId);
+        const p1Cities = getCities(p1_countryId, p1_regionId);
+        const p1_cityId = findCityIdLoose(p1Cities, p1?.city);
 
-        const p2_countryId = findCountryIdLoose(geos, p2?.country);
-        const p2_regionId = findRegionIdLoose(geos, p2_countryId, p2?.region);
-        const p2_cityId = findCityIdLoose(geos, p2_countryId, p2_regionId, p2?.city);
+        const p2_countryId = findCountryIdLoose(countries, p2?.country);
+        const p2Regions = getRegions(p2_countryId);
+        if (p2_countryId) ensureRegions(p2_countryId);
+        const p2_regionId = findRegionIdLoose(p2Regions, p2?.region);
+        if (p2_countryId && p2_regionId) ensureCities(p2_countryId, p2_regionId);
+        const p2Cities = getCities(p2_countryId, p2_regionId);
+        const p2_cityId = findCityIdLoose(p2Cities, p2?.city);
 
         setForm(prev => ({
             ...prev,
@@ -251,7 +230,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
         // отпустим каскад на следующий тик
         setTimeout(() => { hydratingRef.current = false; }, 0);
-    }, [open, filtersData, initial]);
+    }, [open, initial, countries, getRegions, ensureRegions, ensureCities, getCities]);
 
     // Каскады (если не гидратируем)
     const handleChange = (key: keyof typeof form) => (e: any) => {
@@ -280,25 +259,10 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         setForm(prev => ({ ...prev, [key]: checked }));
     };
 
-    const geoIdx = useMemo(() => filtersData ? indexGeos(filtersData.geos) : null, [filtersData]);
-
-    const countries = useMemo(() => geoIdx ? geoIdx.byType.COUNTRY : [], [geoIdx]);
-    const p1_regions = useMemo(
-        () => filtersData ? regionsOf(filtersData.geos, form.p1_countryId) : [],
-        [filtersData, form.p1_countryId]
-    );
-    const p1_cities = useMemo(
-        () => filtersData ? citiesOf(filtersData.geos, form.p1_countryId, form.p1_regionId) : [],
-        [filtersData, form.p1_countryId, form.p1_regionId]
-    );
-    const p2_regions = useMemo(
-        () => filtersData ? regionsOf(filtersData.geos, form.p2_countryId) : [],
-        [filtersData, form.p2_countryId]
-    );
-    const p2_cities = useMemo(
-        () => filtersData ? citiesOf(filtersData.geos, form.p2_countryId, form.p2_regionId) : [],
-        [filtersData, form.p2_countryId, form.p2_regionId]
-    );
+    const p1_regions = getRegions(form.p1_countryId);
+    const p1_cities = getCities(form.p1_countryId, form.p1_regionId);
+    const p2_regions = getRegions(form.p2_countryId);
+    const p2_cities = getCities(form.p2_countryId, form.p2_regionId);
 
     const vehicleTypeOptions = useMemo(() => {
         if (!filtersData?.vehicle_types) return [];
@@ -319,7 +283,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
   //      id ? geoIdx?.byId.get(id)?.name ?? null : null;
 
     const submit = async () => {
-        if (!filtersData || !geoIdx) return;
+        if (!filtersData) return;
 
         if (form.dateFrom && form.dateTo && form.dateTo < form.dateFrom) {
             toast.error(t('shipments.copyDialog.errorDateOrder'));

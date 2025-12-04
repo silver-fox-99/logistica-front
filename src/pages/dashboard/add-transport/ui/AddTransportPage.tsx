@@ -11,26 +11,12 @@ import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi
 import {useNavigate} from "react-router-dom";
 import { useLocalizedLookup, useLocalizedGeo } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import { useGeoCascade } from "@/shared/lib/useGeoCascade";
+import type { GeoImportItem } from "@/shared/api/geoImportApi";
 
 import './AddTransportPage.scss';
 
 const PRICE_UNITS = ["Total", "Per ton", "Per km"] as const;
-
-type Geo = {
-    id: string;
-    parent_id: string | null;
-    type: "COUNTRY" | "REGION" | "CITY";
-    name: string;
-    name_ru?: string | null;
-    name_uz?: string | null;
-    code: string | null;
-    iso2: string | null;
-    slug: string | null;
-    order?: number;
-    is_active?: boolean;
-    created_at?: string;
-    updated_at?: string;
-};
 
 type Place = {
     countryId?: string | null;
@@ -72,88 +58,34 @@ type FormValues = {
     extraPhoneAsMain: boolean;
 };
 
-function sortByOrder(a: Geo, b: Geo): number {
-    const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
-    const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
-    if (orderA !== orderB) {
-        return orderA - orderB;
-    }
-    return a.name.localeCompare(b.name);
-}
-
-function buildGeoMaps(geos: Geo[]) {
-    if (!geos || geos.length === 0) {
-        return { byId: new Map(), countries: [], regionsByCountry: new Map(), citiesByParent: new Map() };
-    }
-
-    const byId = new Map<string, Geo>();
-    const countries: Geo[] = [];
-    const regionsByCountry = new Map<string, Geo[]>();
-    const citiesByParent = new Map<string, Geo[]>();
-
-    for (const g of geos) {
-        byId.set(g.id, g);
-        const isActive = g.is_active !== undefined ? g.is_active : true;
-        if (g.type === "COUNTRY" && isActive) countries.push(g);
-    }
-    for (const g of geos) {
-        const isActive = g.is_active !== undefined ? g.is_active : true;
-        if (g.type === "REGION" && g.parent_id && isActive) {
-            if (!regionsByCountry.has(g.parent_id)) regionsByCountry.set(g.parent_id, []);
-            regionsByCountry.get(g.parent_id)!.push(g);
-        }
-    }
-    for (const g of geos) {
-        const isActive = g.is_active !== undefined ? g.is_active : true;
-        if (g.type === "CITY" && g.parent_id && isActive) {
-            if (!citiesByParent.has(g.parent_id)) citiesByParent.set(g.parent_id, []);
-            citiesByParent.get(g.parent_id)!.push(g);
-        }
-    }
-
-    countries.sort(sortByOrder);
-    regionsByCountry.forEach((arr) => arr.sort(sortByOrder));
-    citiesByParent.forEach((arr) => arr.sort(sortByOrder));
-
-    return { byId, countries, regionsByCountry, citiesByParent };
-}
-
 type PlaceRowProps = {
     labelPrefix: string;
     place: Place;
     onChange: (p: Place) => void;
-    geos: Geo[] | null;
-    loading?: boolean;
+    countries: GeoImportItem[];
+    regions: GeoImportItem[];
+    cities: GeoImportItem[];
+    loadingCountries: boolean;
+    loadingRegions: boolean;
+    loadingCities: boolean;
     errorKey?: string;
     showRemove?: boolean;
     onRemove?: () => void;
+    onCountryLoad?: (id?: string | null) => void;
+    onRegionLoad?: (countryId?: string | null, regionId?: string | null) => void;
 };
 
 function PlaceRow({
-                      labelPrefix, place, onChange, geos, loading, errorKey, showRemove, onRemove
+                      labelPrefix, place, onChange, countries, regions, cities,
+                      loadingCountries, loadingRegions, loadingCities,
+                      errorKey, showRemove, onRemove, onCountryLoad, onRegionLoad
                   }: PlaceRowProps) {
     const { t } = useTranslation();
     const { getLocalizedGeoName } = useLocalizedGeo();
-    const { countries, regionsByCountry, citiesByParent } = useMemo(() => {
-        if (!geos || !Array.isArray(geos) || geos.length === 0) {
-            return { countries: [] as Geo[], regionsByCountry: new Map<string, Geo[]>(), citiesByParent: new Map<string, Geo[]>() };
-        }
-        return buildGeoMaps(geos);
-    }, [geos]);
 
-    const selectedCountry = place.countryId ? countries.find(c => c.id === place.countryId) : undefined;
-    const regions: Geo[] = selectedCountry ? (regionsByCountry.get(selectedCountry.id) ?? []) : [];
-    const citiesFromCountry: Geo[] = selectedCountry ? (citiesByParent.get(selectedCountry.id) ?? []) : [];
-    const citiesFromRegion: Geo[] = place.regionId ? (citiesByParent.get(place.regionId) ?? []) : [];
-    const mergedCities = useMemo(() => {
-        const map = new Map<string, Geo>();
-        [...citiesFromCountry, ...citiesFromRegion].forEach((c) => map.set(c.id, c));
-        return Array.from(map.values()).sort(sortByOrder);
-    }, [citiesFromCountry, citiesFromRegion]);
-
-    const countryValue = selectedCountry ?? null;
+    const countryValue = place.countryId ? countries.find(c => c.id === place.countryId) ?? null : null;
     const regionValue = place.regionId ? regions.find(r => r.id === place.regionId) ?? null : null;
-    const cityValue = place.cityId ? mergedCities.find(c => c.id === place.cityId) ?? null : null;
+    const cityValue = place.cityId ? cities.find(c => c.id === place.cityId) ?? null : null;
 
     const errorText = errorKey ? (
         errorKey === "loadPlaces" || errorKey === "unloadPlaces" ? t('addTransport.errors.selectCountryLoad') : ""
@@ -169,9 +101,10 @@ function PlaceRow({
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => {
                     onChange({ ...place, countryId: v?.id ?? null, regionId: null, cityId: null });
+                    onCountryLoad?.(v?.id ?? null);
                 }}
-                noOptionsText={loading ? "Загрузка..." : (geos && geos.length > 0 ? (t('addTransport.fields.noOptions') || "Нет вариантов") : "Данные не загружены")}
-                loading={loading}
+                noOptionsText={loadingCountries ? "Загрузка..." : (countries.length > 0 ? (t('addTransport.fields.noOptions') || "Нет вариантов") : "Данные не загружены")}
+                loading={loadingCountries}
                 renderInput={(params) => (
                     <TextField 
                         {...params} 
@@ -189,7 +122,9 @@ function PlaceRow({
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, v) => {
                     onChange({ ...place, regionId: v?.id ?? null, cityId: null });
+                    onRegionLoad?.(place.countryId ?? null, v?.id ?? null);
                 }}
+                loading={loadingRegions}
                 renderInput={(params) => (
                     <TextField 
                         {...params} 
@@ -198,11 +133,11 @@ function PlaceRow({
                         placeholder={t('addTransport.fields.startTypingRegion')} 
                     />
                 )}
-                disabled={!selectedCountry || regions.length === 0}
+                disabled={!countryValue || regions.length === 0}
             />
 
             <Autocomplete
-                options={mergedCities}
+                options={cities}
                 getOptionLabel={(o) => getLocalizedGeoName(o)}
                 value={cityValue}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -215,7 +150,8 @@ function PlaceRow({
                         placeholder={t('addTransport.fields.startTypingCity')} 
                     />
                 )}
-                disabled={!selectedCountry || mergedCities.length === 0}
+                disabled={!countryValue || cities.length === 0}
+                loading={loadingCities}
             />
 
             {showRemove && (
@@ -237,12 +173,22 @@ function PlaceRow({
 export default function AddTransportPage() {
     const { t, i18n } = useTranslation();
     const { getLocalizedLabel, findLocalizedLabel } = useLocalizedLookup();
-    const { lookups, geos, loadInit, loading: loadingInit } = useInitStore();
+    const { lookups, loadInit, loading: loadingInit } = useInitStore();
+    const {
+        countries,
+        getRegions,
+        getCities,
+        loadCountries,
+        ensureRegions,
+        ensureCities,
+        loading: geoLoading
+    } = useGeoCascade();
     const [activeStep, setActiveStep] = useState(0);
 
     useEffect(() => {
         loadInit();
     }, [loadInit]);
+    useEffect(() => { void loadCountries(); }, []);
 
     const vehicleOpts   = useMemo(() => lookups?.vehicleType ?? [],    [lookups]);
     const payMethodOpts = useMemo(() => lookups?.paymentMethods ?? [], [lookups]);
@@ -489,12 +435,18 @@ export default function AddTransportPage() {
                                                     key={i}
                                                     labelPrefix={i === 0 ? "загрузки" : `загрузки ${i + 1}`}
                                                     place={p}
-                                                    geos={geos ?? null}
-                                                    loading={loadingInit}
+                                                    countries={countries}
+                                                    regions={getRegions(p.countryId)}
+                                                    cities={getCities(p.countryId, p.regionId)}
+                                                    loadingCountries={geoLoading.countries}
+                                                    loadingRegions={geoLoading.regionsFor === (p.countryId || "")}
+                                                    loadingCities={geoLoading.citiesFor === `${p.countryId}/${p.regionId}`}
                                                     errorKey={i === 0 ? errors.loadPlaces : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmLoad(i)}
                                                     onChange={(np) => updateLoad(i, np)}
+                                                    onCountryLoad={(id) => ensureRegions(id)}
+                                                    onRegionLoad={(countryId, regionId) => ensureCities(countryId, regionId)}
                                                 />
                                             ))}
                                         </Stack>
@@ -506,12 +458,18 @@ export default function AddTransportPage() {
                                                     key={i}
                                                     labelPrefix={i === 0 ? "выгрузки" : `выгрузки ${i + 1}`}
                                                     place={p}
-                                                    geos={geos ?? null}
-                                                    loading={loadingInit}
+                                                    countries={countries}
+                                                    regions={getRegions(p.countryId)}
+                                                    cities={getCities(p.countryId, p.regionId)}
+                                                    loadingCountries={geoLoading.countries}
+                                                    loadingRegions={geoLoading.regionsFor === (p.countryId || "")}
+                                                    loadingCities={geoLoading.citiesFor === `${p.countryId}/${p.regionId}`}
                                                     errorKey={i === 0 ? errors.unloadPlaces : undefined}
                                                     showRemove={i > 0}
                                                     onRemove={() => rmUnload(i)}
                                                     onChange={(np) => updateUnload(i, np)}
+                                                    onCountryLoad={(id) => ensureRegions(id)}
+                                                    onRegionLoad={(countryId, regionId) => ensureCities(countryId, regionId)}
                                                 />
                                             ))}
                                         </Stack>
@@ -828,12 +786,18 @@ export default function AddTransportPage() {
                                             key={i}
                                             labelPrefix={i === 0 ? "загрузки" : `загрузки ${i + 1}`}
                                             place={p}
-                                            geos={geos ?? null}
-                                            loading={loadingInit}
+                                            countries={countries}
+                                            regions={getRegions(p.countryId)}
+                                            cities={getCities(p.countryId, p.regionId)}
+                                            loadingCountries={geoLoading.countries}
+                                            loadingRegions={geoLoading.regionsFor === (p.countryId || "")}
+                                            loadingCities={geoLoading.citiesFor === `${p.countryId}/${p.regionId}`}
                                             errorKey={i === 0 ? errors.loadPlaces : undefined}
                                             showRemove={i > 0}
                                             onRemove={() => rmLoad(i)}
                                             onChange={(np) => updateLoad(i, np)}
+                                            onCountryLoad={(id) => ensureRegions(id)}
+                                            onRegionLoad={(countryId, regionId) => ensureCities(countryId, regionId)}
                                         />
                                     ))}
                                 </Stack>
@@ -846,12 +810,18 @@ export default function AddTransportPage() {
                                             key={i}
                                             labelPrefix={i === 0 ? "выгрузки" : `выгрузки ${i + 1}`}
                                             place={p}
-                                            geos={geos ?? null}
-                                            loading={loadingInit}
+                                            countries={countries}
+                                            regions={getRegions(p.countryId)}
+                                            cities={getCities(p.countryId, p.regionId)}
+                                            loadingCountries={geoLoading.countries}
+                                            loadingRegions={geoLoading.regionsFor === (p.countryId || "")}
+                                            loadingCities={geoLoading.citiesFor === `${p.countryId}/${p.regionId}`}
                                             errorKey={i === 0 ? errors.unloadPlaces : undefined}
                                             showRemove={i > 0}
                                             onRemove={() => rmUnload(i)}
                                             onChange={(np) => updateUnload(i, np)}
+                                            onCountryLoad={(id) => ensureRegions(id)}
+                                            onRegionLoad={(countryId, regionId) => ensureCities(countryId, regionId)}
                                         />
                                     ))}
                                 </Stack>
