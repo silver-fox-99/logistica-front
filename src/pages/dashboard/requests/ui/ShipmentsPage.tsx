@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import {
-    Box, Paper, Stack, Typography, Button, MenuItem, Select, Pagination
+    Box, Paper, Stack, Typography, Button, Pagination
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiSliders } from "react-icons/fi";
@@ -316,7 +316,6 @@ function ListBody({
 
 export default function ShipmentsListPage({ scope }: Props) {
     const { t } = useTranslation();
-    const [period, setPeriod] = useState("all");
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const getDefaultFilters = (): PublicFilters => {
