@@ -43,7 +43,13 @@ export default function OtpInput({ length = 4, value, onChange, autoFocus }: Otp
                 const nextIndex = Math.min(text.length, length - 1);
                 focusIndex(nextIndex);
             }}
-            sx={{ display: "flex", justifyContent: 'center', gap: 1 }}
+            sx={{
+                display: { xs: "grid", sm: "flex" },
+                gap: { xs: 1, sm: 1.5 },
+                gridTemplateColumns: { xs: `repeat(${length}, minmax(44px, 1fr))` },
+                justifyContent: "center",
+                width: "100%",
+            }}
         >
             {Array.from({ length }).map((_, i) => (
                 <TextField
@@ -82,18 +88,19 @@ export default function OtpInput({ length = 4, value, onChange, autoFocus }: Otp
                         inputMode: "numeric",
                         pattern: "[0-9]*",
                         maxLength: 1,
-                        style: {
-                            textAlign: "center",
-                            fontSize: 24,
-                            fontWeight: 600,
-                            width: 80,
-                            height: 80,
-                            padding: 0,
-                        },
                     }}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             borderRadius: "10px",
+                        },
+                        "& input": {
+                            textAlign: "center",
+                            fontSize: { xs: 20, sm: 24 },
+                            fontWeight: 600,
+                            width: { xs: "100%", sm: 80 },
+                            minWidth: { xs: 44, sm: 80 },
+                            height: { xs: 56, sm: 80 },
+                            padding: 0,
                         },
                     }}
                 />

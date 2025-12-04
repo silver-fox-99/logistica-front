@@ -18,6 +18,52 @@ export default function StepCodeReset({ length = 6, onVerified, onBack }: Props)
     const [busy, setBusy] = useState(false);
     const [timer, setTimer] = useState(0);
 
+    const primaryBtnSx = {
+        height: 44,
+        borderRadius: "5px",
+        textTransform: "none",
+        fontWeight: 700,
+        background: "#4472B8",
+        color: "#EEF4F7",
+        "&:hover": {
+            background: "#5b87c6",
+            color: "#EEF4F7",
+            borderColor: "#5b87c6",
+            opacity: 0.92,
+        },
+    };
+
+    const secondaryBtnSx = {
+        height: 44,
+        borderRadius: "5px",
+        textTransform: "none",
+        fontWeight: 700,
+        borderColor: "#5b87c6",
+        color: "#EEF4F7",
+        background: "#5b87c6",
+        "&:hover": {
+            background: "#5b87c6",
+            borderColor: "#5b87c6",
+            opacity: 0.9,
+        },
+    };
+
+    const outlineBtnSx = {
+        height: 44,
+        borderRadius: "5px",
+        textTransform: "none",
+        fontWeight: 700,
+        borderColor: "#4472B8",
+        color: "#4472B8",
+        background: "transparent",
+        "&:hover": {
+            background: "#5b87c6",
+            borderColor: "#5b87c6",
+            color: "#EEF4F7",
+            opacity: 0.9,
+        },
+    };
+
     const verify = async () => {
         if (code.length !== length) return;
         setBusy(true);
@@ -52,15 +98,49 @@ export default function StepCodeReset({ length = 6, onVerified, onBack }: Props)
 
     return (
         <Stack spacing={2}>
-            <OtpInput length={length} value={code} onChange={setCode} autoFocus />
+            <OtpInput
+                length={length}
+                value={code}
+                onChange={setCode}
+                autoFocus
+                // layout/styles handled inside OtpInput (adaptive grid for mobile)
+            />
             <Box>
-                <Button fullWidth variant="contained" disabled={busy || code.length !== length} onClick={verify} sx={{ height: 44 }}>
+                <Button
+                    fullWidth
+                    variant="contained"
+                    disabled={busy || code.length !== length}
+                    onClick={verify}
+                    sx={primaryBtnSx}
+                >
                     {t("forgotPassword.verifyButton")}
                 </Button>
             </Box>
-            <Stack direction="row" spacing={1}>
-                <Button disabled={timer > 0} variant="text" onClick={resend}>{t("forgotPassword.resendCodeButton")} {timer > 0 && `(${timer}s)`}</Button>
-                {onBack && <Button variant="outlined" onClick={onBack}>{t("forgotPassword.changePhoneButton")}</Button>}
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1}
+                sx={{
+                    width: "100%",
+                    "& > .MuiButton-root": { width: { xs: "100%", sm: "50%" } }
+                }}
+            >
+                <Button
+                    disabled={timer > 0}
+                    variant="contained"
+                    onClick={resend}
+                    sx={secondaryBtnSx}
+                >
+                    {t("forgotPassword.resendCodeButton")} {timer > 0 && `(${timer}s)`}
+                </Button>
+                {onBack && (
+                    <Button
+                        variant="outlined"
+                        onClick={onBack}
+                        sx={outlineBtnSx}
+                    >
+                        {t("forgotPassword.changePhoneButton")}
+                    </Button>
+                )}
             </Stack>
         </Stack>
     );

@@ -25,14 +25,25 @@ export default function ForgotPasswordPage() {
     }, [activeStep, e164, t]);
 
     return (
-        <Container maxWidth="sm" sx={{ py: 5 }}>
+        <Container
+            maxWidth="sm"
+            sx={{
+                py: 5,
+                px: { xs: 0, sm: undefined },
+            }}
+        >
             <Stepper activeStep={activeStep} sx={{ mb: 3, "& .MuiStepLabel-label": { display: "none" } }}>
                 {steps.map((_, i) => (<Step key={i}><StepLabel /></Step>))}
             </Stepper>
 
             <AuthTop title={header.title} subtitle={header.subtitle} />
 
-            <Paper elevation={0} sx={{ p: 2.5 }}>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: "20px 0", sm: 2.5 },
+                }}
+            >
                 {activeStep === 0 && (
                     <StepPhoneExisting
                         onNext={(phone) => { setE164(phone); setActiveStep(1); }}

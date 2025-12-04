@@ -19,6 +19,20 @@ export default function StepNewPassword({
 }) {
     const { t } = useTranslation();
 
+    const primaryBtnSx = {
+        height: 42,
+        borderRadius: "5px",
+        textTransform: "none",
+        fontWeight: 700,
+        background: "#4472B8",
+        color: "#EEF4F7",
+        "&:hover": {
+            background: "#EEF4F7",
+            color: "#4472B8",
+            borderColor: "#4472B8",
+        },
+    };
+
     const schema = z.object({
         password: z.string().min(8, t("forgotPassword.newPasswordRequired")),
         confirm: z.string().min(1, t("forgotPassword.confirmPasswordRequired")),
@@ -86,7 +100,13 @@ export default function StepNewPassword({
                 {success && <Alert severity="success">{success}</Alert>}
                 {error && <Alert severity="error">{error}</Alert>}
 
-                <Button type="submit" variant="contained" disabled={loading}>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={loading}
+                    fullWidth
+                    sx={primaryBtnSx}
+                >
                     {loading ? t("forgotPassword.pleaseWait") : t("forgotPassword.savePasswordButton")}
                 </Button>
             </Stack>

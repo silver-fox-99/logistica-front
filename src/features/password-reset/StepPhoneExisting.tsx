@@ -13,6 +13,20 @@ type FormValues = { phone: string };
 export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) => void }) {
     const { t } = useTranslation();
 
+    const primaryBtnSx = {
+        height: 42,
+        borderRadius: "5px",
+        textTransform: "none",
+        fontWeight: 700,
+        background: "#4472B8",
+        color: "#EEF4F7",
+        "&:hover": {
+            background: "#EEF4F7",
+            color: "#4472B8",
+            borderColor: "#4472B8",
+        },
+    };
+
     const schema = z.object({
         phone: z.string().min(1, t("forgotPassword.phoneRequired")).refine(v => matchIsValidTel(v), t("forgotPassword.phoneInvalid")),
     });
@@ -59,7 +73,15 @@ export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) =
                     />
                 )}
             />
-            <Button type="submit" variant="contained" disabled={isSubmitting}>{t("forgotPassword.sendCodeButton")}</Button>
+            <Button
+                type="submit"
+                variant="contained"
+                disabled={isSubmitting}
+                fullWidth
+                sx={primaryBtnSx}
+            >
+                {t("forgotPassword.sendCodeButton")}
+            </Button>
         </Box>
     );
 }
