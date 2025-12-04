@@ -381,26 +381,6 @@ export default function ShipmentsListPage({ scope }: Props) {
                     {t('shipments.filter.button')}
                 </Button>
 
-                <Stack 
-                    direction={{ xs: "column", sm: "row" }} 
-                    alignItems={{ xs: "stretch", sm: "center" }} 
-                    spacing={1} 
-                    sx={{ width: { xs: "100%", sm: "auto" } }}
-                >
-                    <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>{t('shipments.filter.period')}</Typography>
-                    <Select
-                        variant="outlined"
-                        size="small"
-                        value={period}
-                        onChange={(e) => setPeriod(e.target.value)}
-                        sx={{ minWidth: { xs: "100%", sm: 160 }, width: { xs: "100%", sm: "auto" } }}
-                    >
-                        <MenuItem value="all">{t('shipments.filter.allTime')}</MenuItem>
-                        <MenuItem value="7d">{t('shipments.filter.last7Days')}</MenuItem>
-                        <MenuItem value="30d">{t('shipments.filter.last30Days')}</MenuItem>
-                        <MenuItem value="ytd">{t('shipments.filter.yearToDate')}</MenuItem>
-                    </Select>
-                </Stack>
             </Stack>
 
             {/* Remount list body on kind/filters/reloadKey changes */}

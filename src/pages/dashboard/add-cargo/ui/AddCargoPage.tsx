@@ -181,7 +181,7 @@ export default function AddCargoPage() {
     };
 
     const [form, setForm] = useState<FormValues>({
-        dateFrom: getTodayDate(), dateTo: getTodayDate(),
+        dateFrom: getTodayDate(), dateTo: "",
         pickups:  [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
         dropoffs: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
 

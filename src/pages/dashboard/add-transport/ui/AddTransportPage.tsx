@@ -202,7 +202,7 @@ export default function AddTransportPage() {
     };
 
     const [form, setForm] = useState<FormValues>({
-        dateFrom: getTodayDate(), dateTo: getTodayDate(),
+        dateFrom: getTodayDate(), dateTo: "",
         loadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
         unloadPlaces: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
 
