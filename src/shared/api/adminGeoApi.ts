@@ -68,20 +68,6 @@ export const adminGeoApi = {
         const { data } = await api.delete(`${BASE}/${id}`);
         return data.data as { id: string };
     },
-    datasetCountries: async () => {
-        const res = await api.get("/geo-location/dataset/countries");
-        return res.data.data as { iso2: string; name: string; region?: string; subregion?: string }[];
-    },
-
-    datasetStates: async (countryCode: string) => {
-        const res = await api.get(`/geo-location/dataset/${countryCode}/states`);
-        return res.data.data as { countryCode: string; stateCode: string; name: string; type: string | null }[];
-    },
-
-    datasetCities: async (countryCode: string, stateCode: string) => {
-        const res = await api.get(`/geo-location/dataset/${countryCode}/states/${stateCode}/cities`);
-        return res.data.data as { countryCode: string; stateCode: string; name: string; latitude?: string; longitude?: string }[];
-    },
 
     importCountries: async () => {
         const res = await api.post("/geo-location/import/countries", {});
