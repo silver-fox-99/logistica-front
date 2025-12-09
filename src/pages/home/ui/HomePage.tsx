@@ -18,22 +18,19 @@ export default function HomePage() {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const getTodayDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
-    };
-
-    const getDefaultDatePlus30 = () => {
-        const date = new Date();
-        date.setDate(date.getDate() + 30);
-        return date.toISOString().split('T')[0];
-    };
+  //  const getTodayDate = () => {
+  //      const today = new Date();
+  //      return today.toISOString().split('T')[0];
+  //  };
+//
+  //  const getDefaultDatePlus30 = () => {
+  //      const date = new Date();
+  //      date.setDate(date.getDate() + 30);
+  //      return date.toISOString().split('T')[0];
+  //  };
 
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [filters, setFilters] = useState<PublicFilters>({
-        pickup_date_from: getTodayDate(),
-        pickup_date_to: getDefaultDatePlus30()
-    });
+    const [filters, setFilters] = useState<PublicFilters>({});
 
     useEffect(() => {
         loadInit();

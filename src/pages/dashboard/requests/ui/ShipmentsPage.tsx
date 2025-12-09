@@ -304,13 +304,7 @@ export default function ShipmentsListPage({ scope }: Props) {
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const getDefaultFilters = (): PublicFilters => {
-        const today = new Date();
-        const datePlus30 = new Date();
-        datePlus30.setDate(datePlus30.getDate() + 30);
-        return {
-            pickup_date_from: today.toISOString().split('T')[0],
-            pickup_date_to: datePlus30.toISOString().split('T')[0]
-        };
+        return {}
     };
 
     // kind: draft/applied
