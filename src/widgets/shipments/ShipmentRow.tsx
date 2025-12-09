@@ -70,14 +70,14 @@ export default function ShipmentRow({
     
     const routeFrom = useMemo(() => {
         if (data.points && data.points[0]) {
-            return formatRoute(data.points[0]);
+            return formatRoute(data.points.find(item => item.type === 'PICKUP'));
         }
         return data.routeFrom || "—";
     }, [data.points, data.routeFrom, formatRoute]);
     
     const routeTo = useMemo(() => {
         if (data.points && data.points[1]) {
-            return formatRoute(data.points[1]);
+            return formatRoute(data.points.find(item => item.type === 'DROPOFF'));
         }
         return data.routeTo || "—";
     }, [data.points, data.routeTo, formatRoute]);
