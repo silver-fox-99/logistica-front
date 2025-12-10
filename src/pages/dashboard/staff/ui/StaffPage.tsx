@@ -9,77 +9,22 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import { FiUsers, FiHome, FiUserPlus } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import type { StackProps } from "@mui/material";
 import animation from "./SearchForUsers.json";
 
-type PageButtonsProps = {
-    direction?: StackProps["direction"];
-    gap?: number;
-    marginTop?: number;
-    desktopAlignItems?: "flex-start" | "center" | "flex-end";
-};
-
-function PageButtons({ 
-    direction = "row", 
-    gap = 12, 
-    marginTop = 3,
-    desktopAlignItems = "flex-start",
-    children 
-}: PageButtonsProps & { children: React.ReactNode }) {
+function InfoBox({ title, items }: { title: string; items: string[] }) {
     return (
-        <>
-            {/* Десктоп: Stack с улучшенными стилями */}
-            <Stack 
-                direction="row" 
-                flexWrap="wrap" 
-                alignItems={desktopAlignItems}
-                sx={{ 
-                    mt: marginTop,
-                    display: { xs: "none", md: "flex" },
-                    gap: "12px",
-                    "& > *": {
-                        marginLeft: "0 !important"
-                    },
-                    "& .MuiButton-root": {
-                        textTransform: "none",
-                        borderRadius: 2,
-                        px: 3,
-                        py: 1
-                    }
-                }}
-            >
-                {children}
+        <Box sx={{ p: 1.5, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.default" }}>
+            <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 0.5 }}>{title}</Typography>
+            <Stack spacing={0.5}>
+                {items.map((it, idx) => (
+                    <Typography key={idx} variant="body2" color="text.secondary">
+                        • {it}
+                    </Typography>
+                ))}
             </Stack>
-
-            {/* Мобилка: Box с gap */}
-            <Box
-                sx={{
-                    display: { xs: "flex", md: "none" },
-                    flexDirection: direction,
-                    gap: `${gap}px`,
-                    mt: marginTop,
-                    width: "100%",
-                    "& > *": {
-                        marginTop: "0 !important",
-                        marginLeft: "0 !important",
-                        marginRight: "0 !important",
-                        marginBottom: "0 !important",
-                    },
-                    "& .MuiButton-root": {
-                        width: "100%",
-                        marginTop: "0 !important",
-                        marginLeft: "0 !important",
-                        marginRight: "0 !important",
-                        marginBottom: "0 !important",
-                    }
-                }}
-            >
-                {children}
-            </Box>
-        </>
+        </Box>
     );
 }
 
@@ -90,49 +35,101 @@ export default function StaffPage() {
     return (
         <Box sx={{ minHeight: "calc(100dvh - 120px)", display: "grid", alignItems: "start", py: 3 }}>
             <Container maxWidth="md">
-                <Grid container spacing={3} alignItems="center">
-                    {/* Animation */}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <Card variant="outlined" sx={{ borderRadius: 4, borderColor: "divider", bgcolor: "background.paper" }}>
-                            <CardContent sx={{ p: 3 }}>
-                                <Box sx={{ maxWidth: 520, mx: "auto" }}>
+                <Stack spacing={3}>
+                    <Card variant="outlined" sx={{ borderRadius: 4, borderColor: "divider", bgcolor: "background.paper" }}>
+                        <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+                            <Stack spacing={3} direction={{ xs: "column", md: "row" }} alignItems="center">
+                                <Box sx={{ width: { xs: "100%", md: "45%" }, maxWidth: 520, mx: "auto" }}>
                                     <Lottie animationData={animation} loop style={{ width: "100%", height: "auto" }} />
                                 </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                                <Stack spacing={1.5} sx={{ flex: 1, width: "100%" }}>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <FiUsers />
+                                        <Typography variant="h5" fontWeight={700}>{t("staff.title")}</Typography>
+                                    </Stack>
+                                    <Typography variant="body1" color="text.secondary">
+                                        {t("staff.description")}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {t("staff.meanwhile")}
+                                    </Typography>
 
-                    {/* Text + CTA */}
-                    <Grid size={{ xs: 12, md: 6 }} sx={{ marginLeft: { xs: 0 } }}>
-                        <Stack spacing={1}>
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <FiUsers />
-                                <Typography variant="h5" fontWeight={700}>{t("staff.title")}</Typography>
+                                    <Stack direction="column" spacing={1.25} sx={{ mt: 1, width: "100%" }}>
+                                        <Button
+                                            onClick={() => navigate("/dashboard/staff/invite")}
+                                            sx={{
+                                                height: 48,
+                                                borderRadius: 2,
+                                                textTransform: "none",
+                                                fontWeight: 700,
+                                                px: 2.75,
+                                                gap: 1,
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                justifyContent: "flex-start",
+                                                color: "#fff",
+                                                bgcolor: "primary.main",
+                                                boxShadow: "none",
+                                                "&:hover": { bgcolor: "primary.dark", boxShadow: "none" },
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <FiUserPlus size={18} />
+                                            {t("staff.inviteButton")}
+                                        </Button>
+                                        <Button
+                                            onClick={() => navigate("/dashboard")}
+                                            sx={{
+                                                height: 48,
+                                                borderRadius: 2,
+                                                textTransform: "none",
+                                                fontWeight: 700,
+                                                px: 2.75,
+                                                gap: 1,
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                justifyContent: "flex-start",
+                                                color: "text.primary",
+                                                bgcolor: "background.default",
+                                                border: "1px solid",
+                                                borderColor: "divider",
+                                                boxShadow: "none",
+                                                "&:hover": { bgcolor: "action.hover", borderColor: "primary.main" },
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <FiHome size={18} color="#4472B8" />
+                                            {t("staff.backButton")}
+                                        </Button>
+                                    </Stack>
+                                </Stack>
                             </Stack>
+                        </CardContent>
+                    </Card>
 
-                            <Typography variant="body1" color="text.secondary">
-                                {t("staff.description")}
-                            </Typography>
-
-                            <Typography variant="body2" color="text.secondary">
-                                {t("staff.meanwhile")}
-                            </Typography>
-                        </Stack>
-
-                        <PageButtons 
-                            direction={{ xs: "column", md: "row" }} 
-                            gap={12}
-                            desktopAlignItems="flex-start"
-                        >
-                            <Button variant="contained" startIcon={<FiUserPlus />} onClick={() => navigate("/dashboard/staff/invite")}>
-                                {t("staff.inviteButton")}
-                            </Button>
-                            <Button variant="outlined" startIcon={<FiHome />} onClick={() => navigate("/dashboard")}>
-                                {t("staff.backButton")}
-                            </Button>
-                        </PageButtons>
-                    </Grid>
-                </Grid>
+                    <Card variant="outlined" sx={{ borderRadius: 4, borderColor: "divider", bgcolor: "background.paper" }}>
+                        <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+                            <Stack spacing={1.5}>
+                                <InfoBox
+                                    title={t("staff.comingSoonTitle")}
+                                    items={[
+                                        t("staff.comingSoon1"),
+                                        t("staff.comingSoon2"),
+                                        t("staff.comingSoon3"),
+                                    ]}
+                                />
+                                <InfoBox
+                                    title={t("staff.actionsTitle")}
+                                    items={[
+                                        t("staff.action1"),
+                                        t("staff.action2"),
+                                        t("staff.action3"),
+                                    ]}
+                                />
+                            </Stack>
+                        </CardContent>
+                    </Card>
+                </Stack>
             </Container>
         </Box>
     );

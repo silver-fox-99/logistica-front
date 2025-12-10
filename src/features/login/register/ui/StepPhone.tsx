@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, FormHelperText, Stack, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,19 +9,21 @@ import parsePhoneNumber from "libphonenumber-js";
 import { authApi } from "@/shared/api/authApi";
 
 
-type FormValues = { phone: string };
+type FormValues = { phone: string; acceptAgreement: boolean };
 type StepPhoneProps = { defaultCountry?: string; onNext?: (e164: string, raw: string) => void; };
 
 export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhoneProps) {
     const { t } = useTranslation();
+    const agreementUrl = "/docs/user-agreement.pdf";
 
     const schema = z.object({
         phone: z.string().min(1, t("register.phoneRequired"))
             .refine(v => matchIsValidTel(v), t("register.phoneInvalid")),
+        acceptAgreement: z.boolean().refine((v) => v === true, "Подтвердите, что принимаете пользовательское соглашение"),
     });
 
-    const { control, handleSubmit, formState: { isSubmitting } } =
-        useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { phone: "" }, mode: "onTouched" });
+    const { control, handleSubmit, formState: { isSubmitting, errors } } =
+        useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { phone: "", acceptAgreement: false }, mode: "onTouched" });
 
     const submit = async (data: FormValues) => {
         try {
@@ -56,6 +58,39 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
                     />
                 )}
             />
+            <Stack spacing={0.25}>
+                <Controller
+                    name="acceptAgreement"
+                    control={control}
+                    render={({ field }) => (
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={field.value}
+                                    onChange={(e) => field.onChange(e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label={
+                                <Typography variant="body2" color="text.secondary">
+                                    Я принимаю{" "}
+                                    <a
+                                        href={agreementUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ color: "#4472B8", fontWeight: 600 }}
+                                    >
+                                        пользовательское соглашение
+                                    </a>
+                                </Typography>
+                            }
+                        />
+                    )}
+                />
+                {errors.acceptAgreement && (
+                    <FormHelperText error>{errors.acceptAgreement.message}</FormHelperText>
+                )}
+            </Stack>
             <Button type="submit" variant="contained" disabled={isSubmitting}>{t("register.sendCodeButton")}</Button>
         </Box>
     );

@@ -280,7 +280,19 @@
       "newPasswordMin": "Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak",
       "confirmPasswordRequired": "Yangi parolni tasdiqlang",
       "passwordsMismatch": "Parollar mos kelmaydi"
-    }
+    },
+    "userAgreementTitle": "Foydalanuvchi kelishuvi",
+    "userAgreementDescription": "Amaldagi foydalanuvchi kelishuvi bilan tanishing. Fayl yangi oynada DOCX formatida ochiladi.",
+    "userAgreementOpen": "Kelishuvni ochish"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Sahifa topilmadi",
+    "description": "Kerakli sahifa o'chirilgan, nomi o'zgargan yoki vaqtincha mavjud emas bo'lishi mumkin.",
+    "home": "Bosh sahifaga",
+    "back": "Orqaga qaytish",
+    "reload": "Sahifani yangilash",
+    "search": "Buyurtmalar qidiruviga o'tish"
   },
   "shipments": {
     "myShipments": {
@@ -447,6 +459,14 @@
     "title": "Kompaniyalar",
     "description": "Ushbu bo'lim hozirda ishlab chiqish jarayonida. Tez orada siz kompaniya yaratishingiz, jamoa a'zolarini taklif qilishingiz, roller vazifalar va to'lovlarni boshqarishingiz, va hamda xizmatlarni ulashingiz mumkin bo'ladi.",
     "meanwhile": "Shu bilan birga, Hozircha siz boshqaruv paneliga qaytishingiz yoki birinchi kompaniyangizni yaratishdan boshlashingiz mumkin.",
+    "comingSoonTitle": "Tez orada",
+    "comingSoon1": "Kompaniya profili rekvizitlar va hujjatlar bilan",
+    "comingSoon2": "Ishtirokchilarni taklif qilish va rollarni tayinlash",
+    "comingSoon3": "To'lovlar, shartnomalar va integratsiyalarni bir joyda boshqarish",
+    "actionsTitle": "Hozir nima qilish mumkin",
+    "action1": "Kompaniya ma'lumotlarini tayyorlang (nomi, kontaktlar, hujjatlar)",
+    "action2": "Jamoa uchun rollar va kirish darajasini belgilang",
+    "action3": "Avval bitta kompaniya bilan boshlang, keyin kengaytiring",
     "createButton": "+ KOMPANIYA YARATISH",
     "backButton": "BOSHQARUV PANELIGA QAYTISH"
   },
@@ -454,6 +474,14 @@
     "title": "Xodimlar",
     "description": "Jamoa boshqaruvi ishlab chiqish jarayonida. Tez orada siz hamkasblaringizni taklif qilishingiz, rollar vazifalar va ruxsatlarni kirish huquqini belgilashingiz hamda kompaniyangizga bo'ylab kirishni boshqarishingiz mumkin bo'ladi.",
     "meanwhile": "Siz boshqaruv paneliga qaytishingiz yoki birinchi hamkasbingizni taklif qilishga tayyorlanishingiz mumkin.",
+    "comingSoonTitle": "Tez orada",
+    "comingSoon1": "Hamkasblarni telefon yoki e-mail orqali taklif qilish",
+    "comingSoon2": "Bo'limlar bo'yicha rollar va kirish huquqlari",
+    "comingSoon3": "Jamoa faolligi bo'yicha qisqa hisobot",
+    "actionsTitle": "Hozir nima qilish mumkin",
+    "action1": "Taklif qilmoqchi bo'lgan hamkasblar kontaktlarini to'plang",
+    "action2": "Kimga tahrirlash va ko'rish huquqi kerakligini aniqlang",
+    "action3": "Avval bir hamkasbni taklif qilib jarayonni sinab ko'ring",
     "inviteButton": "Hamkasbni taklif qilish",
     "backButton": "Boshqaruv paneliga qaytish"
   },
@@ -461,6 +489,14 @@
     "title": "To'lovlar",
     "description": "Ushbu bo'lim ishlab chiqish jarayonida. Tez orada siz to'lov provayderlarini ulashingiz, to'lovlar va hisob-faktura kitoblarni boshqarishingiz hamda tranzaksiyalar tarixini batafsil ko'rib chiqishingiz mumkin bo'ladi.",
     "meanwhile": "Hozircha siz boshqaruv paneliga qaytishingiz yoki ushbu funksiya mavjud bo'lganda provayderga ulanishingiz mumkin.",
+    "comingSoonTitle": "Tez orada",
+    "comingSoon1": "To'lov provayderlarini ulash va hisob-fakturalar",
+    "comingSoon2": "To'lovlar, balanslar va tarixni kuzatish",
+    "comingSoon3": "Buxgalteriya uchun hisobotlarni eksport qilish",
+    "actionsTitle": "Hozir nima qilish mumkin",
+    "action1": "Qaysi provayderni ulashni rejalashtirayotganingizni aniqlang",
+    "action2": "Tezroq ulash uchun rekvizitlarni tayyorlang",
+    "action3": "Sinov uchun bitta hisob-fakturani oldindan tayyorlang",
     "connectButton": "Provayderni ulash",
     "backButton": "Boshqaruv paneliga qaytish"
   },
@@ -498,6 +534,9 @@
     "confirmPasswordRequired": "Parolni tasdiqlash kamida 1 ta belgidan iborat bo'lishi kerak",
     "confirmPasswordMismatch": "Parol va tasdiqlash bir xil emas",
     "passwordHint": "*Parol kamida 6 ta belgidan iborat bo'lishi kerak",
+    "acceptAgreementLabel": "Men roziman",
+    "acceptAgreementLink": "Foydalanuvchi kelishuvi",
+    "agreementRequired": "Foydalanuvchi kelishuvi bilan tanishing va rozilik bering",
     "registerButton": "Ro'yxatdan o'tish",
     "registrationSuccess": "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!",
     "registrationError": "Ro'yxatdan o'tishda xatolik",

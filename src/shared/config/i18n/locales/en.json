@@ -280,7 +280,19 @@
       "newPasswordMin": "New password must be at least 8 characters",
       "confirmPasswordRequired": "Confirm new password",
       "passwordsMismatch": "Passwords do not match"
-    }
+    },
+    "userAgreementTitle": "User Agreement",
+    "userAgreementDescription": "Review the current User Agreement. It will open in a new tab as a DOCX file.",
+    "userAgreementOpen": "Open agreement"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "The page you are looking for might have been removed, renamed, or is temporarily unavailable.",
+    "home": "Go to homepage",
+    "back": "Go back",
+    "reload": "Reload page",
+    "search": "Go to search"
   },
   "shipments": {
     "myShipments": {
@@ -446,6 +458,14 @@
     "title": "Companies",
     "description": "This section is currently under development. Soon you will be able to create a company, invite teammates, manage roles and billing, and connect services.",
     "meanwhile": "Meanwhile, you can return to the dashboard or start by creating your first company.",
+    "comingSoonTitle": "What’s coming soon",
+    "comingSoon1": "Create a company profile with details and documents",
+    "comingSoon2": "Invite team members and assign roles",
+    "comingSoon3": "Manage billing, contracts, and integrations in one place",
+    "actionsTitle": "What you can do now",
+    "action1": "Prepare company info (name, contacts, documents)",
+    "action2": "Plan which teammates and roles you need",
+    "action3": "Start with one company and expand later",
     "createButton": "Create company",
     "backButton": "Back to dashboard"
   },
@@ -453,6 +473,14 @@
     "title": "Staff",
     "description": "Team management is under development. Soon you will be able to invite teammates, assign roles and permissions, and manage access across your company.",
     "meanwhile": "You can go back to the dashboard or prepare to invite your first teammate.",
+    "comingSoonTitle": "What’s coming soon",
+    "comingSoon1": "Inviting teammates by phone or email",
+    "comingSoon2": "Roles and permissions to control access",
+    "comingSoon3": "Activity overview across the team",
+    "actionsTitle": "What you can do now",
+    "action1": "Collect the list of teammates and their contacts",
+    "action2": "Decide who needs edit/view permissions",
+    "action3": "Invite one teammate first to test the flow",
     "inviteButton": "Invite teammate",
     "backButton": "Back to dashboard"
   },
@@ -460,6 +488,14 @@
     "title": "Payments",
     "description": "This section is under development. Soon you will be able to connect payment providers, manage payouts and invoices, and view detailed transaction history.",
     "meanwhile": "For now you can return to the dashboard or proceed to connect a provider once it becomes available.",
+    "comingSoonTitle": "What’s coming soon",
+    "comingSoon1": "Connect providers for payouts and invoices",
+    "comingSoon2": "Track payments, balances, and history",
+    "comingSoon3": "Export reports for accounting",
+    "actionsTitle": "What you can do now",
+    "action1": "Check which provider you plan to use",
+    "action2": "Keep billing details handy to connect faster",
+    "action3": "Prepare a test invoice to try when available",
     "connectButton": "Connect provider",
     "backButton": "Back to dashboard"
   },
@@ -497,6 +533,9 @@
     "confirmPasswordRequired": "Password confirmation must be at least 1 character",
     "confirmPasswordMismatch": "Password and confirmation do not match",
     "passwordHint": "*Password must be at least 6 characters",
+    "acceptAgreementLabel": "I accept the",
+    "acceptAgreementLink": "User Agreement",
+    "agreementRequired": "Please accept the User Agreement",
     "registerButton": "Register",
     "registrationSuccess": "Registration completed successfully!",
     "registrationError": "Registration error",
