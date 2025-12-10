@@ -28,7 +28,7 @@
     "password": "Parol",
     "login": "Kirish",
     "forgotPassword": "Parolni unutdingizmi?",
-    "error": "Telefon raqami yoki parol noto'g'ri",
+    "error": "Telefon raqami yoki parol noto‘g‘ri",
     "success": "Kirish muvaffaqiyatli!"
   },
   "addCargo": {
