@@ -13,7 +13,9 @@ export default function Footer() {
     return <div className="footer">
        <div className="footer__body container">
            <div className="footer__column">
-               <img className="footer__logo" src={logo} alt="logo"/>
+               <Link to="/" aria-label="Go to home">
+                   <img className="footer__logo" src={logo} alt="logo"/>
+               </Link>
 
                <div className="footer__contacts">
                    <a href="tel:+998949866886">+998 94 986 68 86</a>

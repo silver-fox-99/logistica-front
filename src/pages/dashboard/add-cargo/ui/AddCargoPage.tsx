@@ -187,7 +187,7 @@ export default function AddCargoPage() {
 
         cargoType: "",
         vehicleType: "",
-        loadType: [],
+        loadType: [], // убираем дефолтный ANY
         allowPartial: false,
 
         vehiclesCount: 1,
@@ -225,9 +225,8 @@ export default function AddCargoPage() {
         if (lookups && !loadingInit) {
             const currency = lookups.currency[0]?.slug   ?? "";
             const vehicle  = lookups.vehicleType[0]?.slug ?? "";
-            const loadType = lookups.loadType?.[0]?.slug ? [lookups.loadType[0].slug] : [];
             const cargo    = lookups.cargoTypes?.[0]?.slug  ?? "";
-            setForm((s) => ({ ...s, currency, vehicleType: vehicle, loadType, cargoType: cargo }));
+            setForm((s) => ({ ...s, currency, vehicleType: vehicle, cargoType: cargo, loadType: [] }));
         }
     }, [lookups, loadingInit]);
 

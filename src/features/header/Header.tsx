@@ -54,9 +54,9 @@ export default function Header({
     return <div className="header">
         <div className="header__wrapper container">
             <div className="header__left">
-                <div className="header__logo">
+                <Link to="/" className="header__logo" aria-label="Go to home">
                     <img src={logo} alt="logo"/>
-                </div>
+                </Link>
             </div>
 
             {isAuthenticated && <div className="header__column header__column--user">

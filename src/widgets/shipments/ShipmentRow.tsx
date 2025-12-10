@@ -69,16 +69,14 @@ export default function ShipmentRow({
     }, [i18n.resolvedLanguage, i18n.language]);
     
     const routeFrom = useMemo(() => {
-        if (data.points && data.points[0]) {
-            return formatRoute(data.points.find(item => item.type === 'PICKUP'));
-        }
+        const pickup = data.points?.find(item => item.type === "PICKUP") ?? data.points?.[0];
+        if (pickup) return formatRoute(pickup);
         return data.routeFrom || "—";
     }, [data.points, data.routeFrom, formatRoute]);
     
     const routeTo = useMemo(() => {
-        if (data.points && data.points[1]) {
-            return formatRoute(data.points.find(item => item.type === 'DROPOFF'));
-        }
+        const drop = data.points?.find(item => item.type === "DROPOFF") ?? data.points?.[data.points.length - 1];
+        if (drop) return formatRoute(drop);
         return data.routeTo || "—";
     }, [data.points, data.routeTo, formatRoute]);
 

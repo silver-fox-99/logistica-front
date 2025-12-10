@@ -20,7 +20,7 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
             .refine(v => matchIsValidTel(v), t("register.phoneInvalid")),
     });
 
-    const { control, handleSubmit, setError, formState: { isSubmitting } } =
+    const { control, handleSubmit, formState: { isSubmitting } } =
         useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { phone: "" }, mode: "onTouched" });
 
     const submit = async (data: FormValues) => {
@@ -28,11 +28,6 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
             let e164 = data.phone;
             try { const p = parsePhoneNumber(data.phone); if (p) e164 = p.number; } catch {}
 
-            const { existing } = await authApi.checkPhone(e164);
-            if (existing) {
-                setError("phone", { message: t("register.phoneExists") });
-                return;
-            }
             await authApi.sendPhoneCode(e164);
             toast.success(t("register.codeSent"));
             onNext?.(e164, data.phone);

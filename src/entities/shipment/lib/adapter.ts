@@ -27,15 +27,16 @@ function asRouteString(p?: GeoPoint): string {
 }
 
 export function adaptCargo(i: CargoApiItem): ShipmentRowData {
-    // Нормализуем массив points (минимум 2 элемента, чтобы было From/To)
-    const points: GeoPoint[] = Array.isArray(i.points) ? i.points.slice(0, 2) : [];
-    if (points.length < 2) {
-        // дозаполним, чтобы всегда было 2
-        while (points.length < 2) points.push({});
-    }
+    // Нормализуем массив points
+    const pointsAll: GeoPoint[] = Array.isArray(i.points) ? i.points.slice() : [];
+    const pickups = pointsAll.filter((p: any) => p?.type === "PICKUP");
+    const dropoffs = pointsAll.filter((p: any) => p?.type === "DROPOFF");
 
-    const from = points[0];
-    const to = points[1];
+    const fallbackPoints: GeoPoint[] = pointsAll.slice(0, 2);
+    while (fallbackPoints.length < 2) fallbackPoints.push({});
+
+    const from = pickups[0] || fallbackPoints[0];
+    const to = dropoffs[0] || (fallbackPoints[1] ?? {});
 
     const dims = i.has_dimensions ? dimStr(i.length_m, i.width_m, i.height_m) : undefined;
     const name = [i.user?.first_name, i.user?.last_name].filter(Boolean).join(" ");
@@ -48,7 +49,7 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
         routeTo: asRouteString(to),
 
         /** новый массив точек — теперь доступен потребителям */
-        points,
+        points: pointsAll.length ? pointsAll : fallbackPoints,
 
         distanceKm: 0, // при необходимости посчитаешь позже
         dates: { from: i.date_from, to: i.date_to },

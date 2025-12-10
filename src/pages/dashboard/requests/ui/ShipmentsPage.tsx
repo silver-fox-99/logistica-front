@@ -35,15 +35,17 @@ function parsePriceAmount(price?: string | null): number | null {
 type Props = { scope: "public" | "my" };
 
 function ListBody({
-                      scope,
-                      kind,
-                      filters,
-                      onRequestReload
-                  }: {
+    scope,
+    kind,
+    filters,
+    onRequestReload,
+    onTotalChange,
+}: {
     scope: "public" | "my";
     kind: ShipmentsKind;
     filters: Partial<PublicFilters>;
     onRequestReload?: () => void;
+    onTotalChange?: (count: number) => void;
 }) {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
@@ -52,6 +54,10 @@ function ListBody({
 
     const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
     const list = useMemo(() => items, [items]);
+
+    useEffect(() => {
+        onTotalChange?.(total || 0);
+    }, [onTotalChange, total]);
 
     useEffect(() => {
         // No /favorites endpoint, rely on is_favorite from list if available
@@ -238,9 +244,6 @@ function ListBody({
             </Box>
 
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 2, flexWrap: "wrap", gap: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                    {t('shipments.total', { count: total })}
-                </Typography>
                 <Stack direction="row" alignItems="center" spacing={1}>
                     <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{t('shipments.actions.back')}</Button>
                     <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />
@@ -302,6 +305,7 @@ function ListBody({
 export default function ShipmentsListPage({ scope }: Props) {
     const { t } = useTranslation();
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
 
     const getDefaultFilters = (): PublicFilters => {
         return {}
@@ -322,7 +326,7 @@ export default function ShipmentsListPage({ scope }: Props) {
     return (
         <>
             <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2, width: "100%", boxSizing: "border-box" }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
                     <Box className="shipments-page__icon">
                         <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/>
@@ -340,6 +344,18 @@ export default function ShipmentsListPage({ scope }: Props) {
                                 : t('shipments.myShipments.searchDescription')}
                         </Typography>
                     </Box>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            fontWeight: 600,
+                            color: "text.primary",
+                            textAlign: "right",
+                            minWidth: { xs: "100%", sm: "auto" },
+                            alignSelf: { xs: "flex-start", sm: "center" }
+                        }}
+                    >
+                        {t('shipments.total', { count: totalCount })}
+                    </Typography>
                 </Box>
             </Paper>
 
@@ -368,6 +384,7 @@ export default function ShipmentsListPage({ scope }: Props) {
                     kind={appliedKind}
                     filters={appliedFilters}
                     onRequestReload={requestReload}
+                    onTotalChange={setTotalCount}
                 />
             </div>
 

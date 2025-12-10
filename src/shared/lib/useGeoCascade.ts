@@ -9,8 +9,6 @@ type LoadingState = {
     citiesFor?: string | null;
 };
 
-const sortByName = (a: GeoImportItem, b: GeoImportItem) => a.name.localeCompare(b.name);
-
 const preferLocalized = (prev: GeoImportItem, next: GeoImportItem) => {
     const hasRu = (v?: string | null) => v && v.trim().length > 0;
     const hasUz = (v?: string | null) => v && v.trim().length > 0;
@@ -213,7 +211,7 @@ export function useGeoCascade() {
             const normalized = dedupCountries(data);
             const enriched = enrich(normalized);
             const deduped = dedupCountries(enriched);
-            setCountries(deduped.sort(sortByName));
+            setCountries(deduped);
             countriesTried.current = true;
         } catch (e: any) {
             countriesTried.current = false;
@@ -235,7 +233,7 @@ export function useGeoCascade() {
                 const data = await publicGeoApi.listRegions(key);
                 const normalized = dedupRegions(data);
                 const enriched = enrich(normalized);
-                setRegions((prev) => ({ ...prev, [key]: dedupRegions(enriched).sort(sortByName) }));
+                setRegions((prev) => ({ ...prev, [key]: dedupRegions(enriched) }));
             } catch (e: any) {
                 setError(e?.response?.data?.message || e?.message || "Failed to load regions");
                 regionsCache.current.delete(key);
@@ -260,7 +258,7 @@ export function useGeoCascade() {
                 const data = await publicGeoApi.listCities(rId);
                 const normalized = dedupCities(data);
                 const enriched = enrich(normalized);
-                setCities((prev) => ({ ...prev, [key]: dedupCities(enriched).sort(sortByName) }));
+                setCities((prev) => ({ ...prev, [key]: dedupCities(enriched) }));
             } catch (e: any) {
                 setError(e?.response?.data?.message || e?.message || "Failed to load cities");
                 citiesCache.current.delete(key);
@@ -288,7 +286,7 @@ export function useGeoCascade() {
         [cities]
     );
 
-    const countryIndex = useMemo(() => new Map(countries.map((c) => [c.id, c])), [countries]);
+const countryIndex = useMemo(() => new Map(countries.map((c) => [c.id, c])), [countries]);
     const regionIndex = useMemo(() => {
         const entries: [string, GeoImportItem][] = [];
         Object.values(regions).forEach((arr) => arr.forEach((r) => entries.push([r.id, r])));
