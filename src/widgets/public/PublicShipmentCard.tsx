@@ -47,14 +47,11 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
     const labels = useMemo(() => {
         const pts = (data.points ?? []).slice();
 
-        const pickup = pts.find(p => p.type === "PICKUP" || p.type === "DEPARTURE");
-        const dropoff = pts.find(p => p.type === "DROPOFF" || p.type === "ARRIVAL");
+        const pickups = pts.filter(p => p.type === "PICKUP" || p.type === "DEPARTURE");
         const waypoints = pts.filter(p => p.type === "WAYPOINT");
-        
-        const ordered = [];
-        if (pickup) ordered.push(pickup);
-        if (dropoff) ordered.push(dropoff);
-        ordered.push(...waypoints);
+        const dropoffs = pts.filter(p => p.type === "DROPOFF" || p.type === "ARRIVAL");
+
+        const ordered = [...pickups, ...waypoints, ...dropoffs];
 
         const seq = ordered.map(fmtPoint).filter(Boolean);
 
