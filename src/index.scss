@@ -117,3 +117,8 @@ a {
 
 
 }
+
+/* Temporary override: reduce excessive bottom padding on generated class */
+.css-ondx3l {
+  padding-bottom: 64px !important;
+}

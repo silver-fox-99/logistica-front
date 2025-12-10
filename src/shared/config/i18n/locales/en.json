@@ -554,6 +554,27 @@
     "backToDashboard": "Back to dashboard",
     "searchPlaceholder": "Search articles, FAQs, keywords…",
     "quickLinks": "Quick links",
+    "faq": {
+      "title": "FAQ",
+      "q1": "How do I create a new cargo or transport order?",
+      "a1": "Go to the dashboard, choose “Create cargo” or “Create transport”, fill in the route, dates and details, then publish.",
+      "q2": "Can I edit an order after publishing?",
+      "a2": "Yes. Open “My orders”, choose the order, click “Edit”, adjust the fields and save.",
+      "q3": "Why don’t I see regions or cities?",
+      "a3": "Regions and cities load after you pick a country. If the list is empty, try another country or refresh the page.",
+      "q4": "How do I move my order higher?",
+      "a4": "Open “My orders”, choose the order and tap “Raise” to push it up in the list.",
+      "q5": "How do favorites work?",
+      "a5": "Tap the star on a card. If it’s filled, the order is in favorites and will stay after reload. Tap again to remove.",
+      "q6": "What if I forgot my password?",
+      "a6": "Use “Forgot password” on the login page, enter your phone, get the code and set a new password."
+    },
+    "support": {
+      "title": "Support",
+      "email": "Email:",
+      "phone": "Phone:",
+      "chat": "Chat in the app or via your manager."
+    },
     "gettingStarted": {
       "title": "Getting started",
       "description": "First steps and onboarding"

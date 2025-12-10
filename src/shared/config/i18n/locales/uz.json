@@ -556,6 +556,27 @@
     "logout": "Akkauntdan chiqish",
     "searchPlaceholder": "Maqolalar, FAQ, kalit so'zlarni qidirish…",
     "quickLinks": "Tezkor havolalar",
+    "faq": {
+      "title": "FAQ",
+      "q1": "Yangi yuk yoki transportni qanday yarataman?",
+      "a1": "Kabinetga o'ting, “Yuk yaratish” yoki “Transport yaratish”ni tanlang, yo'nalish, sanalar va tafsilotlarni to'ldirib, e'lon qiling.",
+      "q2": "Buyurtmani e'lon qilingandan keyin tahrirlash mumkinmi?",
+      "a2": "Ha. “Mening buyurtmalarim”ga kiring, buyurtmani tanlang, “Tahrirlash”ni bosing, o'zgarishlarni kiriting va saqlang.",
+      "q3": "Nega viloyatlar yoki shaharlar ko'rinmayapti?",
+      "a3": "Viloyat va shaharlar mamlakatni tanlaganingizdan keyin yuklanadi. Ro'yxat bo'sh bo'lsa, boshqa mamlakatni tanlab ko'ring yoki sahifani yangilang.",
+      "q4": "Buyurtmani qanday qilib yuqoriga ko‘taramiz?",
+      "a4": "“Mening buyurtmalarim”ga kiring, keraklisini tanlab “Yuqoriga ko‘tarish” tugmasini bosing.",
+      "q5": "Sevimlilar qanday ishlaydi?",
+      "a5": "Kartadagi yulduzni bosing. Agar yulduz to‘ldirilgan bo‘lsa, buyurtma sevimlilarda va yangilagandan keyin ham qoladi. Qayta bosish olib tashlaydi.",
+      "q6": "Parol esdan chiqsa nima qilaman?",
+      "a6": "Kirish oynasida “Parolni unutdingizmi”ni bosing, telefonni kiriting, kodni oling va yangi parol o‘rnating."
+    },
+    "support": {
+      "title": "Qo'llab-quvvatlash",
+      "email": "Pochta:",
+      "phone": "Telefon:",
+      "chat": "Ilova ichidagi chat yoki menejeringiz orqali."
+    },
     "gettingStarted": {
       "title": "Boshlash",
       "description": "Birinchi qadamlar va kirish"
