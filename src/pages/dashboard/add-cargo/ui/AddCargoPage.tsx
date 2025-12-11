@@ -253,7 +253,7 @@ export default function AddCargoPage() {
 
         if (!form.cargoType) e.cargoType = t('addCargo.errors.selectCargoType');
         if (!form.vehicleType) e.vehicleType = t('addCargo.errors.selectVehicleType');
-        if (!form.loadType || form.loadType.length === 0) e.loadType = t('addCargo.errors.selectLoadType');
+       // if (!form.loadType || form.loadType.length === 0) e.loadType = t('addCargo.errors.selectLoadType');
 
         if (form.contactSecondary && !/^\+?[1-9]\d{9,19}$/.test(form.contactSecondary)) {
             e.contactSecondary = t('addCargo.errors.invalidPhone');
@@ -290,7 +290,7 @@ export default function AddCargoPage() {
             country_from: countryFromName,
 
             vehicle_type: (v.vehicleType as CreateCargoDto["vehicle_type"]) || "ANY",
-            load_type: (v.loadType as CreateCargoDto["load_type"]) || ["FULL"],
+            load_type: (v.loadType as CreateCargoDto["load_type"]),
             cargo_type: (v.cargoType as CreateCargoDto["cargo_type"]) || "GENERAL",
             allow_partial_load: !!v.allowPartial,
 
