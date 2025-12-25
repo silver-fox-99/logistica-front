@@ -21,6 +21,7 @@ import ForgotPasswordPage from "@/pages/auth/forgot-password";
 import RequireAdmin from "@/app/router/RequireAdmin.tsx";
 import AdminLayout from "@/shared/ui/layout/AdminLayout.tsx";
 import AdminUsersPage from "@/pages/admin/users";
+import UserReviewsPage from "@/pages/dashboard/user-reviews";
 import AdminUserPage from "@/pages/admin/user";
 import AdminCargoPage from "@/pages/admin/cargo";
 import AdminTransportPage from "@/pages/admin/transport";
@@ -29,6 +30,7 @@ import AdminActivityLogsPage from "@/pages/admin/activity-log";
 import AdminGeoLocationsPage from "@/pages/admin/geo-location";
 import AdminLookupsPage from "@/pages/admin/admin-lookups/ui/AdminLookupsPage.tsx";
 import AdminOverviewPage from "@/pages/admin/overview-page";
+import AdminReviewsPage from "@/pages/admin/reviews";
 
 
 const router = createBrowserRouter([
@@ -58,6 +60,7 @@ const router = createBrowserRouter([
             {path: "staff", element: <StaffPage/>},
             {path: "payments", element: <PaymentsPage/>},
             {path: "requests", element: <ShipmentsListPage scope="my"/>},
+            {path: "user-reviews", element: <UserReviewsPage/>},
 
             {path: "security", element: <SecurityPage/>},
             {path: "help", element: <HelpSupportPage/>},
@@ -81,7 +84,8 @@ const router = createBrowserRouter([
             { path: "geo", element: <AdminGeoLocationsPage />},
             { path: "black-list", element: <AdminBlackListPage />},
             { path: "activity-logs", element: <AdminActivityLogsPage />},
-            { path: "initial-data", element: <AdminLookupsPage />}
+            { path: "initial-data", element: <AdminLookupsPage />},
+            { path: "reviews", element: <AdminReviewsPage /> }
         ],
     },
     {

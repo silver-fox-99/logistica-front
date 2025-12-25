@@ -9,12 +9,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
   }
 
   &__left {
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  &__middle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: end;
   }
 
   &__logo {
@@ -29,7 +37,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    
+
     @media (max-width: 480px) {
       gap: 8px;
     }
@@ -37,8 +45,7 @@
     &--user {
       font-size: 18px;
       color: #fff;
-      
-      @media (max-width: 480px) {
+      @media (max-width: 860px) {
         font-size: 14px;
       }
     }
@@ -59,5 +66,12 @@
       padding-right: 12px;
       font-size: 12px;
     }
+  }
+}
+
+@media (max-width: 860px) {
+  /* Убираем горизонтальные отступы у MUI Stack на мобилке */
+  .css-112irme-MuiStack-root > :not(style) ~ :not(style) {
+    margin-left: 0 !important;
   }
 }

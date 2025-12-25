@@ -1,12 +1,13 @@
 import logo from "./logo.svg"
-import { Link } from "react-router-dom";
-import {Avatar, IconButton, useMediaQuery, Box, Drawer, Stack, Button} from "@mui/material";
-import {FiMenu} from "react-icons/fi";
-import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {Avatar, IconButton, useMediaQuery, Box, Drawer, Stack, Button, TextField, Autocomplete, CircularProgress, Paper, ListItemText, Typography} from "@mui/material";
+import {FiMenu, FiSearch} from "react-icons/fi";
+import { useEffect, useState } from "react";
 import './header.scss'
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 import {useTranslation} from "react-i18next";
 import LanguageSwitcher from "@/shared/ui/language-switcher/LanguageSwitcher";
+import { adminUsersApi, type AdminUser } from "@/shared/api/adminUsersApi";
 
 export default function Header({
     isAuthenticated, 
@@ -21,6 +22,12 @@ export default function Header({
     const {t} = useTranslation()
     const isMobile = useMediaQuery("(max-width:860px)");
     const [menuOpen, setMenuOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const [options, setOptions] = useState<AdminUser[]>([]);
+    const [loadingOptions, setLoadingOptions] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -50,6 +57,39 @@ export default function Header({
             children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
         };
     }
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const s = params.get("search");
+        if (s) setSearch(s);
+    }, [location.search]);
+
+    const handleSelect = (user?: AdminUser | null) => {
+        if (!user?.id) return;
+        navigate(`/dashboard/user-reviews?search=${encodeURIComponent(user.id)}`);
+        setSearchOpen(false);
+    };
+
+    const loadOptions = async (value: string) => {
+        const q = value.trim();
+        if (q.length < 2) {
+            setOptions([]);
+            return;
+        }
+        setLoadingOptions(true);
+        try {
+            const res = await adminUsersApi.list({ search: q, limit: 5, page: 1 });
+            setOptions(res.items || []);
+        } catch {
+            setOptions([]);
+        } finally {
+            setLoadingOptions(false);
+        }
+    };
+
+    useEffect(() => {
+        const timeout = setTimeout(() => { void loadOptions(search); }, 250);
+        return () => clearTimeout(timeout);
+    }, [search]);
 
     return <div className="header">
         <div className="header__wrapper container">
@@ -58,6 +98,74 @@ export default function Header({
                     <img src={logo} alt="logo"/>
                 </Link>
             </div>
+
+            {isAuthenticated && (
+                <div className="header__middle">
+                    {!isMobile ? (
+                        <Autocomplete<AdminUser | string, false, false, true>
+                            fullWidth
+                            size="small"
+                            freeSolo
+                            options={options}
+                            getOptionLabel={(o) =>
+                                typeof o === "string"
+                                    ? o
+                                    : [o.first_name, o.last_name].filter(Boolean).join(" ") || o.email || o.phone || o.id
+                            }
+                            loading={loadingOptions}
+                            onInputChange={(_, v) => setSearch(v)}
+                            onChange={(_, v) => {
+                                if (typeof v !== "string") handleSelect(v as AdminUser);
+                            }}
+                            renderOption={(props, option) => (
+                                <li {...props} key={typeof option === "string" ? option : option.id}>
+                                    <ListItemText
+                                        primary={
+                                            typeof option === "string"
+                                                ? option
+                                                : [option.first_name, option.last_name].filter(Boolean).join(" ") ||
+                                                  option.email ||
+                                                  option.phone ||
+                                                  option.id
+                                        }
+                                        secondary={
+                                            typeof option === "string"
+                                                ? ""
+                                                : [option.email, option.phone].filter(Boolean).join(" · ")
+                                        }
+                                    />
+                                </li>
+                            )}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    placeholder="Email, телефон или имя"
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <>
+                                                {loadingOptions ? <CircularProgress color="inherit" size={16} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    }}
+                                    sx={{ bgcolor: "white", borderRadius: 1 }}
+                                />
+                            )}
+                            PaperComponent={(props) => <Paper elevation={3} {...props} />}
+                        />
+                    ) : (
+                        <IconButton
+                            aria-label="Поиск пользователя"
+                            onClick={() => setSearchOpen(true)}
+                            size="large"
+                            sx={{ color: "#fff" }}
+                        >
+                            <FiSearch />
+                        </IconButton>
+                    )}
+                </div>
+            )}
 
             {isAuthenticated && <div className="header__column header__column--user">
                 {!isMobile && <Box component="span">{user?.first_name} {user?.last_name}</Box>}
@@ -139,6 +247,80 @@ export default function Header({
                         </Stack>
                     </Drawer>
                 </>
+            )}
+
+            {isAuthenticated && (
+                <Drawer
+                    anchor="top"
+                    open={searchOpen}
+                    onClose={() => setSearchOpen(false)}
+                    PaperProps={{ sx: { p: 2, borderRadius: 0, bgcolor: "rgba(255,255,255,0.98)" } }}
+                    ModalProps={{ keepMounted: true }}
+                >
+                    <Stack spacing={2}>
+                        <Typography variant="subtitle1" fontWeight={700}>
+                            Поиск пользователя
+                        </Typography>
+                        <Autocomplete<AdminUser | string, false, false, true>
+                            fullWidth
+                            size="small"
+                            freeSolo
+                            options={options}
+                            getOptionLabel={(o) =>
+                                typeof o === "string"
+                                    ? o
+                                    : [o.first_name, o.last_name].filter(Boolean).join(" ") || o.email || o.phone || o.id
+                            }
+                            loading={loadingOptions}
+                            onInputChange={(_, v) => setSearch(v)}
+                            onChange={(_, v) => {
+                                if (typeof v !== "string") {
+                                    handleSelect(v as AdminUser);
+                                }
+                            }}
+                            renderOption={(props, option) => (
+                                <li {...props} key={typeof option === "string" ? option : option.id}>
+                                    <ListItemText
+                                        primary={
+                                            typeof option === "string"
+                                                ? option
+                                                : [option.first_name, option.last_name].filter(Boolean).join(" ") ||
+                                                  option.email ||
+                                                  option.phone ||
+                                                  option.id
+                                        }
+                                        secondary={
+                                            typeof option === "string"
+                                                ? ""
+                                                : [option.email, option.phone].filter(Boolean).join(" · ")
+                                        }
+                                    />
+                                </li>
+                            )}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    autoFocus
+                                    placeholder="Email, телефон или имя"
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <>
+                                                {loadingOptions ? <CircularProgress color="inherit" size={16} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    }}
+                                    sx={{ bgcolor: "white", borderRadius: 1 }}
+                                />
+                            )}
+                            PaperComponent={(props) => <Paper elevation={3} {...props} />}
+                        />
+                        <Button variant="outlined" onClick={() => setSearchOpen(false)} sx={{ alignSelf: "flex-start" }}>
+                            Закрыть
+                        </Button>
+                    </Stack>
+                </Drawer>
             )}
         </div>
 

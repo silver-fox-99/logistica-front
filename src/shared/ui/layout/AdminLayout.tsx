@@ -7,6 +7,7 @@ import {
 import {FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2, FiDatabase} from "react-icons/fi";
 import React from "react";
 import {BsGeoAltFill} from "react-icons/bs";
+import { MdRateReview } from "react-icons/md";
 
 function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
     return (
@@ -45,6 +46,7 @@ export default function AdminLayout() {
                                 <NavItem to="/admin/geo" icon={<BsGeoAltFill />} label="Гео-локации" />
                                 <NavItem to="/admin/initial-data" icon={<FiDatabase  />} label="Справочник" />
                                 <NavItem to="/admin/black-list" icon={<FiShield />} label="Черный список" />
+                                <NavItem to="/admin/reviews" icon={<MdRateReview />} label="Отзывы" />
                                 <NavItem to="/admin/activity-logs" icon={<FiSettings />} label="Логи активности" />
                             </List>
                         </Paper>

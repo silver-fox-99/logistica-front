@@ -176,14 +176,14 @@ export default function DashboardLayout() {
                             </Paper>
                         )}
 
-                        <Box 
-                            flexGrow={1} 
-                            sx={{ 
-                                width: "100%", 
-                                maxWidth: "100%", 
+                        <Box
+                            flexGrow={1}
+                            sx={{
+                                width: "100%",
+                                maxWidth: "100%",
                                 minWidth: 0,
-                                overflow: "hidden", 
-                                boxSizing: "border-box" 
+                                overflow: "hidden",
+                                boxSizing: "border-box"
                             }}
                         >
                             <Outlet />
