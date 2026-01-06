@@ -60,9 +60,13 @@ function ListBody({
     }, [onTotalChange, total]);
 
     useEffect(() => {
-        // No /favorites endpoint, rely on is_favorite from list if available
-        setFavoriteIds(new Set());
-    }, [scope, kind]);
+        if (scope === "public" && items?.length) {
+            const favs = items.filter((i) => (i as any).isFavorite || (i as any).is_favorite).map((i) => i.id);
+            setFavoriteIds(new Set(favs));
+        } else {
+            setFavoriteIds(new Set());
+        }
+    }, [scope, kind, items]);
 
     const [editOpen, setEditOpen] = useState(false);
     const [editItem, setEditItem] = useState<ShipmentRowData | null>(null);

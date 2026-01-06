@@ -31,7 +31,7 @@ export type ShipmentRowData = {
     repeats?: number;
     views?: number;
     points?: GeoPoint[];
-    contact?: { name?: string; email?: string; phone1?: string; phone2?: string; telegram?: string };
+    contact?: { userId?: string; name?: string; email?: string; phone1?: string; phone2?: string; telegram?: string };
     
 
     vehicleType?: string;

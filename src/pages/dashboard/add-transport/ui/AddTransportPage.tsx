@@ -481,22 +481,21 @@ export default function AddTransportPage() {
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addTransport.fields.vehicleType')}</Typography>
-                                        <Select
+                                        <Autocomplete
                                             key={`vehicleType-${i18n.language}`}
-                                            fullWidth
-                                            displayEmpty
-                                            value={form.vehicleType}
-                                            onChange={(e) => setField("vehicleType", e.target.value as string)}
-                                            renderValue={selected =>
-                                                !selected ? <em style={{color:'#999'}}>{t('addTransport.fields.selectVehicleType')}</em>
-                                                    : findLocalizedLabel(vehicleOpts, selected as string)
-                                            }
-                                        >
-                                            <MenuItem value="">
-                                                <em style={{ color: '#999' }}>{t('addTransport.fields.selectVehicleType')}</em>
-                                            </MenuItem>
-                                            {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
-                                        </Select>
+                                            options={vehicleOpts}
+                                            getOptionLabel={(o) => getLocalizedLabel(o)}
+                                            value={vehicleOpts.find((o) => o.slug === form.vehicleType) || null}
+                                            onChange={(_, v) => setField("vehicleType", v?.slug || "")}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    label={t('addTransport.fields.vehicleType')}
+                                                    placeholder={t('addTransport.fields.selectVehicleType')}
+                                                />
+                                            )}
+                                        />
                                         {errors.vehicleType && (
                                             <Typography variant="caption" color="error">{errors.vehicleType}</Typography>
                                         )}

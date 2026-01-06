@@ -164,15 +164,23 @@ export default function AdminReviewsPage() {
                                 <TableRow>
                                     <TableCell colSpan={7}>Отзывов нет</TableCell>
                                 </TableRow>
-                            ) : (
-                                reviews.map((r) => {
+                                ) : (
+                                    reviews.map((r) => {
                                     const author =
+                                        [
+                                            (r as any)?.from_user?.first_name,
+                                            (r as any)?.from_user?.last_name,
+                                        ].filter(Boolean).join(" ") ||
                                         [r.from_first_name, r.from_last_name].filter(Boolean).join(" ") ||
                                         r.from_email ||
                                         r.from_phone ||
                                         r.from_user_id ||
                                         "—";
                                     const target =
+                                        [
+                                            (r as any)?.to_user?.first_name,
+                                            (r as any)?.to_user?.last_name,
+                                        ].filter(Boolean).join(" ") ||
                                         [r.to_first_name, r.to_last_name].filter(Boolean).join(" ") ||
                                         r.to_email ||
                                         r.to_phone ||

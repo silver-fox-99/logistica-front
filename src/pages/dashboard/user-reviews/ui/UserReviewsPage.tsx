@@ -31,6 +31,9 @@ import { adminUsersApi } from "@/shared/api/adminUsersApi";
 import type { UserProfileSummary, UserReview } from "@/entities/user-reviews/model/types";
 import { toast } from "react-toastify";
 import { useSearchParams } from "react-router-dom";
+import { useUserStore } from "@/entities/user/model/user.store";
+import { useNavigate } from "react-router-dom";
+import { formatDate } from "@/shared/utils/formatDate";
 
 const mockTags = ["Быстрая доставка", "Надежность", "Позитивный опыт", "Отличная коммуникация"];
 
@@ -42,6 +45,7 @@ type Place = {
 
 export default function UserReviewsPage() {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [loadPlace, setLoadPlace] = useState<Place>({});
     const [unloadPlace, setUnloadPlace] = useState<Place>({});
     const [routeDate, setRouteDate] = useState<string>("");
@@ -51,12 +55,15 @@ export default function UserReviewsPage() {
     const [userId, setUserId] = useState<string | null>(null);
     const [profile, setProfile] = useState<UserProfileSummary | null>(null);
     const [profileLoading, setProfileLoading] = useState(false);
+    const currentUserId = useUserStore((s) => s.user?.id);
 
     const [reviews, setReviews] = useState<UserReview[]>([]);
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
     const [loadingReviews, setLoadingReviews] = useState(false);
     const [creating, setCreating] = useState(false);
+    const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+    const [ratingCountsAll, setRatingCountsAll] = useState<[number, number, number, number, number]>([0, 0, 0, 0, 0]);
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { t } = useTranslation();
     const {
@@ -69,16 +76,6 @@ export default function UserReviewsPage() {
         loading,
         findById,
     } = useGeoCascade();
-
-    const ratingCounts = useMemo(() => {
-        const counts = [0, 0, 0, 0, 0]; // index 0 -> 1 star, 4 -> 5 stars
-        reviews.forEach((r) => {
-            const num = Number(r.rating ?? 0) || 0;
-            const idx = Math.min(5, Math.max(1, Math.round(num))) - 1;
-            counts[idx] += 1;
-        });
-        return counts;
-    }, [reviews]);
 
     const loadGeoForReviews = useCallback(
         async (list: UserReview[]) => {
@@ -171,8 +168,27 @@ export default function UserReviewsPage() {
         async (id: string, nextPage = 1, append = false) => {
             setLoadingReviews(true);
             try {
-                const data = await userReviewsApi.list(id, { page: nextPage, limit: 5, sort: "new" });
-                const items = (data.items || []).filter((r) => !r.status || r.status === "PUBLISHED");
+                const data = await userReviewsApi.list(id, {
+                    page: nextPage,
+                    limit: 5,
+                    sort: "new",
+                });
+                const allItems = (data.items || []).filter((r) => !r.status || r.status === "PUBLISHED");
+
+                // посчитаем общие количества по звездам независимо от фильтра
+                const counts = [0, 0, 0, 0, 0];
+                allItems.forEach((r) => {
+                    const num = Number(r.rating ?? 0) || 0;
+                    const idx = Math.min(5, Math.max(1, Math.round(num))) - 1;
+                    counts[idx] += 1;
+                });
+                setRatingCountsAll(counts as [number, number, number, number, number]);
+
+                const items =
+                    ratingFilter != null
+                        ? allItems.filter((r) => Math.round(Number(r.rating ?? 0)) === ratingFilter)
+                        : allItems;
+
                 setPage(data.page);
                 setPages(data.pages);
                 setReviews((prev) => (append ? [...prev, ...items] : items));
@@ -187,21 +203,30 @@ export default function UserReviewsPage() {
                 setLoadingReviews(false);
             }
         },
-        []
+        [ratingFilter]
     );
 
     const loadByUserId = useCallback(
         async (id: string) => {
+            if (currentUserId && id === currentUserId) {
+                toast.info("Отзывы о себе смотрите в профиле");
+                navigate("/dashboard/profile");
+                return;
+            }
             setUserId(id);
             await fetchProfile(id);
             await fetchReviews(id, 1, false);
         },
-        [fetchProfile, fetchReviews]
+        [fetchProfile, fetchReviews, currentUserId, navigate]
     );
 
     const handleCreateReview = async () => {
         if (!userId) {
             toast.warn("Сначала выберите пользователя");
+            return;
+        }
+        if (currentUserId && userId === currentUserId) {
+            toast.info("Нельзя оставить отзыв самому себе");
             return;
         }
         if (!ratingValue) {
@@ -246,18 +271,30 @@ export default function UserReviewsPage() {
                 try {
                     const res = await adminUsersApi.list({ search: query, limit: 1, page: 1 });
                     const first = res.items?.[0];
-                    if (first?.id) {
+                    if (first?.id && first.id !== currentUserId) {
                         await loadByUserId(first.id);
                         return;
                     }
                 } catch {
                     // fallback to direct load by id
                 }
+                if (currentUserId && query === currentUserId) {
+                    toast.info("Отзывы о себе смотрите в профиле");
+                    navigate("/dashboard/profile");
+                    return;
+                }
                 await loadByUserId(query);
             })();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams]);
+    }, [searchParams, currentUserId]);
+
+    // Перезагрузка при смене фильтра оценки
+    useEffect(() => {
+        if (userId) {
+            void fetchReviews(userId, 1, false);
+        }
+    }, [ratingFilter, userId, fetchReviews]);
 
     return (
         <Stack spacing={3} sx={{ maxWidth: 1200, width: "100%", mx: "auto" }}>
@@ -361,7 +398,7 @@ export default function UserReviewsPage() {
                                     <InfoItem
                                         icon={<CalendarTodayOutlinedIcon fontSize="small" />}
                                         label="Дата регистрации"
-                                        value={profile.created_at ? new Date(profile.created_at).toLocaleDateString() : "—"}
+                                        value={profile.created_at ? formatDate(profile.created_at) : "—"}
                                     />
                                     <InfoItem
                                         icon={<Inventory2OutlinedIcon fontSize="small" />}
@@ -641,20 +678,24 @@ export default function UserReviewsPage() {
 
                         <Stack direction="row" flexWrap="wrap" gap={1}>
                         {[
-                            { label: "Все", count: reviews.length, active: true },
-                            { label: "5", count: ratingCounts[4] },
-                            { label: "4", count: ratingCounts[3] },
-                            { label: "3", count: ratingCounts[2] },
-                            { label: "2", count: ratingCounts[1] },
-                            { label: "1", count: ratingCounts[0] },
-                        ].map((item, idx) => (
+                            { label: "Все", value: null, count: ratingCountsAll.reduce((a, b) => a + b, 0) },
+                            { label: "5", value: 5, count: ratingCountsAll[4] },
+                            { label: "4", value: 4, count: ratingCountsAll[3] },
+                            { label: "3", value: 3, count: ratingCountsAll[2] },
+                            { label: "2", value: 2, count: ratingCountsAll[1] },
+                            { label: "1", value: 1, count: ratingCountsAll[0] },
+                        ].map((item) => (
                             <Chip
                                 key={item.label}
                                 label={`${item.label} (${item.count})`}
-                                color={idx === 0 ? "primary" : "default"}
-                                variant={idx === 0 ? "filled" : "outlined"}
+                                color={ratingFilter === item.value ? "primary" : "default"}
+                                variant={ratingFilter === item.value ? "filled" : "outlined"}
+                                onClick={() => {
+                                    setRatingFilter(item.value);
+                                    setPage(1);
+                                }}
                                 sx={{
-                                    borderColor: idx === 0 ? "primary.main" : "divider",
+                                    borderColor: ratingFilter === item.value ? "primary.main" : "divider",
                                     borderRadius: 1,
                                 }}
                             />
@@ -729,12 +770,14 @@ function ReviewCard({
         data.dropoff_country_id ||
         "—";
     const created = data.order_date || data.created_at;
-    const createdLabel = created ? new Date(created as any).toLocaleDateString() : "";
-    const timeLabel = data.created_at ? new Date(data.created_at as any).toLocaleDateString() : "";
+    const createdLabel = created ? formatDate(created as any) : "";
+    const timeLabel = data.created_at ? formatDate(data.created_at as any) : "";
     const text = data.comment || "Без комментария";
     const ratingNum = Number(data.rating ?? 0);
     const price =
-        data.price_amount != null && data.price_currency
+        data.price_amount != null &&
+        data.price_amount !== 0 &&
+        data.price_currency
             ? `${data.price_amount} ${data.price_currency}`
             : null;
     const statusColor =

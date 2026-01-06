@@ -1,10 +1,13 @@
-import { memo, useMemo, useCallback } from "react";
+import { memo, useMemo, useCallback, useEffect } from "react";
 import { Box, Stack, Typography, Chip, Button, Paper, Tooltip as MuiTooltip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { FiCalendar, FiMapPin, FiTag } from "react-icons/fi";
 import type { PublicShipmentBase, PublicPoint } from "@/entities/public-shipment/model/types";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "@/shared/utils/formatDate";
+import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useInitStore } from "@/shared/store/initStore";
 
 type Props = {
     data: PublicShipmentBase;
@@ -18,6 +21,12 @@ const MAX_VISIBLE_POINTS = 4;
 
 export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, kind, mobileLayout = "column" }: Props) {
     const { t, i18n } = useTranslation();
+    const { lookups, loadInit } = useInitStore();
+    const { findLocalizedLabel } = useLocalizedLookup();
+
+    useEffect(() => {
+        loadInit();
+    }, [loadInit]);
     
     const fmtPoint = useCallback((p?: PublicPoint) => {
         if (!p) return "";
@@ -63,6 +72,63 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
         return { visible, overflow };
     }, [data.points, fmtPoint]);
 
+    const localizedTags = useMemo(() => {
+        if (!data.tags) return [];
+        const vt = lookups?.vehicleType ?? [];
+        const lt = lookups?.loadType ?? [];
+        const ct = lookups?.cargoTypes ?? [];
+
+        const loadTypeMap: Record<string, string> = {
+            ANY: t("shipments.editDialog.loadTypeAny"),
+            FULL: t("shipments.editDialog.loadTypeFull"),
+            PARTIAL: t("shipments.editDialog.loadTypePartial"),
+            CONSOLIDATED: t("shipments.editDialog.loadTypeConsolidated"),
+        };
+
+        return data.tags.map((tag) => {
+            const vtLabel = findLocalizedLabel(vt, tag);
+            if (vtLabel && vtLabel !== tag) return vtLabel;
+
+            const ltLabel = findLocalizedLabel(lt, tag);
+            if (ltLabel && ltLabel !== tag) return ltLabel;
+
+            const ctLabel = findLocalizedLabel(ct, tag);
+            if (ctLabel && ctLabel !== tag) return ctLabel;
+
+            if (loadTypeMap[tag]) return loadTypeMap[tag];
+            return tag;
+        });
+    }, [data.tags, lookups?.vehicleType, lookups?.loadType, lookups?.cargoTypes, findLocalizedLabel, t]);
+
+    const localizedMetrics = useMemo(() => {
+        if (!data.metrics) return [];
+        const list: string[] = [];
+        data.metrics.forEach((m) => {
+            const carsMatch = m.match(/^(\d+)\s*cars?$/i);
+            if (carsMatch) {
+                // пропускаем бейдж "X cars"
+                return;
+            }
+            const weightMatch = m.match(/^([\d.,]+)\s*t$/i);
+            if (weightMatch) {
+                list.push(`${weightMatch[1]} ${t("shipments.shipmentCard.weightUnitShort", "т")}`);
+                return;
+            }
+            const volumeMatch = m.match(/^([\d.,]+)\s*m3$/i);
+            if (volumeMatch) {
+                list.push(`${volumeMatch[1]} ${t("shipments.shipmentCard.volumeUnitShort", "м³")}`);
+                return;
+            }
+            const volumeSupMatch = m.match(/^([\d.,]+)\s*m³$/i);
+            if (volumeSupMatch) {
+                list.push(`${volumeSupMatch[1]} ${t("shipments.shipmentCard.volumeUnitShort", "м³")}`);
+                return;
+            }
+            list.push(m);
+        });
+        return list;
+    }, [data.metrics, t]);
+
     return (
         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
             <Grid container spacing={1.5} alignItems="center">
@@ -99,7 +165,11 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                                 size="small"
                                 icon={<FiCalendar />}
                                 variant="outlined"
-                                label={data.dates?.to ? `${data.dates?.from ?? ""} – ${data.dates.to}` : (data.dates?.from ?? "")}
+                                label={
+                                    data.dates?.to
+                                        ? `${formatDate(data.dates?.from)} – ${formatDate(data.dates.to)}`
+                                        : formatDate(data.dates?.from)
+                                }
                                 sx={{ ml: 0.5 }}
                             />
                             <Chip
@@ -112,17 +182,17 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
 
                         {/* Метрики / цена */}
                         <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                            {data.metrics?.map((m) => (
+                            {localizedMetrics.map((m) => (
                                 <Chip key={m} size="small" variant="outlined" label={m} />
                             ))}
                             {data.price && <Chip size="small" color="success" variant="outlined" label={data.price} />}
                         </Stack>
 
                         {/* Теги */}
-                        {!!data.tags?.length && (
+                        {!!localizedTags.length && (
                             <Stack direction="row" spacing={1} flexWrap="wrap">
-                                {data.tags.map((t) => (
-                                    <Chip key={t} size="small" icon={<FiTag />} variant="outlined" label={t} />
+                                {localizedTags.map((t, idx) => (
+                                    <Chip key={`${t}-${idx}`} size="small" icon={<FiTag />} variant="outlined" label={t} />
                                 ))}
                             </Stack>
                         )}
@@ -151,7 +221,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, cta, 
                         }}
                     >
                         <Typography variant="caption" color="text.secondary">
-                            {t('shipments.shipmentCard.updated')} {data.createdAt?.slice(0, 10) ?? ""}
+                            {t('shipments.shipmentCard.updated')} {formatDate(data.createdAt) ?? ""}
                         </Typography>
 
                         <Button

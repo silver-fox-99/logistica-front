@@ -478,69 +478,62 @@ export default function AddCargoPage() {
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.cargoType')}</Typography>
-                                        <Select
+                                        <Autocomplete
                                             key={`cargoType-${i18n.language}`}
-                                            variant="outlined"
-                                            fullWidth 
-                                            displayEmpty
-                                            value={form.cargoType || ""} 
-                                            onChange={(e) => setField("cargoType", e.target.value as string)}
-                                            renderValue={(selected) => {
-                                                if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectCargoType')}</em>;
-                                                }
-                                                return findLocalizedLabel(cargoOpts, selected as string);
-                                            }}
-                                        >
-                                            {cargoOpts.map(o => (
-                                                   <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>
-                                                 ))}
-                                        </Select>
+                                            options={cargoOpts}
+                                            getOptionLabel={(o) => getLocalizedLabel(o)}
+                                            value={cargoOpts.find((o) => o.slug === form.cargoType) || null}
+                                            onChange={(_, v) => setField("cargoType", v?.slug || "")}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    label={t('addCargo.fields.cargoType')}
+                                                    placeholder={t('addCargo.fields.selectCargoType')}
+                                                />
+                                            )}
+                                        />
                                         {errors.cargoType && <Typography variant="caption" color="error">{errors.cargoType}</Typography>}
                                     </Grid>
 
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.vehicleType')}</Typography>
-                                        <Select
+                                        <Autocomplete
                                             key={`vehicleType-${i18n.language}`}
-                                            fullWidth 
-                                            displayEmpty
-                                            value={form.vehicleType || ""} 
-                                            onChange={(e) => setField("vehicleType", e.target.value as string)}
-                                            renderValue={(selected) => {
-                                                if (!selected || selected === "") {
-                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectVehicleType')}</em>;
-                                                }
-                                                return findLocalizedLabel(vehicleOpts, selected as string);
-                                            }}
-                                        >
-                                            <MenuItem value="">
-                                                <em style={{ color: '#999' }}>{t('addCargo.fields.selectVehicleType')}</em>
-                                            </MenuItem>
-                                            {vehicleOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
-                                        </Select>
+                                            options={vehicleOpts}
+                                            getOptionLabel={(o) => getLocalizedLabel(o)}
+                                            value={vehicleOpts.find((o) => o.slug === form.vehicleType) || null}
+                                            onChange={(_, v) => setField("vehicleType", v?.slug || "")}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    label={t('addCargo.fields.vehicleType')}
+                                                    placeholder={t('addCargo.fields.selectVehicleType')}
+                                                />
+                                            )}
+                                        />
                                         {errors.vehicleType && <Typography variant="caption" color="error">{errors.vehicleType}</Typography>}
                                     </Grid>
 
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.loadType')}</Typography>
-                                        <Select
-                                            key={`loadType-${i18n.language}`}
-                                            fullWidth 
+                                        <Autocomplete
                                             multiple
-                                            displayEmpty
-                                            value={form.loadType || []} 
-                                            onChange={(e) => setField("loadType", typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value as string[])}
-                                            renderValue={(selected) => {
-                                                if (!selected || (Array.isArray(selected) && selected.length === 0)) {
-                                                    return <em style={{ color: '#999' }}>{t('addCargo.fields.selectLoadType')}</em>;
-                                                }
-                                                const selectedArray = Array.isArray(selected) ? selected : [selected];
-                                                return selectedArray.map(slug => findLocalizedLabel(loadOpts, slug as string)).join(', ');
-                                            }}
-                                        >
-                                            {loadOpts.map(o => <MenuItem key={o.slug} value={o.slug}>{getLocalizedLabel(o)}</MenuItem>)}
-                                        </Select>
+                                            key={`loadType-${i18n.language}`}
+                                            options={loadOpts}
+                                            getOptionLabel={(o) => getLocalizedLabel(o)}
+                                            value={loadOpts.filter((o) => (form.loadType || []).includes(o.slug))}
+                                            onChange={(_, v) => setField("loadType", v.map((opt) => opt.slug))}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    label={t('addCargo.fields.loadType')}
+                                                    placeholder={t('addCargo.fields.selectLoadType')}
+                                                />
+                                            )}
+                                        />
                                         {errors.loadType && <Typography variant="caption" color="error">{errors.loadType}</Typography>}
                                     </Grid>
 

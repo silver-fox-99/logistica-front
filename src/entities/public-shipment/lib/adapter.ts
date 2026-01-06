@@ -1,4 +1,5 @@
 import type { PublicCargoApi, PublicTransportApi, PublicShipmentBase } from "../model/types";
+import { formatPrice } from "@/shared/utils/formatPrice";
 
 export function adaptCargo(a: PublicCargoApi): PublicShipmentBase {
     const metrics: string[] = [];
@@ -9,8 +10,9 @@ export function adaptCargo(a: PublicCargoApi): PublicShipmentBase {
     const loadTypes = Array.isArray(a.load_type) ? a.load_type : (a.load_type ? [a.load_type] : []);
     const tags = [a.vehicle_type, ...loadTypes, a.cargo_type].filter(Boolean);
 
-    const price = a.price_amount && a.price_currency
-        ? `${a.price_currency} ${Number(a.price_amount).toFixed(2)}`
+    const priceVal = Number(a.price_amount);
+    const price = Number.isFinite(priceVal) && priceVal !== 0 && a.price_currency
+        ? `${a.price_currency} ${formatPrice(priceVal, { fractionDigits: 2 })}`
         : undefined;
 
     return {
@@ -37,8 +39,9 @@ export function adaptTransport(a: PublicTransportApi): PublicShipmentBase {
 
     const tags = [a.vehicle_type].filter(Boolean);
 
-    const price = a.price_amount && a.price_currency
-        ? `${a.price_currency} ${Number(a.price_amount).toFixed(2)}`
+    const priceVal = Number(a.price_amount);
+    const price = Number.isFinite(priceVal) && priceVal !== 0 && a.price_currency
+        ? `${a.price_currency} ${formatPrice(priceVal, { fractionDigits: 2 })}`
         : undefined;
 
     return {

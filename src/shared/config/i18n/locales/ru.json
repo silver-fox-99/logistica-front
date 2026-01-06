@@ -205,12 +205,12 @@
   },
   "dashboard": {
     "menu": {
-      "search": "Поиск заказов",
+      "search": "Поиск заявок",
       "profile": "Профиль",
       "company": "Компании",
       "staff": "Сотрудники",
       "payments": "Платежи",
-      "myOrders": "Мои заказы",
+      "myOrders": "Мои заявки",
       "security": "Безопасность",
       "helpSupport": "Помощь и поддержка",
       "addCargo": "Добавить груз",
@@ -296,9 +296,9 @@
   },
   "shipments": {
     "myShipments": {
-      "title": "Мои заказы",
+      "title": "Мои заявки",
       "description": "Ваши созданные заказы с транспортом и грузом.",
-      "searchTitle": "Поиск заказов",
+      "searchTitle": "Поиск заявок",
       "searchDescription": "Найдите подходящие заказы от других пользователей."
     },
     "filter": {
@@ -363,6 +363,9 @@
       "loadType": "Тип загрузки:",
       "carsCount": "Количество автомобилей:",
       "palletsCount": "Количество паллет:",
+      "carsShort": "авто",
+      "weightUnitShort": "т",
+      "volumeUnitShort": "м³",
       "weight": "Вес:",
       "volume": "Объем:",
       "partialLoad": "Дозагрузка:",

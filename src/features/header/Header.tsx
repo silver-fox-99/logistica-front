@@ -28,6 +28,7 @@ export default function Header({
     const [loadingOptions, setLoadingOptions] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const currentUserId = user?.id;
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -71,14 +72,15 @@ export default function Header({
 
     const loadOptions = async (value: string) => {
         const q = value.trim();
-        if (q.length < 2) {
+        if (q.length < 1) {
             setOptions([]);
             return;
         }
         setLoadingOptions(true);
         try {
             const res = await adminUsersApi.list({ search: q, limit: 5, page: 1 });
-            setOptions(res.items || []);
+            const filtered = (res.items || []).filter((o) => o.id !== currentUserId);
+            setOptions(filtered);
         } catch {
             setOptions([]);
         } finally {
@@ -107,6 +109,9 @@ export default function Header({
                             size="small"
                             freeSolo
                             options={options}
+                            openOnFocus
+                            autoHighlight
+                            filterOptions={(x) => x}
                             getOptionLabel={(o) =>
                                 typeof o === "string"
                                     ? o
@@ -266,6 +271,9 @@ export default function Header({
                             size="small"
                             freeSolo
                             options={options}
+                            openOnFocus
+                            autoHighlight
+                            filterOptions={(x) => x}
                             getOptionLabel={(o) =>
                                 typeof o === "string"
                                     ? o

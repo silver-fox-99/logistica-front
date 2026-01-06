@@ -5,9 +5,10 @@ import {
 import Grid from "@mui/material/Grid";
 import {
     FiClock, FiMapPin, FiPackage, FiTruck,
-    FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiEye, FiStar
+    FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiStar
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { Link as RouterLink } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import type {ShipmentRowData, ShipmentsKind, GeoPoint} from "@/entities/shipment/model/type";
@@ -17,6 +18,7 @@ import "./ShipmentRow.scss";
 import {cargoApi} from "@/shared/api/cargoApi.ts";
 import {transportApi} from "@/shared/api/transportApi.ts";
 import { favoritesApi } from "@/shared/api/favoritesApi";
+import { formatDate } from "@/shared/utils/formatDate";
 
 type Props = {
     data: ShipmentRowData;
@@ -87,7 +89,7 @@ export default function ShipmentRow({
     useEffect(() => {
         if (scope === "public") {
             if (favoriteIds) {
-                setIsFavorite(favoriteIds.has(data.id) || !!data.isFavorite);
+                setIsFavorite(favoriteIds.has(data.id));
             } else {
                 setIsFavorite(!!data.isFavorite);
             }
@@ -101,16 +103,28 @@ export default function ShipmentRow({
         setFavoriteLoading(true);
         try {
             if (isFavorite) {
+                const confirmed = window.confirm(t("shipments.favorites.confirmRemove", "Удалить из избранного?"));
+                if (!confirmed) {
+                    setFavoriteLoading(false);
+                    return;
+                }
                 await favoritesApi.remove(kind, data.id);
                 setIsFavorite(false);
                 onFavoriteChange?.(data.id, false);
+                toast.success(t("shipments.favorites.removed"));
             } else {
                 await favoritesApi.add(kind, data.id);
                 setIsFavorite(true);
                 onFavoriteChange?.(data.id, true);
+                toast.success(t("shipments.favorites.added"));
             }
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || t('shipments.favorites.error'));
+            const message = error?.response?.data?.message;
+            const status = error?.response?.status;
+            // если сервер не вернул ошибку, не тревожим юзера
+            if (message || (status && status >= 400)) {
+                toast.error(message || t('shipments.favorites.error'));
+            }
         } finally {
             setFavoriteLoading(false);
         }
@@ -178,24 +192,29 @@ export default function ShipmentRow({
                             <Chip
                                 size="small"
                                 icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}
-                                label={kind === "cargo" ? t('shipments.shipmentCard.cargo') : t('shipments.shipmentCard.transport')}
+                                label={
+                                    kind === "cargo"
+                                        ? t('shipments.shipmentCard.cargo')
+                                        : `${t('shipments.shipmentCard.transport')}${
+                                            data.vehicleType
+                                                ? `: ${findLocalizedLabel(lookups?.vehicleType ?? [], data.vehicleType) || data.vehicleType}`
+                                                : ""
+                                        }`
+                                }
                                 className={`shipment-row__chip ${kind === "cargo" ? "shipment-row__chip--cargo" : "shipment-row__chip--transport"}`}
                             />
                             <Chip
                                 size="small"
                                 icon={<FiClock />}
                                 variant="outlined"
-                                label={data.dates.to ? `${data.dates.from} – ${data.dates.to}` : data.dates.from}
+                                label={
+                                    data.dates.to
+                                        ? `${formatDate(data.dates.from)} – ${formatDate(data.dates.to)}`
+                                        : formatDate(data.dates.from)
+                                }
                                 className="shipment-row__chip shipment-row__chip--dates"
                             />
 
-                            <Chip
-                                size="small"
-                                icon={<FiEye />}
-                                variant="outlined"
-                                label={data.viewCount}
-                                className="shipment-row__chip shipment-row__chip--dates"
-                            />
                         </Stack>
 
                         <Stack spacing={1}>
@@ -362,7 +381,17 @@ export default function ShipmentRow({
                                 {data.contact?.name && (
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FiUser />
-                                        <Typography>{data.contact.name}</Typography>
+                                        {data.contact.userId ? (
+                                            <Typography
+                                                component={RouterLink}
+                                                to={`/dashboard/user-reviews?search=${data.contact.userId}`}
+                                                sx={{ textDecoration: "none", color: "inherit" }}
+                                            >
+                                                {data.contact.name}
+                                            </Typography>
+                                        ) : (
+                                            <Typography>{data.contact.name}</Typography>
+                                        )}
                                     </Stack>
                                 )}
                                 {data.contact?.email && (

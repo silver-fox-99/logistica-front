@@ -27,7 +27,8 @@ export function useLocalizedLookup() {
 
     const findLocalizedLabel = (opts: LookupOpt[], slug?: string): string => {
         if (!slug) return "";
-        const opt = opts.find(o => o.slug === slug);
+        const low = slug.toLowerCase();
+        const opt = opts.find(o => o.slug === slug || o.slug.toLowerCase() === low);
         return opt ? getLocalizedLabel(opt) : slug;
     };
 
@@ -60,4 +61,3 @@ export function useLocalizedGeo() {
 
     return { getLocalizedGeoName };
 }
-

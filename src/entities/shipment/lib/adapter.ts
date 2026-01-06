@@ -1,7 +1,14 @@
 // entities/shipment/lib/adapter.ts
 import type { CargoApiItem, TransportApiItem, ShipmentRowData, GeoPoint } from "../model/type";
 
-const money = (cur: string, amt: string | number) => `${amt} ${cur}`;
+import { formatPrice } from "@/shared/utils/formatPrice";
+
+const money = (cur: string, amt: string | number) => {
+    const num = Number(amt);
+    if (!cur || !Number.isFinite(num) || num === 0) return undefined;
+    const formatted = formatPrice(num);
+    return formatted ? `${formatted} ${cur}` : undefined;
+};
 
 const dimStr = (l?: any, w?: any, h?: any) => {
     if (l == null || w == null || h == null) return undefined;
@@ -65,6 +72,7 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
         views: undefined,
 
         contact: {
+            userId: (i as any)?.user?.id,
             name,
             email: i.user?.email,
             phone1: i.user?.phone,
