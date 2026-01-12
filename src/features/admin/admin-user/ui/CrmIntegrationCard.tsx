@@ -84,7 +84,7 @@ export function CrmIntegrationCard({
 
                     <Typography variant="body2" color="text.secondary">
                         {syncedAt
-                            ? `Синхронизирован ${formatDateTime(syncedAt)}`
+                            ? `Синхронизирован ${formatDateTime(syncedAt)}, binotel ID: ${user.binotel_id}`
                             : "Этого юзера еще нет в CRM."}
                     </Typography>
 
