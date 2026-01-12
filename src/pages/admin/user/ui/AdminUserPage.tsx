@@ -10,6 +10,7 @@ import { StatusStageForm } from "@/features/admin/admin-user/ui/StatusStageForm"
 import { MetaForm } from "@/features/admin/admin-user/ui/MetaForm";
 import { SessionsCard } from "@/features/admin/admin-user/ui/SessionsCard";
 import { DangerZoneCard } from "@/features/admin/admin-user/ui/DangerZoneCard";
+import {CrmIntegrationCard} from "@/features/admin/admin-user/ui/CrmIntegrationCard.tsx";
 
 export default function AdminUserPage() {
     const { id = "" } = useParams();
@@ -48,6 +49,10 @@ export default function AdminUserPage() {
 
                     <Grid size={{ xs: 12, md: 6 }}>
                         <AdminToggle user={user} onUpdated={(u) => setUser(u)}/>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <CrmIntegrationCard user={user} onUpdated={(u) => setUser(u)} />
                     </Grid>
 
                     <Grid size={{ xs: 12 }}>

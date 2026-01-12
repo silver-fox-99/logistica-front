@@ -23,6 +23,7 @@ export type AdminUser = {
     status: UserStatus;
     last_login_at: string | null;
     meta: Record<string, unknown>;
+    crm_integrated_at: string | null;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
