@@ -251,6 +251,75 @@
       "invalidPhone": "Введите корректный номер телефона",
       "invalidEmail": "Введите корректный email"
     }
+    ,
+    "reviews": {
+      "title": "Отзывы о вас",
+      "description": "Здесь отображаются опубликованные отзывы других пользователей.",
+      "loading": "Загрузка отзывов...",
+      "empty": "Отзывов пока нет"
+    }
+  },
+  "userReviews": {
+    "searchHint": "Найдите пользователя через поиск в шапке, чтобы увидеть профиль и отзывы.",
+    "tags": {
+      "fastDelivery": "Быстрая доставка",
+      "reliability": "Надежность",
+      "positive": "Позитивный опыт",
+      "communication": "Отличная коммуникация"
+    },
+    "toasts": {
+      "profileLoadError": "Не удалось загрузить профиль",
+      "reviewsLoadError": "Не удалось загрузить отзывы",
+      "selfProfileHint": "Отзывы о себе смотрите в профиле",
+      "selectUser": "Сначала выберите пользователя",
+      "selfReviewForbidden": "Нельзя оставить отзыв самому себе",
+      "ratingRequired": "Поставьте оценку",
+      "dateRequired": "Выберите дату маршрута",
+      "reviewSent": "Отзыв отправлен",
+      "reviewSendError": "Не удалось отправить отзыв"
+    },
+    "profile": {
+      "loading": "Загрузка профиля...",
+      "registeredAt": "Дата регистрации",
+      "totalReviews": "Всего отзывов",
+      "totalOrders": "Всего заявок",
+      "notFound": "Профиль не найден",
+      "location": "Местоположение"
+    },
+    "form": {
+      "yourRatingTitle": "Ваша оценка",
+      "yourRatingSubtitle": "Как прошел ваш опыт поездки?",
+      "routeDate": "Дата маршрута",
+      "datePlaceholder": "мм/дд/гггг",
+      "commentTitle": "Оставить комментарий пользователю",
+      "commentPlaceholder": "Оставьте комментарий про ваш опыт взаимодействия",
+      "send": "Отправить отзыв",
+      "ratingSelect": "Выберите оценку",
+      "routeTitle": "Маршрут",
+      "routeSubtitle": "Выберите способ введения маршрута",
+      "loadTitle": "Загрузка",
+      "unloadTitle": "Выгрузка",
+      "options": {
+        "loading": "Загрузка...",
+        "empty": "Нет вариантов",
+        "notLoaded": "Данные не загружены"
+      }
+    },
+    "reviews": {
+      "title": "Посмотрите отзывы пользователя",
+      "subtitle": "Ознакомьтесь с отзывами пользователя за всё время и решите, хотите ли вы сотрудничать.",
+      "loading": "Загрузка отзывов...",
+      "empty": "Отзывов пока нет",
+      "loadMore": "Загрузить ещё"
+    },
+    "filters": {
+      "all": "Все",
+      "rating": "{{value}}"
+    },
+    "reviewCard": {
+      "noComment": "Без комментария",
+      "defaultTitle": "Отзыв"
+    }
   },
   "security": {
     "addEmail": {

@@ -251,6 +251,75 @@
       "invalidPhone": "Enter a valid phone number",
       "invalidEmail": "Enter a valid email"
     }
+    ,
+    "reviews": {
+      "title": "Reviews about you",
+      "description": "Here you can see published reviews from other users.",
+      "loading": "Loading reviews...",
+      "empty": "No reviews yet"
+    }
+  },
+  "userReviews": {
+    "searchHint": "Find a user via the header search to see their profile and reviews.",
+    "tags": {
+      "fastDelivery": "Fast delivery",
+      "reliability": "Reliability",
+      "positive": "Positive experience",
+      "communication": "Great communication"
+    },
+    "toasts": {
+      "profileLoadError": "Failed to load profile",
+      "reviewsLoadError": "Failed to load reviews",
+      "selfProfileHint": "See your own reviews in the profile",
+      "selectUser": "Select a user first",
+      "selfReviewForbidden": "You cannot review yourself",
+      "ratingRequired": "Please add a rating",
+      "dateRequired": "Select the route date",
+      "reviewSent": "Review sent",
+      "reviewSendError": "Failed to send review"
+    },
+    "profile": {
+      "loading": "Loading profile...",
+      "registeredAt": "Registered at",
+      "totalReviews": "Total reviews",
+      "totalOrders": "Total orders",
+      "notFound": "Profile not found",
+      "location": "Location"
+    },
+    "form": {
+      "yourRatingTitle": "Your rating",
+      "yourRatingSubtitle": "How was your trip experience?",
+      "routeDate": "Route date",
+      "datePlaceholder": "dd/mm/yyyy",
+      "commentTitle": "Leave a comment for the user",
+      "commentPlaceholder": "Share your experience",
+      "send": "Send review",
+      "ratingSelect": "Select a rating",
+      "routeTitle": "Route",
+      "routeSubtitle": "Choose how to enter the route",
+      "loadTitle": "Pickup",
+      "unloadTitle": "Drop-off",
+      "options": {
+        "loading": "Loading...",
+        "empty": "No options",
+        "notLoaded": "Data not loaded"
+      }
+    },
+    "reviews": {
+      "title": "View user reviews",
+      "subtitle": "See all reviews and decide if you want to cooperate.",
+      "loading": "Loading reviews...",
+      "empty": "No reviews yet",
+      "loadMore": "Load more"
+    },
+    "filters": {
+      "all": "All",
+      "rating": "{{value}}"
+    },
+    "reviewCard": {
+      "noComment": "No comment",
+      "defaultTitle": "Review"
+    }
   },
   "security": {
     "addEmail": {

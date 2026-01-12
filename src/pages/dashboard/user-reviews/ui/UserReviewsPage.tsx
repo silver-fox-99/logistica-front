@@ -35,8 +35,6 @@ import { useUserStore } from "@/entities/user/model/user.store";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "@/shared/utils/formatDate";
 
-const mockTags = ["Быстрая доставка", "Надежность", "Позитивный опыт", "Отличная коммуникация"];
-
 type Place = {
     countryId?: string | null;
     regionId?: string | null;
@@ -63,9 +61,19 @@ export default function UserReviewsPage() {
     const [loadingReviews, setLoadingReviews] = useState(false);
     const [creating, setCreating] = useState(false);
     const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+    const [avgRating, setAvgRating] = useState<number | null>(null);
     const [ratingCountsAll, setRatingCountsAll] = useState<[number, number, number, number, number]>([0, 0, 0, 0, 0]);
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { t } = useTranslation();
+    const mockTags = useMemo(
+        () => [
+            t("userReviews.tags.fastDelivery", "Быстрая доставка"),
+            t("userReviews.tags.reliability", "Надежность"),
+            t("userReviews.tags.positive", "Позитивный опыт"),
+            t("userReviews.tags.communication", "Отличная коммуникация"),
+        ],
+        [t]
+    );
     const {
         countries,
         getRegions,
@@ -105,6 +113,16 @@ export default function UserReviewsPage() {
         },
         [ensureRegions, ensureCities]
     );
+
+    const handleTagClick = (tag: string) => {
+        setComment((prev) => {
+            const trimmed = prev.trim();
+            if (!trimmed) return tag;
+            // avoid exact duplicate additions
+            if (trimmed.split(/\s*,?\s*/).includes(tag)) return prev;
+            return `${prev}${prev.endsWith(" ") ? "" : " "}${tag}`;
+        });
+    };
 
     useEffect(() => {
         void loadCountries();
@@ -157,12 +175,12 @@ export default function UserReviewsPage() {
             const data = await userReviewsApi.getUserProfile(id);
             setProfile(data);
         } catch (e: any) {
-            toast.error(e?.message || "Не удалось загрузить профиль");
+            toast.error(e?.message || t("userReviews.toasts.profileLoadError"));
             setProfile(null);
         } finally {
             setProfileLoading(false);
         }
-    }, []);
+    }, [t]);
 
     const fetchReviews = useCallback(
         async (id: string, nextPage = 1, append = false) => {
@@ -177,12 +195,15 @@ export default function UserReviewsPage() {
 
                 // посчитаем общие количества по звездам независимо от фильтра
                 const counts = [0, 0, 0, 0, 0];
+                let ratingsSum = 0;
                 allItems.forEach((r) => {
                     const num = Number(r.rating ?? 0) || 0;
                     const idx = Math.min(5, Math.max(1, Math.round(num))) - 1;
                     counts[idx] += 1;
+                    ratingsSum += num;
                 });
                 setRatingCountsAll(counts as [number, number, number, number, number]);
+                setAvgRating(allItems.length ? ratingsSum / allItems.length : null);
 
                 const items =
                     ratingFilter != null
@@ -193,7 +214,7 @@ export default function UserReviewsPage() {
                 setPages(data.pages);
                 setReviews((prev) => (append ? [...prev, ...items] : items));
             } catch (e: any) {
-                toast.error(e?.message || "Не удалось загрузить отзывы");
+                toast.error(e?.message || t("userReviews.toasts.reviewsLoadError"));
                 if (!append) {
                     setReviews([]);
                     setPage(1);
@@ -203,17 +224,18 @@ export default function UserReviewsPage() {
                 setLoadingReviews(false);
             }
         },
-        [ratingFilter]
+        [ratingFilter, t]
     );
 
     const loadByUserId = useCallback(
         async (id: string) => {
             if (currentUserId && id === currentUserId) {
-                toast.info("Отзывы о себе смотрите в профиле");
+                toast.info(t("userReviews.toasts.selfProfileHint"));
                 navigate("/dashboard/profile");
                 return;
             }
             setUserId(id);
+            setAvgRating(null);
             await fetchProfile(id);
             await fetchReviews(id, 1, false);
         },
@@ -222,19 +244,19 @@ export default function UserReviewsPage() {
 
     const handleCreateReview = async () => {
         if (!userId) {
-            toast.warn("Сначала выберите пользователя");
+            toast.warn(t("userReviews.toasts.selectUser"));
             return;
         }
         if (currentUserId && userId === currentUserId) {
-            toast.info("Нельзя оставить отзыв самому себе");
+            toast.info(t("userReviews.toasts.selfReviewForbidden"));
             return;
         }
         if (!ratingValue) {
-            toast.warn("Поставьте оценку");
+            toast.warn(t("userReviews.toasts.ratingRequired"));
             return;
         }
         if (!routeDate) {
-            toast.warn("Выберите дату маршрута");
+            toast.warn(t("userReviews.toasts.dateRequired"));
             return;
         }
         setCreating(true);
@@ -252,11 +274,11 @@ export default function UserReviewsPage() {
                 dropoff_region_id: unloadPlace.regionId || undefined,
                 dropoff_city_id: unloadPlace.cityId || undefined,
             });
-            toast.success("Отзыв отправлен");
+            toast.success(t("userReviews.toasts.reviewSent"));
             resetForm();
             await fetchReviews(userId, 1, false);
         } catch (e: any) {
-            toast.error(e?.message || "Не удалось отправить отзыв");
+            toast.error(e?.message || t("userReviews.toasts.reviewSendError"));
         } finally {
             setCreating(false);
         }
@@ -279,7 +301,7 @@ export default function UserReviewsPage() {
                     // fallback to direct load by id
                 }
                 if (currentUserId && query === currentUserId) {
-                    toast.info("Отзывы о себе смотрите в профиле");
+                    toast.info(t("userReviews.toasts.selfProfileHint"));
                     navigate("/dashboard/profile");
                     return;
                 }
@@ -301,7 +323,7 @@ export default function UserReviewsPage() {
             {!userId && (
                 <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
                     <Typography variant="body2" color="text.secondary">
-                        Найдите пользователя через поиск в шапке, чтобы увидеть профиль и отзывы.
+                        {t("userReviews.searchHint")}
                     </Typography>
                 </Paper>
             )}
@@ -317,7 +339,7 @@ export default function UserReviewsPage() {
                     }}
                 >
                     {profileLoading ? (
-                        <Typography variant="body2" color="text.secondary">Загрузка профиля...</Typography>
+                        <Typography variant="body2" color="text.secondary">{t("userReviews.profile.loading")}</Typography>
                     ) : profile ? (
                         <Stack direction="row" spacing={2} alignItems="center">
                             <Avatar sx={{ width: 64, height: 64 }} src={profile.avatar_url || undefined}>
@@ -352,26 +374,27 @@ export default function UserReviewsPage() {
                                     {profile.is_admin ? <VerifiedIcon color="primary" fontSize="small" /> : null}
                                 </Stack>
                                 <Stack direction="row" spacing={2} alignItems="center">
-                                    <Stack direction="row" spacing={0.5} alignItems="center">
-                                        <Rating
-                                            value={Number(
-                                                profile.rating ??
-                                                (profile as any).rating_value ??
-                                                (profile as any).reviews_rating ??
-                                                0
-                                            )}
-                                            precision={0.1}
-                                            readOnly
-                                            size="small"
-                                        />
-                                        <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                                            {formatRating(
-                                                profile.rating ??
-                                                (profile as any).rating_value ??
-                                                (profile as any).reviews_rating
-                                            )}
-                                        </Typography>
-                                    </Stack>
+                                    {(() => {
+                                        const rawProfileRating =
+                                            profile.rating ??
+                                            (profile as any).rating_value ??
+                                            (profile as any).reviews_rating ??
+                                            null;
+                                        const displayRating = avgRating ?? (rawProfileRating != null ? Number(rawProfileRating) : 0);
+                                        return (
+                                            <Stack direction="row" spacing={0.5} alignItems="center">
+                                                <Rating
+                                                    value={displayRating}
+                                                    precision={0.1}
+                                                    readOnly
+                                                    size="small"
+                                                />
+                                                <Typography variant="body2" color="text.secondary" fontWeight={600}>
+                                                    {formatRating(displayRating)}
+                                                </Typography>
+                                            </Stack>
+                                        );
+                                    })()}
                                     {(
                                         profile.location ||
                                         (profile as any).meta?.geo ||
@@ -379,7 +402,7 @@ export default function UserReviewsPage() {
                                     ) && (
                                         <Chip
                                             size="small"
-                                            label={`Местоположение: ${
+                                            label={`${t("userReviews.profile.location")}: ${
                                                 profile.location ||
                                                 (profile as any).meta?.geo ||
                                                 (profile as any).meta?.location
@@ -397,12 +420,12 @@ export default function UserReviewsPage() {
                                 <Stack direction="row" spacing={3} flexWrap="wrap">
                                     <InfoItem
                                         icon={<CalendarTodayOutlinedIcon fontSize="small" />}
-                                        label="Дата регистрации"
+                                        label={t("userReviews.profile.registeredAt")}
                                         value={profile.created_at ? formatDate(profile.created_at) : "—"}
                                     />
                                     <InfoItem
                                         icon={<Inventory2OutlinedIcon fontSize="small" />}
-                                        label="Всего отзывов"
+                                        label={t("userReviews.profile.totalReviews")}
                                         value={String(
                                             profile.reviews_count ??
                                             (profile as any).reviews ??
@@ -412,7 +435,7 @@ export default function UserReviewsPage() {
                                     />
                                     <InfoItem
                                         icon={<WorkHistoryOutlinedIcon fontSize="small" />}
-                                        label="Всего заявок"
+                                        label={t("userReviews.profile.totalOrders")}
                                         value={String(
                                             profile.orders_count ??
                                             (profile as any).orders ??
@@ -424,7 +447,7 @@ export default function UserReviewsPage() {
                             </Stack>
                         </Stack>
                     ) : (
-                        <Typography variant="body2" color="text.secondary">Профиль не найден</Typography>
+                        <Typography variant="body2" color="text.secondary">{t("userReviews.profile.notFound")}</Typography>
                     )}
                 </Paper>
             )}
@@ -441,8 +464,8 @@ export default function UserReviewsPage() {
                 >
                     <Stack spacing={3}>
                         <Stack spacing={1}>
-                            <Typography variant="h6" fontWeight={700}>Ваша оценка</Typography>
-                            <Typography variant="body2" color="text.secondary">Как прошел ваш опыт поездки?</Typography>
+                            <Typography variant="h6" fontWeight={700}>{t("userReviews.form.yourRatingTitle")}</Typography>
+                            <Typography variant="body2" color="text.secondary">{t("userReviews.form.yourRatingSubtitle")}</Typography>
                         <Box
                             sx={{
                                 display: "inline-flex",
@@ -459,13 +482,17 @@ export default function UserReviewsPage() {
                                 onChange={(_, v) => setRatingValue(v)}
                                 size="large"
                             />
-                            <Typography variant="body2" color="text.secondary">Выберите оценку</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {t("userReviews.form.ratingSelect")}
+                            </Typography>
                         </Box>
                     </Stack>
 
                     <Stack spacing={1.5}>
-                        <Typography variant="body1" fontWeight={700}>Маршрут</Typography>
-                        <Typography variant="body2" color="text.secondary">Выберите способ введения маршрута</Typography>
+                        <Typography variant="body1" fontWeight={700}>{t("userReviews.form.routeTitle")}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {t("userReviews.form.routeSubtitle")}
+                        </Typography>
 
                         <Grid container spacing={2}>
                             <Grid
@@ -474,7 +501,7 @@ export default function UserReviewsPage() {
                             >
                                 <Stack spacing={1.25}>
                                     <Typography variant="body2" color="text.primary" fontWeight={700}>
-                                        {t("addTransport.fields.loadSection", { defaultValue: "Загрузка" })}
+                                        {t("userReviews.form.loadTitle")}
                                     </Typography>
                                     <Autocomplete
                                         options={countries}
@@ -486,7 +513,13 @@ export default function UserReviewsPage() {
                                             void ensureRegions(v?.id ?? null);
                                         }}
                                         loading={loading.countries}
-                                        noOptionsText={loading.countries ? "Загрузка..." : (countries.length ? "Нет вариантов" : "Данные не загружены")}
+                                        noOptionsText={
+                                            loading.countries
+                                                ? t("userReviews.form.options.loading")
+                                                : countries.length
+                                                    ? t("userReviews.form.options.empty")
+                                                    : t("userReviews.form.options.notLoaded")
+                                        }
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
@@ -543,7 +576,7 @@ export default function UserReviewsPage() {
                             >
                                 <Stack spacing={1.25}>
                                     <Typography variant="body2" color="text.primary" fontWeight={700}>
-                                        {t("addTransport.fields.unloadSection", { defaultValue: "Выгрузка" })}
+                                        {t("userReviews.form.unloadTitle")}
                                     </Typography>
                                     <Autocomplete
                                         options={countries}
@@ -555,7 +588,13 @@ export default function UserReviewsPage() {
                                             void ensureRegions(v?.id ?? null);
                                         }}
                                         loading={loading.countries}
-                                        noOptionsText={loading.countries ? "Загрузка..." : (countries.length ? "Нет вариантов" : "Данные не загружены")}
+                                        noOptionsText={
+                                            loading.countries
+                                                ? t("userReviews.form.options.loading")
+                                                : countries.length
+                                                    ? t("userReviews.form.options.empty")
+                                                    : t("userReviews.form.options.notLoaded")
+                                        }
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
@@ -609,19 +648,19 @@ export default function UserReviewsPage() {
                         </Grid>
 
                         <Stack spacing={1.25} sx={{ maxWidth: { xs: "100%", md: 320 } }}>
-                            <Typography variant="body2" color="text.primary" fontWeight={700}>Дата маршрута</Typography>
+                            <Typography variant="body2" color="text.primary" fontWeight={700}>{t("userReviews.form.routeDate")}</Typography>
                             <TextField
                                 fullWidth
                                 value={routeDate}
                                 onChange={(e) => setRouteDate(e.target.value)}
                                 type="date"
-                                placeholder="мм/дд/гггг"
+                                placeholder={t("userReviews.form.datePlaceholder")}
                             />
                         </Stack>
                     </Stack>
 
                         <Stack spacing={1.5}>
-                            <Typography variant="body1" fontWeight={700}>Оставить комментарий пользователю</Typography>
+                            <Typography variant="body1" fontWeight={700}>{t("userReviews.form.commentTitle")}</Typography>
                             <Stack direction="row" flexWrap="wrap" gap={1}>
                                 {mockTags.map((tag) => (
                                     <Chip
@@ -633,6 +672,7 @@ export default function UserReviewsPage() {
                                             bgcolor: "background.default",
                                             "&:hover": { bgcolor: "action.hover" },
                                         }}
+                                        onClick={() => handleTagClick(tag)}
                                     />
                                 ))}
                             </Stack>
@@ -642,7 +682,7 @@ export default function UserReviewsPage() {
                                 minRows={3}
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
-                                placeholder="Оставьте комментарий про ваш опыт взаимодействия"
+                                placeholder={t("userReviews.form.commentPlaceholder")}
                             />
                             <Button
                                 variant="contained"
@@ -651,7 +691,7 @@ export default function UserReviewsPage() {
                                 onClick={handleCreateReview}
                                 disabled={creating || !userId}
                             >
-                                Отправить отзыв
+                                {t("userReviews.form.send")}
                             </Button>
                         </Stack>
                     </Stack>
@@ -670,20 +710,20 @@ export default function UserReviewsPage() {
                 >
                     <Stack spacing={2.5}>
                         <Stack spacing={0.5}>
-                            <Typography variant="h6" fontWeight={700}>Посмотрите отзывы пользователя</Typography>
+                            <Typography variant="h6" fontWeight={700}>{t("userReviews.reviews.title")}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Ознакомьтесь с отзывами пользователя за всё время и решите, хотите ли вы сотрудничать.
+                                {t("userReviews.reviews.subtitle")}
                             </Typography>
                         </Stack>
 
                         <Stack direction="row" flexWrap="wrap" gap={1}>
                         {[
-                            { label: "Все", value: null, count: ratingCountsAll.reduce((a, b) => a + b, 0) },
-                            { label: "5", value: 5, count: ratingCountsAll[4] },
-                            { label: "4", value: 4, count: ratingCountsAll[3] },
-                            { label: "3", value: 3, count: ratingCountsAll[2] },
-                            { label: "2", value: 2, count: ratingCountsAll[1] },
-                            { label: "1", value: 1, count: ratingCountsAll[0] },
+                            { label: t("userReviews.filters.all"), value: null, count: ratingCountsAll.reduce((a, b) => a + b, 0) },
+                            { label: t("userReviews.filters.rating", { value: 5 }), value: 5, count: ratingCountsAll[4] },
+                            { label: t("userReviews.filters.rating", { value: 4 }), value: 4, count: ratingCountsAll[3] },
+                            { label: t("userReviews.filters.rating", { value: 3 }), value: 3, count: ratingCountsAll[2] },
+                            { label: t("userReviews.filters.rating", { value: 2 }), value: 2, count: ratingCountsAll[1] },
+                            { label: t("userReviews.filters.rating", { value: 1 }), value: 1, count: ratingCountsAll[0] },
                         ].map((item) => (
                             <Chip
                                 key={item.label}
@@ -704,10 +744,10 @@ export default function UserReviewsPage() {
 
                     <Stack spacing={2.25}>
                         {loadingReviews && reviews.length === 0 && (
-                            <Typography variant="body2" color="text.secondary">Загрузка отзывов...</Typography>
+                            <Typography variant="body2" color="text.secondary">{t("userReviews.reviews.loading")}</Typography>
                         )}
                         {!loadingReviews && reviews.length === 0 && (
-                            <Typography variant="body2" color="text.secondary">Отзывов пока нет</Typography>
+                            <Typography variant="body2" color="text.secondary">{t("userReviews.reviews.empty")}</Typography>
                         )}
                         {reviews.map((review, idx) => (
                             <Box key={review.id}>
@@ -728,7 +768,7 @@ export default function UserReviewsPage() {
                                 onClick={() => userId && fetchReviews(userId, page + 1, true)}
                                 disabled={loadingReviews || !userId || page >= pages}
                             >
-                                Загрузить ещё
+                                {t("userReviews.reviews.loadMore")}
                             </Button>
                         </Box>
                     </Stack>
@@ -747,6 +787,7 @@ function ReviewCard({
     geoName: (id?: string | null) => string;
     onSelectAuthor?: (id?: string | null) => void;
 }) {
+    const { t } = useTranslation();
     const routeFrom =
         [data.pickup_country, data.pickup_region, data.pickup_city]
             .filter(Boolean)
@@ -772,7 +813,7 @@ function ReviewCard({
     const created = data.order_date || data.created_at;
     const createdLabel = created ? formatDate(created as any) : "";
     const timeLabel = data.created_at ? formatDate(data.created_at as any) : "";
-    const text = data.comment || "Без комментария";
+    const text = data.comment || t("userReviews.reviewCard.noComment");
     const ratingNum = Number(data.rating ?? 0);
     const price =
         data.price_amount != null &&
@@ -788,7 +829,7 @@ function ReviewCard({
         data.from_email ||
         data.from_phone ||
         data.from_user_id ||
-        "Отзыв";
+        t("userReviews.reviewCard.defaultTitle");
     const authorAvatar = null;
 
     return (

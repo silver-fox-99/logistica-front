@@ -251,6 +251,75 @@
       "invalidPhone": "To'g'ri telefon raqamini kiriting",
       "invalidEmail": "To'g'ri emailni kiriting"
     }
+    ,
+    "reviews": {
+      "title": "Siz haqingizdagi sharhlar",
+      "description": "Bu yerda boshqa foydalanuvchilar e'lon qilgan sharhlar ko'rsatiladi.",
+      "loading": "Sharhlar yuklanmoqda...",
+      "empty": "Hozircha sharhlar yo'q"
+    }
+  },
+  "userReviews": {
+    "searchHint": "Profil va sharhlarni ko‘rish uchun foydalanuvchini qidiruv orqali toping.",
+    "tags": {
+      "fastDelivery": "Tezkor yetkazish",
+      "reliability": "Ishonchlilik",
+      "positive": "Ijobiy tajriba",
+      "communication": "A'lo muloqot"
+    },
+    "toasts": {
+      "profileLoadError": "Profilni yuklab bo‘lmadi",
+      "reviewsLoadError": "Sharhlarni yuklab bo‘lmadi",
+      "selfProfileHint": "O‘zingiz haqidagi sharhlarni profilda ko‘ring",
+      "selectUser": "Avval foydalanuvchini tanlang",
+      "selfReviewForbidden": "O‘zingizga sharh qoldira olmaysiz",
+      "ratingRequired": "Bahoni qo‘ying",
+      "dateRequired": "Marshrut sanasini tanlang",
+      "reviewSent": "Sharh yuborildi",
+      "reviewSendError": "Sharhni yuborib bo‘lmadi"
+    },
+    "profile": {
+      "loading": "Profil yuklanmoqda...",
+      "registeredAt": "Ro‘yxatdan o‘tgan sana",
+      "totalReviews": "Jami sharhlar",
+      "totalOrders": "Jami buyurtmalar",
+      "notFound": "Profil topilmadi",
+      "location": "Joylashuv"
+    },
+    "form": {
+      "yourRatingTitle": "Sizning bahoingiz",
+      "yourRatingSubtitle": "Safar tajribangiz qanday o‘tdi?",
+      "routeDate": "Marshrut sanasi",
+      "datePlaceholder": "oo/kk/yyyy",
+      "commentTitle": "Foydalanuvchiga sharh qoldiring",
+      "commentPlaceholder": "Tajriba haqida sharh qoldiring",
+      "send": "Sharh yuborish",
+      "ratingSelect": "Bahoni tanlang",
+      "routeTitle": "Marshrut",
+      "routeSubtitle": "Marshrutni kiritish usulini tanlang",
+      "loadTitle": "Yuklash",
+      "unloadTitle": "Tushirish",
+      "options": {
+        "loading": "Yuklanmoqda...",
+        "empty": "Variantlar yo‘q",
+        "notLoaded": "Ma'lumotlar yuklanmadi"
+      }
+    },
+    "reviews": {
+      "title": "Foydalanuvchi sharhlarini ko‘ring",
+      "subtitle": "Barcha sharhlarni ko‘rib, hamkorlik qilishni xohlaysizmi, qaror qiling.",
+      "loading": "Sharhlar yuklanmoqda...",
+      "empty": "Hozircha sharhlar yo‘q",
+      "loadMore": "Yana yuklash"
+    },
+    "filters": {
+      "all": "Barchasi",
+      "rating": "{{value}}"
+    },
+    "reviewCard": {
+      "noComment": "Izohsiz",
+      "defaultTitle": "Sharh"
+    }
   },
   "security": {
     "addEmail": {

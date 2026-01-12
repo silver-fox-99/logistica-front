@@ -8,16 +8,14 @@ type ProfileOverviewCardProps = {
     fullName: string;
     location?: string;
     registeredAt?: string;
-    ratings?: { label: string; value: number; color?: "default"|"primary"|"success"|"warning" }[];
+    ratings?: { label: string; value: number | null | undefined; color?: "default"|"primary"|"success"|"warning" }[];
 };
 
 export default function ProfileOverviewCard({
                                                 fullName,
                                                 location = "—",
                                                 registeredAt = "—",
-                                                ratings = [
-                                                    { label: "★", value: 4.7, color: "success" },
-                                                ],
+                                                ratings = [],
                                             }: ProfileOverviewCardProps) {
     const { t } = useTranslation();
     
@@ -49,17 +47,24 @@ export default function ProfileOverviewCard({
                             {fullName.toUpperCase()}
                         </Typography>
 
-                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                            {ratings.map((r, i) => (
-                                <Chip
-                                    key={i}
-                                    label={`${r.label} ${r.value.toFixed(1)}`}
-                                    color={r.color === "success" ? "success" : r.color === "warning" ? "warning" : (r.color as any)}
-                                    size="small"
-                                    variant={r.color ? "filled" : "outlined"}
-                                />
-                            ))}
-                        </Stack>
+                        {ratings.length > 0 && (
+                            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                {ratings.map((r, i) => {
+                                    const formatted = r.value != null && Number.isFinite(Number(r.value))
+                                        ? Number(r.value).toFixed(1)
+                                        : "—";
+                                    return (
+                                        <Chip
+                                            key={i}
+                                            label={`${r.label} ${formatted}`}
+                                            color={r.color === "success" ? "success" : r.color === "warning" ? "warning" : (r.color as any)}
+                                            size="small"
+                                            variant={r.color ? "filled" : "outlined"}
+                                        />
+                                    );
+                                })}
+                            </Stack>
+                        )}
 
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ color: "text.secondary", mt: 0.5 }}>
                             <Typography variant="body2"><b>{t('profile.overview.location')}</b> {location}</Typography>

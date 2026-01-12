@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import ProfileOverviewCard from "@/features/profile/ui/ProfileOverviewCard.tsx";
 import ContactInfoCard, {type ContactInfo} from "@/features/profile/ui/ContactInfoCard.tsx";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {profileApi} from "@/shared/api/profileApi.ts";
 import {userReviewsApi} from "@/shared/api/userReviewsApi.ts";
 import type {UserReview} from "@/entities/user-reviews/model/types";
@@ -52,6 +52,22 @@ export default function ProfilePage() {
         void loadSelfReviews();
     }, [t, user?.id]);
 
+    const avgRating = useMemo(() => {
+        if (!selfReviews.length) return null;
+        const sum = selfReviews.reduce((acc, r) => acc + (Number(r.rating ?? 0) || 0), 0);
+        return selfReviews.length ? sum / selfReviews.length : null;
+    }, [selfReviews]);
+
+    const overviewRatings = useMemo(() => {
+        const fallback =
+            (user as any)?.rating ??
+            (user as any)?.rating_value ??
+            (user as any)?.reviews_rating ??
+            null;
+        const value = avgRating ?? (fallback != null ? Number(fallback) : null);
+        return value != null ? [{ label: "★", value, color: "success" as const }] : [];
+    }, [avgRating, user]);
+
     const updateUser = async (values: ContactInfo & { phoneMainE164?: string; phoneAltE164?: string }) => {
         try {
             const preparedData = {
@@ -79,6 +95,7 @@ export default function ProfilePage() {
                 fullName={user?.first_name + " " + user?.last_name}
                 location={user?.meta?.geo || t('profile.overview.unknown')}
                 registeredAt={userDate || t('profile.overview.unknown')}
+                ratings={overviewRatings}
             />
             <ContactInfoCard
                 data={{
@@ -95,17 +112,17 @@ export default function ProfilePage() {
             <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
                 <Stack spacing={2}>
                     <Stack spacing={0.5}>
-                        <Typography variant="h6" fontWeight={700}>Отзывы о вас</Typography>
+                        <Typography variant="h6" fontWeight={700}>{t('profile.reviews.title')}</Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Здесь отображаются опубликованные отзывы других пользователей.
+                            {t('profile.reviews.description')}
                         </Typography>
                     </Stack>
 
                     {selfReviewsLoading && (
-                        <Typography variant="body2" color="text.secondary">Загрузка отзывов...</Typography>
+                        <Typography variant="body2" color="text.secondary">{t('profile.reviews.loading')}</Typography>
                     )}
                     {!selfReviewsLoading && selfReviews.length === 0 && (
-                        <Typography variant="body2" color="text.secondary">Отзывов пока нет</Typography>
+                        <Typography variant="body2" color="text.secondary">{t('profile.reviews.empty')}</Typography>
                     )}
                     {!selfReviewsLoading && selfReviews.length > 0 && (
                         <Stack spacing={2.5}>
@@ -152,12 +169,7 @@ function ProfileReviewRow({ review }: { review: UserReview }) {
                 </Avatar>
                 <Stack spacing={0.5}>
                     <Typography variant="subtitle1" fontWeight={700}>{authorName}</Typography>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <Rating value={Number(review.rating ?? 0)} readOnly size="small" />
-                        <Typography variant="body2" color="text.secondary">
-                            {Number.isFinite(Number(review.rating)) ? Number(review.rating).toFixed(1) : ""}
-                        </Typography>
-                    </Stack>
+                    <Rating value={Number(review.rating ?? 0)} readOnly size="small" />
                     <Typography variant="body2" color="text.secondary">
                         {routeFrom} → {routeTo}
                     </Typography>
