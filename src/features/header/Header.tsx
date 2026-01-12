@@ -93,10 +93,13 @@ export default function Header({
         return () => clearTimeout(timeout);
     }, [search]);
 
+    const logoHref = "/";
+    const avatarProps = stringAvatar(`${user?.first_name} ${user?.last_name}`);
+
     return <div className="header">
         <div className="header__wrapper container">
             <div className="header__left">
-                <Link to="/" className="header__logo" aria-label="Go to home">
+                <Link to={logoHref} className="header__logo" aria-label="Go to home">
                     <img src={logo} alt="logo"/>
                 </Link>
             </div>
@@ -174,7 +177,13 @@ export default function Header({
 
             {isAuthenticated && <div className="header__column header__column--user">
                 {!isMobile && <Box component="span">{user?.first_name} {user?.last_name}</Box>}
-                <Avatar {...stringAvatar(`${user?.first_name} ${user?.last_name}`)} />
+                <Avatar
+                    {...avatarProps}
+                    component={Link}
+                    to="/dashboard/profile"
+                    aria-label="Open profile"
+                    sx={{ cursor: "pointer", ...(avatarProps.sx || {}) }}
+                />
                 <LanguageSwitcher />
                 {showBurger && (
                     <IconButton

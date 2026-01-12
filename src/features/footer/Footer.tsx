@@ -5,10 +5,30 @@ import facebookLogo from './facebook.svg'
 
 import './footer.scss'
 import {useTranslation} from "react-i18next";
+import { useState, type AnchorHTMLAttributes, type MouseEvent } from "react";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 export default function Footer() {
 
     const {t} = useTranslation()
+    const [contactOpen, setContactOpen] = useState(false);
+    const externalLinkProps: AnchorHTMLAttributes<HTMLAnchorElement> = { target: "_blank", rel: "noreferrer" };
+    const docs = {
+        about: "/about-company.pdf",
+        intro: "/introduction.pdf",
+        security: "/account-security.pdf",
+        terms: "/docs/user-agreement.pdf",
+        billing: "/payments-billing.pdf",
+    };
+    const phoneNumbers = ["+998 94 986 68 86", "+998781136755"];
+    const email = "info@yologistic.uz";
+    const user = useUserStore((s) => s.user);
+    const isAuthenticated = !!(user || (typeof window !== "undefined" && localStorage.getItem("accessToken")));
+
+    const handleContactClick = (e: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        setContactOpen(true);
+    };
 
     return <div className="footer">
        <div className="footer__body container">
@@ -18,7 +38,9 @@ export default function Footer() {
                </Link>
 
                <div className="footer__contacts">
-                   <a href="tel:+998949866886">+998 94 986 68 86</a>
+                   {phoneNumbers.map((num) => (
+                       <a key={num} href={`tel:${num.replace(/\s+/g, "")}`}>{num}</a>
+                   ))}
                    <a href="mailto:info@yologistic.uz">info@yologistic.uz</a>
                </div>
                
@@ -40,26 +62,52 @@ export default function Footer() {
                <h5 className="footer__title">{t('footer.company')}</h5>
 
                <div className="footer__links">
-                   <Link to="/" >{t('footer.aboutCompany')}</Link>
-                   <Link to="/" >{t('footer.contacts')}</Link>
-                   <Link to="/">{t('footer.askAndAnswer')}</Link>
-                   <Link to="/">{t('footer.support')}</Link>
+                   <a href={docs.about} {...externalLinkProps}>{t('footer.aboutCompany')}</a>
+                   <button type="button" className="footer__link-button" onClick={handleContactClick}>
+                       {t('footer.contacts')}
+                   </button>
+                   {isAuthenticated ? (
+                       <Link to="/dashboard/help">{t('footer.askAndAnswer')}</Link>
+                   ) : (
+                       <a href="/help" {...externalLinkProps}>{t('footer.askAndAnswer')}</a>
+                   )}
                </div>
            </div>
 
            <div className="footer__column">
-               <div className="footer__title">{t('footer.privacyAndPolicy')}</div>
+                <div className="footer__title">{t('footer.privacyAndPolicy')}</div>
 
-               <div className="footer__links">
-                   <Link to="/">{t('footer.termsCookie')}</Link>
-                   <Link to="/">{t('footer.terms')}</Link>
-                   <Link to="/">{t('footer.privacy')}</Link>
-               </div>
-           </div>
+                <div className="footer__links">
+                   <a href={docs.intro} {...externalLinkProps}>{t('footer.terms')}</a>
+                   <a href={docs.security} {...externalLinkProps}>{t('footer.privacy')}</a>
+                   <a href={docs.billing} {...externalLinkProps}>{t('footer.billing')}</a>
+                </div>
+            </div>
        </div>
 
+        {contactOpen && (
+            <div className="footer__modal-overlay" onClick={() => setContactOpen(false)} role="dialog" aria-modal="true" aria-label={t('footer.contacts')}>
+                <div className="footer__modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="footer__modal-title">{t('footer.contacts')}</div>
+                    <div className="footer__modal-phones">
+                        {phoneNumbers.map((num) => (
+                            <a key={num} href={`tel:${num.replace(/\s+/g, "")}`}>
+                                {num}
+                            </a>
+                        ))}
+                    </div>
+                    <div className="footer__modal-email">
+                        <a href={`mailto:${email}`}>{email}</a>
+                    </div>
+                    <button type="button" className="footer__modal-close" onClick={() => setContactOpen(false)}>
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        )}
+
         <div className="footer__bottom container">
-            © 2025 Logistica. All rights reserved. Design by nikitich.
+            © 2025 Logistica. All rights reserved.
         </div>
     </div>
 }

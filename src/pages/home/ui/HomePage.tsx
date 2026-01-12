@@ -8,12 +8,15 @@ import { PublicShipmentCard } from "@/widgets/public/PublicShipmentCard";
 import { PublicFiltersDrawer } from "@/widgets/public/PublicFiltersDrawer";
 import type {PublicFilters} from "@/entities/public-shipment/model/types.ts";
 import { useInitStore } from "@/shared/store/initStore";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 type TabKind = "cargo" | "transport";
 
 export default function HomePage() {
     const { t } = useTranslation();
     const { loadInit } = useInitStore();
+    const user = useUserStore((s) => s.user);
+    const isAuthenticated = !!(user || (typeof window !== "undefined" && localStorage.getItem("accessToken")));
     const [tab, setTab] = useState<TabKind>("cargo");
     const [page, setPage] = useState(1);
     const limit = 10;
@@ -105,7 +108,7 @@ export default function HomePage() {
                                 data={item}
                                 cta={{
                                     label: t("homePage.moreDetails"),
-                                    href: `/login?next=/${tab}/${item.id}`,
+                                    href: isAuthenticated ? "/dashboard/search" : "/auth/register",
                                     icon: <FiChevronRight />,
                                 }}
                                 kind={tab}

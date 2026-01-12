@@ -67,6 +67,16 @@
     }
 
   }
+  
+  &__link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 16px;
+    color: #fff;
+    cursor: pointer;
+    text-align: left;
+  }
 
   &__bottom {
     display: flex;
@@ -79,6 +89,67 @@
 
     font-size: 16px;
     color: #fff;
+  }
+
+  &__modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  &__modal {
+    background: #fff;
+    color: #152736;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  &__modal-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  &__modal-phones {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    a {
+      color: #152736;
+      font-weight: 600;
+    }
+  }
+
+  &__modal-email {
+    margin-bottom: 16px;
+
+    a {
+      color: #152736;
+      font-weight: 600;
+      word-break: break-all;
+    }
+  }
+
+  &__modal-close {
+    background: #152736;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
   }
 }
 
