@@ -47,12 +47,8 @@ export default function AdminLayout() {
                                 <NavItem to="/admin/initial-data" icon={<FiDatabase  />} label="Справочник" />
                                 <NavItem to="/admin/black-list" icon={<FiShield />} label="Черный список" />
                                 <NavItem to="/admin/reviews" icon={<MdRateReview />} label="Отзывы" />
-                                <Typography variant="caption" sx={{ px: 2, pt: 1, pb: 0.5, color: "text.secondary" }}>
-                                    Тарифы
-                                </Typography>
-                                <NavItem to="/admin/tariffs/plans" icon={<FiLayers />} label="Тарифные планы" />
-                                <NavItem to="/admin/tariffs/subscriptions" icon={<FiCreditCard />} label="Подписки пользователей" />
                                 <NavItem to="/admin/activity-logs" icon={<FiSettings />} label="Логи активности" />
+                                <NavItem to="/admin/tariffs/plans" icon={<FiLayers />} label="Тарифные планы" />
                             </List>
                         </Paper>
 
