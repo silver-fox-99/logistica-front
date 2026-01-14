@@ -31,6 +31,8 @@ import AdminGeoLocationsPage from "@/pages/admin/geo-location";
 import AdminLookupsPage from "@/pages/admin/admin-lookups/ui/AdminLookupsPage.tsx";
 import AdminOverviewPage from "@/pages/admin/overview-page";
 import AdminReviewsPage from "@/pages/admin/reviews";
+import AdminTariffPlansPage from "@/pages/admin/tariffs/plans";
+import AdminTariffSubscriptionsPage from "@/pages/admin/tariffs/subscriptions";
 
 
 const router = createBrowserRouter([
@@ -87,7 +89,9 @@ const router = createBrowserRouter([
             { path: "black-list", element: <AdminBlackListPage />},
             { path: "activity-logs", element: <AdminActivityLogsPage />},
             { path: "initial-data", element: <AdminLookupsPage />},
-            { path: "reviews", element: <AdminReviewsPage /> }
+            { path: "reviews", element: <AdminReviewsPage /> },
+            { path: "tariffs/plans", element: <AdminTariffPlansPage /> },
+            { path: "tariffs/subscriptions", element: <AdminTariffSubscriptionsPage /> }
         ],
     },
     {

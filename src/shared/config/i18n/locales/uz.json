@@ -573,6 +573,47 @@
     "connectButton": "Provayderni ulash",
     "backButton": "Boshqaruv paneliga qaytish"
   },
+  "paymentsNew": {
+    "title": "Tariflar",
+    "subtitle": "O'zingizga mos tarifni tanlang. Hozircha xarid qo'llab-quvvatlash orqali amalga oshiriladi.",
+    "refresh": "Yangilash",
+    "loading": "Yuklanmoqda…",
+    "current": "Joriy reja",
+    "perks": "Nima kiradi",
+    "cargoLimit": "Oyiga yuk limiti:",
+    "vehicleLimit": "Oyiga transport limiti:",
+    "orderDetails": "Buyurtma tafsilotlari:",
+    "companies": "Kompaniyalar:",
+    "billingPeriod": "Hisob davri",
+    "supportNote": "Xarid qo'llab-quvvatlash orqali. To'lovlar ishga tushgach, hisob-faktura chiqariladi.",
+    "tabs": {
+      "limits": "Joriy limitlar",
+      "history": "Tarix"
+    },
+    "emptyLimits": "Limitlar hali mavjud emas.",
+    "errors": {
+      "loadPlans": "Tariflarni yuklab bo'lmadi",
+      "history": "Tarix mavjud emas"
+    },
+    "tooltips": {
+      "current": "Bu sizning joriy rejangiz",
+      "upgrade": "Yangilash uchun qo'llab-quvvatlashga murojaat qiling"
+    },
+    "buttons": {
+      "current": "Joriy",
+      "upgrade": "Yangilash"
+    },
+    "table": {
+      "plan": "Tarif",
+      "status": "Holat",
+      "starts": "Boshlanishi",
+      "ends": "Tugashi",
+      "source": "Manba",
+      "created": "Yaratilgan"
+    },
+    "emptyHistory": "Tarix hali yo'q",
+    "lifetime": "Cheksiz"
+  },
   "register": {
     "step1Title": "Hisob yaratish",
     "step1Subtitle": "SMS-kod olish va davom etish uchun telefon raqamingizni kiriting.",

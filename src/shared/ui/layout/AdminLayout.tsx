@@ -4,7 +4,7 @@ import {
     AppBar, Toolbar, Typography, Box, Container, Paper, Stack,
     List, ListItemButton, ListItemIcon, ListItemText, Divider, IconButton
 } from "@mui/material";
-import {FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2, FiDatabase} from "react-icons/fi";
+import {FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2, FiDatabase, FiLayers, FiCreditCard} from "react-icons/fi";
 import React from "react";
 import {BsGeoAltFill} from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
@@ -47,6 +47,11 @@ export default function AdminLayout() {
                                 <NavItem to="/admin/initial-data" icon={<FiDatabase  />} label="Справочник" />
                                 <NavItem to="/admin/black-list" icon={<FiShield />} label="Черный список" />
                                 <NavItem to="/admin/reviews" icon={<MdRateReview />} label="Отзывы" />
+                                <Typography variant="caption" sx={{ px: 2, pt: 1, pb: 0.5, color: "text.secondary" }}>
+                                    Тарифы
+                                </Typography>
+                                <NavItem to="/admin/tariffs/plans" icon={<FiLayers />} label="Тарифные планы" />
+                                <NavItem to="/admin/tariffs/subscriptions" icon={<FiCreditCard />} label="Подписки пользователей" />
                                 <NavItem to="/admin/activity-logs" icon={<FiSettings />} label="Логи активности" />
                             </List>
                         </Paper>

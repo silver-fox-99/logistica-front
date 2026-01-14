@@ -100,7 +100,7 @@ export const userReviewsApi = {
         return data?.data ?? null;
     },
 
-    // Admin endpoints
+    
     async adminList(params?: AdminReviewsQuery) {
         const token = typeof localStorage !== "undefined" ? localStorage.getItem("accessToken") : null;
         const finalParams = compact({

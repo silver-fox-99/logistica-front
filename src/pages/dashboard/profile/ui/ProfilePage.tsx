@@ -68,6 +68,13 @@ export default function ProfilePage() {
         return value != null ? [{ label: "★", value, color: "success" as const }] : [];
     }, [avgRating, user]);
 
+    const planLabel =
+        user?.tariff?.active_subscription?.plan?.name ??
+        user?.tariff?.active_subscription?.plan?.code ??
+        (user?.tariff?.active_subscription ? "Active plan" : "Free");
+    const baseName = [user?.first_name, user?.last_name].filter(Boolean).join(" ").trim() || t('profile.overview.unknown');
+    const fullNameWithPlan = `${baseName} (${planLabel})`;
+
     const updateUser = async (values: ContactInfo & { phoneMainE164?: string; phoneAltE164?: string }) => {
         try {
             const preparedData = {
@@ -92,7 +99,7 @@ export default function ProfilePage() {
     return (
         <Stack spacing={3}>
             <ProfileOverviewCard
-                fullName={user?.first_name + " " + user?.last_name}
+                fullName={fullNameWithPlan}
                 location={user?.meta?.geo || t('profile.overview.unknown')}
                 registeredAt={userDate || t('profile.overview.unknown')}
                 ratings={overviewRatings}

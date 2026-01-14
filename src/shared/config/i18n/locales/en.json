@@ -572,6 +572,47 @@
     "connectButton": "Connect provider",
     "backButton": "Back to dashboard"
   },
+  "paymentsNew": {
+    "title": "Plans",
+    "subtitle": "Choose the tariff that fits you. Purchases are processed via support for now.",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "current": "Current plan",
+    "perks": "Included perks",
+    "cargoLimit": "Cargo limit/month:",
+    "vehicleLimit": "Vehicle limit/month:",
+    "orderDetails": "Order details:",
+    "companies": "Companies:",
+    "billingPeriod": "Billing period",
+    "supportNote": "Purchase via support chat. Upgrades will create an invoice once payments are live.",
+    "tabs": {
+      "limits": "Current limits",
+      "history": "History"
+    },
+    "emptyLimits": "Limits are not available yet.",
+    "errors": {
+      "loadPlans": "Request failed. Please try again.",
+      "history": "History is unavailable"
+    },
+    "tooltips": {
+      "current": "This is your current plan",
+      "upgrade": "Contact support to upgrade"
+    },
+    "buttons": {
+      "current": "Current",
+      "upgrade": "Upgrade"
+    },
+    "table": {
+      "plan": "Plan",
+      "status": "Status",
+      "starts": "Starts",
+      "ends": "Ends",
+      "source": "Source",
+      "created": "Created"
+    },
+    "emptyHistory": "No history yet",
+    "lifetime": "Lifetime"
+  },
   "register": {
     "step1Title": "Create an account",
     "step1Subtitle": "Enter your phone number to get an SMS code and continue.",

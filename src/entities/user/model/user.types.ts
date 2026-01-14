@@ -1,3 +1,4 @@
+import type { TariffSubscription, Entitlements } from "@/shared/api/tariffsApi";
 
 export type RegistrationStage =
     | "PENDING"
@@ -12,6 +13,11 @@ export interface User {
 
 
     is_admin: boolean;
+
+    tariff?: {
+        active_subscription?: TariffSubscription | null;
+        effective_entitlements?: Entitlements | null;
+    };
 
 
     phone: string;
