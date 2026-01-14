@@ -172,8 +172,7 @@ export default function PaymentsPage() {
             setPlansLoading(true);
             try {
                 const res = await tariffsApi.listPublicPlans();
-                const activeOnly = res.items.filter((p) => p.is_active);
-                setPlans(activeOnly);
+                setPlans(res.items);
             } catch (e: any) {
                 const msg = e?.response?.data?.message ?? t("paymentsNew.errors.loadPlans");
                 toast.error(msg);
@@ -215,6 +214,20 @@ export default function PaymentsPage() {
             if (next.has(id)) next.delete(id); else next.add(id);
             return next;
         });
+    };
+    const resolveEntitlementLabel = (key: EntitlementKey | string) => {
+        const meta = limitsConfig.find((l) => l.key === key);
+        if (meta?.label) return meta.label;
+        const fallback: Partial<Record<EntitlementKey, string>> = {
+            cargo_limit: t("paymentsNew.cargoLimit", "Лимит грузов/мес"),
+            vehicle_limit: t("paymentsNew.vehicleLimit", "Лимит транспорта/мес"),
+            order_details_views_per_day_limit: t("paymentsNew.orderDetailsViews", "Просмотры деталей/день"),
+            company_limit: t("paymentsNew.companyLimit", "Лимит компаний"),
+            members_per_company_limit: t("paymentsNew.membersLimit", "Участников на компанию"),
+            can_view_order_details: t("paymentsNew.orderDetails", "Доступ к деталям заказов"),
+            can_create_companies: t("paymentsNew.companies", "Создание компаний"),
+        };
+        return (fallback as Record<string, string>)[key] ?? key;
     };
 
     const renderPlanCard = (plan: TariffPlan) => {
@@ -320,7 +333,7 @@ export default function PaymentsPage() {
                                     {priceLabel(plan)}
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary">
-                                    {t("paymentsNew.billingPeriod")}: {plan.billing_period || "—"}
+                                    {t("paymentsNew.billingPeriod", "Период биллинга")}: {plan.billing_period || "—"}
                                 </Typography>
                             </Stack>
                         )}
@@ -638,7 +651,7 @@ export default function PaymentsPage() {
                                                                                 <Stack spacing={1}>
                                                                                     {item.entitlements_overrides.map((ent) => {
                                                                                         const meta = limitsConfig.find((l) => l.key === ent.key);
-                                                                                        const label = meta?.label || ent.key;
+                                                                                        const label = resolveEntitlementLabel(ent.key);
                                                                                         const valueRaw =
                                                                                             ent.bool_value !== null && ent.bool_value !== undefined
                                                                                                 ? (ent.bool_value ? t("paymentsNew.enabled", "Enabled") : t("paymentsNew.disabled", "Disabled"))
@@ -703,8 +716,7 @@ export default function PaymentsPage() {
                                                                                     </TableHead>
                                                                                     <TableBody>
                                                                                         {item.entitlements_overrides.map((ent) => {
-                                                                                            const meta = limitsConfig.find((l) => l.key === ent.key);
-                                                                                            const label = meta?.label || ent.key;
+                                                                                            const label = resolveEntitlementLabel(ent.key);
                                                                                             const valueRaw =
                                                                                                 ent.bool_value !== null && ent.bool_value !== undefined
                                                                                                     ? (ent.bool_value ? t("paymentsNew.enabled", "Enabled") : t("paymentsNew.disabled", "Disabled"))
@@ -715,7 +727,6 @@ export default function PaymentsPage() {
                                                                                                 <TableRow key={`${item.id}-${ent.key}-${ent.created_at ?? ""}`}>
                                                                                                     <TableCell sx={{ whiteSpace: "normal", wordBreak: "break-word" }}>
                                                                                                         <Stack direction="row" spacing={0.75} alignItems="center">
-                                                                                                            {meta?.icon}
                                                                                                             <Typography variant="body2">{label}</Typography>
                                                                                                         </Stack>
                                                                                                     </TableCell>

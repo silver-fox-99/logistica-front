@@ -281,14 +281,14 @@ function DeactivateDialog({
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    loading: boolean;
-}) {
-    return (
-        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-            <DialogTitle>Удалить тариф?</DialogTitle>
+        loading: boolean;
+    }) {
+        return (
+            <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+            <DialogTitle>Деактивировать тариф?</DialogTitle>
             <DialogContent dividers>
                 <Typography variant="body2" color="text.secondary">
-                    Тарифный план будет удален и недоступен для новых подписок.
+                    Тарифный план будет деактивирован и станет недоступен для новых подписок.
                 </Typography>
             </DialogContent>
             <DialogActions sx={{ px: 3, py: 2 }}>
@@ -296,13 +296,13 @@ function DeactivateDialog({
                     Отмена
                 </Button>
                 <Button
-                    color="error"
+                    color="warning"
                     variant="contained"
                     onClick={onConfirm}
-                    startIcon={<FiTrash2 />}
+                    startIcon={<BiBlock />}
                     disabled={loading}
                 >
-                    Удалить
+                    Деактивировать
                 </Button>
             </DialogActions>
         </Dialog>
