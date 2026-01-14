@@ -8,7 +8,8 @@ import {
     FiClock, FiMapPin, FiPackage, FiTruck,
     FiRepeat, FiTrash2, FiEdit2, FiCopy, FiChevronDown, FiChevronUp, FiMail, FiUser, FiPhone, FiStar
 } from "react-icons/fi";
-import { useTranslation, type TFunction } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Link as RouterLink } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -16,6 +17,7 @@ import type {ShipmentRowData, ShipmentsKind, GeoPoint} from "@/entities/shipment
 import { adaptCargo, adaptTransport } from "@/entities/shipment/lib/adapter";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import type { CommonInitData } from "@/shared/api/commonInitApi";
 import "./ShipmentRow.scss";
 import {cargoApi} from "@/shared/api/cargoApi.ts";
 import {transportApi} from "@/shared/api/transportApi.ts";
@@ -33,7 +35,7 @@ const DetailsTransition = forwardRef(function DetailsTransition(
 type ShipmentDetailsContentProps = {
     data: ShipmentRowData;
     scope: "public" | "my";
-    lookups: ReturnType<typeof useInitStore>["lookups"];
+    lookups: CommonInitData["lookups"] | null;
     findLocalizedLabel: ReturnType<typeof useLocalizedLookup>["findLocalizedLabel"];
     t: TFunction;
     showActions?: boolean;
@@ -229,7 +231,7 @@ type ShipmentDetailsModalProps = {
     onClose: () => void;
     data: ShipmentRowData | null;
     kind: ShipmentsKind;
-    lookups: ReturnType<typeof useInitStore>["lookups"];
+    lookups: CommonInitData["lookups"] | null;
     findLocalizedLabel: ReturnType<typeof useLocalizedLookup>["findLocalizedLabel"];
     t: TFunction;
     loading: boolean;
