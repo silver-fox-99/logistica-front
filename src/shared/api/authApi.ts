@@ -60,7 +60,7 @@ export const authApi = {
         return res.data;
     },
 
-    completeRegister: async (payload: { firstName: string; lastName: string; password: string; }) => {
+    completeRegister: async (payload: { firstName: string; lastName: string; password: string; type: string }) => {
         const { data } = await api.post("/auth/register", payload);
         if (data?.accessToken)  localStorage.setItem("accessToken", data.accessToken);
         if (data?.refreshToken) localStorage.setItem("refreshToken", data.refreshToken);
