@@ -4,7 +4,7 @@ import {
     AppBar, Toolbar, Typography, Box, Container, Paper, Stack,
     List, ListItemButton, ListItemIcon, ListItemText, Divider, IconButton
 } from "@mui/material";
-import {FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2, FiDatabase, FiLayers, FiCreditCard} from "react-icons/fi";
+import {FiHome, FiUsers, FiPackage, FiSettings, FiShield, FiBarChart2, FiDatabase, FiLayers} from "react-icons/fi";
 import React from "react";
 import {BsGeoAltFill} from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";

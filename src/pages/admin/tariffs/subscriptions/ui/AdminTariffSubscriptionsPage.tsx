@@ -22,6 +22,7 @@ import {
     Typography,
 } from "@mui/material";
 import { FiCheck, FiEdit3, FiPlus, FiRefreshCw, FiTrash2, FiX } from "react-icons/fi";
+import { BiBlock } from "react-icons/bi";
 import { toast } from "react-toastify";
 import {
     tariffsApi,
@@ -662,10 +663,10 @@ export default function AdminTariffSubscriptionsPage() {
             />
 
             <Dialog open={!!cancelId} onClose={() => setCancelId(null)} maxWidth="xs" fullWidth>
-                <DialogTitle>Отменить подписку?</DialogTitle>
+                <DialogTitle>Деактивировать подписку?</DialogTitle>
                 <DialogContent dividers>
                     <Typography variant="body2" color="text.secondary">
-                        Подписка будет отменена. Доступ сохранится до даты окончания.
+                        Подписка будет деактивирована. Доступ сохранится до даты окончания.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, py: 2 }}>
@@ -676,10 +677,10 @@ export default function AdminTariffSubscriptionsPage() {
                         onClick={handleCancel}
                         color="error"
                         variant="contained"
-                        startIcon={<FiTrash2 />}
+                        startIcon={<BiBlock />}
                         disabled={cancelLoading}
                     >
-                        Отменить
+                        Деактивировать
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -31,16 +31,17 @@ import {
     type Entitlements,
 } from "@/shared/api/tariffsApi";
 import { ENTITLEMENTS } from "@/shared/config/entitlements";
+import { BiBlock } from "react-icons/bi";
 
 type PlanFormState = UpsertTariffPlanPayload & { price_text?: string };
 
-const BILLING_PERIODS: { value: BillingPeriod; label: string }[] = [
+const FALLBACK_BILLING_PERIODS: { value: BillingPeriod; label: string }[] = [
     { value: "MONTHLY", label: "Monthly" },
     { value: "YEARLY", label: "Yearly" },
     { value: "ONE_TIME", label: "One-time" },
 ];
 
-const emptyPlan = (): PlanFormState => ({
+const emptyPlan = (defaultPeriod?: BillingPeriod | null): PlanFormState => ({
     code: "",
     name: "",
     description: "",
@@ -49,7 +50,7 @@ const emptyPlan = (): PlanFormState => ({
     priority: 0,
     price_text: "",
     currency: "",
-    billing_period: "MONTHLY",
+    billing_period: defaultPeriod ?? "",
     entitlements: {},
 });
 
@@ -74,12 +75,14 @@ function PlanDialog({
                         initial,
                         onSubmit,
                         loading,
+                        billingPeriods,
                     }: {
     open: boolean;
     initial: PlanFormState | null;
     onClose: () => void;
     onSubmit: (payload: PlanFormState) => void;
     loading: boolean;
+    billingPeriods: { value: BillingPeriod; label: string }[];
 }) {
     const [state, setState] = useState<PlanFormState>(emptyPlan());
 
@@ -92,9 +95,9 @@ function PlanDialog({
                     (initial.price !== null && initial.price !== undefined ? String(initial.price) : ""),
             });
         } else {
-            setState(emptyPlan());
+            setState(emptyPlan(billingPeriods?.[0]?.value));
         }
-    }, [initial, open]);
+    }, [initial, open, billingPeriods]);
 
     const updateField = (field: keyof PlanFormState, value: unknown) => {
         setState((prev) => ({ ...prev, [field]: value }));
@@ -188,7 +191,7 @@ function PlanDialog({
                         onChange={(e) => updateField("billing_period", e.target.value as BillingPeriod)}
                         sx={{ minWidth: 180 }}
                     >
-                        {BILLING_PERIODS.map((p) => (
+                        {billingPeriods.map((p) => (
                             <MenuItem key={p.value} value={p.value}>
                                 {p.label}
                             </MenuItem>
@@ -315,7 +318,10 @@ export default function AdminTariffPlansPage() {
     const [dialogLoading, setDialogLoading] = useState(false);
     const [deactivateId, setDeactivateId] = useState<string | null>(null);
     const [deactivateLoading, setDeactivateLoading] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const [editing, setEditing] = useState<TariffPlan | null>(null);
+    const [billingPeriods, setBillingPeriods] = useState<{ value: BillingPeriod; label: string }[]>([]);
 
     const loadPlans = useCallback(async () => {
         setLoading(true);
@@ -336,6 +342,26 @@ export default function AdminTariffPlansPage() {
     useEffect(() => {
         void loadPlans();
     }, [loadPlans]);
+
+    useEffect(() => {
+        const loadInit = async () => {
+            try {
+                const init = await tariffsApi.adminInit();
+                const options =
+                    init.billing_period?.map((item) => ({
+                        value: item.value as BillingPeriod,
+                        label: item.name || item.value,
+                    })) ?? [];
+                setBillingPeriods(options.length ? options : FALLBACK_BILLING_PERIODS);
+            } catch (e) {
+                console.error("Failed to load tariffs init", e);
+                setBillingPeriods(FALLBACK_BILLING_PERIODS);
+            }
+        };
+        void loadInit();
+    }, []);
+
+    const billingPeriodOptions = billingPeriods.length ? billingPeriods : FALLBACK_BILLING_PERIODS;
 
     const openCreate = () => {
         setEditing(null);
@@ -434,6 +460,22 @@ export default function AdminTariffPlansPage() {
         }
     };
 
+    const handleDelete = async () => {
+        if (!deleteId) return;
+        setDeleteLoading(true);
+        try {
+            await tariffsApi.adminHardDeletePlan(deleteId);
+            setDeleteId(null);
+            await loadPlans();
+        } catch (e: any) {
+            const msg = e?.response?.data?.message ?? "Request failed. Please try again.";
+            toast.error(msg);
+            console.error(e);
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
     const tableContent = useMemo(() => {
         if (loading) {
             return (
@@ -510,6 +552,15 @@ export default function AdminTariffPlansPage() {
                             size="small"
                             onClick={() => setDeactivateId(plan.id)}
                             disabled={!plan.is_active}
+                            title="Деактивировать"
+                        >
+                            <BiBlock />
+                        </IconButton>
+                        <IconButton
+                            size="small"
+                            onClick={() => setDeleteId(plan.id)}
+                            color="error"
+                            title="Удалить"
                         >
                             <FiTrash2 />
                         </IconButton>
@@ -577,6 +628,7 @@ export default function AdminTariffPlansPage() {
                 }
                 loading={dialogLoading}
                 onSubmit={handleSave}
+                billingPeriods={billingPeriodOptions}
             />
 
             <DeactivateDialog
@@ -585,6 +637,29 @@ export default function AdminTariffPlansPage() {
                 onConfirm={handleDeactivate}
                 loading={deactivateLoading}
             />
+
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)} maxWidth="xs" fullWidth>
+                <DialogTitle>Удалить тариф?</DialogTitle>
+                <DialogContent dividers>
+                    <Typography variant="body2" color="text.secondary">
+                        Тариф будет удалён без возможности восстановления. Каскадно удалятся связанные данные.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button onClick={() => setDeleteId(null)} startIcon={<FiX />} variant="outlined">
+                        Закрыть
+                    </Button>
+                    <Button
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        startIcon={<FiTrash2 />}
+                        disabled={deleteLoading}
+                    >
+                        Удалить
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Stack>
     );
 }

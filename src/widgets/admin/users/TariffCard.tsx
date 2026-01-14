@@ -11,7 +11,8 @@ import {
     DialogContent,
     DialogActions,
 } from "@mui/material";
-import { FiEdit3, FiPlus, FiRefreshCw, FiTrash2, FiX } from "react-icons/fi";
+import { FiEdit3, FiPlus, FiRefreshCw, FiX } from "react-icons/fi";
+import { BiBlock } from "react-icons/bi";
 import { toast } from "react-toastify";
 import {
     tariffsApi,
@@ -234,10 +235,10 @@ export default function TariffCard({ userId }: TariffCardProps) {
                             size="small"
                             variant="outlined"
                             color="error"
-                            startIcon={<FiTrash2 />}
+                            startIcon={<BiBlock />}
                             onClick={() => setCancelId(active.id)}
                         >
-                            Отменить
+                            Деактивировать
                         </Button>
                     </Stack>
                 </Stack>
@@ -282,24 +283,24 @@ export default function TariffCard({ userId }: TariffCardProps) {
             />
 
             <Dialog open={!!cancelId} onClose={() => setCancelId(null)} maxWidth="xs" fullWidth>
-                <DialogTitle>Cancel subscription?</DialogTitle>
+                <DialogTitle>Деактивировать подписку?</DialogTitle>
                 <DialogContent dividers>
                     <Typography variant="body2" color="text.secondary">
-                        The subscription will be marked as canceled. User will lose access after end date.
+                        Подписка будет деактивирована. Доступ сохранится до даты окончания.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, py: 2 }}>
                     <Button onClick={() => setCancelId(null)} startIcon={<FiX />} variant="outlined">
-                        Close
+                        Закрыть
                     </Button>
                     <Button
                         onClick={handleCancel}
                         color="error"
                         variant="contained"
-                        startIcon={<FiTrash2 />}
+                        startIcon={<BiBlock />}
                         disabled={cancelLoading}
                     >
-                        Cancel
+                        Деактивировать
                     </Button>
                 </DialogActions>
             </Dialog>

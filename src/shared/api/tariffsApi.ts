@@ -1,6 +1,6 @@
 import api from "@/shared/api/axios";
 
-export type BillingPeriod = "MONTHLY" | "YEARLY" | "ONE_TIME";
+export type BillingPeriod = string;
 
 export type EntitlementKey =
     | "cargo_limit"
@@ -110,8 +110,25 @@ export type TariffSubscription = {
     note?: string | null;
     plan?: TariffPlan | null;
     entitlements?: Entitlements | null;
+    entitlements_overrides?: {
+        id?: string;
+        key: string;
+        int_value?: number | null;
+        bool_value?: boolean | null;
+        reason?: string | null;
+        created_at?: string | null;
+        updated_at?: string | null;
+    }[] | null;
     created_at?: string | null;
     updated_at?: string | null;
+};
+
+export type TariffsInitDictItem = { name?: string | null; value: string };
+export type TariffsInitData = {
+    billing_period?: TariffsInitDictItem[];
+    subscription_status?: TariffsInitDictItem[];
+    subscription_source?: TariffsInitDictItem[];
+    element_key?: TariffsInitDictItem[];
 };
 
 const normalizePlan = (raw: any): TariffPlan => ({
@@ -142,6 +159,17 @@ const normalizeSubscription = (raw: any): TariffSubscription => ({
     note: raw?.note ?? null,
     plan: raw?.plan ? normalizePlan(raw.plan) : raw?.plan ?? null,
     entitlements: extractEntitlements(raw),
+    entitlements_overrides: Array.isArray(raw?.entitlements)
+        ? raw.entitlements.map((e: any) => ({
+            id: e?.id,
+            key: e?.key ?? "",
+            int_value: e?.int_value ?? null,
+            bool_value: e?.bool_value ?? null,
+            reason: e?.reason ?? null,
+            created_at: e?.created_at ?? null,
+            updated_at: e?.updated_at ?? null,
+        }))
+        : null,
     created_at: raw?.created_at ?? raw?.createdAt ?? null,
     updated_at: raw?.updated_at ?? raw?.updatedAt ?? null,
 });
@@ -149,6 +177,13 @@ const normalizeSubscription = (raw: any): TariffSubscription => ({
 export type TariffMeResponse = {
     effective_entitlements: Entitlements;
     active_subscription: TariffSubscription | null;
+    usage?: {
+        monthKey?: string;
+        dayKey?: string;
+        cargo_creates_used?: number | string;
+        vehicle_creates_used?: number | string;
+        order_details_views_used?: number | string;
+    } | null;
     raw?: any;
 };
 
@@ -269,6 +304,18 @@ export const tariffsApi = {
         return payload;
     },
 
+    async adminHardDeletePlan(id: string) {
+        const { data } = await api.delete<{ data?: unknown }>(`/admin/tariffs/plans/${id}/hard`);
+        const payload = (data as any)?.data ?? data ?? {};
+        return payload;
+    },
+
+    async adminInit(): Promise<TariffsInitData> {
+        const { data } = await api.get<any>("/admin/tariffs/init");
+        const payload = (data as any)?.data ?? data ?? {};
+        return payload as TariffsInitData;
+    },
+
     async adminListUserSubscriptions(userId: string) {
         const { data } = await api.get<any>(`/admin/tariffs/users/${userId}/subscriptions`);
         const payload = (data as any)?.data ?? data ?? {};
@@ -295,6 +342,7 @@ export const tariffsApi = {
         return {
             effective_entitlements: entitlements,
             active_subscription: active,
+            usage: payload?.usage ?? null,
             raw: payload,
         };
     },
