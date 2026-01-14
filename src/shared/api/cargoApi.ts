@@ -124,6 +124,10 @@ export const cargoApi = {
         const { data } = await api.post<CreateResponse>("/cargo/create", payload);
         return data;
     },
+    async info(id: string) {
+        const { data } = await api.get<CreateResponse>(`/cargo/${id}/info`);
+        return data?.data ?? data;
+    },
     async viewCount(id: string) {
         const { data } = await api.get<CreateResponse>(`/cargo/${id}/view-count`);
         return data;
