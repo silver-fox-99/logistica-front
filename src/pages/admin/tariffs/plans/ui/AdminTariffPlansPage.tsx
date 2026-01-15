@@ -382,7 +382,7 @@ export default function AdminTariffPlansPage() {
         const priorityRaw = payload.priority as any;
         const priorityValue =
             priorityRaw === "" || priorityRaw === null || priorityRaw === undefined ? null : Number(priorityRaw);
-        if (priorityValue === 0) {
+        if (priorityValue === 0 && Number(payload.price) > 0) {
             toast.error("Приоритет не может быть 0");
             return;
         }
