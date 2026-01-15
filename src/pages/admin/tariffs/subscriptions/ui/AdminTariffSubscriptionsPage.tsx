@@ -42,6 +42,18 @@ const fmt = (d?: string | null) =>
         })
         : "—";
 
+const toLocalInputValue = (date: Date) => {
+    const offset = date.getTimezoneOffset();
+    const local = new Date(date.getTime() - offset * 60000);
+    return local.toISOString().slice(0, 16);
+};
+
+const todayMidnightInput = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return toLocalInputValue(d);
+};
+
 type IssueForm = IssueSubscriptionPayload & { lifetime?: boolean };
 
 export function IssueSubscriptionDialog({
@@ -63,13 +75,14 @@ export function IssueSubscriptionDialog({
 
     useEffect(() => {
         if (open) {
-            const isLifetime =
-                subscription?.lifetime ??
-                ((subscription?.ends_at === null || subscription?.ends_at === undefined) ? true : false);
+            const isLifetime = subscription
+                ? (subscription.lifetime ?? (subscription.ends_at === null || subscription.ends_at === undefined))
+                : false;
+            const nowIso = todayMidnightInput();
             setForm({
                 plan_id: subscription?.plan_id ?? "",
                 lifetime: !!isLifetime,
-                starts_at: subscription?.starts_at ?? "",
+                starts_at: subscription?.starts_at ?? nowIso,
                 ends_at: isLifetime ? "" : subscription?.ends_at ?? "",
                 note: subscription?.note ?? "",
             });
@@ -100,14 +113,26 @@ export function IssueSubscriptionDialog({
                         ))}
                 </TextField>
 
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Switch
+                        checked={!!form.lifetime}
+                        onChange={(e) => update("lifetime", e.target.checked)}
+                        inputProps={{ "aria-label": "Бессрочно" }}
+                    />
+                    <Typography variant="body2" sx={{ pointerEvents: "none" }}>
+                        Бессрочно
+                    </Typography>
+                </Stack>
+
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                     <TextField
                         label="Дата начала"
                         type="datetime-local"
                         InputLabelProps={{ shrink: true }}
                         value={form.starts_at ?? ""}
-                        onChange={(e) => update("starts_at", e.target.value)}
                         fullWidth
+                        disabled
+                        InputProps={{ readOnly: true }}
                     />
                     <TextField
                         label="Дата окончания"
@@ -119,16 +144,6 @@ export function IssueSubscriptionDialog({
                         disabled={!!form.lifetime}
                     />
                 </Stack>
-
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={!!form.lifetime}
-                            onChange={(e) => update("lifetime", e.target.checked)}
-                        />
-                    }
-                    label="Бессрочно"
-                />
 
                 <TextField
                     label="Комментарий"
@@ -327,6 +342,10 @@ export default function AdminTariffSubscriptionsPage() {
 
     const handleIssue = async (payload: IssueForm) => {
         if (!currentUserId) return;
+        if (!payload.lifetime && !payload.ends_at) {
+            toast.error("Укажите дату окончания подписки");
+            return;
+        }
         setIssueLoading(true);
         try {
             await tariffsApi.adminIssueSubscription(currentUserId, {
