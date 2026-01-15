@@ -28,6 +28,7 @@ export type AdminUser = {
     updated_at: string;
     deleted_at: string | null;
     binotel_id: string | null;
+    type?: string | null
 };
 
 export type AdminUsersResponse = {

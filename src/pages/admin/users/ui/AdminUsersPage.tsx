@@ -158,6 +158,7 @@ export default function AdminUsersPage() {
                                 <TableCell>Имя</TableCell>
                                 <TableCell>Телефон</TableCell>
                                 <TableCell>Email</TableCell>
+                                <TableCell>Тип</TableCell>
                                 <TableCell>Статус</TableCell>
                                 <TableCell>Этап регистрации</TableCell>
                                 <TableCell
@@ -189,6 +190,9 @@ export default function AdminUsersPage() {
                                         <Typography variant="caption" color="text.secondary">
                                             {u.email ? (u.email_verified_at ? "Подтвержден" : "Не подтвержден") : ""}
                                         </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{u.type || '-'}</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Chip
