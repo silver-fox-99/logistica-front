@@ -25,13 +25,13 @@ import {
     FiShield,
     FiBarChart2,
     FiDatabase,
-    FiLayers,
     FiChevronLeft,
     FiChevronRight,
 } from "react-icons/fi";
 import { BsGeoAltFill } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
 import { FaTruck } from "react-icons/fa";
+import {TbPremiumRights} from "react-icons/tb";
 
 type NavItemConfig = {
     to: string;
@@ -50,7 +50,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/black-list", icon: <FiShield />, label: "Blacklist" },
     { to: "/admin/reviews", icon: <MdRateReview />, label: "Reviews" },
     { to: "/admin/activity-logs", icon: <FiSettings />, label: "Activity logs" },
-    { to: "/admin/tariffs/plans", icon: <FiLayers />, label: "Tariff plans" },
+    { to: "/admin/tariffs/plans", icon: <TbPremiumRights />, label: "Tariff plans" },
 ];
 
 function NavItem(props: {

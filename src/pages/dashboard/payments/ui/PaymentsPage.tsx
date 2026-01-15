@@ -129,6 +129,7 @@ export default function PaymentsPage() {
     const [historyError, setHistoryError] = useState<string | null>(null);
     const [effectiveFromApi, setEffectiveFromApi] = useState<Entitlements | null>(null);
     const [usage, setUsage] = useState<TariffMeResponse["usage"]>(null);
+    const [checkoutLoadingId, setCheckoutLoadingId] = useState<string | null>(null);
 
     const [tab, setTab] = useState(0);
     const [expandedHistory, setExpandedHistory] = useState<Set<string>>(new Set());
@@ -229,6 +230,33 @@ export default function PaymentsPage() {
         };
         return (fallback as Record<string, string>)[key] ?? key;
     };
+
+    const handleCheckout = async (plan: TariffPlan) => {
+        if (!plan?.id) return;
+
+        try {
+            setCheckoutLoadingId(plan.id);
+
+            const res = await tariffsApi.checkout(plan.id);
+
+            const url = res.checkout_url || res.short_link;
+            if (!url) {
+                toast.error(t("paymentsNew.errors.checkoutNoUrl", "Checkout URL was not returned."));
+                return;
+            }
+
+            window.open(url, "_blank", "noopener,noreferrer");
+        } catch (e: any) {
+            const msg =
+                e?.response?.data?.message ??
+                t("paymentsNew.errors.checkout", "Failed to create invoice.");
+            toast.error(msg);
+            console.error(e);
+        } finally {
+            setCheckoutLoadingId(null);
+        }
+    };
+
 
     const renderPlanCard = (plan: TariffPlan) => {
         const isCurrent = currentPlanId === plan.id;
@@ -349,15 +377,20 @@ export default function PaymentsPage() {
                                     size="small"
                                     variant={isCurrent ? "outlined" : "contained"}
                                     color={isCurrent ? "success" : "primary"}
-                                    disabled={isCurrent}
+                                    disabled={isCurrent || checkoutLoadingId === plan.id}
                                     endIcon={<FiArrowUpRight />}
                                     onClick={() => {
                                         if (isCurrent) return;
-                                        window.location.href = "/dashboard/help";
+                                        void handleCheckout(plan);
                                     }}
                                 >
-                                    {isCurrent ? t("paymentsNew.buttons.current") : t("paymentsNew.buttons.upgrade")}
-                                </Button>
+  {checkoutLoadingId === plan.id
+      ? t("paymentsNew.buttons.processing", "Processing...")
+      : isCurrent
+          ? t("paymentsNew.buttons.current")
+          : t("paymentsNew.buttons.upgrade")}
+</Button>
+
                             </span>
                         </Tooltip>
                     </Stack>

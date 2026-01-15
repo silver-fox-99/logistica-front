@@ -209,6 +209,13 @@ const serializePlanPayload = (payload: UpsertTariffPlanPayload) => {
     return base;
 };
 
+export type CheckoutResponse = {
+    invoice_id: string;
+    subscription_id: string;
+    checkout_url: string | null;
+    short_link?: string | null;
+};
+
 export type IssueSubscriptionPayload = {
     plan_id: string;
     starts_at?: string | null;
@@ -437,5 +444,16 @@ export const tariffsApi = {
         const { data } = await api.post<any>(`/admin/tariffs/users/${userId}/assign-default`);
         const payload = (data as any)?.data ?? data ?? {};
         return payload;
+    },
+
+    async checkout(plan_id: string): Promise<CheckoutResponse> {
+        const { data } = await api.post<any>("/tariffs/checkout", { plan_id });
+        const payload = (data as any)?.data ?? data ?? {};
+        return {
+            invoice_id: payload?.invoice_id ?? payload?.id ?? "",
+            subscription_id: payload?.subscription_id ?? "",
+            checkout_url: payload?.checkout_url ?? null,
+            short_link: payload?.short_link ?? null,
+        };
     },
 };
