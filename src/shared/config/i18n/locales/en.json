@@ -250,8 +250,7 @@
     "validation": {
       "invalidPhone": "Enter a valid phone number",
       "invalidEmail": "Enter a valid email"
-    }
-    ,
+    },
     "reviews": {
       "title": "Reviews about you",
       "description": "Here you can see published reviews from other users.",
@@ -579,31 +578,33 @@
     "loading": "Loading…",
     "current": "Current plan",
     "perks": "Included perks",
-  "cargoLimit": "Cargo limit/month:",
-  "vehicleLimit": "Vehicle limit/month:",
-  "orderDetailsViews": "Order details views/day:",
-  "orderDetails": "Order details:",
-  "companies": "Companies:",
-  "companyLimit": "Company limit",
-  "membersLimit": "Members per company limit",
-  "personalEntitlements": "Personal entitlements",
-  "entitlementKey": "Category",
-  "entitlementValue": "Value",
-  "reason": "Reason",
-  "noReason": "No reason provided",
-  "updated": "Updated",
-  "created": "Created",
-  "billingPeriod": "Billing period",
-  "supportShort": "Purchase via support",
-  "supportNote": "Purchase via support chat. Upgrades will create an invoice once payments are live.",
-  "tabs": {
-    "limits": "Current limits",
-      "history": "History"
+    "cargoLimit": "Cargo limit/month:",
+    "vehicleLimit": "Vehicle limit/month:",
+    "orderDetailsViews": "Order details views/day:",
+    "orderDetails": "Order details:",
+    "companies": "Companies:",
+    "companyLimit": "Company limit",
+    "membersLimit": "Members per company limit",
+    "personalEntitlements": "Personal entitlements",
+    "entitlementKey": "Category",
+    "entitlementValue": "Value",
+    "reason": "Reason",
+    "noReason": "No reason provided",
+    "updated": "Updated",
+    "created": "Created",
+    "billingPeriod": "Billing period",
+    "supportShort": "Purchase via support",
+    "supportNote": "Purchase via support chat. Upgrades will create an invoice once payments are live.",
+    "tabs": {
+      "limits": "Current limits",
+      "history": "History",
+      "invoices": "Invoices"
     },
     "emptyLimits": "Limits are not available yet.",
     "errors": {
       "loadPlans": "Request failed. Please try again.",
-      "history": "History is unavailable"
+      "history": "History is unavailable",
+      "invoices": "Invoices are unavailable"
     },
     "tooltips": {
       "current": "This is your current plan",
@@ -619,10 +620,15 @@
       "starts": "Starts",
       "ends": "Ends",
       "source": "Source",
-      "created": "Created"
+      "created": "Created",
+      "amount": "Amount",
+      "provider": "Provider",
+      "link": "Receipt",
+      "openLink": "Open receipt"
     },
     "emptyHistory": "No history yet",
-    "lifetime": "Lifetime"
+    "lifetime": "Lifetime",
+    "emptyInvoices": "No invoices yet"
   },
   "register": {
     "step1Title": "Create an account",

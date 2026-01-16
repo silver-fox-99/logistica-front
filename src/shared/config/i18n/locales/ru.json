@@ -250,8 +250,7 @@
     "validation": {
       "invalidPhone": "Введите корректный номер телефона",
       "invalidEmail": "Введите корректный email"
-    }
-    ,
+    },
     "reviews": {
       "title": "Отзывы о вас",
       "description": "Здесь отображаются опубликованные отзывы других пользователей.",
@@ -517,8 +516,7 @@
       "max": "Макс",
       "apply": "Применить",
       "reset": "Сбросить",
-      "searchLabel": "Поиск заказов",
-      "favorites": "Только избранное"
+      "searchLabel": "Поиск заказов"
     },
     "favorites": {
       "added": "Добавлено в избранное",
@@ -580,31 +578,33 @@
     "loading": "Загрузка…",
     "current": "Текущий план",
     "perks": "Что входит",
-  "cargoLimit": "Лимит грузов/мес:",
-  "vehicleLimit": "Лимит транспорта/мес:",
-  "orderDetailsViews": "Просмотры деталей/день:",
-  "orderDetails": "Доступ к деталям заказов:",
-  "companies": "Компании:",
-  "companyLimit": "Лимит компаний",
-  "membersLimit": "Участников на компанию",
-  "personalEntitlements": "Персональные квоты",
-  "entitlementKey": "Категория",
-  "entitlementValue": "Значение",
-  "reason": "Причина",
-  "noReason": "—",
-  "updated": "Обновлено",
-  "created": "Создано",
-  "billingPeriod": "Период биллинга",
-  "supportShort": "Покупка через поддержку",
-  "supportNote": "Покупка через поддержку. После запуска платежей будет выставлен счёт.",
-  "tabs": {
-    "limits": "Текущие лимиты",
-      "history": "История"
+    "cargoLimit": "Лимит грузов/мес:",
+    "vehicleLimit": "Лимит транспорта/мес:",
+    "orderDetailsViews": "Просмотры деталей/день:",
+    "orderDetails": "Доступ к деталям заказов:",
+    "companies": "Компании:",
+    "companyLimit": "Лимит компаний",
+    "membersLimit": "Участников на компанию",
+    "personalEntitlements": "Персональные квоты",
+    "entitlementKey": "Категория",
+    "entitlementValue": "Значение",
+    "reason": "Причина",
+    "noReason": "—",
+    "updated": "Обновлено",
+    "created": "Создано",
+    "billingPeriod": "Период биллинга",
+    "supportShort": "Покупка через поддержку",
+    "supportNote": "Покупка через поддержку. После запуска платежей будет выставлен счёт.",
+    "tabs": {
+      "limits": "Текущие лимиты",
+      "history": "История",
+      "invoices": "Инвойсы"
     },
     "emptyLimits": "Лимиты пока недоступны.",
     "errors": {
       "loadPlans": "Не удалось загрузить тарифы",
-      "history": "История недоступна"
+      "history": "История недоступна",
+      "invoices": "Не удалось загрузить инвойсы"
     },
     "tooltips": {
       "current": "Ваш текущий план",
@@ -620,10 +620,15 @@
       "starts": "Начало",
       "ends": "Окончание",
       "source": "Источник",
-      "created": "Создано"
+      "created": "Создано",
+      "amount": "Сумма",
+      "provider": "Провайдер",
+      "link": "Квитанция",
+      "openLink": "Открыть квитанцию"
     },
     "emptyHistory": "История пока пустая",
-    "lifetime": "Бессрочно"
+    "lifetime": "Бессрочно",
+    "emptyInvoices": "Инвойсов нет"
   },
   "register": {
     "step1Title": "Создать аккаунт",

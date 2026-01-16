@@ -250,8 +250,7 @@
     "validation": {
       "invalidPhone": "To'g'ri telefon raqamini kiriting",
       "invalidEmail": "To'g'ri emailni kiriting"
-    }
-    ,
+    },
     "reviews": {
       "title": "Siz haqingizdagi sharhlar",
       "description": "Bu yerda boshqa foydalanuvchilar e'lon qilgan sharhlar ko'rsatiladi.",
@@ -580,31 +579,33 @@
     "loading": "Yuklanmoqda…",
     "current": "Joriy reja",
     "perks": "Nima kiradi",
-  "cargoLimit": "Oyiga yuk limiti:",
-  "vehicleLimit": "Oyiga transport limiti:",
-  "orderDetailsViews": "Buyurtma tafsilotlari/kun:",
-  "orderDetails": "Buyurtma tafsilotlari:",
-  "companies": "Kompaniyalar:",
-  "companyLimit": "Kompaniya limiti",
-  "membersLimit": "Kompaniyadagi a'zolar limiti",
-  "personalEntitlements": "Shaxsiy kvotalar",
-  "entitlementKey": "Kategoriya",
-  "entitlementValue": "Qiymat",
-  "reason": "Sabab",
-  "noReason": "—",
-  "updated": "Yangilangan",
-  "created": "Yaratilgan",
-  "billingPeriod": "Hisob davri",
-  "supportShort": "Qo'llab-quvvatlash orqali xarid",
-  "supportNote": "Xarid qo'llab-quvvatlash orqali. To'lovlar ishga tushgach, hisob-faktura chiqariladi.",
-  "tabs": {
-    "limits": "Joriy limitlar",
-      "history": "Tarix"
+    "cargoLimit": "Oyiga yuk limiti:",
+    "vehicleLimit": "Oyiga transport limiti:",
+    "orderDetailsViews": "Buyurtma tafsilotlari/kun:",
+    "orderDetails": "Buyurtma tafsilotlari:",
+    "companies": "Kompaniyalar:",
+    "companyLimit": "Kompaniya limiti",
+    "membersLimit": "Kompaniyadagi a'zolar limiti",
+    "personalEntitlements": "Shaxsiy kvotalar",
+    "entitlementKey": "Kategoriya",
+    "entitlementValue": "Qiymat",
+    "reason": "Sabab",
+    "noReason": "—",
+    "updated": "Yangilangan",
+    "created": "Yaratilgan",
+    "billingPeriod": "Hisob davri",
+    "supportShort": "Qo'llab-quvvatlash orqali xarid",
+    "supportNote": "Xarid qo'llab-quvvatlash orqali. To'lovlar ishga tushgach, hisob-faktura chiqariladi.",
+    "tabs": {
+      "limits": "Joriy limitlar",
+      "history": "Tarix",
+      "invoices": "Hisob-fakturalar"
     },
     "emptyLimits": "Limitlar hali mavjud emas.",
     "errors": {
       "loadPlans": "Tariflarni yuklab bo'lmadi",
-      "history": "Tarix mavjud emas"
+      "history": "Tarix mavjud emas",
+      "invoices": "Hisob-fakturalarni yuklab bo‘lmadi"
     },
     "tooltips": {
       "current": "Bu sizning joriy rejangiz",
@@ -620,10 +621,15 @@
       "starts": "Boshlanishi",
       "ends": "Tugashi",
       "source": "Manba",
-      "created": "Yaratilgan"
+      "created": "Yaratilgan",
+      "amount": "Summa",
+      "provider": "Provayder",
+      "link": "Chek",
+      "openLink": "Chekni ochish"
     },
     "emptyHistory": "Tarix hali yo'q",
-    "lifetime": "Cheksiz"
+    "lifetime": "Cheksiz",
+    "emptyInvoices": "Hisob-fakturalar yo‘q"
   },
   "register": {
     "step1Title": "Hisob yaratish",

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import { Card, CardContent, Stack, TextField, InputAdornment, Button } from "@mui/material";
-import { FiUser, FiPhone, FiMail, FiSave, FiLoader } from "react-icons/fi";
+import { FiUser, FiPhone, FiMail, FiSave, FiLoader, FiBriefcase } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
@@ -16,6 +16,7 @@ type FormValues = {
     phone?: string;
     email?: string | null;
     avatar?: string | null;
+    type?: string | null;
 };
 
 export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: AdminUser) => void; }) {
@@ -26,6 +27,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             phone:      user.phone ?? "",
             email:      user.email ?? "",
             avatar:     user.avatar ?? "",
+            type:       user.type ?? "",
         },
     });
 
@@ -40,6 +42,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                 phone:      values.phone?.trim()      ? values.phone.trim()      : undefined,
                 email:      values.email?.trim()      ? values.email.trim()      : null,
                 avatar:     values.avatar?.trim()     ? values.avatar.trim()     : null,
+                type:       values.type?.trim()       ? values.type.trim()       : null,
             };
 
             const payload = diffPayload<FormValues>(
@@ -49,6 +52,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                     phone:      user.phone ?? undefined,
                     email:      user.email ?? null,
                     avatar:     user.avatar ?? null,
+                    type:       user.type ?? null,
                 },
                 normalized
             );
@@ -81,6 +85,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                 phone:      res.data.user.phone ?? "",
                 email:      res.data.user.email ?? "",
                 avatar:     res.data.user.avatar ?? "",
+                type:       res.data.user.type ?? "",
             });
         } catch (error: any) {
             const message = error?.response?.data?.message || 'Ошибка при обновлении пользователя';
@@ -149,6 +154,16 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                                     })}
                                     error={!!errors.avatar}
                                     helperText={errors.avatar?.message}
+                                />
+                                <TextField
+                                    label="Тип пользователя"
+                                    {...register("type", {
+                                        setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                        maxLength: { value: 120, message: "Максимум 120 символов" },
+                                    })}
+                                    error={!!errors.type}
+                                    helperText={errors.type?.message}
+                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiBriefcase/></InputAdornment> }}
                                 />
                             </Stack>
                         </Grid>

@@ -35,6 +35,7 @@ import {
     FiChevronDown,
     FiChevronUp,
     FiX,
+    FiExternalLink,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import {
@@ -44,6 +45,7 @@ import {
     type Entitlements,
     type EntitlementKey,
     type TariffMeResponse,
+    type TariffInvoice,
 } from "@/shared/api/tariffsApi";
 import { formatEntitlementValue } from "@/shared/config/entitlements";
 import { useUserStore } from "@/entities/user/model/user.store";
@@ -127,6 +129,9 @@ export default function PaymentsPage() {
     const [history, setHistory] = useState<TariffSubscription[]>([]);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [historyError, setHistoryError] = useState<string | null>(null);
+    const [invoices, setInvoices] = useState<TariffInvoice[]>([]);
+    const [invoicesLoading, setInvoicesLoading] = useState(false);
+    const [invoicesError, setInvoicesError] = useState<string | null>(null);
     const [effectiveFromApi, setEffectiveFromApi] = useState<Entitlements | null>(null);
     const [usage, setUsage] = useState<TariffMeResponse["usage"]>(null);
     const [checkoutLoadingId, setCheckoutLoadingId] = useState<string | null>(null);
@@ -202,6 +207,23 @@ export default function PaymentsPage() {
         };
         void loadHistory();
     }, []);
+    useEffect(() => {
+        const loadInvoices = async () => {
+            setInvoicesLoading(true);
+            setInvoicesError(null);
+            try {
+                const res = await tariffsApi.listMyInvoices();
+                setInvoices(res.items);
+            } catch (e: any) {
+                const msg = e?.response?.data?.message ?? t("paymentsNew.errors.invoices", "Invoices unavailable");
+                setInvoicesError(msg);
+                console.error(e);
+            } finally {
+                setInvoicesLoading(false);
+            }
+        };
+        void loadInvoices();
+    }, [t]);
 
     const planLookup = useMemo(() => {
         const map = new Map<string, TariffPlan>();
@@ -579,9 +601,10 @@ export default function PaymentsPage() {
 
                     <Card variant="outlined" sx={{ borderRadius: 3 }}>
                         <CardContent>
-                            <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+                            <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }} >
                                 <Tab label={t("paymentsNew.tabs.limits")} />
                                 <Tab label={t("paymentsNew.tabs.history")} />
+                                <Tab label={t("paymentsNew.tabs.invoices", "Инвойсы")} />
                             </Tabs>
 
                             {tab === 0 && (
@@ -798,6 +821,104 @@ export default function PaymentsPage() {
                                     </Table>
                                 </Box>
                             )}
+
+                            {tab === 2 && (
+                                <Box sx={{ overflowX: "auto" }}>
+                                    <Table size="small">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>{t("paymentsNew.table.plan")}</TableCell>
+                                                <TableCell sx={{ width: 140 }}>{t("paymentsNew.table.amount", "Сумма")}</TableCell>
+                                                <TableCell sx={{ width: 140 }}>{t("paymentsNew.table.status")}</TableCell>
+                                                <TableCell sx={{ width: 140 }}>{t("paymentsNew.table.provider", "Провайдер")}</TableCell>
+                                                <TableCell sx={{ width: 180 }}>{t("paymentsNew.table.created")}</TableCell>
+                                                <TableCell sx={{ width: 80 }}>{t("paymentsNew.table.link", "Ссылка")}</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {invoicesLoading && (
+                                                <TableRow>
+                                                    <TableCell colSpan={6}>
+                                                        <Typography align="center" color="text.secondary" sx={{ py: 2 }}>
+                                                            {t("paymentsNew.loading")}
+                                                        </Typography>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                            {!invoicesLoading && invoicesError && (
+                                                <TableRow>
+                                                    <TableCell colSpan={6}>
+                                                        <Typography align="center" color="text.secondary" sx={{ py: 2 }}>
+                                                            {invoicesError}
+                                                        </Typography>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                            {!invoicesLoading && !invoicesError && invoices.length === 0 && (
+                                                <TableRow>
+                                                    <TableCell colSpan={6}>
+                                                        <Typography align="center" color="text.secondary" sx={{ py: 2 }}>
+                                                            {t("paymentsNew.emptyInvoices", "Нет инвойсов")}
+                                                        </Typography>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                            {!invoicesLoading && !invoicesError &&
+                                                invoices.map((inv) => {
+                                                    const status = inv.status ?? "";
+                                                    const color =
+                                                        status === "PAID"
+                                                            ? "success"
+                                                            : status === "PENDING"
+                                                                ? "warning"
+                                                                : status === "CANCELLED" || status === "FAILED"
+                                                                    ? "error"
+                                                                    : "default";
+                                                    return (
+                                                        <TableRow key={inv.id}>
+                                                            <TableCell>
+                                                                <Stack spacing={0.25}>
+                                                                    <Typography variant="body2" fontWeight={700}>
+                                                                        {inv.plan_name ?? inv.plan_code ?? "—"}
+                                                                    </Typography>
+                                                                    <Typography variant="caption" color="text.secondary">
+                                                                        #{inv.subscription_id ?? "—"}
+                                                                    </Typography>
+                                                                </Stack>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {inv.amount ?? "—"} {inv.currency}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Chip size="small" label={status || "—"} color={color as any} variant="outlined" />
+                                                            </TableCell>
+                                                            <TableCell>{inv.provider ?? "—"}</TableCell>
+                                                            <TableCell>{fmt(inv.created_at)}</TableCell>
+                                                            <TableCell>
+                                                                {inv.short_link || inv.checkout_url ? (
+                                                                    <Tooltip title={t("paymentsNew.table.openLink", "Открыть ссылку")}>
+                                                                        <IconButton
+                                                                            size="small"
+                                                                            component="a"
+                                                                            href={(inv.short_link || inv.checkout_url) ?? "#"}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                        >
+                                                                            <FiExternalLink />
+                                                                        </IconButton>
+                                                                    </Tooltip>
+                                                                ) : (
+                                                                    "—"
+                                                                )}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })}
+                                        </TableBody>
+                                    </Table>
+                                </Box>
+                            )}
+
                         </CardContent>
                     </Card>
                 </Stack>

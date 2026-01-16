@@ -34,12 +34,17 @@
         background-color: #EEF4F7;
       }
       
-      &.active, &:focus {
+      &.active {
         background-color: #4472B8;
         color: white;
         svg{
             color: #fff;
         }
+      }
+
+      &:focus-visible {
+        outline: 2px solid #4472B8;
+        outline-offset: 2px;
       }
 
       svg{

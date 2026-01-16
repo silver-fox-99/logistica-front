@@ -39,6 +39,7 @@ export type AdminUserPatch = Partial<{
     last_login_at: string | null;
     meta: Record<string, any>;
     deleted_at: string | null;
+    type: string | null;
 }>;
 
 export const adminUserApi = {

@@ -41,16 +41,16 @@ type NavItemConfig = {
 };
 
 const NAV_ITEMS: NavItemConfig[] = [
-    { to: "/admin", icon: <FiBarChart2 />, label: "Overview", end: true },
-    { to: "/admin/users", icon: <FiUsers />, label: "Users" },
-    { to: "/admin/cargo", icon: <FiPackage />, label: "Cargo" },
-    { to: "/admin/transport", icon: <FaTruck />, label: "Transport" },
-    { to: "/admin/geo", icon: <BsGeoAltFill />, label: "Geo locations" },
-    { to: "/admin/initial-data", icon: <FiDatabase />, label: "Reference data" },
-    { to: "/admin/black-list", icon: <FiShield />, label: "Blacklist" },
-    { to: "/admin/reviews", icon: <MdRateReview />, label: "Reviews" },
-    { to: "/admin/activity-logs", icon: <FiSettings />, label: "Activity logs" },
-    { to: "/admin/tariffs/plans", icon: <TbPremiumRights />, label: "Tariff plans" },
+    { to: "/admin", icon: <FiBarChart2 />, label: "Обзор", end: true },
+    { to: "/admin/users", icon: <FiUsers />, label: "Пользователи" },
+    { to: "/admin/cargo", icon: <FiPackage />, label: "Грузы" },
+    { to: "/admin/transport", icon: <FaTruck />, label: "Транспорт" },
+    { to: "/admin/geo", icon: <BsGeoAltFill />, label: "Геолокации" },
+    { to: "/admin/initial-data", icon: <FiDatabase />, label: "Справочники" },
+    { to: "/admin/black-list", icon: <FiShield />, label: "Черный список" },
+    { to: "/admin/reviews", icon: <MdRateReview />, label: "Отзывы" },
+    { to: "/admin/activity-logs", icon: <FiSettings />, label: "Журнал активности" },
+    { to: "/admin/tariffs/plans", icon: <TbPremiumRights />, label: "Тарифы" },
 ];
 
 function NavItem(props: {
@@ -142,13 +142,17 @@ export default function AdminLayout() {
             <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
                 {!collapsed && (
                     <Typography variant="subtitle2" fontWeight={800} sx={{ whiteSpace: "nowrap" }}>
-                        Admin panel
+                        Админ-панель
                     </Typography>
                 )}
 
                 <Box sx={{ flexGrow: 1 }} />
 
-                <IconButton onClick={toggleCollapsed} size="small" title="Toggle sidebar">
+                <IconButton
+                    onClick={toggleCollapsed}
+                    size="small"
+                    title={collapsed ? "Развернуть меню" : "Свернуть меню"}
+                >
                     {collapsed ? <FiChevronLeft /> : <FiChevronRight />}
                 </IconButton>
             </Box>
@@ -197,7 +201,7 @@ export default function AdminLayout() {
             >
                 <Toolbar sx={{ px: { xs: 2, md: 3 } }}>
                     <Typography variant="h6" fontWeight={800}>
-                        Admin panel
+                        Админ-панель
                     </Typography>
 
                     <Box sx={{ flexGrow: 1 }} />
@@ -205,14 +209,14 @@ export default function AdminLayout() {
                     {isDesktop && (
                         <IconButton
                             onClick={toggleCollapsed}
-                            title={collapsed ? "Expand navigation" : "Collapse navigation"}
+                            title={collapsed ? "Развернуть меню" : "Свернуть меню"}
                             sx={{ mr: 1 }}
                         >
                             {collapsed ? <FiChevronLeft /> : <FiChevronRight />}
                         </IconButton>
                     )}
 
-                    <IconButton component={NavLink} to="/dashboard" title="Back to dashboard">
+                    <IconButton component={NavLink} to="/dashboard" title="Назад в кабинет">
                         <FiHome />
                     </IconButton>
                 </Toolbar>

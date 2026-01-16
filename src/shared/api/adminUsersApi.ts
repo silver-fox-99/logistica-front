@@ -28,7 +28,7 @@ export type AdminUser = {
     updated_at: string;
     deleted_at: string | null;
     binotel_id: string | null;
-    type?: string | null
+    type?: string | null;
 };
 
 export type AdminUsersResponse = {
@@ -49,5 +49,14 @@ export const adminUsersApi = {
     list: async (params: AdminUsersQuery) => {
         const { data } = await api.get<AdminUsersResponse>("/users", { params });
         return data.data;
+    },
+
+    impersonate: async (id: string, reason?: string): Promise<{ accessToken: string; refreshToken: string }> => {
+        const { data } = await api.post(`/users/${id}/impersonate`, { reason });
+        const payload = (data as any)?.data ?? data ?? {};
+        return {
+            accessToken: payload?.accessToken ?? payload?.access_token ?? "",
+            refreshToken: payload?.refreshToken ?? payload?.refresh_token ?? "",
+        };
     },
 };

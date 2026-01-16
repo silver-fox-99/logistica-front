@@ -1,7 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import { Alert, Chip, Container, Stack, Typography, Button } from "@mui/material";
-import { FiArrowLeft, FiShield, FiUser } from "react-icons/fi";
+import { FiArrowLeft, FiShield, FiUser, FiLogIn } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { useAdminUser } from "@/features/admin/admin-user/model/useAdminUser";
 import { GeneralInfoForm } from "@/features/admin/admin-user/ui/GeneralInfoForm";
 import { PasswordForm } from "@/features/admin/admin-user/ui/PasswordForm";
@@ -12,11 +14,43 @@ import { SessionsCard } from "@/features/admin/admin-user/ui/SessionsCard";
 import { DangerZoneCard } from "@/features/admin/admin-user/ui/DangerZoneCard";
 import {CrmIntegrationCard} from "@/features/admin/admin-user/ui/CrmIntegrationCard.tsx";
 import TariffCard from "@/widgets/admin/users/TariffCard";
+import UserInvoices from "@/widgets/admin/users/UserInvoices";
+import { adminUsersApi } from "@/shared/api/adminUsersApi";
+import { authApi } from "@/shared/api/authApi";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 export default function AdminUserPage() {
     const { id = "" } = useParams();
     const navigate = useNavigate();
     const { user, sessions, loading, err, setUser } = useAdminUser(id);
+    const setCurrentUser = useUserStore((s) => s.setUser);
+    const [impersonating, setImpersonating] = useState(false);
+
+    const handleImpersonate = async () => {
+        if (!id) return;
+        setImpersonating(true);
+        try {
+            const tokens = await adminUsersApi.impersonate(id, "Admin impersonation");
+
+            if (tokens.accessToken) localStorage.setItem("accessToken", tokens.accessToken);
+            if (tokens.refreshToken) localStorage.setItem("refreshToken", tokens.refreshToken);
+
+            try {
+                const me = await authApi.getMe();
+                if (me?.data) setCurrentUser(me.data);
+            } catch (error) {
+                console.error(error);
+            }
+
+            toast.success("Вы вошли под пользователем");
+            navigate("/dashboard/profile");
+        } catch (e: any) {
+            const message = e?.response?.data?.message ?? "Не удалось выполнить вход под пользователем";
+            toast.error(message);
+        } finally {
+            setImpersonating(false);
+        }
+    };
 
     if (loading) return <Container><Typography color="text.secondary">Загрузка…</Typography></Container>;
     if (!user)   return <Container><Alert severity="error">{err ?? " Пользователь не найден"}</Alert></Container>;
@@ -33,10 +67,21 @@ export default function AdminUserPage() {
                         <Chip size="small" label={user.status}
                               color={user.status === "ACTIVE" ? "success" : "default"}
                               variant={user.status === "ACTIVE" ? "filled" : "outlined"} />
+                        {user.type && <Chip size="small" label={user.type} />}
                     </Stack>
-                    <Button variant="outlined" startIcon={<FiArrowLeft/>} onClick={() => navigate("/admin/users")}>
-                        Назад к списку
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                        <Button
+                            variant="contained"
+                            startIcon={<FiLogIn />}
+                            onClick={handleImpersonate}
+                            disabled={impersonating}
+                        >
+                            Войти
+                        </Button>
+                        <Button variant="outlined" startIcon={<FiArrowLeft/>} onClick={() => navigate("/admin/users")}>
+                            Назад к списку
+                        </Button>
+                    </Stack>
                 </Stack>
 
                 <Grid container spacing={2}>
@@ -66,6 +111,10 @@ export default function AdminUserPage() {
 
                     <Grid size={{ xs: 12 }}>
                         <TariffCard userId={id} />
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                        <UserInvoices userId={id} />
                     </Grid>
 
                     <Grid size={{ xs: 12 }}>

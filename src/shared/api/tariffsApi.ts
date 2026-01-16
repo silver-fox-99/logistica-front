@@ -131,6 +131,26 @@ export type TariffsInitData = {
     element_key?: TariffsInitDictItem[];
 };
 
+export type TariffInvoice = {
+    id: string;
+    user_id?: string;
+    plan_id?: string;
+    plan_name?: string;
+    plan_code?: string;
+    currency?: string;
+    subscription_id?: string;
+    invoice_id?: string;
+    provider?: string;
+    provider_uuid?: string;
+    status?: string;
+    provider_status?: string;
+    amount?: string | number | null;
+    checkout_url?: string | null;
+    short_link?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+};
+
 const normalizePlan = (raw: any): TariffPlan => ({
     id: raw?.id ?? "",
     code: raw?.code ?? "",
@@ -400,6 +420,23 @@ export const tariffsApi = {
         return payloadData;
     },
 
+    async adminListInvoices(userId: string) {
+        const { data } = await api.get<any>(`/admin/tariffs/invoices/${userId}/list`);
+        const payload = (data as any)?.data ?? data ?? {};
+        const itemsRaw = payload?.items ?? [];
+        const items = Array.isArray(itemsRaw) ? (itemsRaw as any[] as TariffInvoice[]) : [];
+        const total = payload?.total ?? items.length;
+        const limit = payload?.limit ?? items.length;
+        const offset = payload?.offset ?? 0;
+        return { items, total, limit, offset };
+    },
+
+    async adminDeleteInvoice(id: string) {
+        const { data } = await api.delete<any>(`/admin/tariffs/invoices/${id}`);
+        const payload = (data as any)?.data ?? data ?? {};
+        return payload;
+    },
+
     async listPublicPlans(params?: TariffPlansQuery) {
         const { data } = await api.get<any>("/tariff-plans", { params });
         const payload = (data as any)?.data ?? data ?? {};
@@ -421,6 +458,17 @@ export const tariffsApi = {
         const payload = (data as any)?.data ?? data ?? {};
         const itemsRaw = payload?.items ?? [];
         const items = Array.isArray(itemsRaw) ? itemsRaw.map(normalizeSubscription) : [];
+        const total = payload?.total ?? items.length;
+        const limit = payload?.limit ?? items.length;
+        const offset = payload?.offset ?? 0;
+        return { items, total, limit, offset };
+    },
+
+    async listMyInvoices() {
+        const { data } = await api.get<any>("/tariffs/invoices");
+        const payload = (data as any)?.data ?? data ?? {};
+        const itemsRaw = payload?.items ?? [];
+        const items = Array.isArray(itemsRaw) ? (itemsRaw as any[] as TariffInvoice[]) : [];
         const total = payload?.total ?? items.length;
         const limit = payload?.limit ?? items.length;
         const offset = payload?.offset ?? 0;

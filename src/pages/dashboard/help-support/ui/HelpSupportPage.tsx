@@ -118,7 +118,10 @@ export default function HelpSupportPage() {
                                 </Typography>
                                 <Stack spacing={1.25}>
                                     <Box
-                                        onClick={() => navigate("/dashboard/help/getting-started")}
+                                        component="a"
+                                        href="/introduction.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         sx={{
                                             p: 1.5,
                                             borderRadius: 2,
@@ -130,6 +133,8 @@ export default function HelpSupportPage() {
                                             alignItems: "flex-start",
                                             cursor: "pointer",
                                             transition: "all 0.2s ease",
+                                            textDecoration: "none",
+                                            color: "inherit",
                                             "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" },
                                         }}
                                     >
@@ -143,7 +148,10 @@ export default function HelpSupportPage() {
                                     </Box>
 
                                     <Box
-                                        onClick={() => navigate("/dashboard/help/account-security")}
+                                        component="a"
+                                        href="/account-security.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         sx={{
                                             p: 1.5,
                                             borderRadius: 2,
@@ -155,6 +163,8 @@ export default function HelpSupportPage() {
                                             alignItems: "flex-start",
                                             cursor: "pointer",
                                             transition: "all 0.2s ease",
+                                            textDecoration: "none",
+                                            color: "inherit",
                                             "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" },
                                         }}
                                     >
@@ -168,7 +178,10 @@ export default function HelpSupportPage() {
                                     </Box>
 
                                     <Box
-                                        onClick={() => navigate("/dashboard/help/billing")}
+                                        component="a"
+                                        href="/payments-billing.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         sx={{
                                             p: 1.5,
                                             borderRadius: 2,
@@ -180,6 +193,8 @@ export default function HelpSupportPage() {
                                             alignItems: "flex-start",
                                             cursor: "pointer",
                                             transition: "all 0.2s ease",
+                                            textDecoration: "none",
+                                            color: "inherit",
                                             "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" },
                                         }}
                                     >
