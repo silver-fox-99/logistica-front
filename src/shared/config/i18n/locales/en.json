@@ -761,5 +761,10 @@
   "language": "Language",
   "english": "English",
   "russian": "Russian",
-  "uzbek": "Uzbek"
+  "uzbek": "Uzbek",
+  "apiErrors": {
+    "MONTHLY_CREATED": "Monthly creation limit reached. Please try again later or upgrade your plan.",
+    "FREE_PLAN": "Free plan cannot be paid. Please select a paid plan to continue.",
+    "DAILY_LIMIT": "Daily limit exceeded. Try again tomorrow or contact support."
+  }
 }

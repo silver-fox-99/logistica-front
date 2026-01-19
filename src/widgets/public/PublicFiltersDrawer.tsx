@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-    Drawer, Box, Stack, Typography, Divider, TextField, Button, FormControlLabel, Switch
+    Drawer, Box, Stack, Typography, Divider, TextField, Button, FormControlLabel, Switch,
+    type InputBaseComponentProps
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { FiFilter, FiRefreshCw } from "react-icons/fi";
@@ -117,10 +118,12 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     useEffect(() => { ensureCities(f.pickup_country, f.pickup_region); }, [ensureCities, f.pickup_country, f.pickup_region]);
     useEffect(() => { ensureCities(f.dropoff_country, f.dropoff_region); }, [ensureCities, f.dropoff_country, f.dropoff_region]);
 
+    const digitsOnly = (v: string) => v.replace(/\D/g, "");
     const setNum = (key: keyof PublicFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        const raw = e.target.value;
+        const raw = digitsOnly(e.target.value);
         setF(v => ({ ...v, [key]: raw === "" ? undefined : Number(raw) }));
     };
+    const numericInputProps: InputBaseComponentProps = { inputMode: "numeric", pattern: "[0-9]*" };
 
     const onReset = () => setF({
         pickup_date_from: getTodayDate(),
@@ -316,18 +319,18 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                 {/* WEIGHT */}
                 <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.weight')}</Typography>
                 <Stack direction="row" gap={1.2}>
-                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.min')} inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="text" label={t('shipments.filters.min')} inputProps={numericInputProps}
                                value={f.weight_min ?? ""} onChange={setNum("weight_min")}/>
-                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.max')} inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="text" label={t('shipments.filters.max')} inputProps={numericInputProps}
                                value={f.weight_max ?? ""} onChange={setNum("weight_max")}/>
                 </Stack>
 
                 {/* VOLUME */}
                 <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>{t('shipments.filters.volume')}</Typography>
                 <Stack direction="row" gap={1.2}>
-                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.min')} inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="text" label={t('shipments.filters.min')} inputProps={numericInputProps}
                                value={f.volume_min ?? ""} onChange={setNum("volume_min")}/>
-                    <TextField fullWidth size="small" type="number" label={t('shipments.filters.max')} inputProps={{ step: "0.001", min: 0 }}
+                    <TextField fullWidth size="small" type="text" label={t('shipments.filters.max')} inputProps={numericInputProps}
                                value={f.volume_max ?? ""} onChange={setNum("volume_max")}/>
                 </Stack>
 

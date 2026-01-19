@@ -77,10 +77,11 @@ function ActivityFiltersBar({
                 <TextField
                     size="small"
                     placeholder="Статус"
-                    type="number"
+                    type="text"
+                    inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                     value={filters.statusCode ?? ""}
                     onChange={(e) => {
-                        const v = e.target.value;
+                        const v = e.target.value.replace(/\D/g, "");
                         setFilters((f) => ({ ...f, statusCode: v === "" ? "" : Number(v) }));
                     }}
                     sx={{ width: 120 }}

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {useUserStore} from "@/entities/user/model/user.store.ts";
+import i18n from "@/app/providers/i18n/i18n";
 
 
 const api = axios.create({
@@ -44,7 +45,21 @@ api.interceptors.response.use(
 
         return response;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+        try {
+            const code = error?.response?.data?.code;
+            const serverMessage = error?.response?.data?.message;
+            if (code) {
+                const translated = i18n.t(`apiErrors.${code}`, serverMessage);
+                if (translated) {
+                    error.response.data.message = translated;
+                }
+            }
+        } catch {
+            // ignore translation issues
+        }
+        return Promise.reject(error);
+    }
 );
 
 export default api;

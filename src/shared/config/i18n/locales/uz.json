@@ -763,5 +763,10 @@
   "language": "Til",
   "english": "Inglizcha",
   "russian": "Ruscha",
-  "uzbek": "O'zbekcha"
+  "uzbek": "O'zbekcha",
+  "apiErrors": {
+    "MONTHLY_CREATED": "Oylik yaratish limiti tugadi. Keyinroq urinib ko‘ring yoki tarifni yangilang.",
+    "FREE_PLAN": "Bepul tarifni to‘lash mumkin emas. Davom etish uchun pullik tarifni tanlang.",
+    "DAILY_LIMIT": "Kunlik limit oshib ketdi. Ertaga urinib ko‘ring yoki qo‘llab-quvvatlashga murojaat qiling."
+  }
 }

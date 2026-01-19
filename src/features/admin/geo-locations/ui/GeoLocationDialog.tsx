@@ -179,13 +179,13 @@ export default function GeoLocationDialog({
                             <TextField
                                 size="small"
                                 label="Порядок сортировки"
-                                type="number"
+                                type="text"
+                                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                                 value={order}
                                 onChange={(e) => {
-                                    const val = e.target.value;
+                                    const val = e.target.value.replace(/\D/g, "");
                                     setOrder(val === "" ? "" : parseInt(val, 10));
                                 }}
-                                inputProps={{ min: 0 }}
                                 helperText="Меньшее значение = выше в списке (например, 0 для Узбекистана)"
                             />
                             <FormControl size="small">

@@ -237,7 +237,8 @@ export function EditEntitlementsDialog({
                             />
                         ) : (
                             <TextField
-                                type="number"
+                                type="text"
+                                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                                 placeholder="Без ограничений"
                                 value={
                                     entitlementsState?.[ent.key] === null ||
@@ -246,7 +247,10 @@ export function EditEntitlementsDialog({
                                         : (entitlementsState?.[ent.key] as number | string)
                                 }
                                 onChange={(e) =>
-                                    updateEntitlement(ent.key, e.target.value === "" ? null : Number(e.target.value))
+                                    updateEntitlement(
+                                        ent.key,
+                                        e.target.value === "" ? null : Number(e.target.value.replace(/\D/g, ""))
+                                    )
                                 }
                                 sx={{ maxWidth: 240 }}
                             />

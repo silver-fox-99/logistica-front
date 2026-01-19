@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
     Box, Paper, Stack, Typography, TextField, Button, Divider, FormControl,
-    Checkbox, FormControlLabel, Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, InputAdornment
+    Checkbox, FormControlLabel, Select, MenuItem, Autocomplete, InputLabel, OutlinedInput, InputAdornment,
+    type InputBaseComponentProps
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { toast } from "react-toastify";
@@ -233,7 +234,12 @@ export default function AddCargoPage() {
     const setField = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
         setForm((s) => ({ ...s, [key]: value }));
 
-    const num = (v: string) => (v === "" ? undefined : Number(v));
+    const sanitizeDigits = (v: string) => v.replace(/\D/g, "");
+    const num = (v: string) => {
+        const cleaned = sanitizeDigits(v);
+        return cleaned === "" ? undefined : Number(cleaned);
+    };
+    const numericInputProps: InputBaseComponentProps = { inputMode: "numeric", pattern: "[0-9]*" };
 
     const updatePickup = (idx: number, p: Place) =>
         setField("pickups", form.pickups.map((x, i) => (i === idx ? p : x)));
@@ -341,6 +347,16 @@ export default function AddCargoPage() {
 
     const navigate = useNavigate();
 
+    const getErrorMessage = (error: any) => {
+        const code = error?.response?.data?.code;
+        const serverMessage = error?.response?.data?.message;
+        if (code) {
+            const translated = t(`apiErrors.${code}`, serverMessage);
+            if (translated) return translated;
+        }
+        return serverMessage || t('addCargo.errorMessage');
+    };
+
     const onSubmit = async (ev: React.FormEvent) => {
         ev.preventDefault();
         if (!validate()) {
@@ -353,8 +369,7 @@ export default function AddCargoPage() {
             toast.success(t('addCargo.successMessage'));
             navigate("/dashboard/requests");
         } catch (error: any) {
-            const message = error?.response?.data?.message || t('addCargo.errorMessage');
-            toast.error(message);
+            toast.error(getErrorMessage(error));
         }
     };
 
@@ -557,31 +572,35 @@ export default function AddCargoPage() {
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.weightTons')}</Typography>
                                         <TextField
-                                            type="number" 
+                                            type="text"
                                             fullWidth
                                             placeholder={t('addCargo.fields.weightPlaceholder')}
+                                            inputProps={numericInputProps}
                                             value={form.weightTons ?? ""} 
                                             onChange={(e) => setField("weightTons", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label={t('addCargo.fields.volume')} type="number" fullWidth placeholder={t('addCargo.fields.volumePlaceholder')}
+                                            label={t('addCargo.fields.volume')} type="text" fullWidth placeholder={t('addCargo.fields.volumePlaceholder')}
+                                            inputProps={numericInputProps}
                                             value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label={t('addCargo.fields.vehiclesCount')} type="number" fullWidth placeholder={t('addCargo.fields.vehiclesCountPlaceholder')}
+                                            label={t('addCargo.fields.vehiclesCount')} type="text" fullWidth placeholder={t('addCargo.fields.vehiclesCountPlaceholder')}
+                                            inputProps={numericInputProps}
                                             value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.palletsCount')}</Typography>
                                         <TextField
-                                            type="number" 
+                                            type="text" 
                                             fullWidth
                                             placeholder={t('addCargo.fields.palletsCountPlaceholder')}
+                                            inputProps={numericInputProps}
                                             value={form.palletsCount ?? ""} 
                                             onChange={(e) => setField("palletsCount", num(e.target.value))}
                                         />
@@ -592,20 +611,23 @@ export default function AddCargoPage() {
                                         <Grid container spacing={1}>
                                             <Grid size={{ xs:12, lg:4 }}>
                                                 <TextField
-                                                    type="number" placeholder={t('addCargo.fields.length')} fullWidth
+                                                    type="text" placeholder={t('addCargo.fields.length')} fullWidth
+                                                    inputProps={numericInputProps}
                                                     value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
                                                     error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
                                                 />
                                             </Grid>
                                             <Grid size={{ xs:12, lg:4 }}>
                                                 <TextField
-                                                    type="number" placeholder={t('addCargo.fields.width')} fullWidth
+                                                    type="text" placeholder={t('addCargo.fields.width')} fullWidth
+                                                    inputProps={numericInputProps}
                                                     value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
                                                 />
                                             </Grid>
                                             <Grid size={{ xs:12, lg:4 }}>
                                                 <TextField
-                                                    type="number" placeholder={t('addCargo.fields.height')} fullWidth
+                                                    type="text" placeholder={t('addCargo.fields.height')} fullWidth
+                                                    inputProps={numericInputProps}
                                                     value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
                                                 />
                                             </Grid>
@@ -623,7 +645,8 @@ export default function AddCargoPage() {
                                                 label={t('addCargo.fields.price')}
                                                 value={form.price ?? ""}
                                                 onChange={(e) => setField("price", num(e.target.value))}
-                                                type="number"
+                                                type="text"
+                                                inputProps={numericInputProps}
                                                 className="price-input-field"
                                                 startAdornment={
                                                     <InputAdornment position="start" sx={{ mr: 1 }}>
@@ -963,23 +986,26 @@ export default function AddCargoPage() {
                         <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.weightTons')}</Typography>
                             <TextField
-                                    type="number" 
+                                    type="text" 
                                     fullWidth
                                     placeholder={t('addCargo.fields.weightPlaceholder')}
+                                    inputProps={numericInputProps}
                                     value={form.weightTons ?? ""} 
                                     onChange={(e) => setField("weightTons", num(e.target.value))}
                             />
                         </Grid>
                         <Grid size={{ xs:12, sm:6 }}>
                             <TextField
-                                    label={t('addCargo.fields.volume')} type="number" fullWidth placeholder={t('addCargo.fields.volumePlaceholder')}
+                                    label={t('addCargo.fields.volume')} type="text" fullWidth placeholder={t('addCargo.fields.volumePlaceholder')}
+                                inputProps={numericInputProps}
                                 value={form.volumeM3 ?? ""} onChange={(e) => setField("volumeM3", num(e.target.value))}
                             />
                         </Grid>
 
                         <Grid size={{ xs:12, sm:6 }}>
                             <TextField
-                                    label={t('addCargo.fields.vehiclesCount')} type="number" fullWidth placeholder={t('addCargo.fields.vehiclesCountPlaceholder')}
+                                    label={t('addCargo.fields.vehiclesCount')} type="text" fullWidth placeholder={t('addCargo.fields.vehiclesCountPlaceholder')}
+                                inputProps={numericInputProps}
                                 value={form.vehiclesCount ?? ""} onChange={(e) => setField("vehiclesCount", num(e.target.value))}
                             />
                         </Grid>
@@ -987,9 +1013,10 @@ export default function AddCargoPage() {
                         <Grid size={{ xs:12, sm:6 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.palletsCount')}</Typography>
                             <TextField
-                                    type="number" 
+                                    type="text" 
                                     fullWidth
                                     placeholder={t('addCargo.fields.palletsCountPlaceholder')}
+                                    inputProps={numericInputProps}
                                     value={form.palletsCount ?? ""} 
                                     onChange={(e) => setField("palletsCount", num(e.target.value))}
                             />
@@ -998,7 +1025,8 @@ export default function AddCargoPage() {
                         <Grid size={{ xs:12, sm:6 }}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.length')}</Typography>
                             <TextField
-                                type="number" placeholder={t('addCargo.fields.length')} fullWidth
+                                type="text" placeholder={t('addCargo.fields.length')} fullWidth
+                                inputProps={numericInputProps}
                                 value={form.dims.length ?? ""} onChange={(e) => setField("dims", { ...form.dims, length: num(e.target.value) })}
                                 error={!!errors.dims} helperText={errors.dims && "Fill all dimensions"}
                             />
@@ -1007,7 +1035,8 @@ export default function AddCargoPage() {
                         <Grid size={{ xs:12, sm:6 }}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.width')}</Typography>
                             <TextField
-                                type="number" placeholder={t('addCargo.fields.width')} fullWidth
+                                type="text" placeholder={t('addCargo.fields.width')} fullWidth
+                                inputProps={numericInputProps}
                                 value={form.dims.width ?? ""} onChange={(e) => setField("dims", { ...form.dims, width: num(e.target.value) })}
                             />
                         </Grid>
@@ -1015,7 +1044,8 @@ export default function AddCargoPage() {
                         <Grid size={{ xs:12, sm:6 }}>
                             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>{t('addCargo.fields.height')}</Typography>
                             <TextField
-                                type="number" placeholder={t('addCargo.fields.height')} fullWidth
+                                type="text" placeholder={t('addCargo.fields.height')} fullWidth
+                                inputProps={numericInputProps}
                                 value={form.dims.height ?? ""} onChange={(e) => setField("dims", { ...form.dims, height: num(e.target.value) })}
                             />
                         </Grid>
@@ -1031,7 +1061,8 @@ export default function AddCargoPage() {
                                         label={t('addCargo.fields.price')}
                                         value={form.price ?? ""}
                                         onChange={(e) => setField("price", num(e.target.value))}
-                                        type="number"
+                                        type="text"
+                                        inputProps={numericInputProps}
                                         className="price-input-field"
                                         startAdornment={
                                             <InputAdornment position="start" sx={{ mr: 1 }}>

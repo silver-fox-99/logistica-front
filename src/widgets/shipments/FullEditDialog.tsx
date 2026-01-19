@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     Stack, TextField, Button, FormControlLabel, Checkbox,
-    MenuItem, Select, InputLabel, FormControl, Divider, CircularProgress
+    MenuItem, Select, InputLabel, FormControl, Divider, CircularProgress,
+    type InputBaseComponentProps
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { toast } from "react-toastify";
@@ -232,9 +233,14 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         setTimeout(() => { hydratingRef.current = false; }, 0);
     }, [open, initial, countries, getRegions, ensureRegions, ensureCities, getCities]);
 
+    const numericKeys: Array<keyof typeof form> = ["palletsCount", "carsCount", "weightT", "volumeM3", "lengthM", "widthM", "heightM", "priceAmount"];
+    const sanitizeDigits = (v: string) => v.replace(/\D/g, "");
+    const numericInputProps: InputBaseComponentProps = { inputMode: "numeric", pattern: "[0-9]*" };
+
     // Каскады (если не гидратируем)
     const handleChange = (key: keyof typeof form) => (e: any) => {
-        const value = e?.target?.value;
+        const rawValue = e?.target?.value;
+        const value = numericKeys.includes(key) ? sanitizeDigits(rawValue || "") : rawValue;
         setForm(prev => {
             if (hydratingRef.current) return { ...prev, [key]: value };
             // каскад From
@@ -466,7 +472,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <TextField
                                             label={t('shipments.editDialog.palletsCount')}
-                                            type="number"
+                                            type="text"
+                                            inputProps={numericInputProps}
                                             value={form.palletsCount}
                                             onChange={handleChange("palletsCount")}
                                             fullWidth
@@ -481,7 +488,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <TextField
                                             label={t('shipments.editDialog.vehiclesCount')}
-                                            type="number"
+                                            type="text"
+                                            inputProps={numericInputProps}
                                             value={form.carsCount}
                                             onChange={handleChange("carsCount")}
                                             fullWidth
@@ -507,7 +515,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     label={t('shipments.editDialog.weight')}
-                                    type="number"
+                                    type="text"
+                                    inputProps={numericInputProps}
                                     value={form.weightT}
                                     onChange={handleChange("weightT")}
                                     fullWidth
@@ -516,7 +525,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     label={t('shipments.editDialog.volume')}
-                                    type="number"
+                                    type="text"
+                                    inputProps={numericInputProps}
                                     value={form.volumeM3}
                                     onChange={handleChange("volumeM3")}
                                     fullWidth
@@ -538,32 +548,35 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
                             {form.hasDimensions && (
                                 <>
-                                    <Grid size={{ xs: 12, md: 4 }}>
-                                        <TextField
-                                            label={t('shipments.editDialog.length')}
-                                            type="number"
-                                            value={form.lengthM}
-                                            onChange={handleChange("lengthM")}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid size={{ xs: 12, md: 4 }}>
-                                        <TextField
-                                            label={t('shipments.editDialog.width')}
-                                            type="number"
-                                            value={form.widthM}
-                                            onChange={handleChange("widthM")}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid size={{ xs: 12, md: 4 }}>
-                                        <TextField
-                                            label={t('shipments.editDialog.height')}
-                                            type="number"
-                                            value={form.heightM}
-                                            onChange={handleChange("heightM")}
-                                            fullWidth
-                                        />
+                                            <Grid size={{ xs: 12, md: 4 }}>
+                                                <TextField
+                                                    label={t('shipments.editDialog.length')}
+                                                    type="text"
+                                                    inputProps={numericInputProps}
+                                                    value={form.lengthM}
+                                                    onChange={handleChange("lengthM")}
+                                                    fullWidth
+                                                />
+                                            </Grid>
+                                            <Grid size={{ xs: 12, md: 4 }}>
+                                                <TextField
+                                                    label={t('shipments.editDialog.width')}
+                                                    type="text"
+                                                    inputProps={numericInputProps}
+                                                    value={form.widthM}
+                                                    onChange={handleChange("widthM")}
+                                                    fullWidth
+                                                />
+                                            </Grid>
+                                            <Grid size={{ xs: 12, md: 4 }}>
+                                                <TextField
+                                                    label={t('shipments.editDialog.height')}
+                                                    type="text"
+                                                    inputProps={numericInputProps}
+                                                    value={form.heightM}
+                                                    onChange={handleChange("heightM")}
+                                                    fullWidth
+                                                />
                                     </Grid>
                                 </>
                             )}
@@ -586,14 +599,15 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                 </FormControl>
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <TextField
-                                    label={t('shipments.editDialog.priceAmount')}
-                                    type="number"
-                                    value={form.priceAmount}
-                                    onChange={handleChange("priceAmount")}
-                                    fullWidth
-                                />
-                            </Grid>
+                                    <TextField
+                                        label={t('shipments.editDialog.priceAmount')}
+                                        type="text"
+                                        inputProps={numericInputProps}
+                                        value={form.priceAmount}
+                                        onChange={handleChange("priceAmount")}
+                                        fullWidth
+                                    />
+                                </Grid>
 
                             <Grid size={{ xs: 12 }}>
                                 <Divider sx={{ my: 0.5 }} />

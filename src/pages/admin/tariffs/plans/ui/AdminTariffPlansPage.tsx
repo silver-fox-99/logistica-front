@@ -162,9 +162,13 @@ function PlanDialog({
                     />
                     <TextField
                         label="Приоритет"
-                        type="number"
+                        type="text"
+                        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                         value={state.priority ?? ""}
-                        onChange={(e) => updateField("priority", e.target.value === "" ? null : Number(e.target.value))}
+                        onChange={(e) => {
+                            const v = e.target.value.replace(/\D/g, "");
+                            updateField("priority", v === "" ? null : Number(v));
+                        }}
                         sx={{ maxWidth: 160 }}
                     />
                 </Stack>
@@ -172,9 +176,10 @@ function PlanDialog({
                 <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
                     <TextField
                         label="Цена"
-                        type="number"
+                        type="text"
+                        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                         value={state.price_text ?? ""}
-                        onChange={(e) => updateField("price_text", e.target.value)}
+                        onChange={(e) => updateField("price_text", e.target.value.replace(/\D/g, ""))}
                         fullWidth
                     />
                     <TextField
@@ -233,7 +238,8 @@ function PlanDialog({
                                         />
                                     ) : (
                                         <TextField
-                                            type="number"
+                                            type="text"
+                                            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                                             placeholder="Без ограничений"
                                             value={
                                                 state.entitlements?.[ent.key] === null ||
@@ -244,7 +250,7 @@ function PlanDialog({
                                         onChange={(e) =>
                                             updateEntitlement(
                                                 ent.key,
-                                                e.target.value === "" ? null : Number(e.target.value)
+                                                e.target.value === "" ? null : Number(e.target.value.replace(/\D/g, ""))
                                             )
                                         }
                                         sx={{ maxWidth: 240 }}

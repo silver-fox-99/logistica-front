@@ -78,6 +78,8 @@ export default function ProfilePage() {
     const updateUser = async (values: ContactInfo & { phoneMainE164?: string; phoneAltE164?: string }) => {
         try {
             const preparedData = {
+                firstName: values.firstName?.trim() || undefined,
+                lastName: values.lastName?.trim() || undefined,
                 email: values.email,
                 phone: values.phoneMainE164,
                 meta: {
@@ -106,6 +108,8 @@ export default function ProfilePage() {
             />
             <ContactInfoCard
                 data={{
+                    firstName: user?.first_name || "",
+                    lastName: user?.last_name || "",
                     geo: user?.meta?.geo || '',
                     phoneMain: user?.phone || "",
                     phoneAlt: user?.meta?.phoneAlt || "",

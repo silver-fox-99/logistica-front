@@ -13,6 +13,8 @@ import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import { parsePhoneNumber } from "libphonenumber-js";
 
 export type ContactInfo = {
+    firstName?: string;
+    lastName?: string;
     phoneMain?: string;
     phoneAlt?: string;
     telegram?: string;
@@ -32,6 +34,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
     const { t } = useTranslation();
     
     const schema = z.object({
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
         phoneMain: z.string().optional().refine((v) => !v || matchIsValidTel(v), t('profile.validation.invalidPhone')),
         phoneAlt: z.string().optional().refine((v) => !v || matchIsValidTel(v), t('profile.validation.invalidPhone')),
         telegram: z.string().optional(),
@@ -43,6 +47,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
     const { control, register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
         defaultValues: {
+            firstName: data.firstName ?? "",
+            lastName: data.lastName ?? "",
             phoneMain: data.phoneMain ?? "",
             phoneAlt: data.phoneAlt ?? "",
             telegram: data.telegram ?? "",
@@ -55,6 +61,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
 
     useEffect(() => {
         reset({
+            firstName: data.firstName ?? "",
+            lastName: data.lastName ?? "",
             phoneMain: data.phoneMain ?? "",
             phoneAlt: data.phoneAlt ?? "",
             telegram: data.telegram ?? "",
@@ -105,6 +113,32 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
                     </Box>
 
                     <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Имя</Typography>
+                            <TextField
+                                placeholder="Ваше имя"
+                                fullWidth
+                                disabled={!editing}
+                                {...register("firstName")}
+                                error={!!errors.firstName}
+                                helperText={errors.firstName?.message}
+                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>Фамилия</Typography>
+                            <TextField
+                                placeholder="Ваша фамилия"
+                                fullWidth
+                                disabled={!editing}
+                                {...register("lastName")}
+                                error={!!errors.lastName}
+                                helperText={errors.lastName?.message}
+                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
+                            />
+                        </Grid>
+
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.phoneMain')}</Typography>
                             <Controller
