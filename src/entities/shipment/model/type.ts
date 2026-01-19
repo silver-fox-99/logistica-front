@@ -21,6 +21,7 @@ export type ShipmentRowData = {
     routeTo: string;
     distanceKm: number;
     dates: { from: string; to: string };
+    loadWindow?: { from: string; to: string };
     dims?: string;
     typeTags: string[];
     badges?: string[];
@@ -66,8 +67,9 @@ export type CargoApiItem = {
         city_ru?: string | null;
         city_uz?: string | null;
     }[];
-    date_from: string;
-    date_to: string;
+    date_from: string | string[];
+    date_to: string | string[];
+    pickup_dates?: string[];
     has_dimensions: boolean;
     length_m: string | number | null;
     width_m: string | number | null;

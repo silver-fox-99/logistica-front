@@ -488,11 +488,16 @@ export default function ShipmentRow({
                                 size="small"
                                 icon={<FiClock />}
                                 variant="outlined"
-                                label={
-                                    data.dates.to
-                                        ? `${formatDate(data.dates.from)} – ${formatDate(data.dates.to)}`
-                                        : formatDate(data.dates.from)
-                                }
+                                label={(() => {
+                                    const loadFrom = data.loadWindow?.from ?? data.dates.from;
+                                    const loadTo = data.loadWindow?.to ?? data.loadWindow?.from ?? data.dates.from;
+                                    const unload = data.dates.to;
+                                    const loadPart = data.loadWindow
+                                        ? `${t('shipments.shipmentCard.load')}: ${formatDate(loadFrom)} – ${formatDate(loadTo)}`
+                                        : `${t('shipments.shipmentCard.load')}: ${formatDate(loadFrom)}`;
+                                    const unloadPart = unload ? `${t('shipments.shipmentCard.unload')}: ${formatDate(unload)}` : "";
+                                    return unloadPart ? `${loadPart} / ${unloadPart}` : loadPart;
+                                })()}
                                 className="shipment-row__chip shipment-row__chip--dates"
                             />
 

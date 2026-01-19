@@ -52,6 +52,9 @@
     },
     "fields": {
       "dateFrom": "Yuklash ortish sanasi",
+      "dateFromStart": "Yuklash sanasi (dan)",
+      "dateFromEnd": "Yuklash sanasi (gacha)",
+      "datesRangeHint": "Yuklash kunlari soni: {{count}}",
       "dateTo": "Yuk tushirish sanasi",
       "countryLoad": "Yuklash Yuk ortuvchi davlat",
       "regionLoad": "Yuklash Yuk ortuvchi hudud",
@@ -107,6 +110,7 @@
     },
     "errors": {
       "required": "Majburiy",
+      "dateRangeOrder": "Yuklash yakun sanasi boshlanishidan oldin bo'lmasligi kerak",
       "selectCountryLoad": "Birinchi yuklash nuqtasi uchun kamida mamlakatni tanlang",
       "selectCountryUnload": "Birinchi tushirish nuqtasi uchun kamida mamlakatni tanlang",
       "selectCargoType": "Yuk turini tanlang",
@@ -427,6 +431,8 @@
       "contactInfo": "Aloqa ma'lumotlari",
       "additionalPhone": "Qo'shimcha telefon:",
       "orderDetails": "Buyurtma tafsilotlari",
+      "load": "Yuklash",
+      "unload": "Tushirish",
       "vehicleType": "Transport turi:",
       "cargoType": "Yuk turi:",
       "loadType": "Yuklash turi:",

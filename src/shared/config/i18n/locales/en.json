@@ -52,6 +52,9 @@
     },
     "fields": {
       "dateFrom": "Loading Date",
+      "dateFromStart": "Loading Date (from)",
+      "dateFromEnd": "Loading Date (to)",
+      "datesRangeHint": "Pickup window days: {{count}}",
       "dateTo": "Unloading Date",
       "countryLoad": "Loading Country",
       "regionLoad": "Loading Region",
@@ -107,6 +110,7 @@
     },
     "errors": {
       "required": "Required",
+      "dateRangeOrder": "Pickup end date must be after start date",
       "selectCountryLoad": "Select at least a country for the first pickup point",
       "selectCountryUnload": "Select at least a country for the first dropoff point",
       "selectCargoType": "Select cargo type",
@@ -427,6 +431,8 @@
       "contactInfo": "Contact Information",
       "additionalPhone": "Additional phone:",
       "orderDetails": "Order Details",
+      "load": "Pickup",
+      "unload": "Delivery",
       "vehicleType": "Vehicle Type:",
       "cargoType": "Cargo Type:",
       "loadType": "Loading Type:",

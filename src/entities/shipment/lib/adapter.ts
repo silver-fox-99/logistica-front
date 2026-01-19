@@ -28,6 +28,23 @@ const paymentMap: Record<string, "Cash" | "Bank" | "Card" | undefined> = {
     CARD: "Card",
 };
 
+const toDateArray = (raw: any): string[] => {
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (raw && typeof raw === "object") return Object.values(raw).filter(Boolean) as string[];
+    return raw ? [raw] : [];
+};
+
+const getMinMaxDate = (arr: string[]): { min?: string; max?: string } => {
+    if (!arr.length) return {};
+    const sorted = arr
+        .map((d) => new Date(d))
+        .filter((d) => !Number.isNaN(d.getTime()))
+        .sort((a, b) => a.getTime() - b.getTime());
+    if (!sorted.length) return {};
+    const toISO = (d: Date) => d.toISOString().split("T")[0];
+    return { min: toISO(sorted[0]), max: toISO(sorted[sorted.length - 1]) };
+};
+
 function asRouteString(p?: GeoPoint): string {
     if (!p) return "—";
     return [p.country, p.region, p.city].filter(Boolean).join(", ") || "—";
@@ -47,6 +64,21 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
 
     const dims = i.has_dimensions ? dimStr(i.length_m, i.width_m, i.height_m) : undefined;
     const name = [i.user?.first_name, i.user?.last_name].filter(Boolean).join(" ");
+    const dateFromArr = toDateArray(i.date_from);
+    const pickupDates = toDateArray((i as any).pickup_dates);
+    const loadDates = dateFromArr.length ? dateFromArr : pickupDates;
+
+    const unloadDates = toDateArray(i.date_to);
+
+    const loadRange = getMinMaxDate(loadDates);
+    const unloadRange = getMinMaxDate(unloadDates);
+
+    const loadWindow = (loadRange.min && loadRange.max && loadRange.min !== loadRange.max)
+        ? { from: loadRange.min, to: loadRange.max }
+        : undefined;
+
+    const datesFrom = loadWindow?.from ?? loadRange.min ?? dateFromArr[0] ?? (typeof i.date_from === "string" ? i.date_from : "");
+    const datesTo = unloadRange.max ?? loadWindow?.to ?? (typeof i.date_to === "string" ? i.date_to : loadRange.max ?? "");
 
     return {
         id: i.id,
@@ -59,7 +91,8 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
         points: pointsAll.length ? pointsAll : fallbackPoints,
 
         distanceKm: 0, // при необходимости посчитаешь позже
-        dates: { from: i.date_from, to: i.date_to },
+        dates: { from: datesFrom, to: datesTo },
+        loadWindow,
         dims,
         typeTags: tagsFromPayload(i),
         badges: undefined,

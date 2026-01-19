@@ -40,6 +40,7 @@ export type PublicFilters = {
 export type PublicShipmentBase = {
     id: string;
     dates: { from: string; to: string };
+    loadWindow?: { from: string; to: string };
     // краткое представление маршрута — пока без геокодинга (можно дополнить позже)
     routeFrom?: string;
     routeTo?: string;
@@ -56,8 +57,9 @@ export type PublicCargoApi = {
     id: string;
     user_id: string;
     images: string[];
-    date_from: string;
-    date_to: string;
+    date_from: string | string[];
+    date_to: string | string[];
+    pickup_dates?: string[];
     vehicle_type: string;
     load_type: string[];
     cargo_type: string;
@@ -87,8 +89,9 @@ export type PublicTransportApi = {
     id: string;
     user_id: string;
     images: string[];
-    date_from: string;
-    date_to: string;
+    date_from: string | string[];
+    date_to: string | string[];
+    pickup_dates?: string[];
     vehicle_type: string;
     cars_count: number;
     weight_t: string;

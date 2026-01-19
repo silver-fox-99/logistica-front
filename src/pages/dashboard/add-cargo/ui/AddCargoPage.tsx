@@ -28,6 +28,7 @@ type Dims = { length?: number; width?: number; height?: number };
 
 type FormValues = {
     dateFrom: string;
+    dateFromEnd: string;
     dateTo: string;
 
     pickups: Place[];
@@ -182,7 +183,7 @@ export default function AddCargoPage() {
     };
 
     const [form, setForm] = useState<FormValues>({
-        dateFrom: getTodayDate(), dateTo: "",
+        dateFrom: getTodayDate(), dateFromEnd: getTodayDate(), dateTo: "",
         pickups:  [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
         dropoffs: [{ countryId: undefined, regionId: undefined, cityId: undefined, address: "" }],
 
@@ -211,8 +212,6 @@ export default function AddCargoPage() {
 
     const currentCurrency = form.currency || currencyOpts[0]?.slug || "USD";
     const [errors, setErrors] = useState<Record<string, string>>({});
-
-
 
     const steps = [
         t('addCargo.steps.datesRoutes'),
@@ -252,7 +251,12 @@ export default function AddCargoPage() {
     /* ===== validation ===== */
     const validate = () => {
         const e: Record<string, string> = {};
-        if (form.dateFrom && form.dateTo && form.dateTo < form.dateFrom) e.dateTo = t('addCargo.errors.dateOrder');
+        if (!form.dateFrom) e.dateFrom = t('addCargo.errors.required');
+        if (!form.dateFromEnd) e.dateFromEnd = t('addCargo.errors.required');
+        if (form.dateFrom && form.dateFromEnd && form.dateFromEnd < form.dateFrom) {
+            e.dateFromEnd = t('addCargo.errors.dateRangeOrder');
+        }
+        if (form.dateFromEnd && form.dateTo && form.dateTo < form.dateFromEnd) e.dateTo = t('addCargo.errors.dateOrder');
 
         if (!form.pickups[0]?.countryId) e.pickups = t('addCargo.errors.selectCountryLoad');
         if (!form.dropoffs[0]?.countryId) e.dropoffs = t('addCargo.errors.selectCountryUnload');
@@ -289,8 +293,13 @@ export default function AddCargoPage() {
 
         const countryFromName = getName(firstPickup.countryId) || "Unknown";
 
+        const dateFromPayload =
+            v.dateFromEnd && v.dateFromEnd !== v.dateFrom
+                ? [v.dateFrom, v.dateFromEnd].filter(Boolean)
+                : (v.dateFrom ? v.dateFrom : "");
+
         return {
-            date_from: v.dateFrom || "",
+            date_from: dateFromPayload as CreateCargoDto["date_from"],
             date_to: v.dateTo || "",
 
             country_from: countryFromName,
@@ -428,9 +437,16 @@ export default function AddCargoPage() {
                     <Grid container spacing={2}>
                                     <Grid size={{ xs:12 }}>
                                         <TextField
-                                            label={t('addCargo.fields.dateFrom')} type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                            label={t('addCargo.fields.dateFromStart')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                             value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
                                             error={!!errors.dateFrom} helperText={errors.dateFrom}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs:12 }}>
+                                        <TextField
+                                            label={t('addCargo.fields.dateFromEnd')} type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                            value={form.dateFromEnd} onChange={(e) => setField("dateFromEnd", e.target.value)}
+                                            error={!!errors.dateFromEnd} helperText={errors.dateFromEnd}
                                         />
                                     </Grid>
                                     <Grid size={{ xs:12 }}>
@@ -832,14 +848,21 @@ export default function AddCargoPage() {
                 <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                     <Box component="form" noValidate onSubmit={onSubmit}>
                         <Grid container spacing={2}>
-                        <Grid size={{ xs:12, sm:6 }}>
+                        <Grid size={{ xs:12, sm:4 }}>
                             <TextField
-                                    label={t('addCargo.fields.dateFrom')} type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                    label={t('addCargo.fields.dateFromStart')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                 value={form.dateFrom} onChange={(e) => setField("dateFrom", e.target.value)}
                                 error={!!errors.dateFrom} helperText={errors.dateFrom}
                             />
                         </Grid>
-                        <Grid size={{ xs:12, sm:6 }}>
+                        <Grid size={{ xs:12, sm:4 }}>
+                            <TextField
+                                    label={t('addCargo.fields.dateFromEnd')} type="date" InputLabelProps={{ shrink: true }} fullWidth
+                                value={form.dateFromEnd} onChange={(e) => setField("dateFromEnd", e.target.value)}
+                                error={!!errors.dateFromEnd} helperText={errors.dateFromEnd}
+                            />
+                        </Grid>
+                        <Grid size={{ xs:12, sm:4 }}>
                             <TextField
                                     label={t('addCargo.fields.dateTo')} type="date" InputLabelProps={{ shrink: true }} fullWidth
                                 value={form.dateTo} onChange={(e) => setField("dateTo", e.target.value)}

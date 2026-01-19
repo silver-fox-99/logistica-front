@@ -52,6 +52,9 @@
     },
     "fields": {
       "dateFrom": "Дата загрузки",
+      "dateFromStart": "Дата загрузки (с)",
+      "dateFromEnd": "Дата загрузки (по)",
+      "datesRangeHint": "Будет отправлено дней: {{count}}",
       "dateTo": "Дата выгрузки",
       "countryLoad": "Страна загрузки",
       "regionLoad": "Регион загрузки",
@@ -194,6 +197,7 @@
     },
     "errors": {
       "required": "Обязательно",
+      "dateRangeOrder": "Окончание периода загрузки не может быть раньше начала",
       "selectCountryLoad": "Выберите хотя бы страну для первой точки загрузки",
       "selectCountryUnload": "Выберите хотя бы страну для первой точки разгрузки",
       "selectVehicleType": "Выберите тип транспорта",
@@ -427,6 +431,8 @@
       "contactInfo": "Контактная информация",
       "additionalPhone": "Доп. телефон:",
       "orderDetails": "Детали заказа",
+      "load": "Загрузка",
+      "unload": "Выгрузка",
       "vehicleType": "Тип автомобиля:",
       "cargoType": "Тип груза:",
       "loadType": "Тип загрузки:",
