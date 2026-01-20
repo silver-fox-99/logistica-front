@@ -20,8 +20,8 @@ export type ShipmentRowData = {
     routeFrom: string;
     routeTo: string;
     distanceKm: number;
-    dates: { from: string; to: string };
-    loadWindow?: { from: string; to: string };
+    dates: { from: string; to?: string };
+    loadWindow?: { from: string; to?: string };
     dims?: string;
     typeTags: string[];
     badges?: string[];

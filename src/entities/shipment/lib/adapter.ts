@@ -50,7 +50,7 @@ function asRouteString(p?: GeoPoint): string {
     return [p.country, p.region, p.city].filter(Boolean).join(", ") || "—";
 }
 
-export function adaptCargo(i: CargoApiItem): ShipmentRowData {
+export function adaptCargo(i: CargoApiItem): any {
     // Нормализуем массив points
     const pointsAll: GeoPoint[] = Array.isArray(i.points) ? i.points.slice() : [];
     const pickups = pointsAll.filter((p: any) => p?.type === "PICKUP");
@@ -68,17 +68,16 @@ export function adaptCargo(i: CargoApiItem): ShipmentRowData {
     const pickupDates = toDateArray((i as any).pickup_dates);
     const loadDates = dateFromArr.length ? dateFromArr : pickupDates;
 
-    const unloadDates = toDateArray(i.date_to);
+  //  const unloadDates = toDateArray(i.date_to);
 
     const loadRange = getMinMaxDate(loadDates);
-    const unloadRange = getMinMaxDate(unloadDates);
+  //  const unloadRange = getMinMaxDate(unloadDates);
 
-    const loadWindow = (loadRange.min && loadRange.max && loadRange.min !== loadRange.max)
-        ? { from: loadRange.min, to: loadRange.max }
-        : undefined;
+    const loadWindow = i.date_from?.length > 1 ? {from: i.date_from[0], to: i.date_from[1]}
+        : {from: i.date_from[0] || i.date_from, to: undefined};
 
     const datesFrom = loadWindow?.from ?? loadRange.min ?? dateFromArr[0] ?? (typeof i.date_from === "string" ? i.date_from : "");
-    const datesTo = unloadRange.max ?? loadWindow?.to ?? (typeof i.date_to === "string" ? i.date_to : loadRange.max ?? "");
+    const datesTo = i.date_to ?? "";
 
     return {
         id: i.id,
