@@ -271,7 +271,7 @@ function ListBody({
                allowPartialLoad: (editItem as any)?.allowPartialLoad ?? false,
                palletsCount: (editItem as any)?.palletsCount ?? null,
                // transport-only:
-               carsCount: (editItem as any)?.carsCount ?? (kind === "transport" ? 1 : null),
+               carsCount: (editItem as any)?.carsCount ?? null,
                bargain: (editItem as any)?.bargain ?? (kind === "transport" ? "ALLOWED" : null),
                weightT: editItem?.weightT ?? (editItem as any)?.weight_t ?? null,
                volumeM3: editItem?.volumeM3 ?? (editItem as any)?.volume_m3 ?? null,

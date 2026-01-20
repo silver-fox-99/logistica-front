@@ -114,7 +114,6 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
     const [filtersData, setFiltersData] = useState<null | { vehicle_types: VehicleTypeOpt[] }>(null);
     const [loadingFilters, setLoadingFilters] = useState(false);
-
     // Форма (без RHF): один объект состояния
     const [form, setForm] = useState(() => ({
         // common
@@ -138,7 +137,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         palletsCount: toStr(initial?.palletsCount),
 
         // transport only
-        carsCount: toStr(initial?.carsCount ?? (kind === "transport" ? 1 : "")),
+        carsCount: toStr(initial?.carsCount ?? ""),
         bargain: initial?.bargain || "ALLOWED",
 
         // geo ids (selects)
@@ -190,7 +189,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             cargoType: initial?.cargoType || "GENERAL",
             allowPartialLoad: toBool(initial?.allowPartialLoad, false),
             palletsCount: toStr(initial?.palletsCount),
-            carsCount: toStr(initial?.carsCount ?? (kind === "transport" ? 1 : "")),
+            carsCount: toStr(initial?.carsCount ?? ""),
             bargain: initial?.bargain || "ALLOWED",
             // geo ids не трогаем здесь — их ниже проставим по каталогам
         }));
@@ -336,6 +335,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
             payload.cargo_type = form.cargoType || "GENERAL";
             payload.allow_partial_load = !!form.allowPartialLoad;
             payload.pallets_count = toOptionalNumber(form.palletsCount);
+            payload.cars_count = toNumberOr(form.carsCount, 1);
         } else {
             payload.cars_count = toNumberOr(form.carsCount, 1);
             payload.bargain = form.bargain || "ALLOWED";
@@ -479,6 +479,16 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                             fullWidth
                                         />
                                     </Grid>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <TextField
+                                            label={t('shipments.editDialog.vehiclesCount')}
+                                            type="text"
+                                            inputProps={numericInputProps}
+                                            value={form.carsCount}
+                                            onChange={handleChange("carsCount")}
+                                            fullWidth
+                                        />
+                                    </Grid>
                                 </>
                             )}
 
@@ -577,6 +587,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                                     onChange={handleChange("heightM")}
                                                     fullWidth
                                                 />
+
                                     </Grid>
                                 </>
                             )}
