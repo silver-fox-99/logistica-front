@@ -18,7 +18,6 @@ import {PlansSection} from "@/widgets/payments-plans/ui/PlansSection.tsx";
 export default function PaymentsPage() {
     const { t } = useTranslation();
 
-    // держим актуального юзера
     useRefreshMe();
     const user = useUserStore((s) => s.user);
 

@@ -15,5 +15,5 @@ export const useRefreshMe = () => {
             }
         };
         void run();
-    }, [setUser]);
+    }, []);
 };
