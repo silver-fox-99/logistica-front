@@ -19,16 +19,16 @@ export type PublicPoint = {
 
 export type PublicFilters = {
     pickup_country?: string;
-    pickup_region?: string;
+    pickup_region?: string[];
     pickup_city?: string;
     dropoff_country?: string;
-    dropoff_region?: string;
+    dropoff_region?: string[];
     dropoff_city?: string;
     pickup_date_from?: string;
     pickup_date_to?: string;
     dropoff_date_from?: string;
     dropoff_date_to?: string;
-    vehicle_type?: string;
+    vehicle_type?: string[];
     q?: string;
     weight_min?: number;
     weight_max?: number;
