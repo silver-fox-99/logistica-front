@@ -73,8 +73,24 @@ export function adaptCargo(i: CargoApiItem): any {
     const loadRange = getMinMaxDate(loadDates);
   //  const unloadRange = getMinMaxDate(unloadDates);
 
-    const loadWindow = i.date_from?.length > 1 ? {from: i.date_from[0], to: i.date_from[1]}
-        : {from: i.date_from[0] || i.date_from, to: undefined};
+    const df = i.date_from;
+
+    const loadWindow = (() => {
+        if (!df) return { from: undefined, to: undefined };
+
+        if (Array.isArray(df)) {
+            const dates = df.filter(Boolean);
+
+            if (dates.length >= 2) return { from: dates[0], to: dates[1] };
+            if (dates.length === 1) return { from: dates[0], to: undefined  };
+
+            return { from: undefined, to: undefined };
+        }
+
+        return { from: df, to: undefined };
+    })();
+
+
 
     const datesFrom = loadWindow?.from ?? loadRange.min ?? dateFromArr[0] ?? (typeof i.date_from === "string" ? i.date_from : "");
     const datesTo = i.date_to ?? "";

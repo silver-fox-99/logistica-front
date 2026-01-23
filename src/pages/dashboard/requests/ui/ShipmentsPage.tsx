@@ -53,6 +53,7 @@ function ListBody({
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
     const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
+    console.log(items)
     const list = useMemo(() => items, [items]);
 
     useEffect(() => {
