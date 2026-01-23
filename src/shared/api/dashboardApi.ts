@@ -35,6 +35,18 @@ export type ApiEndpointStat = {
     errors: number;
 };
 
+export type InfoViewer = {
+    user_id: string | null;
+    phone: string | null;
+    email: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    cargo_views: number;
+    transport_views: number;
+    total_views: number;
+    last_view_at: string;
+};
+
 export type DashboardResponse = {
     status: boolean;
     data: {
@@ -52,6 +64,7 @@ export type DashboardResponse = {
                 transport: { departure: TopCountry[]; arrival: TopCountry[] };
             };
             powerUsers: PowerUser[];
+            infoViewers: InfoViewer[];
         };
         api: { endpoints: ApiEndpointStat[] };
     };

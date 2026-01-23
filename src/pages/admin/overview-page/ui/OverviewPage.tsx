@@ -11,6 +11,7 @@ import TopCountriesTabs from "@/widgets/dashboard/TopCountriesTabs";
 import PowerUsersTable from "@/widgets/dashboard/PowerUsersTable";
 import RecentActivity from "@/widgets/dashboard/RecentActivity";
 import { FiTrendingUp, FiUsers, FiPackage, FiTruck } from "react-icons/fi";
+import TopInfoViewersTable from "@/widgets/dashboard/TopInfoViewersTable.tsx";
 
 export default function AdminOverviewPage() {
     const [range, setRange] = useState<Range>("30d");
@@ -99,6 +100,10 @@ export default function AdminOverviewPage() {
 
                         <Grid size={{ xs: 12 }}>
                             <PowerUsersTable rows={data?.top.powerUsers ?? []} />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <TopInfoViewersTable rows={data?.top.infoViewers ?? []} />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
