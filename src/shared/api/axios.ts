@@ -1,11 +1,17 @@
 import axios from 'axios';
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 import i18n from "@/app/providers/i18n/i18n";
+import qs from "qs";
 
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3080',
     withCredentials: false,
+    paramsSerializer: (params) =>
+        qs.stringify(params, {
+            arrayFormat: "repeat",
+            skipNulls: true,
+        }),
 });
 
 api.interceptors.request.use((config) => {
