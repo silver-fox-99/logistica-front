@@ -1,15 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { Box, Button, Checkbox, FormControlLabel, Grid, Stack, TextField, Typography } from "@mui/material";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
-import { Controller } from "react-hook-form";
 import type { AddCargoFormValues } from "../model/types";
 import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 import { PlaceRowField } from "./PlaceRowField";
 import { PriceField } from "./PriceField";
 import { onDigitsOnlyKeyDown, onDigitsOnlyPaste } from "@/shared/lib/numericInput";
-import {LookupAutocomplete} from "@/shared/ui/lookup/LookupAutocomplete.tsx";
-import { LookupMultiAutocomplete } from "@/shared/ui/lookup/LookupMultiAutocomplete";
+
+import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
+import { RHFLookupMultiAutocomplete } from "@/shared/ui/lookup/RHFLookupMultiAutocomplete";
+import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
 
 type Props = {
     t: (k: string) => string;
@@ -29,7 +31,7 @@ type Props = {
 
     getLocalizedLabel: (o: LookupOpt) => string;
 
-    geo: any; // ваш useGeoCascade, чтобы не тянуть типы сюда
+    geo: any;
     pickupCountryError?: string;
     dropoffCountryError?: string;
 };
@@ -60,7 +62,13 @@ export function AddCargoMobileForm({
     const { register, control, setValue, formState } = form;
 
     const steps = useMemo(
-        () => [t("addCargo.steps.datesRoutes"), t("addCargo.steps.cargoInfo"), t("addCargo.steps.dimensions"), t("addCargo.steps.payment"), t("addCargo.steps.contacts")],
+        () => [
+            t("addCargo.steps.datesRoutes"),
+            t("addCargo.steps.cargoInfo"),
+            t("addCargo.steps.dimensions"),
+            t("addCargo.steps.payment"),
+            t("addCargo.steps.contacts"),
+        ],
         [t]
     );
 
@@ -171,47 +179,38 @@ export function AddCargoMobileForm({
                 {activeStep === 1 && (
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            <LookupAutocomplete
+                            <RHFLookupAutocomplete<AddCargoFormValues>
                                 key={`cargoType-${i18nLang}`}
+                                control={control}
+                                name="cargoType"
                                 label={t("addCargo.fields.cargoType")}
                                 placeholder={t("addCargo.fields.selectCargoType")}
                                 options={cargoOpts}
-                                valueSlug={form.getValues("cargoType")}
-                                onChangeSlug={(slug) => setValue("cargoType", slug, { shouldDirty: true })}
                                 getOptionLabel={getLocalizedLabel}
-                                errorText={formState.errors.cargoType?.message as any}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <LookupAutocomplete
+                            <RHFLookupAutocomplete<AddCargoFormValues>
                                 key={`vehicleType-${i18nLang}`}
+                                control={control}
+                                name="vehicleType"
                                 label={t("addCargo.fields.vehicleType")}
                                 placeholder={t("addCargo.fields.selectVehicleType")}
                                 options={vehicleOpts}
-                                valueSlug={form.getValues("vehicleType")}
-                                onChangeSlug={(slug) => setValue("vehicleType", slug, { shouldDirty: true })}
                                 getOptionLabel={getLocalizedLabel}
-                                errorText={formState.errors.vehicleType?.message as any}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Controller
-                                name="loadType"
+                            <RHFLookupMultiAutocomplete<AddCargoFormValues>
+                                key={`loadType-${i18nLang}`}
                                 control={control}
-                                render={({ field, fieldState }) => (
-                                    <LookupMultiAutocomplete
-                                        key={`loadType-desktop-${i18nLang}`}
-                                        label={t("addCargo.fields.loadType")}
-                                        placeholder={t("addCargo.fields.selectLoadType")}
-                                        options={loadOpts}
-                                        valueSlugs={(field.value as string[] | undefined) ?? []}
-                                        onChangeSlugs={(slugs) => field.onChange(slugs)}
-                                        getOptionLabel={getLocalizedLabel}
-                                        errorText={(fieldState.error?.message as any) ?? undefined}
-                                    />
-                                )}
+                                name="loadType"
+                                label={t("addCargo.fields.loadType")}
+                                placeholder={t("addCargo.fields.selectLoadType")}
+                                options={loadOpts}
+                                getOptionLabel={getLocalizedLabel}
                             />
                         </Grid>
 
@@ -300,6 +299,7 @@ export function AddCargoMobileForm({
                                         onPaste={onDigitsOnlyPaste as any}
                                     />
                                 </Grid>
+
                                 <Grid size={{ xs: 12, lg: 4 }}>
                                     <TextField
                                         type="text"
@@ -310,6 +310,7 @@ export function AddCargoMobileForm({
                                         onPaste={onDigitsOnlyPaste as any}
                                     />
                                 </Grid>
+
                                 <Grid size={{ xs: 12, lg: 4 }}>
                                     <TextField
                                         type="text"
@@ -328,37 +329,30 @@ export function AddCargoMobileForm({
                 {activeStep === 3 && (
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            <PriceField
-                                control={control}
-                                label={t("addCargo.fields.price")}
-                                currencyOpts={currencyOpts}
-                                getLocalizedLabel={getLocalizedLabel}
-                            />
+                            <PriceField control={control} label={t("addCargo.fields.price")} currencyOpts={currencyOpts} getLocalizedLabel={getLocalizedLabel} />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <LookupAutocomplete
+                            <RHFLookupAutocomplete<AddCargoFormValues>
                                 key={`paymentMethod-${i18nLang}`}
+                                control={control}
+                                name="paymentMethod"
                                 label={t("addCargo.fields.paymentMethod")}
                                 placeholder={t("addCargo.fields.selectPaymentMethod")}
                                 options={payMethodOpts}
-                                valueSlug={form.getValues("paymentMethod")}
-                                onChangeSlug={(slug) => setValue("paymentMethod", slug, { shouldDirty: true })}
                                 getOptionLabel={getLocalizedLabel}
-                                errorText={formState.errors.paymentMethod?.message as any}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <LookupAutocomplete
+                            <RHFLookupAutocomplete<AddCargoFormValues>
                                 key={`paymentTerm-${i18nLang}`}
+                                control={control}
+                                name="paymentTerm"
                                 label={t("addCargo.fields.paymentTerm")}
                                 placeholder={t("addCargo.fields.selectPaymentTerm")}
                                 options={payTermOpts}
-                                valueSlug={form.getValues("paymentTerm")}
-                                onChangeSlug={(slug) => setValue("paymentTerm", slug, { shouldDirty: true })}
                                 getOptionLabel={getLocalizedLabel}
-                                errorText={formState.errors.paymentTerm?.message as any}
                             />
                         </Grid>
 
@@ -366,7 +360,7 @@ export function AddCargoMobileForm({
                             <Controller
                                 name="bargaining"
                                 control={control}
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <LookupAutocomplete
                                         label={t("addCargo.fields.bargaining")}
                                         placeholder={t("addCargo.fields.selectBargaining")}
@@ -374,9 +368,10 @@ export function AddCargoMobileForm({
                                             { slug: "possible", label: t("addCargo.fields.bargainingPossible") } as any,
                                             { slug: "none", label: t("addCargo.fields.bargainingNone") } as any,
                                         ]}
-                                        valueSlug={field.value}
+                                        valueSlug={(field.value as any) ?? ""}
                                         onChangeSlug={(slug) => field.onChange(slug)}
                                         getOptionLabel={(o: any) => o.label}
+                                        errorText={(fieldState.error?.message as any) ?? undefined}
                                     />
                                 )}
                             />
