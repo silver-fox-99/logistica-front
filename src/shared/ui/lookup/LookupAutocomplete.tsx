@@ -8,11 +8,10 @@ type Props = {
     options: LookupOpt[];
     valueSlug: string;
     onChangeSlug: (slug: string) => void;
+    getOptionLabel: (o: LookupOpt) => string;
     loading?: boolean;
     errorText?: string;
     disabled?: boolean;
-
-    getOptionLabel?: (o: LookupOpt) => string;
 };
 
 export const LookupAutocomplete = React.memo(function LookupAutocomplete({
@@ -21,10 +20,10 @@ export const LookupAutocomplete = React.memo(function LookupAutocomplete({
                                                                              options,
                                                                              valueSlug,
                                                                              onChangeSlug,
+                                                                             getOptionLabel,
                                                                              loading,
                                                                              errorText,
                                                                              disabled,
-                                                                             getOptionLabel,
                                                                          }: Props) {
     const bySlug = useMemo(() => new Map(options.map((o) => [o.slug, o])), [options]);
     const value = valueSlug ? bySlug.get(valueSlug) ?? null : null;
@@ -36,16 +35,16 @@ export const LookupAutocomplete = React.memo(function LookupAutocomplete({
             loading={!!loading}
             disabled={!!disabled}
             isOptionEqualToValue={(a, b) => a.slug === b.slug}
-            getOptionLabel={(o) => (getOptionLabel ? getOptionLabel(o) : (o.label ?? o.slug))}
+            getOptionLabel={(o) => getOptionLabel(o) || o.slug}
             onChange={(_, v) => onChangeSlug(v?.slug ?? "")}
             renderInput={(params) => (
                 <TextField
                     {...params}
+                    fullWidth
                     label={label}
                     placeholder={placeholder}
                     error={!!errorText}
                     helperText={errorText}
-                    fullWidth
                 />
             )}
         />
