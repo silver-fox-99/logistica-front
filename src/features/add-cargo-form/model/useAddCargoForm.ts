@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useForm, type FieldErrors, type UseFormRegisterReturn } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -97,7 +97,6 @@ export function useAddCargoForm() {
 
     const { register, setValue, getValues, setError, clearErrors, handleSubmit, control, formState } = form;
 
-    // set defaults from lookups ONCE
     useEffect(() => {
         if (!lookups || loadingInit) return;
 
@@ -109,14 +108,12 @@ export function useAddCargoForm() {
         if (!veh) setValue("vehicleType", lookups.vehicleType?.[0]?.slug ?? "", { shouldDirty: false });
         if (!car) setValue("cargoType", lookups.cargoTypes?.[0]?.slug ?? "", { shouldDirty: false });
 
-        // loadType default: empty
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lookups, loadingInit]);
 
     const registerDigits = useCallback(
         (name: keyof AddCargoFormValues | `dims.${"length" | "width" | "height"}`) => {
-            const r = register(name as any);
-            // IMPORTANT: не делаем setState — просто правим value в инпуте
+            const r:any = register(name as any);
             return {
                 ...r,
                 onChange: (e: any) => {
