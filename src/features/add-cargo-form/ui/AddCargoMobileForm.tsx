@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Box, Button, Checkbox, FormControlLabel, Grid, Stack, TextField, Typography } from "@mui/material";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import type { AddCargoFormValues } from "../model/types";
-import type { UseFormReturn } from "react-hook-form";
+import {type UseFormReturn, useWatch} from "react-hook-form";
 import { Controller } from "react-hook-form";
 
 import { PlaceRowField } from "./PlaceRowField";
@@ -71,6 +71,12 @@ export function AddCargoMobileForm({
         ],
         [t]
     );
+
+    const pickupCountryId = useWatch({ control, name: "pickups.0.countryId" });
+    const pickupRegionId  = useWatch({ control, name: "pickups.0.regionId" });
+
+    const dropoffCountryId = useWatch({ control, name: "dropoffs.0.countryId" });
+    const dropoffRegionId  = useWatch({ control, name: "dropoffs.0.regionId" });
 
     const handleNext = () => setActiveStep((p) => p + 1);
     const handleBack = () => setActiveStep((p) => p - 1);
@@ -142,11 +148,11 @@ export function AddCargoMobileForm({
                                     control={control}
                                     setValue={setValue}
                                     countries={geo.countries}
-                                    regions={geo.getRegions(form.getValues("pickups.0.countryId"))}
-                                    cities={geo.getCities(form.getValues("pickups.0.countryId"), form.getValues("pickups.0.regionId"))}
+                                    regions={geo.getRegions(pickupCountryId)}
+                                    cities={geo.getCities(pickupCountryId, pickupRegionId)}
                                     loadingCountries={geo.loading.countries}
-                                    loadingRegions={geo.loading.regionsFor === (form.getValues("pickups.0.countryId") || "")}
-                                    loadingCities={geo.loading.citiesFor === `${form.getValues("pickups.0.countryId")}/${form.getValues("pickups.0.regionId")}`}
+                                    loadingRegions={geo.loading.regionsFor === (pickupCountryId || "")}
+                                    loadingCities={geo.loading.citiesFor === `${pickupCountryId || ""}/${pickupRegionId || ""}`}
                                     errorText={pickupCountryError}
                                     onCountryLoad={(id) => geo.ensureRegions(id)}
                                     onRegionLoad={(countryId, regionId) => geo.ensureCities(countryId, regionId)}
@@ -162,11 +168,11 @@ export function AddCargoMobileForm({
                                     control={control}
                                     setValue={setValue}
                                     countries={geo.countries}
-                                    regions={geo.getRegions(form.getValues("dropoffs.0.countryId"))}
-                                    cities={geo.getCities(form.getValues("dropoffs.0.countryId"), form.getValues("dropoffs.0.regionId"))}
+                                    regions={geo.getRegions(dropoffCountryId)}
+                                    cities={geo.getCities(dropoffCountryId, dropoffRegionId)}
                                     loadingCountries={geo.loading.countries}
-                                    loadingRegions={geo.loading.regionsFor === (form.getValues("dropoffs.0.countryId") || "")}
-                                    loadingCities={geo.loading.citiesFor === `${form.getValues("dropoffs.0.countryId")}/${form.getValues("dropoffs.0.regionId")}`}
+                                    loadingRegions={geo.loading.regionsFor === (dropoffCountryId || "")}
+                                    loadingCities={geo.loading.citiesFor === `${dropoffCountryId || ""}/${dropoffRegionId || ""}`}
                                     errorText={dropoffCountryError}
                                     onCountryLoad={(id) => geo.ensureRegions(id)}
                                     onRegionLoad={(countryId, regionId) => geo.ensureCities(countryId, regionId)}
