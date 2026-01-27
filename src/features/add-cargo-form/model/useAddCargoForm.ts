@@ -12,14 +12,14 @@ import { onDigitsOnlyChange } from "@/shared/lib/numericInput";
 
 import type { AddCargoFormValues } from "./types";
 
-const PHONE_RE = /^\+?[1-9]\d{9,19}$/;
+export const PHONE_RE = /^\+?[1-9]\d{9,19}$/;
 
-function getTodayDate() {
+export function getTodayDate() {
     const today = new Date();
     return today.toISOString().split("T")[0];
 }
 
-function toIntOrZero(v: string) {
+export function toIntOrZero(v: string) {
     const s = (v ?? "").trim();
     if (!s) return 0;
     const n = parseInt(s, 10);
