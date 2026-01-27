@@ -1,354 +1,69 @@
-import { useMemo, useState, useEffect } from "react";
-import {
-    Box, Paper, Stack, Typography, Button, Pagination
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
+import { useCallback, useMemo, useState } from "react";
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { FiSliders } from "react-icons/fi";
-import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
-import { useShipments } from "@/entities/shipment/model/useShipments";
-import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
-import ShipmentRow from "@/widgets/shipments/ShipmentRow";
-import ShipmentsFilterDrawer from "@/widgets/shipments/ShipmentsFilterDrawer";
-import ConfirmDialog from "@/widgets/common/ConfirmDialog";
+import type { ShipmentsKind } from "@/entities/shipment/model/type";
+import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
 
-import {
-    cargoUp, cargoPatch, cargoDelete,
-    transportUp, transportPatch, transportDelete, shipmentCopy
-} from "@/shared/api/shipmentsActions";
-
-
+import { ShipmentsListBody } from "@/widgets/shipments/ShipmentsListBody";
+import { ShipmentsFilterDrawerController } from "@/widgets/shipments/ShipmentsFilterDrawerController";
 
 import "./MyShipmentsPage.scss";
-import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
-import FullEditDialog from "@/widgets/shipments/FullEditDialog.tsx";
-import CopyShipmentDialog from "@/widgets/shipments/CopyShipmentDialog.tsx";
-
-function parsePriceAmount(price?: string | null): number | null {
-    if (!price) return null;
-    const num = price.replace(/[^\d.,]/g, "").replace(",", ".");
-    const val = Number(num);
-    return Number.isFinite(val) ? val : null;
-}
 
 type Props = { scope: "public" | "my" };
 
-function ListBody({
-    scope,
-    kind,
-    filters,
-    onRequestReload,
-    onTotalChange,
-}: {
-    scope: "public" | "my";
-    kind: ShipmentsKind;
-    filters: Partial<PublicFilters>;
-    onRequestReload?: () => void;
-    onTotalChange?: (count: number) => void;
-}) {
-    const { t } = useTranslation();
-    const [page, setPage] = useState(1);
-    const limit = 10;
-    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
-
-    const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
-
-    const list = useMemo(() => items, [items]);
-
-    useEffect(() => {
-        onTotalChange?.(total || 0);
-    }, [onTotalChange, total]);
-
-    useEffect(() => {
-        if (scope === "public" && items?.length) {
-            const favs = items.filter((i) => (i as any).isFavorite || (i as any).is_favorite).map((i) => i.id);
-            setFavoriteIds(new Set(favs));
-        } else {
-            setFavoriteIds(new Set());
-        }
-    }, [scope, kind, items]);
-
-    const [editOpen, setEditOpen] = useState(false);
-    const [editItem, setEditItem] = useState<ShipmentRowData | null>(null);
-
-    const [copyOpen, setCopyOpen] = useState(false);
-    const [copyId, setCopyId] = useState<string | null>(null);
-
-    // Delete confirmation
-    const [deleteOpen, setDeleteOpen] = useState(false);
-    const [deleteId, setDeleteId] = useState<string | null>(null);
-
-    const openCopy = (id: string) => {
-        setCopyId(id);
-        setCopyOpen(true);
-    };
-    const closeCopy = () => setCopyOpen(false);
-
-    const openDelete = (id: string) => {
-        setDeleteId(id);
-        setDeleteOpen(true);
-    };
-    const closeDelete = () => {
-        setDeleteOpen(false);
-        setDeleteId(null);
-    };
-
-    const handleCopySubmit = async (payload: { date_from: string; date_to: string }) => {
-        if (!copyId) return;
-        
-        try {
-            if (kind === "cargo") {
-                await shipmentCopy(kind, copyId, payload);
-            } else if (kind === "transport") {
-                await shipmentCopy(kind, copyId, payload);
-            } else {
-                toast.error(t('shipments.messages.invalidOrderType'));
-                return;
-            }
-            toast.success(t('shipments.messages.orderCopied'));
-            setCopyId(null);
-            onRequestReload?.();
-        } catch (error: any) {
-            const message = error?.response?.data?.message || t('shipments.messages.orderCopyError');
-            toast.error(message);
-        }
-    };
-
-    const copyInitial = useMemo(() => {
-        const item = list.find(x => x.id === copyId);
-        return item
-            ? { dateFrom: item.dates?.from ?? "", dateTo: item.dates?.to ?? "" }
-            : { dateFrom: "", dateTo: "" };
-    }, [copyId, list]);
-
-    const openEdit = (id: string) => {
-        const found = list.find((x) => x.id === id) || null;
-        setEditItem(found);
-        setEditOpen(true);
-    };
-    const closeEdit = () => setEditOpen(false);
-
-    const reload = () => onRequestReload?.();
-
-    const handleUp = async (id: string) => {
-        try {
-            if (kind === "cargo") {
-                await cargoUp(id);
-            } else if (kind === "transport") {
-                await transportUp(id);
-            } else {
-                toast.error(t('shipments.messages.invalidOrderType'));
-                return;
-            }
-            toast.success(t('shipments.messages.orderRaised'));
-            reload();
-        } catch (error: any) {
-            const message = error?.response?.data?.message || t('shipments.messages.orderRaiseError');
-            toast.error(message);
-        }
-    };
-
-    const handleDelete = (id: string) => {
-        openDelete(id);
-    };
-
-    const confirmDelete = async () => {
-        if (!deleteId) return;
-        
-        try {
-            if (kind === "cargo") {
-                await cargoDelete(deleteId);
-            } else if (kind === "transport") {
-                await transportDelete(deleteId);
-            } else {
-                toast.error(t('shipments.messages.invalidOrderType'));
-                closeDelete();
-                return;
-            }
-            toast.success(t('shipments.messages.orderDeleted'));
-            closeDelete();
-            reload();
-        } catch (error: any) {
-            const message = error?.response?.data?.message || t('shipments.messages.orderDeleteError');
-            toast.error(message);
-        }
-    };
-
-    const handleEditSubmit = async (payload: any) => {
-        if (!editItem) return;
-
-        const prune = (obj: any) =>
-            Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
-
-        try {
-            if (kind === "cargo") {
-                await cargoPatch(editItem.id, prune(payload));
-            } else if (kind === "transport") {
-                await transportPatch(editItem.id, prune(payload));
-            } else {
-                toast.error(t('shipments.messages.invalidOrderType'));
-                return;
-            }
-            toast.success(t('shipments.messages.orderUpdated'));
-            setEditItem(null);
-            reload();
-        } catch (error: any) {
-            const message = error?.response?.data?.message || t('shipments.messages.orderUpdateError');
-            toast.error(message);
-        }
-    };
-
-    // Initial values for edit dialog
-    const editInitial = useMemo(() => {
-        if (!editItem) return undefined;
-
-        const fallbackPrice = parsePriceAmount(editItem.price);
-
-        return {
-            dateFrom: editItem.dates?.from ?? null,
-            dateTo: editItem.dates?.to ?? null,
-            priceAmount: fallbackPrice,
-            contactExtraPhone: editItem.contactExtraPhone ?? editItem.contact?.phone2 ?? null,
-            note: editItem.note ?? null,
-        };
-    }, [editItem]);
-
-    return (
-        <>
-            <Box sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, overflow: "hidden", boxSizing: "border-box" }}>
-                <Grid container spacing={{ xs: 0, md: 1.5 }} sx={{ width: "100%", maxWidth: { xs: "100vw", md: "100%" }, margin: { xs: "0 !important", md: 0 }, marginLeft: { xs: "0 !important", md: 0 }, marginRight: { xs: "0 !important", md: 0 } }}>
-                    {list.map((item) => (
-                        <Grid key={`${item.id}-${kind}`} size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: 0 }, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-                            <ShipmentRow
-                                scope={scope}
-                                data={item}
-                                kind={kind}
-                                favoriteIds={scope === "public" ? favoriteIds : undefined}
-                                onFavoriteChange={scope === "public" ? (id: string, isFav: boolean) => {
-                                    setFavoriteIds(prev => {
-                                        const next = new Set(prev);
-                                    if (isFav) next.add(id); else next.delete(id);
-                                        return next;
-                                    });
-                                } : undefined}
-                                onMoreOpen={(id) => console.log("more", id)}
-                                onUp={scope === "my" ? handleUp : undefined}
-                                onEdit={scope === "my" ? openEdit : undefined}
-                                onDelete={scope === "my" ? handleDelete : undefined}
-                                onCopy={scope === "my" ? openCopy : undefined}
-                            />
-                    </Grid>
-                ))}
-                {loading && (
-                    <Grid size={{ xs: 12 }} sx={{ padding: { xs: "0 0 12px 0", md: "0 0 12px 0" } }}>
-                        <Typography variant="body2" color="text.secondary">{t('shipments.actions.loading')}</Typography>
-                    </Grid>
-                )}
-            </Grid>
-            </Box>
-
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 2, flexWrap: "wrap", gap: 1 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                    <Button variant="text" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{t('shipments.actions.back')}</Button>
-                    <Pagination count={pages} page={page} onChange={(_, v) => setPage(v)} siblingCount={1} />
-                    <Button variant="text" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>{t('shipments.actions.next')}</Button>
-                </Stack>
-            </Stack>
-
-            <FullEditDialog
-                open={editOpen}
-                kind={kind}
-                onClose={closeEdit}
-                onSubmit={handleEditSubmit}
-             initial={{
-                 id: editItem?.id ?? undefined,
-               dateFrom: editInitial?.dateFrom ?? null,
-               dateTo: editInitial?.dateTo ?? null,
-               vehicleType: editItem?.vehicleType ?? "ANY",
-               // cargo-only:
-               loadType: (editItem as any)?.loadType ?? ["ANY"],
-               cargoType: (editItem as any)?.cargoType ?? "GENERAL",
-               allowPartialLoad: (editItem as any)?.allowPartialLoad ?? false,
-               palletsCount: (editItem as any)?.palletsCount ?? null,
-               // transport-only:
-               carsCount: (editItem as any)?.carsCount ?? null,
-               bargain: (editItem as any)?.bargain ?? (kind === "transport" ? "ALLOWED" : null),
-               weightT: editItem?.weightT ?? (editItem as any)?.weight_t ?? null,
-               volumeM3: editItem?.volumeM3 ?? (editItem as any)?.volume_m3 ?? null,
-               hasDimensions: (editItem as any)?.hasDimensions ?? (editItem as any)?.has_dimensions ?? false,
-               lengthM: (editItem as any)?.length ?? (editItem as any)?.length_m ?? null,
-               widthM: (editItem as any)?.width ?? (editItem as any)?.width_m ?? null,
-               heightM: (editItem as any)?.height ?? (editItem as any)?.height_m ?? null,
-               priceCurrency: (editItem as any)?.price_currency ?? "USD",
-               priceAmount: parsePriceAmount(editItem?.price ?? "") ?? (editItem as any)?.price_amount ?? null,
-               note: editItem?.note ?? null,
-               points: editItem?.points ?? [],
-             }}
-            />
-
-            <CopyShipmentDialog
-                open={copyOpen}
-                onClose={closeCopy}
-                onSubmit={handleCopySubmit}
-                initial={copyInitial}
-            />
-
-            <ConfirmDialog
-                open={deleteOpen}
-                title={t('shipments.deleteDialog.title')}
-                message={t('shipments.deleteDialog.message')}
-                confirmText={t('shipments.deleteDialog.confirm')}
-                cancelText={t('shipments.deleteDialog.cancel')}
-                onClose={closeDelete}
-                onConfirm={confirmDelete}
-            />
-        </>
-    );
-}
+const DEFAULT_KIND: ShipmentsKind = "cargo";
+const DEFAULT_FILTERS: PublicFilters = {};
 
 export default function ShipmentsListPage({ scope }: Props) {
     const { t } = useTranslation();
+
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
 
-    const getDefaultFilters = (): PublicFilters => {
-        return {}
-    };
 
-    // kind: draft/applied
-    const [draftKind, setDraftKind] = useState<ShipmentsKind>("cargo");
-    const [appliedKind, setAppliedKind] = useState<ShipmentsKind>("cargo");
+    const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(DEFAULT_KIND);
+    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(DEFAULT_FILTERS);
 
-    // filters: draft/applied
-    const [draftFilters, setDraftFilters] = useState<PublicFilters>(getDefaultFilters());
-    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(getDefaultFilters());
-
-    /** Key to remount ListBody -> guaranteed refetch */
     const [reloadKey, setReloadKey] = useState(0);
-    const requestReload = () => setReloadKey((k) => k + 1);
+    const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
+
+    const handleApply = useCallback(
+        (kind: ShipmentsKind, filters: PublicFilters) => {
+            setDrawerOpen(false);
+            setAppliedKind(kind);
+            setAppliedFilters(filters);
+            setReloadKey((k) => k + 1);
+        },
+        []
+    );
+
+    const listKey = useMemo(() => {
+        return `${appliedKind}-${JSON.stringify(appliedFilters)}-${reloadKey}`;
+    }, [appliedKind, appliedFilters, reloadKey]);
 
     return (
         <>
             <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2, width: "100%", boxSizing: "border-box" }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
                     <Box className="shipments-page__icon">
                         <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/>
-                            <circle cx="18" cy="18" r="6" stroke="#4472B8" strokeWidth="2.5" fill="none"/>
-                            <path d="M24 24L28 28" stroke="#4472B8" strokeWidth="2.5" strokeLinecap="round"/>
+                            <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7" />
+                            <circle cx="18" cy="18" r="6" stroke="#4472B8" strokeWidth="2.5" fill="none" />
+                            <path d="M24 24L28 28" stroke="#4472B8" strokeWidth="2.5" strokeLinecap="round" />
                         </svg>
                     </Box>
+
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h6" mb={1} className="shipments-page__title">
-                            {scope === "my" ? t('shipments.myShipments.title') : t('shipments.myShipments.searchTitle')}
+                            {scope === "my" ? t("shipments.myShipments.title") : t("shipments.myShipments.searchTitle")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" mb={2} className="shipments-page__subtitle">
-                            {scope === "my"
-                                ? t('shipments.myShipments.description')
-                                : t('shipments.myShipments.searchDescription')}
+                            {scope === "my" ? t("shipments.myShipments.description") : t("shipments.myShipments.searchDescription")}
                         </Typography>
                     </Box>
+
                     <Typography
                         variant="body2"
                         sx={{
@@ -356,35 +71,27 @@ export default function ShipmentsListPage({ scope }: Props) {
                             color: "text.primary",
                             textAlign: "right",
                             minWidth: { xs: "100%", sm: "auto" },
-                            alignSelf: { xs: "flex-start", sm: "center" }
+                            alignSelf: { xs: "flex-start", sm: "center" },
                         }}
                     >
-                        {t('shipments.total', { count: totalCount })}
+                        {t("shipments.total", { count: totalCount })}
                     </Typography>
                 </Box>
             </Paper>
 
-            <Stack 
-                direction={{ xs: "column", sm: "row" }} 
-                spacing={1} 
-                alignItems={{ xs: "stretch", sm: "center" }} 
-                justifyContent="space-between" 
-                sx={{ mb: 1, width: "100%" }}
-            >
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" sx={{ mb: 1, width: "100%" }}>
                 <Button
                     variant="contained"
                     startIcon={<FiSliders />}
                     sx={{ textTransform: "none", width: { xs: "100%", sm: "auto" } }}
                     onClick={() => setDrawerOpen(true)}
                 >
-                    {t('shipments.filter.button')}
+                    {t("shipments.filter.button")}
                 </Button>
-
             </Stack>
 
-            {/* Remount list body on kind/filters/reloadKey changes */}
-            <div key={`${appliedKind}-${JSON.stringify(appliedFilters)}-${reloadKey}`}>
-                <ListBody
+            <div key={listKey}>
+                <ShipmentsListBody
                     scope={scope}
                     kind={appliedKind}
                     filters={appliedFilters}
@@ -393,20 +100,14 @@ export default function ShipmentsListPage({ scope }: Props) {
                 />
             </div>
 
-            <ShipmentsFilterDrawer
+            <ShipmentsFilterDrawerController
                 open={drawerOpen}
-                value={draftKind}
-                onChange={setDraftKind}
-                filters={draftFilters}
-                onFiltersChange={setDraftFilters}
+                initialKind={appliedKind}
+                initialFilters={appliedFilters}
+                defaultKind={DEFAULT_KIND}
+                defaultFilters={DEFAULT_FILTERS}
                 onClose={() => setDrawerOpen(false)}
-                onReset={() => { setDraftKind("cargo"); setDraftFilters(getDefaultFilters()); }}
-                onApply={() => {
-                    setDrawerOpen(false);
-                    setAppliedKind(draftKind);
-                    setAppliedFilters(draftFilters);
-                    setReloadKey((k) => k + 1); // also reload when type changes or filters applied
-                }}
+                onApply={handleApply}
             />
         </>
     );
