@@ -29,16 +29,6 @@ export default function ShipmentsListPage({ scope }: Props) {
     const [reloadKey, setReloadKey] = useState(0);
     const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
 
-    const handleApply = useCallback(
-        (kind: ShipmentsKind, filters: PublicFilters) => {
-            setDrawerOpen(false);
-            setAppliedKind(kind);
-            setAppliedFilters(filters);
-            setReloadKey((k) => k + 1);
-        },
-        []
-    );
-
     const listKey = useMemo(() => {
         return `${appliedKind}-${JSON.stringify(appliedFilters)}-${reloadKey}`;
     }, [appliedKind, appliedFilters, reloadKey]);
