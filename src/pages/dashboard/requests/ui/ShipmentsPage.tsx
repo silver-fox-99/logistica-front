@@ -7,9 +7,9 @@ import type { ShipmentsKind } from "@/entities/shipment/model/type";
 import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
 
 import { ShipmentsListBody } from "@/widgets/shipments/ShipmentsListBody";
-import { ShipmentsFilterDrawerController } from "@/widgets/shipments/ShipmentsFilterDrawerController";
 
 import "./MyShipmentsPage.scss";
+import {ShipmentsFilterDrawerForm} from "@/widgets/shipments/ShipmentsFilterDrawerForm.tsx";
 
 type Props = { scope: "public" | "my" };
 
@@ -100,15 +100,19 @@ export default function ShipmentsListPage({ scope }: Props) {
                 />
             </div>
 
-            <ShipmentsFilterDrawerController
+            <ShipmentsFilterDrawerForm
                 open={drawerOpen}
                 initialKind={appliedKind}
                 initialFilters={appliedFilters}
-                defaultKind={DEFAULT_KIND}
-                defaultFilters={DEFAULT_FILTERS}
                 onClose={() => setDrawerOpen(false)}
-                onApply={handleApply}
+                onApply={(kind, filters) => {
+                    setDrawerOpen(false);
+                    setAppliedKind(kind);
+                    setAppliedFilters(filters);
+                    setReloadKey((k) => k + 1);
+                }}
             />
+
         </>
     );
 }
