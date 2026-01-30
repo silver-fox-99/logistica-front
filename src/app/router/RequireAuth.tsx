@@ -7,6 +7,7 @@ import {authApi} from "@/shared/api/authApi.ts";
 export default function RequireAuth({ children }: { children: JSX.Element }) {
     const user = useUserStore((s) => s.user);
     const setUser = useUserStore((s) => s.setUser);
+    const clearUser = useUserStore((s) => s.clearUser);
 
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -26,6 +27,7 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
             setUser(res.data);
             setIsAuthenticated(true);
         } catch {
+            clearUser()
             setIsAuthenticated(false);
         } finally {
             setLoading(false);
