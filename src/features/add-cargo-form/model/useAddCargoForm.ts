@@ -22,16 +22,28 @@ export function getTodayDate() {
 export function toIntOrZero(v: string) {
     const s = (v ?? "").trim();
     if (!s) return 0;
-    const n = parseInt(s, 10);
-    return Number.isFinite(n) ? n : 0;
+
+    const normalized = s.replace(",", ".");
+    const n = Number(normalized);
+
+    if (!Number.isFinite(n)) return 0;
+
+    return Math.round(n * 100) / 100;
 }
 
-function toNullableNum(v: string) {
+
+export function toNullableNum(v: string) {
     const s = (v ?? "").trim();
     if (!s) return undefined;
-    const n = parseInt(s, 10);
-    return Number.isFinite(n) ? n : undefined;
+
+    const normalized = s.replace(",", ".");
+
+    const n = Number(normalized);
+    if (!Number.isFinite(n)) return undefined;
+
+    return Math.round(n * 100) / 100;
 }
+
 
 export function useAddCargoForm() {
     const { t } = useTranslation();

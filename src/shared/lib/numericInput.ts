@@ -14,10 +14,27 @@ const CONTROL_KEYS = new Set([
 ]);
 
 export function sanitizeDigits(value: string) {
-    return value.replace(/[^\d]/g, "");
+    // оставляем только цифры и точку
+    let v = value.replace(/[^\d.]/g, "");
+
+    // одна точка максимум
+    const dot = v.indexOf(".");
+    if (dot !== -1) {
+        const intPart = v.slice(0, dot);
+        let fracPart = v.slice(dot + 1).replace(/\./g, ""); // удаляем лишние точки
+        fracPart = fracPart.slice(0, 2); // максимум 2 знака после точки
+        v = `${intPart}.${fracPart}`;
+    }
+
+    // если пользователь начал с точки — делаем "0."
+    if (v.startsWith(".")) v = `0${v}`;
+
+    return v;
 }
 
-export function onDigitsOnlyKeyDown(e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
+export function onDigitsOnlyKeyDown(
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+) {
     const key = e.key;
 
     // allow ctrl/cmd shortcuts
@@ -25,24 +42,67 @@ export function onDigitsOnlyKeyDown(e: React.KeyboardEvent<HTMLInputElement | HT
 
     if (CONTROL_KEYS.has(key)) return;
 
-    // allow digits only
-    if (/^\d$/.test(key)) return;
+    const el = e.currentTarget;
+    const value = el.value ?? "";
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+    const hasSelection = start !== end;
+
+    // allow digits (но ограничиваем 2 знака после точки)
+    if (/^\d$/.test(key)) {
+        const dot = value.indexOf(".");
+        if (dot !== -1) {
+            const caretInFraction = start > dot; // курсор правее точки
+            if (caretInFraction && !hasSelection) {
+                const fracLen = value.length - dot - 1;
+                if (fracLen >= 2) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+        return;
+    }
+
+    // allow dot only once
+    if (key === ".") {
+        // если точка уже есть — запрещаем (кроме случая, когда выделением её заменяем)
+        if (value.includes(".")) {
+            // разрешим, если выделенный диапазон содержит текущую точку
+            const dot = value.indexOf(".");
+            const dotIsSelected = dot >= start && dot < end;
+            if (!dotIsSelected) e.preventDefault();
+        }
+        return;
+    }
 
     e.preventDefault();
 }
 
-export function onDigitsOnlyPaste(e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    const txt = e.clipboardData.getData("text");
-    const sanitized = sanitizeDigits(txt);
+export function onDigitsOnlyPaste(
+    e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>
+) {
+    const el = e.currentTarget;
+    const pasted = e.clipboardData.getData("text");
 
-    // если вставка "грязная" — подменяем
-    if (sanitized !== txt) {
+    // вставку обрабатываем с учётом текущего value и выделения
+    const value = el.value ?? "";
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+
+    const nextRaw = value.slice(0, start) + pasted + value.slice(end);
+    const next = sanitizeDigits(nextRaw);
+
+    if (next !== nextRaw) {
         e.preventDefault();
-        document.execCommand("insertText", false, sanitized);
+        // вставляем уже “нормализованную” строку
+        document.execCommand("insertText", false, next);
     }
 }
 
-export function onDigitsOnlyChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+export function onDigitsOnlyChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) {
     const next = sanitizeDigits(e.target.value);
     if (next !== e.target.value) e.target.value = next;
 }
