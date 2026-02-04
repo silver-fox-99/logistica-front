@@ -112,6 +112,18 @@ export function AddTransportMobileForm({
 
                         <Grid size={{ xs: 12 }}>
                             <TextField
+                                label={t("addTransport.fields.dateFrom")}
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                                {...register("dateFromEnd")}
+                                error={!!formState.errors.dateFromEnd}
+                                helperText={formState.errors.dateFromEnd?.message as any}
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <TextField
                                 label={t("addTransport.fields.dateTo")}
                                 type="date"
                                 InputLabelProps={{ shrink: true }}

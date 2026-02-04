@@ -7,6 +7,7 @@ export type TransportPlace = {
 
 export type AddTransportFormValues = {
     dateFrom: string;
+    dateFromEnd: string;
     dateTo: string;
 
     loadPlaces: TransportPlace[];

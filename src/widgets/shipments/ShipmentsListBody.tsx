@@ -58,6 +58,7 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
     const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
+    console.log(items)
 
     useEffect(() => {
         onTotalChange?.(total || 0);
@@ -283,7 +284,13 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
                 onSubmit={handleEditSubmit}
                 initial={{
                     id: editItem?.id ?? undefined,
-                    dateFrom: editItem?.dates?.from ?? null,
+                    dateFrom: (
+                        editItem?.loadWindow?.from || editItem?.loadWindow?.to
+                            ? [editItem?.loadWindow?.from, editItem?.loadWindow?.to].filter(
+                                (v): v is string => typeof v === "string" && v.length > 0
+                            )
+                            : null
+                    ),
                     dateTo: editItem?.dates?.to ?? null,
                     vehicleType: editItem?.vehicleType ?? "ANY",
 

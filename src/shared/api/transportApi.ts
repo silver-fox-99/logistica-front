@@ -59,7 +59,7 @@ export type TransportPointDto = {
 
 export type CreateTransportDto = {
     images?: string[];
-    date_from: string;
+    date_from: string | string[];
     date_to: string;
     vehicle_type: "ANY" | "TENT" | "REFRIGERATOR" | "VAN" | "PLATFORM"; // из init.vehicleType
     cars_count: number;

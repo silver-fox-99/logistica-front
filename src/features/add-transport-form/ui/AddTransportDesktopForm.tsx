@@ -64,7 +64,7 @@ export function AddTransportDesktopForm({
     return (
         <Box component="form" noValidate onSubmit={onSubmit}>
             <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                         label={t("addTransport.fields.dateFrom")}
                         type="date"
@@ -76,7 +76,19 @@ export function AddTransportDesktopForm({
                     />
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                    <TextField
+                        label={t("addTransport.fields.dateFrom")}
+                        type="date"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        {...register("dateFromEnd")}
+                        error={!!formState.errors.dateFromEnd}
+                        helperText={formState.errors.dateFromEnd?.message as any}
+                    />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                         label={t("addTransport.fields.dateTo")}
                         type="date"
@@ -87,6 +99,7 @@ export function AddTransportDesktopForm({
                         helperText={formState.errors.dateTo?.message as any}
                     />
                 </Grid>
+
 
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Stack spacing={1}>

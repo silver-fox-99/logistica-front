@@ -47,6 +47,7 @@ export function useAddTransportForm() {
         shouldUnregister: false,
         defaultValues: {
             dateFrom: getTodayDate(),
+            dateFromEnd: getTodayDate(),
             dateTo: "",
 
             loadPlaces: [{ countryId: null, regionId: null, cityId: null, address: "" }],
@@ -105,7 +106,12 @@ export function useAddTransportForm() {
                 ok = false;
             }
 
-            if (v.dateFrom && v.dateTo && v.dateTo < v.dateFrom) {
+            if (v.dateFrom && v.dateFromEnd && v.dateFromEnd < v.dateFrom) {
+                setError("dateFromEnd", { type: "validate", message: t("addTransport.errors.dateRangeOrder") });
+                ok = false;
+            }
+
+            if (v.dateFromEnd && v.dateTo && v.dateTo < v.dateFromEnd) {
                 setError("dateTo", { type: "validate", message: t("addTransport.errors.dateOrder") });
                 ok = false;
             }
@@ -131,10 +137,10 @@ export function useAddTransportForm() {
                 ok = false;
             }
 
-            if (!v.paymentTerm) {
-                setError("paymentTerm", { type: "required", message: t("addTransport.errors.selectPaymentTerm") });
-                ok = false;
-            }
+          //  if (!v.paymentTerm) {
+          //      setError("paymentTerm", { type: "required", message: t("addTransport.errors.selectPaymentTerm") });
+          //      ok = false;
+          //  }
 
             if (v.contactSecondary && !PHONE_RE.test(v.contactSecondary)) {
                 setError("contactSecondary", { type: "pattern", message: t("addTransport.errors.invalidPhone") });
@@ -157,10 +163,15 @@ export function useAddTransportForm() {
             (toNullableNum(v.dims.width) ?? 0) > 0 ||
             (toNullableNum(v.dims.height) ?? 0) > 0;
 
+        const dateFromPayload =
+            v.dateFromEnd && v.dateFromEnd !== v.dateFrom
+                ? [v.dateFrom, v.dateFromEnd].filter(Boolean)
+                : v.dateFrom || "";
+
         return {
             images: undefined,
 
-            date_from: v.dateFrom || "",
+            date_from: dateFromPayload as CreateTransportDto["date_from"],
             date_to: v.dateTo || "",
 
             vehicle_type: (v.vehicleType as CreateTransportDto["vehicle_type"]) || "ANY",
