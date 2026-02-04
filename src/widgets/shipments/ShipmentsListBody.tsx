@@ -58,7 +58,7 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
     const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
-    console.log(items)
+
 
     useEffect(() => {
         onTotalChange?.(total || 0);

@@ -171,7 +171,6 @@ const findCityIdLoose = (cities: GeoImportItem[], name?: string | null) => {
 /** ===== Component ===== */
 export default function FullEditDialog({ open, kind, initial, onClose, onSubmit }: Props) {
     const { t } = useTranslation();
-    console.log(initial)
     const { getLocalizedGeoName } = useLocalizedGeo();
     const { getLocalizedLabel } = useLocalizedLookup();
 
