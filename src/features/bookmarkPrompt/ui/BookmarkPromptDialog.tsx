@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
+    Box,
     Button,
     Dialog,
     DialogActions,
@@ -80,7 +81,7 @@ type BeforeInstallPromptEvent = Event & {
 
 export default function BookmarkPromptDialog() {
     const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [open, setOpen] = useState(false);
     const [showHowTo, setShowHowTo] = useState(false);
@@ -233,23 +234,82 @@ export default function BookmarkPromptDialog() {
     if (!open) return null;
 
     return (
-        <Dialog open={open} onClose={close} maxWidth="sm" fullWidth fullScreen={fullScreen}>
-            <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <FiBookmark />
-                {ui.title}
+        <Dialog
+            open={open}
+            onClose={close}
+            fullScreen={isMobile}
+            maxWidth="sm"
+            fullWidth
+            scroll="paper"
+            PaperProps={{
+                sx: {
+                    borderRadius: isMobile ? 0 : 3,
+                    m: isMobile ? 0 : 2,
+                },
+            }}
+        >
+            <DialogTitle
+                sx={{
+                    px: isMobile ? 2 : 3,
+                    py: isMobile ? 1.5 : 2,
+                }}
+            >
+                <Stack direction="row" alignItems="center" spacing={1.25}>
+                    <Box
+                        sx={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: "50%",
+                            display: "grid",
+                            placeItems: "center",
+                            bgcolor: "action.hover",
+                            flex: "0 0 auto",
+                        }}
+                    >
+                        <FiBookmark />
+                    </Box>
+
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography variant={isMobile ? "h6" : "h6"} sx={{ lineHeight: 1.2 }}>
+                            {ui.title}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.25 }}>
+                            {ui.browser === "desktop" ? "Закладки" : "Главный экран / установка"}
+                        </Typography>
+                    </Box>
+                </Stack>
             </DialogTitle>
 
-            <DialogContent>
-                <Stack spacing={1.25} sx={{ mt: 1 }}>
-                    <Typography variant="body2">{ui.hint}</Typography>
+            <DialogContent
+                dividers
+                sx={{
+                    px: isMobile ? 2 : 3,
+                    py: isMobile ? 2 : 2,
+                }}
+            >
+                <Stack spacing={1.25}>
+                    <Typography variant="body2" sx={{ fontSize: isMobile ? 14 : 14, lineHeight: 1.5 }}>
+                        {ui.hint}
+                    </Typography>
 
-                    <Alert icon={<FiSmartphone />} severity="info">
+                    <Alert
+                        icon={<FiSmartphone />}
+                        severity="info"
+                        sx={{
+                            alignItems: "flex-start",
+                            "& .MuiAlert-message": { width: "100%" },
+                            "& b": { fontWeight: 700 },
+                            fontSize: isMobile ? 14 : 14,
+                            lineHeight: 1.5,
+                        }}
+                    >
                         {showHowTo ? (
                             ui.howTo
                         ) : canInstall ? (
                             <>
-                                Этот сайт можно установить как приложение. Нажмите <b>Установить</b> или откройте <b>Как добавить</b>{" "}
-                                для ручной инструкции.
+                                Этот сайт можно установить как приложение.
+                                <br />
+                                Нажмите <b>Установить</b> или откройте <b>Как добавить</b> для ручной инструкции.
                             </>
                         ) : (
                             <>
@@ -259,31 +319,72 @@ export default function BookmarkPromptDialog() {
                     </Alert>
 
                     {canInstall && (
-                        <Alert icon={<FiDownload />} severity="success">
+                        <Alert
+                            icon={<FiDownload />}
+                            severity="success"
+                            sx={{
+                                alignItems: "flex-start",
+                                "& .MuiAlert-message": { width: "100%" },
+                                fontSize: isMobile ? 14 : 14,
+                                lineHeight: 1.5,
+                            }}
+                        >
                             На этом устройстве доступна установка.
                         </Alert>
                     )}
                 </Stack>
             </DialogContent>
 
-            <DialogActions>
-                <Button onClick={dontShowAgain} color="inherit">
-                    Больше не показывать
-                </Button>
-
-                <Button variant="outlined" onClick={() => setShowHowTo((v) => !v)}>
-                    {showHowTo ? "Скрыть" : "Как добавить"}
-                </Button>
-
-                {canInstall ? (
-                    <Button variant="contained" onClick={onInstall}>
-                        Установить
+            <DialogActions
+                sx={{
+                    px: isMobile ? 2 : 3,
+                    py: isMobile ? 2 : 1.5,
+                    pb: isMobile ? "calc(16px + env(safe-area-inset-bottom))" : 1.5,
+                }}
+            >
+                <Stack
+                    direction={isMobile ? "column" : "row"}
+                    spacing={1}
+                    sx={{ width: "100%" }}
+                >
+                    <Button
+                        onClick={dontShowAgain}
+                        color="inherit"
+                        fullWidth={isMobile}
+                        size={isMobile ? "large" : "medium"}
+                    >
+                        Больше не показывать
                     </Button>
-                ) : (
-                    <Button variant="contained" onClick={close}>
-                        Понятно
+
+                    <Button
+                        variant="outlined"
+                        onClick={() => setShowHowTo((v) => !v)}
+                        fullWidth={isMobile}
+                        size={isMobile ? "large" : "medium"}
+                    >
+                        {showHowTo ? "Скрыть" : "Как добавить"}
                     </Button>
-                )}
+
+                    {canInstall ? (
+                        <Button
+                            variant="contained"
+                            onClick={onInstall}
+                            fullWidth={isMobile}
+                            size={isMobile ? "large" : "medium"}
+                        >
+                            Установить
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="contained"
+                            onClick={close}
+                            fullWidth={isMobile}
+                            size={isMobile ? "large" : "medium"}
+                        >
+                            Понятно
+                        </Button>
+                    )}
+                </Stack>
             </DialogActions>
         </Dialog>
     );
