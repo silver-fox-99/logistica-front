@@ -1,4 +1,3 @@
-
 import { Outlet, NavLink } from "react-router-dom";
 import React, { useState, Fragment } from "react";
 import {
@@ -8,7 +7,8 @@ import {
 import { Add } from "@mui/icons-material";
 import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
-    FiLogOut, FiUsers, FiSearch
+    FiLogOut, FiUsers, FiSearch,
+    FiAward
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
 import { useUserStore } from "@/entities/user/model/user.store";
 import "./DashboardLayout.scss";
+import BookmarkPromptDialog from "@/features/bookmarkPrompt/ui/BookmarkPromptDialog";
 
 function NavItem({ to, icon, label, onClick }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void }) {
     return (
@@ -39,6 +40,7 @@ function SidebarContent({
         { to: "/dashboard/company",  icon: <FiPackage />,     label: t('dashboard.menu.company') },
         { to: "/dashboard/staff",    icon: <FiUsers />,       label: t('dashboard.menu.staff') },
         { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
+        { to: "/dashboard/referral", icon: <FiAward />,  label: "Referral" },
         { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },
     ];
 
@@ -132,6 +134,10 @@ export default function DashboardLayout() {
                 showBurger={isMobile}
                 onMenuClick={() => toggle(true)}
             />
+
+            <BookmarkPromptDialog />
+
+
             <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32, overflow: "hidden" }}>
                 <Container 
                     maxWidth="lg"

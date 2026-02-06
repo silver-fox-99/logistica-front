@@ -1,4 +1,3 @@
-// features/admin/geo-locations/pages/AdminGeoLocationFlowPage.tsx
 import { useMemo, useState } from "react";
 import {
     Box,

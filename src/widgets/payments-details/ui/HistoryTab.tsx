@@ -19,7 +19,7 @@ import type { TariffPlan, TariffSubscription } from "@/shared/api/tariffsApi.ts"
 
 import { buildLimitItemsConfig } from "@/entities/tariff/lib/limits.ts";
 import { useTranslation } from "react-i18next";
-import { formatDateTimeEnGB } from "@/shared/lib/formatDateTime.ts";
+import { formatDateTimeEnGB } from "@/shared/lib/format/formatDateTime.ts";
 
 type Props = {
     history: TariffSubscription[];

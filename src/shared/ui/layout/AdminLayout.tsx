@@ -26,12 +26,14 @@ import {
     FiBarChart2,
     FiDatabase,
     FiChevronLeft,
-    FiChevronRight,
+    FiChevronRight, FiAward,
 } from "react-icons/fi";
 import { BsGeoAltFill } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
 import { FaTruck } from "react-icons/fa";
 import {TbPremiumRights} from "react-icons/tb";
+import { HiOutlineDocumentText } from "react-icons/hi2";
+import {PiBellRingingLight} from "react-icons/pi";
 
 type NavItemConfig = {
     to: string;
@@ -46,11 +48,15 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/cargo", icon: <FiPackage />, label: "Грузы" },
     { to: "/admin/transport", icon: <FaTruck />, label: "Транспорт" },
     { to: "/admin/geo", icon: <BsGeoAltFill />, label: "Геолокации" },
+    { to: "/admin/reviews", icon: <MdRateReview />, label: "Отзывы" },
+    { to: "/admin/documents", icon: <HiOutlineDocumentText />, label: "Документы" },
+    { to: "/admin/referral-settings", icon: <FiAward />, label: "Реферальная система" },
+    { to: "/admin/tariffs/plans", icon: <TbPremiumRights />, label: "Тарифы" },
     { to: "/admin/initial-data", icon: <FiDatabase />, label: "Справочники" },
     { to: "/admin/black-list", icon: <FiShield />, label: "Черный список" },
-    { to: "/admin/reviews", icon: <MdRateReview />, label: "Отзывы" },
+    { to: "/admin/notifications", icon: <PiBellRingingLight />, label: "Уведомления" },
     { to: "/admin/activity-logs", icon: <FiSettings />, label: "Журнал активности" },
-    { to: "/admin/tariffs/plans", icon: <TbPremiumRights />, label: "Тарифы" },
+
 ];
 
 function NavItem(props: {
@@ -98,7 +104,7 @@ const LS_KEY = "admin.sidebar.collapsed";
 function readCollapsedFromStorage(): boolean {
     try {
         const v = localStorage.getItem(LS_KEY);
-        if (v === null) return true; // дефолт: свернуто
+        if (v === null) return true;
         return v === "true";
     } catch {
         return true;
@@ -119,16 +125,13 @@ export default function AdminLayout() {
     const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
     const isTight = useMediaQuery("(max-width:1100px)");
 
-    // 1) init from localStorage
     const [collapsed, setCollapsed] = React.useState<boolean>(() => readCollapsedFromStorage());
 
-    // 2) force-collapse on tight screens (do not overwrite storage)
     React.useEffect(() => {
         if (!isDesktop) return;
         if (isTight && collapsed === false) setCollapsed(true);
     }, [isDesktop, isTight, collapsed]);
 
-    // 3) persist on change
     React.useEffect(() => {
         writeCollapsedToStorage(collapsed);
     }, [collapsed]);

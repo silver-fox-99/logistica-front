@@ -4,7 +4,7 @@ import { FiExternalLink } from "react-icons/fi";
 import type { TariffInvoice } from "@/shared/api/tariffsApi.ts";
 
 import { useTranslation } from "react-i18next";
-import {formatDateTimeEnGB} from "@/shared/lib/formatDateTime.ts";
+import {formatDateTimeEnGB} from "@/shared/lib/format/formatDateTime.ts";
 
 type Props = {
     invoices: TariffInvoice[];

@@ -1,4 +1,3 @@
-
 import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
 import { Box } from "@mui/material";

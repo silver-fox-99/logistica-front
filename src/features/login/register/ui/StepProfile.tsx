@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
     Box,
-    Stack,
     TextField,
     Button,
     InputAdornment,
@@ -31,6 +30,7 @@ export type ProfileFormValues = {
     type: ProfileType;
     password: string;
     confirmPassword: string;
+    code?: string
 };
 
 type StepProfileProps = {
@@ -51,6 +51,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             type: z.enum(PROFILE_TYPES, { message: "Please select a role." }),
             password: z.string().min(6, t("register.passwordRequired")),
             confirmPassword: z.string().min(1, t("register.confirmPasswordRequired")),
+            code: z.string().optional(),
         })
         .refine((data) => data.password === data.confirmPassword, {
             path: ["confirmPassword"],
@@ -70,6 +71,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             type: "Другое",
             password: "",
             confirmPassword: "",
+            code: "",
             ...defaultValues,
         },
         mode: "onTouched",
@@ -186,11 +188,15 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
                 }}
             />
 
-            <Stack spacing={0.5}>
-                <Typography variant="caption" color="text.secondary">
-                    {t("register.passwordHint")}
-                </Typography>
-            </Stack>
+            <TextField
+                label={"Пригласительный код"}
+                placeholder={"Введите пригласительный код если есть"}
+                autoComplete="given-code"
+                fullWidth
+                {...register("code")}
+                error={!!errors.code}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+            />
 
             <Button
                 type="submit"

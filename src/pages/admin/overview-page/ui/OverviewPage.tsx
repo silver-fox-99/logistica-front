@@ -79,6 +79,14 @@ export default function AdminOverviewPage() {
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
+                            <TopInfoViewersTable rows={data?.top.infoViewers ?? []} />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <PowerUsersTable rows={data?.top.powerUsers ?? []} />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
                             <PriceTrendChart data={data?.series.priceTrend ?? []} />
                         </Grid>
 
@@ -96,14 +104,6 @@ export default function AdminOverviewPage() {
                                 transDep={data?.top.countries.transport.departure ?? []}
                                 transArr={data?.top.countries.transport.arrival ?? []}
                             />
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
-                            <PowerUsersTable rows={data?.top.powerUsers ?? []} />
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
-                            <TopInfoViewersTable rows={data?.top.infoViewers ?? []} />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>

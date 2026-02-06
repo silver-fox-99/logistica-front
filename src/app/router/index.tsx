@@ -33,6 +33,10 @@ import AdminOverviewPage from "@/pages/admin/overview-page";
 import AdminReviewsPage from "@/pages/admin/reviews";
 import AdminTariffPlansPage from "@/pages/admin/tariffs/plans";
 import AdminTariffSubscriptionsPage from "@/pages/admin/tariffs/subscriptions";
+import DocumentsPage from "@/pages/admin/documents";
+import ReferralSettingsPage from "@/pages/admin/referral-settings";
+import ReferralPage from "@/pages/dashboard/referral";
+import NotificationsPage from "@/pages/admin/notifications";
 
 
 const router = createBrowserRouter([
@@ -65,6 +69,7 @@ const router = createBrowserRouter([
             {path: "payments", element: <PaymentsPage/>},
             {path: "requests", element: <ShipmentsListPage scope="my"/>},
             {path: "user-reviews", element: <UserReviewsPage/>},
+            {path: "referral", element: <ReferralPage/>},
 
             {path: "security", element: <SecurityPage/>},
             {path: "help", element: <HelpSupportPage/>},
@@ -91,7 +96,10 @@ const router = createBrowserRouter([
             { path: "initial-data", element: <AdminLookupsPage />},
             { path: "reviews", element: <AdminReviewsPage /> },
             { path: "tariffs/plans", element: <AdminTariffPlansPage /> },
-            { path: "tariffs/subscriptions", element: <AdminTariffSubscriptionsPage /> }
+            { path: "tariffs/subscriptions", element: <AdminTariffSubscriptionsPage /> },
+            { path: "documents", element: <DocumentsPage />},
+            { path: "referral-settings", element: <ReferralSettingsPage />},
+            { path: "notifications", element: <NotificationsPage />}
         ],
     },
     {

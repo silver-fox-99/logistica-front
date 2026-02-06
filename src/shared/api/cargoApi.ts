@@ -103,24 +103,6 @@ export const cargoApi = {
         const { data } = await api.get<InitResponse>("/cargo/init");
         return data.data;
     },
-    async getGeos(): Promise<GeoItem[]> {
-        try {
-            const response = await api.get("/geo-location");
-            let geos: GeoItem[] = [];
-            
-            if (response.data?.data && Array.isArray(response.data.data)) {
-                geos = response.data.data;
-            } else if (Array.isArray(response.data)) {
-                geos = response.data;
-            } else if (response.data?.status && Array.isArray(response.data.data)) {
-                geos = response.data.data;
-            }
-            
-            return geos;
-        } catch (error) {
-            return [];
-        }
-    },
     async create(payload: CreateCargoDto) {
         const { data } = await api.post<CreateResponse>("/cargo/create", payload);
         return data;

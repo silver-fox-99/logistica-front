@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { publicGeoApi } from "@/shared/api/publicGeoApi";
-import { adminGeoApi, type GeoLocation } from "@/shared/api/adminGeoApi";
+import { type GeoLocation } from "@/shared/api/adminGeoApi";
 import type { GeoImportItem } from "@/shared/api/geoImportApi";
 
 type LoadingState = {
@@ -72,68 +72,6 @@ type AdminGeoIndex = {
     citiesByName: Map<string, GeoLocation[]>;
 };
 
-const buildAdminIndexes = (list: GeoLocation[]): AdminGeoIndex => {
-    const mapById = new Map<string, GeoLocation>(list.map((g) => [g.id, g]));
-    const countriesByIso = new Map<string, GeoLocation>();
-    const countriesByName = new Map<string, GeoLocation[]>();
-    const regionsByKey = new Map<string, GeoLocation>();
-    const citiesByKey = new Map<string, GeoLocation>();
-    const regionsByName = new Map<string, GeoLocation[]>();
-    const citiesByName = new Map<string, GeoLocation[]>();
-
-    const findCountryIso = (id?: string | null) => {
-        let current = id ? mapById.get(id) : undefined;
-        let guard = 0;
-        while (current && guard < 6) {
-            if (current.type === "COUNTRY") return (current.iso2 || "").toUpperCase();
-            current = current.parent_id ? mapById.get(current.parent_id) : undefined;
-            guard += 1;
-        }
-        return "";
-    };
-
-    list.forEach((g) => {
-        if (g.type === "COUNTRY" && g.iso2) {
-            countriesByIso.set(g.iso2.toUpperCase(), g);
-        }
-        if (g.type === "COUNTRY" && g.name) {
-            const key = g.name.trim().toLowerCase();
-            const bucket = countriesByName.get(key) || [];
-            bucket.push(g);
-            countriesByName.set(key, bucket);
-        }
-    });
-
-    list.forEach((g) => {
-        if (g.type === "REGION") {
-            const countryIso = findCountryIso(g.parent_id);
-            const code = (g.code || g.slug || g.name || g.id).toLowerCase();
-            const key = `${countryIso}|${code}`;
-            if (countryIso && code) regionsByKey.set(key, g);
-            if (countryIso && g.name) {
-                const bucket = regionsByName.get(countryIso) || [];
-                bucket.push(g);
-                regionsByName.set(countryIso, bucket);
-            }
-        }
-        if (g.type === "CITY") {
-            const region = g.parent_id ? mapById.get(g.parent_id) : undefined;
-            const countryIso = findCountryIso(region?.id ?? g.parent_id);
-            const regionCode = (region?.code || region?.slug || "").toLowerCase();
-            const cityCode = (g.code || g.slug || g.name || g.id).toLowerCase();
-            const key = `${countryIso}|${regionCode}|${cityCode}`;
-            if (countryIso && regionCode && cityCode) citiesByKey.set(key, g);
-            if (countryIso && g.name) {
-                const bucket = citiesByName.get(countryIso) || [];
-                bucket.push(g);
-                citiesByName.set(countryIso, bucket);
-            }
-        }
-    });
-
-    return { mapById, countriesByIso, countriesByName, regionsByKey, citiesByKey, regionsByName, citiesByName };
-};
-
 export function useGeoCascade() {
     const [countries, setCountries] = useState<GeoImportItem[]>([]);
     const [regions, setRegions] = useState<Record<string, GeoImportItem[]>>({});
@@ -150,9 +88,9 @@ export function useGeoCascade() {
     const ensureAdminGeoMap = useCallback(async () => {
         if (adminGeoMapRef.current) return;
         try {
-            const list = await adminGeoApi.list();
-            adminGeoMapRef.current = new Map(list.map((g) => [g.id, g]));
-            adminGeoIndexRef.current = buildAdminIndexes(list);
+         //   const list = await adminGeoApi.list();
+         //   adminGeoMapRef.current = new Map(list.map((g) => [g.id, g]));
+         //   adminGeoIndexRef.current = buildAdminIndexes(list);
         } catch {
             adminGeoMapRef.current = null;
             adminGeoIndexRef.current = null;

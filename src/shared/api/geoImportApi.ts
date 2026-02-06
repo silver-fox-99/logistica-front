@@ -1,4 +1,3 @@
-// Тип для унифицированного представления локаций из публичных geo endpoints
 export type GeoImportItem = {
     id: string;
     name: string;
