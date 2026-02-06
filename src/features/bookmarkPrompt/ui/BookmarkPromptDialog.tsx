@@ -339,7 +339,7 @@ export default function BookmarkPromptDialog() {
                 sx={{
                     px: isMobile ? 2 : 3,
                     py: isMobile ? 2 : 1.5,
-                    pb: isMobile ? "calc(16px + env(safe-area-inset-bottom))" : 1.5,
+                    pb: isMobile ? "calc(96px + env(safe-area-inset-bottom))" : 1.5,
                 }}
             >
                 <Stack
