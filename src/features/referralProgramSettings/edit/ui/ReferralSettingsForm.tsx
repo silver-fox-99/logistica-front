@@ -1,5 +1,3 @@
-"use client";
-
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import {
     Autocomplete,
@@ -100,14 +98,12 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
 
     const rewardType = useWatch({ control, name: "reward_type" });
     const linkMode = useWatch({ control, name: "linkMode" });
-    const selectedDocId = useWatch({ control, name: "document_id" });
-    const selectedDocKey = useWatch({ control, name: "document_key" });
     const rewardValue = useWatch({ control, name: "reward_value" });
 
-    const selectedDoc = useMemo(() => {
-        if (!selectedDocId) return null;
-        return documents.find((d) => d.id === selectedDocId) ?? null;
-    }, [documents, selectedDocId]);
+    const showDocId = linkMode === "DOCUMENT_ID";
+    const showDocKey = linkMode === "DOCUMENT_KEY";
+
+    const docsReady = documents.length > 0;
 
     const rewardPreview = useMemo(() => {
         if (rewardType !== ReferralRewardType.FIXED) return null;
@@ -147,16 +143,29 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             document_key: active.document_key ?? null,
             meta_json: JSON.stringify(active.meta ?? {}, null, 2),
         });
-    }, [active, reset]);
+
+        requestAnimationFrame(() => {
+            if (active.document?.id) {
+                setValue("document_id", active.document.id, {
+                    shouldDirty: false,
+                    shouldTouch: false,
+                    shouldValidate: false,
+                });
+            }
+            if (active.document_key) {
+                setValue("document_key", active.document_key, {
+                    shouldDirty: false,
+                    shouldTouch: false,
+                    shouldValidate: false,
+                });
+            }
+        });
+    }, [active?.id, active?.updated_at, docsReady, reset, setValue]);
 
     useEffect(() => {
         if (linkMode === "NONE") {
-            setValue("document_id", null);
-            setValue("document_key", null);
-        } else if (linkMode === "DOCUMENT_ID") {
-            setValue("document_key", null);
-        } else if (linkMode === "DOCUMENT_KEY") {
-            setValue("document_id", null);
+            setValue("document_id", null, { shouldDirty: true });
+            setValue("document_key", null, { shouldDirty: true });
         }
     }, [linkMode, setValue]);
 
@@ -180,20 +189,20 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             reward_type: values.reward_type,
             reward_value: values.reward_value,
             reward_currency: values.reward_type === ReferralRewardType.FIXED ? (values.reward_currency || "UZS") : null,
-            document_id: values.linkMode === "DOCUMENT_ID" ? values.document_id : null,
-            document_key: values.linkMode === "DOCUMENT_KEY" ? values.document_key : null,
             meta: metaRes.data,
+            document_id: values.linkMode === "DOCUMENT_ID" ? values.document_id : undefined,
+            document_key: values.linkMode === "DOCUMENT_KEY" ? values.document_key : undefined,
         };
+
+        if (values.linkMode === "NONE") {
+            dto.document_id = null;
+            dto.document_key = null;
+        }
 
         await onSave(dto);
     });
 
     useImperativeHandle(ref, () => ({ submit }), [submit]);
-    console.log(selectedDoc)
-    console.log(selectedDocKey)
-    console.log(selectedDocId);
-    console.log(settings)
-    console.log(documents)
 
     return (
         <Stack spacing={2}>
@@ -259,8 +268,12 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                         <FormControl fullWidth>
                             <InputLabel id="reward-type-label">Тип награды</InputLabel>
                             <Select labelId="reward-type-label" label="Тип награды" {...field}>
-                                <MenuItem value={ReferralRewardType.FIXED}>{REWARD_TYPE_RU[ReferralRewardType.FIXED]}</MenuItem>
-                                <MenuItem value={ReferralRewardType.PERCENT}>{REWARD_TYPE_RU[ReferralRewardType.PERCENT]}</MenuItem>
+                                <MenuItem value={ReferralRewardType.FIXED}>
+                                    {REWARD_TYPE_RU[ReferralRewardType.FIXED]}
+                                </MenuItem>
+                                <MenuItem value={ReferralRewardType.PERCENT}>
+                                    {REWARD_TYPE_RU[ReferralRewardType.PERCENT]}
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     )}
@@ -323,40 +336,58 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     )}
                 />
 
-                {linkMode === "DOCUMENT_ID" && (
-                    <Autocomplete
-                        fullWidth
-                        options={documents}
-                        value={selectedDoc}
-                        onChange={(_, v) => setValue("document_id", v?.id ?? null, { shouldDirty: true })}
-                        getOptionLabel={(o) => docLabel(o)}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Документ"
-                                placeholder="Выберите документ..."
-                                helperText="Настройки будут привязаны к конкретной версии документа"
-                            />
-                        )}
-                    />
-                )}
+                <Controller
+                    name="document_id"
+                    control={control}
+                    render={({ field }) => {
+                        const valueObj = field.value ? documents.find((d) => d.id === field.value) ?? null : null;
 
-                {linkMode === "DOCUMENT_KEY" && (
-                    <Autocomplete
-                        fullWidth
-                        options={documentKeys}
-                        value={selectedDocKey ?? null}
-                        onChange={(_, v) => setValue("document_key", v ?? null, { shouldDirty: true })}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Ключ документа"
-                                placeholder="Выберите ключ документа..."
-                                helperText='Будет использован последний документ со статусом "PUBLISHED" для выбранного ключа'
+                        return (
+                            <Autocomplete
+                                fullWidth
+                                options={documents}
+                                value={valueObj}
+                                onChange={(_, v) => field.onChange(v?.id ?? null)}
+                                isOptionEqualToValue={(opt, val) => opt.id === val.id}
+                                getOptionLabel={(o) => docLabel(o)}
+                                disabled={!showDocId}
+                                sx={{ display: showDocId ? "block" : "none" }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Документ"
+                                        placeholder="Выберите документ..."
+                                        helperText="Настройки будут привязаны к конкретной версии документа"
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                )}
+                        );
+                    }}
+                />
+
+                <Controller
+                    name="document_key"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            fullWidth
+                            options={documentKeys}
+                            value={field.value ?? null}
+                            onChange={(_, v) => field.onChange(v ?? null)}
+                            isOptionEqualToValue={(opt, val) => opt === val}
+                            disabled={!showDocKey}
+                            sx={{ display: showDocKey ? "block" : "none" }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Ключ документа"
+                                    placeholder="Выберите ключ документа..."
+                                    helperText='Будет использован последний документ со статусом "PUBLISHED" для выбранного ключа'
+                                />
+                            )}
+                        />
+                    )}
+                />
             </Stack>
 
             <Divider />
