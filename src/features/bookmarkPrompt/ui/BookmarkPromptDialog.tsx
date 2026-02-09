@@ -13,6 +13,7 @@ import {
     useTheme,
 } from "@mui/material";
 import { FiBookmark, FiSmartphone, FiDownload } from "react-icons/fi";
+import { Trans, useTranslation } from "react-i18next";
 
 const LS_KEY = "bookmark_prompt_dismissed_v2";
 
@@ -82,6 +83,7 @@ type BeforeInstallPromptEvent = Event & {
 export default function BookmarkPromptDialog() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
     const [showHowTo, setShowHowTo] = useState(false);
@@ -118,86 +120,18 @@ export default function BookmarkPromptDialog() {
     const ui = useMemo(() => {
         const browser = detectMobileBrowser();
 
-        const title = browser === "desktop" ? "Добавьте сайт в закладки" : "Добавьте сайт на главный экран";
+        const title =
+            browser === "desktop"
+                ? t("bookmarkPrompt.title.desktop")
+                : t("bookmarkPrompt.title.mobile");
+
         const hint =
             browser === "desktop"
-                ? "Так вы сможете быстрее возвращаться к сервису и не искать ссылку каждый раз."
-                : "Так будет быстрее открывать сервис — он появится как иконка, почти как приложение.";
+                ? t("bookmarkPrompt.hint.desktop")
+                : t("bookmarkPrompt.hint.mobile");
 
-        const howTo = (() => {
-            switch (browser) {
-                case "ios_safari":
-                    return (
-                        <>
-                            Нажмите <b>Поделиться</b> (квадрат со стрелкой вверх) и выберите <b>На экран «Домой»</b>.
-                            <br />
-                            Если пункта не видно — прокрутите список действий вниз.
-                        </>
-                    );
-
-                case "ios_chrome":
-                case "ios_edge":
-                case "ios_firefox":
-                    return (
-                        <>
-                            На iPhone/iPad все браузеры используют одно и то же меню.
-                            <br />
-                            Нажмите <b>Поделиться</b> и выберите <b>На экран «Домой»</b>.
-                        </>
-                    );
-
-                case "android_chrome":
-                    return (
-                        <>
-                            Откройте меню браузера (⋮) и выберите <b>Установить приложение</b> или <b>Добавить на главный экран</b>.
-                            <br />
-                            Если появится предложение установить — можно нажать его.
-                        </>
-                    );
-
-                case "android_samsung":
-                    return (
-                        <>
-                            Откройте меню (≡ или ⋮) и выберите <b>Добавить страницу на</b> → <b>Главный экран</b> или{" "}
-                            <b>Установить приложение</b> (если доступно).
-                        </>
-                    );
-
-                case "android_edge":
-                    return (
-                        <>
-                            Откройте меню (⋯) и выберите <b>Приложения</b> → <b>Установить этот сайт как приложение</b> либо{" "}
-                            <b>Добавить на главный экран</b>.
-                            <br />
-                            Название пункта может отличаться.
-                        </>
-                    );
-
-                case "android_firefox":
-                    return (
-                        <>
-                            Откройте меню (⋮) и выберите <b>Установить</b> (если доступно) или <b>Добавить на главный экран</b>.
-                        </>
-                    );
-
-                case "android_other":
-                    return (
-                        <>
-                            Откройте меню браузера и найдите пункт <b>Добавить на главный экран</b> или <b>Установить приложение</b>.
-                        </>
-                    );
-
-                default:
-                    return (
-                        <>
-                            Нажмите <b>Ctrl + D</b> (Windows) или <b>Cmd + D</b> (Mac), чтобы добавить сайт в закладки.
-                        </>
-                    );
-            }
-        })();
-
-        return { browser, title, hint, howTo };
-    }, []);
+        return { browser, title, hint };
+    }, [t]);
 
     const close = () => setOpen(false);
 
@@ -270,11 +204,14 @@ export default function BookmarkPromptDialog() {
                     </Box>
 
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography variant={isMobile ? "h6" : "h6"} sx={{ lineHeight: 1.2 }}>
+                        <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
                             {ui.title}
                         </Typography>
+
                         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.25 }}>
-                            {ui.browser === "desktop" ? "Закладки" : "Главный экран / установка"}
+                            {ui.browser === "desktop"
+                                ? t("bookmarkPrompt.subtitle.desktop")
+                                : t("bookmarkPrompt.subtitle.mobile")}
                         </Typography>
                     </Box>
                 </Stack>
@@ -288,7 +225,7 @@ export default function BookmarkPromptDialog() {
                 }}
             >
                 <Stack spacing={1.25}>
-                    <Typography variant="body2" sx={{ fontSize: isMobile ? 14 : 14, lineHeight: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontSize: 14, lineHeight: 1.5 }}>
                         {ui.hint}
                     </Typography>
 
@@ -299,21 +236,19 @@ export default function BookmarkPromptDialog() {
                             alignItems: "flex-start",
                             "& .MuiAlert-message": { width: "100%" },
                             "& b": { fontWeight: 700 },
-                            fontSize: isMobile ? 14 : 14,
+                            fontSize: 14,
                             lineHeight: 1.5,
                         }}
                     >
                         {showHowTo ? (
-                            ui.howTo
+                            <Trans i18nKey={`bookmarkPrompt.howTo.${ui.browser}`} />
                         ) : canInstall ? (
                             <>
-                                Этот сайт можно установить как приложение.
-                                <br />
-                                Нажмите <b>Установить</b> или откройте <b>Как добавить</b> для ручной инструкции.
+                                <Trans i18nKey="bookmarkPrompt.alert.canInstall" />
                             </>
                         ) : (
                             <>
-                                Нажмите <b>Как добавить</b>, и мы покажем инструкцию для вашего устройства.
+                                <Trans i18nKey="bookmarkPrompt.alert.manualOnly" />
                             </>
                         )}
                     </Alert>
@@ -325,11 +260,11 @@ export default function BookmarkPromptDialog() {
                             sx={{
                                 alignItems: "flex-start",
                                 "& .MuiAlert-message": { width: "100%" },
-                                fontSize: isMobile ? 14 : 14,
+                                fontSize: 14,
                                 lineHeight: 1.5,
                             }}
                         >
-                            На этом устройстве доступна установка.
+                            {t("bookmarkPrompt.installAvailable")}
                         </Alert>
                     )}
                 </Stack>
@@ -342,46 +277,28 @@ export default function BookmarkPromptDialog() {
                     pb: isMobile ? "calc(96px + env(safe-area-inset-bottom))" : 1.5,
                 }}
             >
-                <Stack
-                    direction={isMobile ? "column" : "row"}
-                    spacing={1}
-                    sx={{ width: "100%" }}
-                >
-                    <Button
-                        onClick={dontShowAgain}
-                        color="inherit"
-                        fullWidth={isMobile}
-                        size={isMobile ? "large" : "medium"}
-                    >
-                        Больше не показывать
+                <Stack direction={isMobile ? "column" : "row"} spacing={1} sx={{ width: "100%" }}>
+                    <Button onClick={dontShowAgain} color="inherit" fullWidth={isMobile} size={isMobile ? "large" : "medium"}>
+                        {t("bookmarkPrompt.actions.dontShowAgain")}
                     </Button>
 
                     <Button
+
                         variant="outlined"
                         onClick={() => setShowHowTo((v) => !v)}
                         fullWidth={isMobile}
                         size={isMobile ? "large" : "medium"}
                     >
-                        {showHowTo ? "Скрыть" : "Как добавить"}
+                        {showHowTo ? t("bookmarkPrompt.actions.hide") : t("bookmarkPrompt.actions.howTo")}
                     </Button>
 
                     {canInstall ? (
-                        <Button
-                            variant="contained"
-                            onClick={onInstall}
-                            fullWidth={isMobile}
-                            size={isMobile ? "large" : "medium"}
-                        >
-                            Установить
+                        <Button variant="contained" onClick={onInstall} fullWidth={isMobile} size={isMobile ? "large" : "medium"}>
+                            {t("bookmarkPrompt.actions.install")}
                         </Button>
                     ) : (
-                        <Button
-                            variant="contained"
-                            onClick={close}
-                            fullWidth={isMobile}
-                            size={isMobile ? "large" : "medium"}
-                        >
-                            Понятно
+                        <Button variant="contained" onClick={close} fullWidth={isMobile} size={isMobile ? "large" : "medium"}>
+                            {t("bookmarkPrompt.actions.gotIt")}
                         </Button>
                     )}
                 </Stack>

@@ -8,7 +8,7 @@ export function useReferralPayouts() {
 
     const [candidates, setCandidates] = useState<ReferralPayoutCandidate[]>([]);
     const [batchKey, setBatchKey] = useState("");
-    const [minBalanceCents, setMinBalanceCents] = useState<number>(1);
+    const [minBalanceCents, setMinBalanceCents] = useState<number>(5000000);
     const [payoutNote, setPayoutNote] = useState("");
 
     const [resetDialogOpen, setResetDialogOpen] = useState(false);

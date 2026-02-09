@@ -5,7 +5,8 @@ import { AgreementCard } from "./AgreementCard";
 import { CodeCard } from "./CodeCard";
 import { BalanceCard } from "./BalanceCard";
 import { ReferralTabs } from "./ReferralTabs";
-import {ReferralUnavailable} from "@/widgets/referralProgram/ui/ReferralUnavailable.tsx";
+import { ReferralUnavailable } from "@/widgets/referralProgram/ui/ReferralUnavailable.tsx";
+import { useTranslation } from "react-i18next";
 
 function ReferralProgramWidgetBase() {
     const {
@@ -18,10 +19,11 @@ function ReferralProgramWidgetBase() {
         invitedUsers,
         earningsRows,
         actions,
-        enabled
+        enabled,
     } = useReferralProgram();
 
     const [agreementOpen, setAgreementOpen] = useState(false);
+    const { t } = useTranslation();
 
     const openAgreement = useCallback(() => {
         setAgreementOpen(true);
@@ -50,10 +52,10 @@ function ReferralProgramWidgetBase() {
                 <Stack direction="row" alignItems="center" gap={1.25}>
                     <Box>
                         <Typography variant="h5" fontWeight={800}>
-                            Referral Program
+                            {t("referralProgram.title")}
                         </Typography>
                         <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                            Sign the agreement to activate your referral code and start earning rewards.
+                            {t("referralProgram.subtitle")}
                         </Typography>
                     </Box>
                 </Stack>

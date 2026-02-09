@@ -1,16 +1,16 @@
-"use client";
-
-
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { FiRefreshCw } from "react-icons/fi";
-import animationData from "@/pages/dashboard/referral/animations/share.json"
+import animationData from "@/pages/dashboard/referral/animations/share.json";
 import Lottie from "lottie-react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     onReload?: () => void;
 };
 
 export function ReferralUnavailable({ onReload }: Props) {
+    const { t } = useTranslation();
+
     return (
         <Box sx={{ p: { xs: 2, md: 3 } }}>
             <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
@@ -21,16 +21,20 @@ export function ReferralUnavailable({ onReload }: Props) {
 
                     <Box>
                         <Typography variant="h5" fontWeight={800}>
-                            Referral Program is temporarily unavailable
+                            {t("referralProgram.unavailable.title")}
                         </Typography>
                         <Typography variant="body2" sx={{ opacity: 0.75, mt: 0.5 }}>
-                            We are performing maintenance. Please try again later.
+                            {t("referralProgram.unavailable.subtitle")}
                         </Typography>
                     </Box>
 
                     {onReload && (
-                        <Button variant="outlined" onClick={onReload} startIcon={<FiRefreshCw />}>
-                            Reload
+                        <Button
+                            variant="outlined"
+                            onClick={onReload}
+                            startIcon={<FiRefreshCw />}
+                        >
+                            {t("common.reload")}
                         </Button>
                     )}
                 </Stack>

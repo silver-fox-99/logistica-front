@@ -13,18 +13,18 @@ type Props = {
 function DeleteSettingsDialog({ open, onClose, onConfirm, saving }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-            <DialogTitle>Delete settings?</DialogTitle>
+            <DialogTitle>Удалить настройки?</DialogTitle>
             <DialogContent>
                 <Typography variant="body2" sx={{ mt: 1 }}>
-                    This action cannot be undone.
+                    Это действие нельзя отменить.
                 </Typography>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} disabled={saving}>
-                    Cancel
+                    Отмена
                 </Button>
                 <Button color="error" variant="contained" onClick={onConfirm} disabled={saving}>
-                    Delete
+                    Удалить
                 </Button>
             </DialogActions>
         </Dialog>

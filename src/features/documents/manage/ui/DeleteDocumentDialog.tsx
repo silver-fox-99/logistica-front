@@ -12,18 +12,18 @@ type Props = {
 export const DeleteDocumentDialog = React.memo(function DeleteDocumentDialog({ open, doc, onClose, onConfirm }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Delete document version</DialogTitle>
+            <DialogTitle>Удалить версию документа</DialogTitle>
             <DialogContent>
                 <Typography>
-                    Are you sure you want to delete <b>{doc?.key}</b> version <b>v{doc?.version}</b>?
+                    Вы уверены, что хотите удалить документ <b>{doc?.key}</b> версии <b>v{doc?.version}</b>?
                 </Typography>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={onClose}>
-                    Cancel
+                    Отмена
                 </Button>
                 <Button color="error" variant="contained" onClick={() => void onConfirm()}>
-                    Delete
+                    Удалить
                 </Button>
             </DialogActions>
         </Dialog>

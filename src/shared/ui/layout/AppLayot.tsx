@@ -3,10 +3,32 @@ import Footer from "@/features/footer/Footer";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useUserStore } from "@/entities/user/model/user.store";
+import {useEffect, useRef} from "react";
+import {authApi} from "@/shared/api/authApi.ts";
 
 
 export default function AppLayout() {
     const user = useUserStore((s) => s.user);
+    const setUser = useUserStore(s => s.setUser);
+    const didRun = useRef(false);
+
+    const run = async () => {
+        try {
+            if (user) {
+                return;
+            }
+            const res = await authApi.getMe();
+            setUser(res.data);
+        } catch {
+            setUser(null);
+        }
+    };
+
+    useEffect(() => {
+        if (didRun.current) return;
+        didRun.current = true;
+        run()
+    }, []);
 
     return (
         <Box 

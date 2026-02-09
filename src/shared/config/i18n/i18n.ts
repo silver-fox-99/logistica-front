@@ -17,11 +17,17 @@ void i18n
             ru: { translation: ru },
             uz: { translation: uz }
         },
+        interpolation: {
+            escapeValue: false,
+        },
+        react: {
+            transSupportBasicHtmlNodes: true,
+            transKeepBasicHtmlNodesFor: ["br", "b", "strong", "i", "em"],
+        },
         detection: {
             order: ["localStorage", "navigator", "htmlTag", "cookie"],
             caches: ["localStorage"]
         },
-        interpolation: { escapeValue: false },
         returnEmptyString: false
     });
 

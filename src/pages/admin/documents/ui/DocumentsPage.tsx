@@ -64,18 +64,18 @@ export default function DocumentsPage() {
         <Stack gap={2}>
             <DocumentsToolbar loading={loading} onReload={reload} onCreate={openCreate} />
 
-            {error ? <Alert severity="error">{error}</Alert> : null}
+            {error ? <Alert severity="error">Ошибка: {error}</Alert> : null}
 
             <Card>
                 <CardContent>
                     <Stack gap={2}>
                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
-                            <Typography variant="h6">Document</Typography>
+                            <Typography variant="h6">Документы</Typography>
 
                             <FormControl size="small" sx={{ minWidth: 260 }}>
-                                <InputLabel>Key</InputLabel>
+                                <InputLabel>Ключ</InputLabel>
                                 <Select
-                                    label="Key"
+                                    label="Ключ"
                                     value={selectedKey}
                                     onChange={(e) => setSelectedKey(String(e.target.value))}
                                 >

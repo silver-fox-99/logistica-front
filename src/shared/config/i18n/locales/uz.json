@@ -222,7 +222,8 @@
       "addTransport": "Transport qo'shish",
       "adminPanel": "Admin panel",
       "logout": "Chiqish",
-      "openMenu": "Menyuni ochish"
+      "openMenu": "Menyuni ochish",
+      "referrals": "Referallar"
     }
   },
   "profile": {
@@ -678,7 +679,16 @@
     "registrationSuccess": "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!",
     "registrationError": "Ro'yxatdan o'tishda xatolik",
     "alreadyHaveAccount": "Hisobingiz bormi?",
-    "signInButton": "Kirish"
+    "signInButton": "Kirish",
+    "invitationCode": "Taklifnoma kodi",
+    "enterInvitationCode": "Agar bo‘lsa, taklifnoma kodini kiriting",
+    "accountType": "Hisob turi",
+    "accountTypes": {
+      "shipper": "Yuk jo‘natuvchi",
+      "logist": "Logist",
+      "carrier": "Tashuvchi",
+      "other": "Boshqa"
+    }
   },
   "forgotPassword": {
     "step1Title": "Parolni tiklash",
@@ -774,5 +784,143 @@
     "MONTHLY_CREATED": "Oylik yaratish limiti tugadi. Keyinroq urinib ko‘ring yoki tarifni yangilang.",
     "FREE_PLAN": "Bepul tarifni to‘lash mumkin emas. Davom etish uchun pullik tarifni tanlang.",
     "DAILY_LIMIT": "Kunlik limit oshib ketdi. Ertaga urinib ko‘ring yoki qo‘llab-quvvatlashga murojaat qiling."
+  },
+  "referralProgram": {
+    "title": "Referal dasturi",
+    "subtitle": "Referal kodingizni faollashtirish va mukofotlar olishni boshlash uchun kelishuvni imzolang.",
+    "unavailable": {
+      "title": "Referal dasturi vaqtincha mavjud emas",
+      "subtitle": "Texnik ishlar olib borilmoqda. Iltimos, keyinroq qayta urinib ko‘ring."
+    },
+    "agreement": {
+      "title": "Kelishuv",
+      "status": {
+        "signed": "Imzolangan",
+        "notSigned": "Imzolanmagan"
+      },
+      "description": {
+        "notSigned": "Referal havolangizni faollashtirish uchun referal kelishuvini imzolashingiz kerak.",
+        "signed": "Kelishuv imzolangan. Referal havolangizni ulashishingiz va daromadlarni kuzatishingiz mumkin."
+      },
+      "actions": {
+        "view": "Kelishuvni ko‘rish",
+        "sign": "Kelishuvni imzolash"
+      },
+      "acceptTerms": "Men shartlarga roziman",
+      "contentUnavailable": "Kelishuv matni hozircha mavjud emas."
+    },
+    "code": {
+      "title": "Referal kodi",
+      "tooltip": "Do‘stlarni taklif qilish uchun kodingizni ulashing.",
+      "fieldLabel": "Sizning referal kodingiz"
+    },
+    "balance": {
+      "title": "Balans va xulosa",
+      "available": "Mavjud balans",
+      "pending": "Kutilmoqda: {{amount}}",
+      "invited": "Taklif qilinganlar",
+      "active": "Faollar",
+      "qualified": "Mos kelganlar",
+      "totalEarned": "Jami ishlangan"
+    },
+    "tabs": {
+      "overview": "Umumiy",
+      "invitedUsers": "Taklif qilinganlar",
+      "earningsHistory": "Daromadlar tarixi",
+      "faq": "FAQ"
+    },
+    "overview": {
+      "howItWorks": {
+        "title": "Qanday ishlaydi",
+        "steps": {
+          "1": "1) Taklif kodingizni ulashing",
+          "2": "2) Do‘stingiz ro‘yxatdan o‘tadi va kerakli amalni bajaradi",
+          "3": "3) Mos kelgan referallar uchun mukofot olasiz"
+        }
+      },
+      "recentEarnings": {
+        "title": "So‘nggi daromadlar"
+      }
+    },
+    "table": {
+      "date": "Sana",
+      "user": "Foydalanuvchi",
+      "amount": "Miqdor",
+      "status": "Holat",
+      "joinedAt": "Ro‘yxatdan o‘tgan sana",
+      "reward": "Mukofot",
+      "reason": "Sabab"
+    },
+    "faq": {
+      "q1": {
+        "title": "Mukofotni qachon olaman?",
+        "text": "Mukofot taklif qilingan foydalanuvchi kerakli amalni bajarganidan so‘ng hisoblanadi."
+      },
+      "q2": {
+        "title": "Mos kelgan referral nima?",
+        "text": "Mos kelgan referral — bu kelishuvda belgilangan dastur shartlarini bajargan foydalanuvchi."
+      },
+      "q3": {
+        "title": "Ishlagan pulim bilan nima qilsam bo‘ladi?",
+        "text": "Agar balansingiz 0 dan yuqori bo‘lsa, to‘lovlar oyiga bir marta amalga oshiriladi. Batafsil ma’lumot uchun kelishuvga qarang."
+      }
+    },
+    "status": {
+      "PENDING": "Kutilmoqda",
+      "REGISTERED": "Ro‘yxatdan o‘tgan",
+      "QUALIFIED": "Mos kelgan",
+      "CONFIRMED": "Tasdiqlangan",
+      "REVERSED": "Bekor qilingan"
+    },
+    "reason": {
+      "REFERRAL_BONUS": "Referal bonusi",
+      "REFERRAL_PAYOUT": "Referal dasturi bo‘yicha to‘lov",
+      "REFERRAL_BONUS_REVERSAL": "Referal bonusini bekor qilish"
+    }
+  },
+  "common": {
+    "reload": "Qayta yuklash",
+    "loading": "Yuklanmoqda...",
+    "close": "Yopish",
+    "copy": "Nusxa olish",
+    "dash": "—"
+  },
+  "bookmarkPrompt": {
+    "title": {
+      "desktop": "Saytni xatcho‘plarga qo‘shing",
+      "mobile": "Saytni Bosh ekranga qo‘shing"
+    },
+    "subtitle": {
+      "desktop": "Xatcho‘plar",
+      "mobile": "Bosh ekran / o‘rnatish"
+    },
+    "hint": {
+      "desktop": "Shunda servisga tezroq qaytasiz va havolani har safar qidirib o‘tirmaysiz.",
+      "mobile": "Servis tezroq ochiladi — u ikonka sifatida paydo bo‘ladi, deyarli ilova kabi."
+    },
+    "alert": {
+      "canInstall": "Ushbu saytni ilova sifatida o‘rnatish mumkin.<br/><b>Install</b> tugmasini bosing yoki qo‘lda yo‘riqnoma uchun <b>How to add</b> ni oching.",
+      "manualOnly": "<b>How to add</b> ni bosing — qurilmangiz uchun yo‘riqnomani ko‘rsatamiz."
+    },
+    "installAvailable": "Bu qurilmada o‘rnatish mavjud.",
+    "actions": {
+      "dontShowAgain": "Qayta ko‘rsatmasin",
+      "howTo": "Qanday qo‘shish",
+      "hide": "Yashirish",
+      "install": "O‘rnatish",
+      "gotIt": "Tushunarli"
+    },
+    "howTo": {
+      "ios_safari": "<b>Share</b> (o‘qchali kvadrat) ni bosing va <b>Add to Home Screen</b> ni tanlang.<br/>Agar ko‘rinmasa, amallar ro‘yxatini pastga aylantiring.",
+      "ios_chrome": "iPhone/iPad’da barcha brauzerlar bir xil tizim menyusidan foydalanadi.<br/><b>Share</b> ni bosing va <b>Add to Home Screen</b> ni tanlang.",
+      "ios_edge": "iPhone/iPad’da barcha brauzerlar bir xil tizim menyusidan foydalanadi.<br/><b>Share</b> ni bosing va <b>Add to Home Screen</b> ni tanlang.",
+      "ios_firefox": "iPhone/iPad’da barcha brauzerlar bir xil tizim menyusidan foydalanadi.<br/><b>Share</b> ni bosing va <b>Add to Home Screen</b> ni tanlang.",
+      "android_chrome": "Brauzer menyusini (⋮) oching va <b>Install app</b> yoki <b>Add to Home screen</b> ni tanlang.<br/>Agar o‘rnatish taklifi chiqsa, uni qabul qilishingiz mumkin.",
+      "android_samsung": "Menyuni (≡ yoki ⋮) oching va <b>Add page to</b> → <b>Home screen</b> yoki (mavjud bo‘lsa) <b>Install app</b> ni tanlang.",
+      "android_edge": "Menyuni (⋯) oching va <b>Apps</b> → <b>Install this site as an app</b> yoki <b>Add to Home screen</b> ni tanlang.<br/>Matn nomi farq qilishi mumkin.",
+      "android_firefox": "Menyuni (⋮) oching va (mavjud bo‘lsa) <b>Install</b> yoki <b>Add to Home screen</b> ni tanlang.",
+      "android_other": "Brauzer menyusida <b>Add to Home screen</b> yoki <b>Install app</b> bandini toping.",
+      "desktop": "Saytni xatcho‘plarga qo‘shish uchun <b>Ctrl + D</b> (Windows) yoki <b>Cmd + D</b> (Mac) ni bosing."
+    }
   }
 }

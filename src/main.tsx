@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './index.scss'
 import AppRoot from './app'
-import "@/app/providers/i18n/i18n";
+import "@/shared/config/i18n/i18n.ts";
 
 
 createRoot(document.getElementById('root')!).render(

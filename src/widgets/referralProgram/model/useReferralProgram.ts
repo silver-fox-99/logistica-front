@@ -99,6 +99,7 @@ export function useReferralProgram() {
             amount: t.amount,
             currency,
             status: mapTxStatus(t.reason),
+            reason: t.reason
         }));
         setEarningsRows(mapped);
     }, []);
@@ -178,6 +179,7 @@ export function useReferralProgram() {
                     amount: t.amount,
                     currency,
                     status: mapTxStatus(t.reason),
+                    reason: t.reason
                 }))
             );
         } catch (e: any) {
@@ -230,6 +232,7 @@ export function useReferralProgram() {
                         amount: t.amount,
                         currency,
                         status: mapTxStatus(t.reason),
+                        reason: t.reason
                     }))
                 );
             } catch {

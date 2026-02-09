@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { FiCheckCircle, FiFileText } from "react-icons/fi";
 import type { ReferralAgreement } from "@/entities/referralProgram";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     agreement: ReferralAgreement;
@@ -27,11 +28,22 @@ type Props = {
 
 function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingContent }: Props) {
     const [accepted, setAccepted] = useState(false);
+    const { t } = useTranslation();
 
     const chip = useMemo(() => {
-        if (agreement.isSigned) return { label: "Signed", color: "success" as const, icon: <FiCheckCircle /> };
-        return { label: "Not signed", color: "warning" as const, icon: <FiFileText /> };
-    }, [agreement.isSigned]);
+        if (agreement.isSigned) {
+            return {
+                label: t("referralProgram.agreement.status.signed"),
+                color: "success" as const,
+                icon: <FiCheckCircle />,
+            };
+        }
+        return {
+            label: t("referralProgram.agreement.status.notSigned"),
+            color: "warning" as const,
+            icon: <FiFileText />,
+        };
+    }, [agreement.isSigned, t]);
 
     const onToggle = useCallback((_: any, v: boolean) => setAccepted(v), []);
     const onSignClick = useCallback(() => {
@@ -45,10 +57,19 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                 <Stack spacing={1.5}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
                         <Stack direction="row" alignItems="center" gap={1}>
-                            <Box sx={{ display: "grid", placeItems: "center", width: 36, height: 36, borderRadius: 2, bgcolor: "rgba(0,0,0,0.04)" }}>
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    placeItems: "center",
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: 2,
+                                    bgcolor: "rgba(0,0,0,0.04)",
+                                }}
+                            >
                                 <FiFileText />
                             </Box>
-                            <Typography fontWeight={800}>Agreement</Typography>
+                            <Typography fontWeight={800}>{t("referralProgram.agreement.title")}</Typography>
                         </Stack>
 
                         <Chip
@@ -62,17 +83,17 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
 
                     {!agreement.isSigned ? (
                         <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                            You need to sign the referral agreement to activate your referral link.
+                            {t("referralProgram.agreement.description.notSigned")}
                         </Typography>
                     ) : (
                         <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                            Agreement is signed. You can share your referral link and track earnings.
+                            {t("referralProgram.agreement.description.signed")}
                         </Typography>
                     )}
 
                     <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} sx={{ pt: 0.5 }}>
                         <Button variant="outlined" onClick={onOpen} sx={{ justifyContent: "space-between" }}>
-                            View Agreement
+                            {t("referralProgram.agreement.actions.view")}
                         </Button>
 
                         {!agreement.isSigned && (
@@ -82,7 +103,7 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                                 disabled={!accepted}
                                 sx={{ justifyContent: "space-between" }}
                             >
-                                Sign Agreement
+                                {t("referralProgram.agreement.actions.sign")}
                             </Button>
                         )}
                     </Stack>
@@ -90,7 +111,7 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                     {!agreement.isSigned && (
                         <FormControlLabel
                             control={<Checkbox checked={accepted} onChange={onToggle} />}
-                            label="I agree to the terms"
+                            label={t("referralProgram.agreement.acceptTerms")}
                         />
                     )}
                 </Stack>
@@ -101,16 +122,16 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                 <DialogContent dividers>
                     {loadingContent ? (
                         <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                            Loading...
+                            {t("common.loading")}
                         </Typography>
                     ) : (
                         <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", opacity: 0.85 }}>
-                            {agreement.content || "Agreement content is not available yet."}
+                            {agreement.content || t("referralProgram.agreement.contentUnavailable")}
                         </Typography>
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onClose}>Close</Button>
+                    <Button onClick={onClose}>{t("common.close")}</Button>
                 </DialogActions>
             </Dialog>
         </>

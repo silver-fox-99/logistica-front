@@ -65,6 +65,15 @@ type Props = {
     onSave: (dto: UpsertReferralSettingsDto) => Promise<void>;
 };
 
+const TRIGGER_RU: Record<string, string> = {
+    [ReferralTrigger.PREMIUM_PURCHASE]: "Покупка Premium",
+};
+
+const REWARD_TYPE_RU: Record<string, string> = {
+    [ReferralRewardType.FIXED]: "Фиксированная сумма",
+    [ReferralRewardType.PERCENT]: "Процент",
+};
+
 const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function ReferralSettingsForm(props, ref) {
     const { settings, activeId, onChangeActiveId, active, documents, documentKeys, setError, onSave } = props;
 
@@ -89,7 +98,6 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
         mode: "onChange",
     });
 
-    // точечные подписки — не заставляют ререндерить всё из-за любого поля
     const rewardType = useWatch({ control, name: "reward_type" });
     const linkMode = useWatch({ control, name: "linkMode" });
     const selectedDocId = useWatch({ control, name: "document_id" });
@@ -101,7 +109,6 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
         return documents.find((d) => d.id === selectedDocId) ?? null;
     }, [documents, selectedDocId]);
 
-    // для ориентира — показываем формат с точками, но не ломаем ввод (значение остаётся строкой)
     const rewardPreview = useMemo(() => {
         if (rewardType !== ReferralRewardType.FIXED) return null;
         const onlyDigits = (rewardValue ?? "").replace(/[^\d]/g, "");
@@ -163,7 +170,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
         }
 
         if (!/^\d+(\.\d+)?$/.test(values.reward_value)) {
-            setError("Reward value must be a numeric string (e.g. 10 or 10.5)");
+            setError("Значение награды должно быть числом (например: 10 или 10.5)");
             return;
         }
 
@@ -188,16 +195,16 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             {settings.length > 1 && (
                 <Stack direction="row" spacing={2}>
                     <FormControl fullWidth>
-                        <InputLabel id="active-settings-label">Active Settings</InputLabel>
+                        <InputLabel id="active-settings-label">Активные настройки</InputLabel>
                         <Select
                             labelId="active-settings-label"
-                            label="Active Settings"
+                            label="Активные настройки"
                             value={activeId ?? ""}
                             onChange={(e) => onChangeActiveId(String(e.target.value))}
                         >
                             {settings.map((s) => (
                                 <MenuItem key={s.id} value={s.id}>
-                                    {s.trigger} • {s.is_enabled ? "Enabled" : "Disabled"}
+                                    {(TRIGGER_RU[s.trigger] ?? s.trigger)} • {s.is_enabled ? "Включено" : "Отключено"}
                                 </MenuItem>
                             ))}
                         </Select>
@@ -212,7 +219,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     render={({ field }) => (
                         <FormControlLabel
                             control={<Switch checked={field.value} onChange={(_, v) => field.onChange(v)} />}
-                            label="Enabled"
+                            label="Включено"
                         />
                     )}
                 />
@@ -222,9 +229,11 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     control={control}
                     render={({ field }) => (
                         <FormControl fullWidth>
-                            <InputLabel id="trigger-label">Trigger</InputLabel>
-                            <Select labelId="trigger-label" label="Trigger" {...field}>
-                                <MenuItem value={ReferralTrigger.PREMIUM_PURCHASE}>Premium Purchase</MenuItem>
+                            <InputLabel id="trigger-label">Триггер</InputLabel>
+                            <Select labelId="trigger-label" label="Триггер" {...field}>
+                                <MenuItem value={ReferralTrigger.PREMIUM_PURCHASE}>
+                                    {TRIGGER_RU[ReferralTrigger.PREMIUM_PURCHASE]}
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     )}
@@ -234,7 +243,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             <Divider />
 
             <Typography variant="subtitle1" fontWeight={700}>
-                Reward
+                Награда
             </Typography>
 
             <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -243,10 +252,10 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     control={control}
                     render={({ field }) => (
                         <FormControl fullWidth>
-                            <InputLabel id="reward-type-label">Reward Type</InputLabel>
-                            <Select labelId="reward-type-label" label="Reward Type" {...field}>
-                                <MenuItem value={ReferralRewardType.FIXED}>Fixed</MenuItem>
-                                <MenuItem value={ReferralRewardType.PERCENT}>Percent</MenuItem>
+                            <InputLabel id="reward-type-label">Тип награды</InputLabel>
+                            <Select labelId="reward-type-label" label="Тип награды" {...field}>
+                                <MenuItem value={ReferralRewardType.FIXED}>{REWARD_TYPE_RU[ReferralRewardType.FIXED]}</MenuItem>
+                                <MenuItem value={ReferralRewardType.PERCENT}>{REWARD_TYPE_RU[ReferralRewardType.PERCENT]}</MenuItem>
                             </Select>
                         </FormControl>
                     )}
@@ -258,14 +267,14 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     render={({ field }) => (
                         <TextField
                             fullWidth
-                            label="Reward Value"
+                            label="Размер награды"
                             placeholder={rewardType === ReferralRewardType.PERCENT ? "10.5" : "10000"}
                             {...field}
                             error={!!errors.reward_value}
                             helperText={
                                 rewardType === ReferralRewardType.PERCENT
-                                    ? "Percent value (e.g. 10.5)"
-                                    : `Fixed amount (numeric string). Preview: ${rewardPreview ?? "0"}`
+                                    ? "Процент (например: 10.5)"
+                                    : `Фиксированная сумма (число). Предпросмотр: ${rewardPreview ?? "0"}`
                             }
                         />
                     )}
@@ -277,11 +286,11 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     render={({ field }) => (
                         <TextField
                             fullWidth
-                            label="Currency"
+                            label="Валюта"
                             disabled
                             placeholder="UZS"
                             {...field}
-                            helperText={rewardType !== ReferralRewardType.FIXED ? "Not required for percent" : "e.g. UZS"}
+                            helperText={rewardType !== ReferralRewardType.FIXED ? "Не требуется для процента" : "Например: UZS"}
                         />
                     )}
                 />
@@ -290,7 +299,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             <Divider />
 
             <Typography variant="subtitle1" fontWeight={700}>
-                Agreement Document
+                Документ соглашения
             </Typography>
 
             <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -299,11 +308,11 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     control={control}
                     render={({ field }) => (
                         <FormControl fullWidth>
-                            <InputLabel id="link-mode-label">Link Mode</InputLabel>
-                            <Select labelId="link-mode-label" label="Link Mode" {...field}>
-                                <MenuItem value="NONE">No document</MenuItem>
-                                <MenuItem value="DOCUMENT_ID">Link by document</MenuItem>
-                                <MenuItem value="DOCUMENT_KEY">Link by key (latest published)</MenuItem>
+                            <InputLabel id="link-mode-label">Способ привязки</InputLabel>
+                            <Select labelId="link-mode-label" label="Способ привязки" {...field}>
+                                <MenuItem value="NONE">Без документа</MenuItem>
+                                <MenuItem value="DOCUMENT_ID">Привязать к документу</MenuItem>
+                                <MenuItem value="DOCUMENT_KEY">Привязать по ключу (последний опубликованный)</MenuItem>
                             </Select>
                         </FormControl>
                     )}
@@ -319,9 +328,9 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Document"
-                                placeholder="Select a document..."
-                                helperText="This will link settings to a specific document version"
+                                label="Документ"
+                                placeholder="Выберите документ..."
+                                helperText="Настройки будут привязаны к конкретной версии документа"
                             />
                         )}
                     />
@@ -336,9 +345,9 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Document Key"
-                                placeholder="Select a document key..."
-                                helperText='This will use the latest "PUBLISHED" document for the selected key'
+                                label="Ключ документа"
+                                placeholder="Выберите ключ документа..."
+                                helperText='Будет использован последний документ со статусом "PUBLISHED" для выбранного ключа'
                             />
                         )}
                     />
@@ -348,7 +357,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             <Divider />
 
             <Typography variant="subtitle1" fontWeight={700}>
-                Meta
+                Метаданные
             </Typography>
 
             <Controller
@@ -357,7 +366,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                 render={({ field }) => (
                     <TextField
                         {...field}
-                        label="Meta (JSON)"
+                        label="Метаданные (JSON)"
                         multiline
                         minRows={6}
                         placeholder={`{\n  "example": true\n}`}

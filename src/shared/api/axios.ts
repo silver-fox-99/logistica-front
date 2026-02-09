@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {useUserStore} from "@/entities/user/model/user.store.ts";
-import i18n from "@/app/providers/i18n/i18n";
+import i18n from "@/shared/config/i18n/i18n.ts";
 import qs from "qs";
 
 

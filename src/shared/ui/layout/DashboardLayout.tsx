@@ -40,7 +40,7 @@ function SidebarContent({
         { to: "/dashboard/company",  icon: <FiPackage />,     label: t('dashboard.menu.company') },
         { to: "/dashboard/staff",    icon: <FiUsers />,       label: t('dashboard.menu.staff') },
         { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
-        { to: "/dashboard/referral", icon: <FiAward />,  label: "Referral" },
+        { to: "/dashboard/referral", icon: <FiAward />,  label: t('dashboard.menu.referrals') },
         { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },
     ];
 

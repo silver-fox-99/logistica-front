@@ -121,7 +121,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
 
             {/* Type select */}
             <FormControl fullWidth error={!!errors.type}>
-                <InputLabel id="profile-type-label">Account type</InputLabel>
+                <InputLabel id="profile-type-label">{t('register.accountType')}</InputLabel>
                 <Controller
                     name="type"
                     control={control}
@@ -132,10 +132,10 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
                             label="Account type"
                             sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                         >
-                            <MenuItem value="Грузоотправитель">Грузоотправитель</MenuItem>
-                            <MenuItem value="Логист">Логист</MenuItem>
-                            <MenuItem value="Перевозчик">Перевозчик</MenuItem>
-                            <MenuItem value="Другое">Другое</MenuItem>
+                            <MenuItem value="Грузоотправитель">{t('register.accountTypes.shipper')}</MenuItem>
+                            <MenuItem value="Логист">{t('register.accountTypes.logist')}</MenuItem>
+                            <MenuItem value="Перевозчик">{t('register.accountTypes.carrier')}</MenuItem>
+                            <MenuItem value="Другое">{t('register.accountTypes.other')}</MenuItem>
                         </Select>
                     )}
                 />
@@ -189,8 +189,8 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             />
 
             <TextField
-                label={"Пригласительный код"}
-                placeholder={"Введите пригласительный код если есть"}
+                label={t('register.invitationCode')}
+                placeholder={t('register.enterInvitationCode')}
                 autoComplete="given-code"
                 fullWidth
                 {...register("code")}

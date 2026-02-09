@@ -14,7 +14,13 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 
-import { DocumentFormat, DocumentStatus, type DocumentEntity, type CreateDocumentDto, type UpdateDocumentDto } from "@/entities/document/model/types";
+import {
+    DocumentFormat,
+    DocumentStatus,
+    type DocumentEntity,
+    type CreateDocumentDto,
+    type UpdateDocumentDto,
+} from "@/entities/document/model/types";
 import { DocumentKey, DOCUMENT_KEY_LABELS } from "@/entities/document/model/constants";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
@@ -36,6 +42,17 @@ type Props = {
     defaultKey?: string;
     onClose: () => void;
     onSubmit: (dto: CreateDocumentDto | UpdateDocumentDto) => Promise<void>;
+};
+
+const FORMAT_RU: Record<string, string> = {
+    [DocumentFormat.MARKDOWN]: "Markdown",
+    [DocumentFormat.HTML]: "HTML",
+};
+
+const STATUS_RU: Record<string, string> = {
+    [DocumentStatus.DRAFT]: "Черновик",
+    [DocumentStatus.ARCHIVED]: "Архив",
+    [DocumentStatus.PUBLISHED]: "Опубликован",
 };
 
 export const DocumentEditorDialog = React.memo(function DocumentEditorDialog({
@@ -106,74 +123,69 @@ export const DocumentEditorDialog = React.memo(function DocumentEditorDialog({
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>{isEdit ? `Edit version` : "Create new version"}</DialogTitle>
+            <DialogTitle>{isEdit ? "Редактировать версию" : "Создать новую версию"}</DialogTitle>
 
             <DialogContent>
                 <Stack gap={2} sx={{ pt: 1 }}>
                     <RHFLookupAutocomplete
                         control={control}
                         name={"key"}
-                        label="Document key"
-                        placeholder="Select document key"
+                        label="Ключ документа"
+                        placeholder="Выберите ключ документа"
                         options={keyOptions}
                         getOptionLabel={(o: any) => o.label ?? o.slug}
                         disabled={isEdit}
                     />
 
                     <TextField
-                        label="Title"
-                        placeholder="Enter title"
+                        label="Заголовок"
+                        placeholder="Введите заголовок"
                         fullWidth
-                        {...register("title", { required: "Title is required" })}
+                        {...register("title", { required: "Заголовок обязателен" })}
                         error={!!formState.errors.title}
                         helperText={formState.errors.title?.message}
                     />
 
                     <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
                         <FormControl fullWidth>
-                            <InputLabel>Format</InputLabel>
-                            <Select label="Format" defaultValue={DocumentFormat.MARKDOWN} {...register("format" as any)}>
-                                <MenuItem value={DocumentFormat.MARKDOWN}>MARKDOWN</MenuItem>
-                                <MenuItem value={DocumentFormat.HTML}>HTML</MenuItem>
+                            <InputLabel>Формат</InputLabel>
+                            <Select label="Формат" defaultValue={DocumentFormat.MARKDOWN} {...register("format" as any)}>
+                                <MenuItem value={DocumentFormat.MARKDOWN}>{FORMAT_RU[DocumentFormat.MARKDOWN]}</MenuItem>
+                                <MenuItem value={DocumentFormat.HTML}>{FORMAT_RU[DocumentFormat.HTML]}</MenuItem>
                             </Select>
                         </FormControl>
 
                         <FormControl fullWidth>
-                            <InputLabel>Status</InputLabel>
-                            <Select label="Status" defaultValue={DocumentStatus.DRAFT} {...register("status" as any)}>
-                                <MenuItem value={DocumentStatus.DRAFT}>DRAFT</MenuItem>
-                                <MenuItem value={DocumentStatus.ARCHIVED}>ARCHIVED</MenuItem>
-                                <MenuItem value={DocumentStatus.PUBLISHED}>PUBLISHED</MenuItem>
+                            <InputLabel>Статус</InputLabel>
+                            <Select label="Статус" defaultValue={DocumentStatus.DRAFT} {...register("status" as any)}>
+                                <MenuItem value={DocumentStatus.DRAFT}>{STATUS_RU[DocumentStatus.DRAFT]}</MenuItem>
+                                <MenuItem value={DocumentStatus.ARCHIVED}>{STATUS_RU[DocumentStatus.ARCHIVED]}</MenuItem>
+                                <MenuItem value={DocumentStatus.PUBLISHED}>{STATUS_RU[DocumentStatus.PUBLISHED]}</MenuItem>
                             </Select>
                         </FormControl>
                     </Stack>
 
                     <TextField
-                        label="Content"
-                        placeholder="Enter document content"
+                        label="Содержимое"
+                        placeholder="Введите содержимое документа"
                         fullWidth
                         multiline
                         minRows={10}
-                        {...register("content", { required: "Content is required" })}
+                        {...register("content", { required: "Содержимое обязательно" })}
                         error={!!formState.errors.content}
                         helperText={formState.errors.content?.message}
                     />
 
-                    <TextField
-                        label="Selected key"
-                        value={selectedKey}
-                        fullWidth
-                        disabled
-                    />
+                    <TextField label="Выбранный ключ" value={selectedKey} fullWidth disabled />
                 </Stack>
             </DialogContent>
 
             <DialogActions>
                 <Button onClick={onClose} variant="outlined">
-                    Cancel
+                    Отмена
                 </Button>
                 <Button onClick={submit} variant="contained" disabled={!formState.isValid}>
-                    Save
+                    Сохранить
                 </Button>
             </DialogActions>
         </Dialog>

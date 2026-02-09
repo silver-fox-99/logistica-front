@@ -57,7 +57,7 @@ export default function ReferralPayouts() {
             <Stack spacing={2}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
                     <Typography variant="h6" fontWeight={700}>
-                        Referral Payouts
+                        Выплаты по реферальной программе
                     </Typography>
 
                     <Stack direction="row" gap={1}>
@@ -67,7 +67,7 @@ export default function ReferralPayouts() {
                             onClick={() => void loadCandidates()}
                             disabled={payoutLoading || resetting}
                         >
-                            Load list
+                            Загрузить список
                         </Button>
 
                         <Button
@@ -76,7 +76,7 @@ export default function ReferralPayouts() {
                             onClick={() => setResetDialogOpen(true)}
                             disabled={payoutLoading || resetting || candidates.length === 0}
                         >
-                            Reset all balances
+                            Обнулить все балансы
                         </Button>
                     </Stack>
                 </Stack>
@@ -84,43 +84,43 @@ export default function ReferralPayouts() {
                 {payoutError && <Alert severity="error">{payoutError}</Alert>}
 
                 <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-                    <TextField fullWidth label="Currency" value="UZS" disabled helperText="Payout currency" />
+                    <TextField fullWidth label="Валюта" value="UZS" disabled helperText="Валюта выплат" />
 
                     <TextField
                         fullWidth
-                        label="Min Balance (cents)"
+                        label="Мин. баланс (центы)"
                         value={formatIntWithDots(minBalanceCents)}
                         onChange={(e) => setMinBalanceCents(Math.max(1, parseIntDots(e.target.value, 1)))}
-                        helperText="Minimum referral balance to include in payout list"
+                        helperText="Минимальный реферальный баланс для включения в список выплат"
                         inputProps={{ inputMode: "numeric" }}
                     />
 
                     <TextField
                         fullWidth
-                        label="Batch Key"
+                        label="Batch key"
                         value={batchKey}
                         onChange={(e) => setBatchKey(e.target.value)}
                         placeholder="2026-02"
-                        helperText="Required for idempotency (prevents double payouts)"
+                        helperText="Нужен для идемпотентности (защита от повторных выплат)"
                     />
                 </Stack>
 
                 <TextField
                     fullWidth
-                    label="Note"
+                    label="Комментарий"
                     value={payoutNote}
                     onChange={(e) => setPayoutNote(e.target.value)}
-                    placeholder="Monthly referral payouts"
+                    placeholder="Ежемесячные выплаты по реферальной программе"
                 />
 
                 <Divider />
 
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography variant="body2">
-                        Candidates: <b>{formatIntWithDots(candidates.length)}</b>
+                        Кандидаты: <b>{formatIntWithDots(candidates.length)}</b>
                     </Typography>
                     <Typography variant="body2">
-                        Total (cents): <b>{candidatesTotalFmt}</b>
+                        Итого (центы): <b>{candidatesTotalFmt}</b>
                     </Typography>
                 </Stack>
 
@@ -128,10 +128,10 @@ export default function ReferralPayouts() {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>User</TableCell>
-                                <TableCell>Wallet ID</TableCell>
-                                <TableCell>Currency</TableCell>
-                                <TableCell align="right">Balance (cents)</TableCell>
+                                <TableCell>Пользователь</TableCell>
+                                <TableCell>ID кошелька</TableCell>
+                                <TableCell>Валюта</TableCell>
+                                <TableCell align="right">Баланс (центы)</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -150,7 +150,7 @@ export default function ReferralPayouts() {
                                 <TableRow>
                                     <TableCell colSpan={4}>
                                         <Typography variant="body2" color="text.secondary">
-                                            No candidates found.
+                                            Кандидаты не найдены.
                                         </Typography>
                                     </TableCell>
                                 </TableRow>

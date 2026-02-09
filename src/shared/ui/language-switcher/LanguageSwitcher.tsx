@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Button, Menu, MenuItem, ListItemIcon, ListItemText, Avatar, Tooltip, Box } from "@mui/material";
 import { FiGlobe } from "react-icons/fi";
-import i18n from "@/app/providers/i18n/i18n";
+import i18n from "@/shared/config/i18n/i18n.ts";
 import { useTranslation } from "react-i18next";
 
 const langToCountry: Record<string, string> = {

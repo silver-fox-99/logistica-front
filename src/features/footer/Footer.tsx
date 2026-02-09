@@ -23,7 +23,7 @@ export default function Footer() {
     const phoneNumbers = ["+998 94 986 68 86", "+998781136755"];
     const email = "info@yologistic.uz";
     const user = useUserStore((s) => s.user);
-    const isAuthenticated = !!(user || (typeof window !== "undefined" && localStorage.getItem("accessToken")));
+    const isAuthenticated = !!user;
 
     const handleContactClick = (e: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
         e.preventDefault();

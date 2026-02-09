@@ -24,10 +24,10 @@ export const DocumentsToolbar = React.memo(function DocumentsToolbar({
 
             <Stack direction="row" gap={1}>
                 <Button variant="outlined" onClick={onReload} startIcon={<FiRefreshCw />}>
-                    Refresh
+                    Обновить
                 </Button>
                 <Button variant="contained" onClick={onCreate} startIcon={<FiPlus />}>
-                    Create version
+                   Создать документ
                 </Button>
             </Stack>
         </Box>

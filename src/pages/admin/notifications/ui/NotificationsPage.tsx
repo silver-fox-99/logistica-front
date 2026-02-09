@@ -26,26 +26,26 @@ import { useNotifications } from "@/features/notifications/list/model/useNotific
 import { NotificationType, type Notification } from "@/entities/notification/model/types";
 
 const TABS: Array<{ label: string; type?: NotificationType }> = [
-    { label: "All", type: undefined },
-    { label: "Registration", type: NotificationType.REGISTRATION },
-    { label: "Reviews", type: NotificationType.REVIEW },
-    { label: "Plan changes", type: NotificationType.PLAN_CHANGE },
-    { label: "Cargo created", type: NotificationType.CARGO_CREATED },
-    { label: "Transport created", type: NotificationType.TRANSPORT_CREATED },
+    { label: "Все", type: undefined },
+    { label: "Регистрация", type: NotificationType.REGISTRATION },
+    { label: "Отзывы", type: NotificationType.REVIEW },
+    { label: "Смена тарифа", type: NotificationType.PLAN_CHANGE },
+    { label: "Создан груз", type: NotificationType.CARGO_CREATED },
+    { label: "Создан транспорт", type: NotificationType.TRANSPORT_CREATED },
 ];
 
 function typeLabel(t: NotificationType) {
     switch (t) {
         case NotificationType.REGISTRATION:
-            return "Registration";
+            return "Регистрация";
         case NotificationType.REVIEW:
-            return "Review";
+            return "Отзыв";
         case NotificationType.PLAN_CHANGE:
-            return "Plan change";
+            return "Смена тарифа";
         case NotificationType.CARGO_CREATED:
-            return "Cargo created";
+            return "Создан груз";
         case NotificationType.TRANSPORT_CREATED:
-            return "Transport created";
+            return "Создан транспорт";
         default:
             return t;
     }
@@ -53,7 +53,7 @@ function typeLabel(t: NotificationType) {
 
 function formatTime(iso: string) {
     const d = new Date(iso);
-    return new Intl.DateTimeFormat("en-GB", {
+    return new Intl.DateTimeFormat("ru-RU", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -92,19 +92,19 @@ export default function NotificationsPage() {
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                 <Stack>
                     <Typography variant="h5" fontWeight={800}>
-                        Notifications
+                        Уведомления
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Search by user ID or phone. Filter by category tabs.
+                        Поиск по ID пользователя или телефону. Фильтрация по категориям во вкладках.
                     </Typography>
                 </Stack>
 
-                <Tooltip title="Refresh">
-          <span>
-            <IconButton onClick={() => void reload()} disabled={loading}>
-              {loading ? <CircularProgress size={18} /> : <FiRefreshCw />}
-            </IconButton>
-          </span>
+                <Tooltip title="Обновить">
+                    <span>
+                        <IconButton onClick={() => void reload()} disabled={loading}>
+                            {loading ? <CircularProgress size={18} /> : <FiRefreshCw />}
+                        </IconButton>
+                    </span>
                 </Tooltip>
             </Stack>
 
@@ -129,8 +129,8 @@ export default function NotificationsPage() {
 
                     <TextField
                         fullWidth
-                        label="Search"
-                        placeholder="User ID (uuid) or phone"
+                        label="Поиск"
+                        placeholder="ID пользователя (uuid) или телефон"
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                     />
@@ -139,11 +139,11 @@ export default function NotificationsPage() {
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell width={170}>Time</TableCell>
-                                    <TableCell width={170}>Type</TableCell>
-                                    <TableCell width={280}>User</TableCell>
-                                    <TableCell width={170}>Phone</TableCell>
-                                    <TableCell>Message</TableCell>
+                                    <TableCell width={170}>Время</TableCell>
+                                    <TableCell width={170}>Тип</TableCell>
+                                    <TableCell width={280}>Пользователь</TableCell>
+                                    <TableCell width={170}>Телефон</TableCell>
+                                    <TableCell>Сообщение</TableCell>
                                 </TableRow>
                             </TableHead>
 
@@ -174,7 +174,7 @@ export default function NotificationsPage() {
                                     <TableRow>
                                         <TableCell colSpan={5}>
                                             <Typography variant="body2" color="text.secondary">
-                                                No notifications found.
+                                                Уведомления не найдены.
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -185,7 +185,7 @@ export default function NotificationsPage() {
                                         <TableCell colSpan={5}>
                                             <Stack direction="row" alignItems="center" gap={1.5}>
                                                 <CircularProgress size={18} />
-                                                <Typography variant="body2">Loading...</Typography>
+                                                <Typography variant="body2">Загрузка...</Typography>
                                             </Stack>
                                         </TableCell>
                                     </TableRow>
@@ -204,6 +204,10 @@ export default function NotificationsPage() {
                                 setPage(0);
                             }}
                             rowsPerPageOptions={[10, 25, 50, 100]}
+                            labelRowsPerPage="Строк на странице:"
+                            labelDisplayedRows={({ from, to, count }) =>
+                                `${from}–${to} из ${count !== -1 ? count : `больше чем ${to}`}`
+                            }
                         />
                     </TableContainer>
                 </Stack>

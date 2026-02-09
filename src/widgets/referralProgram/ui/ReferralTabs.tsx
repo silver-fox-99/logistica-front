@@ -15,7 +15,8 @@ import {
 } from "@mui/material";
 import { TabPanel } from "@/shared/ui/TabPanel";
 import type { ReferralEarningRow, ReferralInvitedRow } from "@/entities/referralProgram";
-import {formatDate} from "@/shared/utils/formatDate.ts";
+import { formatDate } from "@/shared/utils/formatDate.ts";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     invitedUsers: ReferralInvitedRow[];
@@ -39,47 +40,61 @@ function statusChipColor(status: string): "default" | "success" | "warning" | "e
 
 function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
     const [tab, setTab] = useState(0);
+    const { t } = useTranslation();
 
     const onTabChange = useCallback((_: any, v: number) => setTab(v), []);
 
     const invitedRows = useMemo(() => invitedUsers, [invitedUsers]);
     const earningRows = useMemo(() => recentEarnings, [recentEarnings]);
 
+    const statusLabel = useCallback(
+        (status: string) => t(`referralProgram.status.${status}`, { defaultValue: status }),
+        [t]
+    );
+
+    const reasonLabel = useCallback(
+        (reason?: string | null) =>
+            reason ? t(`referralProgram.reason.${reason}`, { defaultValue: reason }) : t("common.dash"),
+        [t]
+    );
+
     return (
         <Paper sx={{ p: { xs: 2, md: 2.25 }, borderRadius: 3 }}>
             <Tabs value={tab} onChange={onTabChange} sx={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-                <Tab label="Overview" />
-                <Tab label="Invited Users" />
-                <Tab label="Earnings History" />
-                <Tab label="FAQ" />
+                <Tab label={t("referralProgram.tabs.overview")} />
+                <Tab label={t("referralProgram.tabs.invitedUsers")} />
+                <Tab label={t("referralProgram.tabs.earningsHistory")} />
+                <Tab label={t("referralProgram.tabs.faq")} />
             </Tabs>
 
+            {/* OVERVIEW */}
             <TabPanel value={tab} index={0}>
                 <Stack spacing={2}>
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
                         <Typography fontWeight={800} sx={{ mb: 1 }}>
-                            How it works
+                            {t("referralProgram.overview.howItWorks.title")}
                         </Typography>
                         <Stack spacing={0.75}>
-                            <Typography variant="body2">1) Share your invite code</Typography>
-                            <Typography variant="body2">2) Your friend signs up and completes the required action</Typography>
-                            <Typography variant="body2">3) You receive rewards for qualified referrals</Typography>
+                            <Typography variant="body2">{t("referralProgram.overview.howItWorks.steps.1")}</Typography>
+                            <Typography variant="body2">{t("referralProgram.overview.howItWorks.steps.2")}</Typography>
+                            <Typography variant="body2">{t("referralProgram.overview.howItWorks.steps.3")}</Typography>
                         </Stack>
                     </Paper>
 
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
                         <Typography fontWeight={800} sx={{ mb: 1 }}>
-                            Recent earnings
+                            {t("referralProgram.overview.recentEarnings.title")}
                         </Typography>
 
                         <Box sx={{ overflowX: "auto" }}>
-                            <Table size="small" sx={{ minWidth: 640 }}>
+                            <Table size="small" >
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>User</TableCell>
-                                        <TableCell>Amount</TableCell>
-                                        <TableCell>Status</TableCell>
+                                        <TableCell>{t("referralProgram.table.date")}</TableCell>
+                                        <TableCell>{t("referralProgram.table.user")}</TableCell>
+                                        <TableCell>{t("referralProgram.table.amount")}</TableCell>
+                                        {/*<TableCell>{t("referralProgram.table.status")}</TableCell>*/}
+                                        {/*<TableCell>{t("referralProgram.table.reason")}</TableCell>*/}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -88,15 +103,23 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                                             <TableCell>{formatDate(r.date)}</TableCell>
                                             <TableCell>{r.userMasked}</TableCell>
                                             <TableCell>{`${r.amount} ${r.currency}`}</TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    size="small"
-                                                    label={r.status}
-                                                    color={statusChipColor(r.status)}
-                                                    variant="outlined"
-                                                    sx={{ borderRadius: 2 }}
-                                                />
-                                            </TableCell>
+                                            {/*<TableCell>*/}
+                                            {/*    <Chip*/}
+                                            {/*        size="small"*/}
+                                            {/*        label={statusLabel(r.status)}*/}
+                                            {/*        color={statusChipColor(r.status)}*/}
+                                            {/*        variant="outlined"*/}
+                                            {/*        sx={{ borderRadius: 2 }}*/}
+                                            {/*    />*/}
+                                            {/*</TableCell>*/}
+                                            {/*<TableCell>*/}
+                                            {/*    <Chip*/}
+                                            {/*        size="small"*/}
+                                            {/*        label={reasonLabel((r as any).reason)}*/}
+                                            {/*        variant="outlined"*/}
+                                            {/*        sx={{ borderRadius: 2 }}*/}
+                                            {/*    />*/}
+                                            {/*</TableCell>*/}
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -106,15 +129,16 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                 </Stack>
             </TabPanel>
 
+            {/* INVITED USERS */}
             <TabPanel value={tab} index={1}>
                 <Box sx={{ overflowX: "auto" }}>
                     <Table size="small" sx={{ minWidth: 760 }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>User</TableCell>
-                                <TableCell>Joined at</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Reward</TableCell>
+                                <TableCell>{t("referralProgram.table.user")}</TableCell>
+                                <TableCell>{t("referralProgram.table.joinedAt")}</TableCell>
+                                <TableCell>{t("referralProgram.table.status")}</TableCell>
+                                <TableCell>{t("referralProgram.table.reward")}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -125,15 +149,13 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                                     <TableCell>
                                         <Chip
                                             size="small"
-                                            label={r.status}
+                                            label={statusLabel(r.status)}
                                             color={statusChipColor(r.status)}
                                             variant="outlined"
                                             sx={{ borderRadius: 2 }}
                                         />
                                     </TableCell>
-                                    <TableCell>
-                                        {r.rewarded_at ? formatDate(r.rewarded_at) : "—"}
-                                    </TableCell>
+                                    <TableCell>{r.rewarded_at ? formatDate(r.rewarded_at) : t("common.dash")}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -141,15 +163,17 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                 </Box>
             </TabPanel>
 
+            {/* EARNINGS HISTORY */}
             <TabPanel value={tab} index={2}>
                 <Box sx={{ overflowX: "auto" }}>
                     <Table size="small" sx={{ minWidth: 760 }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Date</TableCell>
-                                <TableCell>User</TableCell>
-                                <TableCell>Amount</TableCell>
-                                <TableCell>Status</TableCell>
+                                <TableCell>{t("referralProgram.table.date")}</TableCell>
+                                <TableCell>{t("referralProgram.table.user")}</TableCell>
+                                <TableCell>{t("referralProgram.table.amount")}</TableCell>
+                                <TableCell>{t("referralProgram.table.status")}</TableCell>
+                                <TableCell>{t("referralProgram.table.reason")}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -161,8 +185,16 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                                     <TableCell>
                                         <Chip
                                             size="small"
-                                            label={r.status}
+                                            label={statusLabel(r.status)}
                                             color={statusChipColor(r.status)}
+                                            variant="outlined"
+                                            sx={{ borderRadius: 2 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            size="small"
+                                            label={reasonLabel((r as any).reason)}
                                             variant="outlined"
                                             sx={{ borderRadius: 2 }}
                                         />
@@ -174,25 +206,27 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                 </Box>
             </TabPanel>
 
+            {/* FAQ */}
             <TabPanel value={tab} index={3}>
                 <Stack spacing={1}>
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                        <Typography fontWeight={800}>When do I receive rewards?</Typography>
+                        <Typography fontWeight={800}>{t("referralProgram.faq.q1.title")}</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
-                            Rewards are credited after the invited user completes the required action.
+                            {t("referralProgram.faq.q1.text")}
                         </Typography>
                     </Paper>
 
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                        <Typography fontWeight={800}>What is a qualified referral?</Typography>
+                        <Typography fontWeight={800}>{t("referralProgram.faq.q2.title")}</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
-                            A qualified referral is a user who meets the program conditions defined in the agreement.
+                            {t("referralProgram.faq.q2.text")}
                         </Typography>
                     </Paper>
+
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                        <Typography fontWeight={800}>What can I do with the money I earn?</Typography>
+                        <Typography fontWeight={800}>{t("referralProgram.faq.q3.title")}</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
-                            Payments are made once a month if your balance is above 0. For more details, please refer to the agreement.
+                            {t("referralProgram.faq.q3.text")}
                         </Typography>
                     </Paper>
                 </Stack>

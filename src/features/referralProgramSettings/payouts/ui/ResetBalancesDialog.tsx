@@ -35,18 +35,19 @@ function ResetBalancesDialog({
                              }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Reset all referral balances?</DialogTitle>
+            <DialogTitle>Обнулить все реферальные балансы?</DialogTitle>
             <DialogContent>
                 <Stack spacing={1.25} sx={{ mt: 1 }}>
                     <Alert severity="warning">
-                        This will create DEBIT transactions with reason <b>REFERRAL_PAYOUT</b> for all candidates and reduce their referral balances to zero.
+                        Будут созданы транзакции <b>DEBIT</b> с причиной <b>REFERRAL_PAYOUT</b> для всех кандидатов,
+                        и их реферальный баланс будет уменьшен до нуля.
                     </Alert>
 
                     <Typography variant="body2">
-                        Candidates: <b>{candidatesCount}</b>
+                        Кандидаты: <b>{candidatesCount}</b>
                     </Typography>
                     <Typography variant="body2">
-                        Total (cents): <b>{totalCentsFormatted}</b>
+                        Итого (центы): <b>{totalCentsFormatted}</b>
                     </Typography>
                     <Typography variant="body2">
                         Batch key: <b>{batchKey || "—"}</b>
@@ -55,7 +56,7 @@ function ResetBalancesDialog({
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} disabled={resetting}>
-                    Cancel
+                    Отмена
                 </Button>
                 <Button
                     color="error"
@@ -64,7 +65,7 @@ function ResetBalancesDialog({
                     disabled={resetting}
                     startIcon={resetting ? <CircularProgress size={16} /> : undefined}
                 >
-                    Confirm reset
+                    Подтвердить обнуление
                 </Button>
             </DialogActions>
         </Dialog>

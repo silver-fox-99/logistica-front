@@ -222,7 +222,8 @@
       "addTransport": "Add Transport",
       "adminPanel": "Admin Panel",
       "logout": "Log Out",
-      "openMenu": "Open menu"
+      "openMenu": "Open menu",
+      "referrals": "Referrals"
     }
   },
   "profile": {
@@ -677,7 +678,16 @@
     "registrationSuccess": "Registration completed successfully!",
     "registrationError": "Registration error",
     "alreadyHaveAccount": "Already have an account?",
-    "signInButton": "Sign in"
+    "signInButton": "Sign in",
+    "invitationCode": "Invitation code",
+    "enterInvitationCode": "Enter an invitation code if you have one",
+    "accountType": "Account type",
+    "accountTypes": {
+      "shipper": "Shipper",
+      "logist": "Logistics specialist",
+      "carrier": "Carrier",
+      "other": "Other"
+    }
   },
   "forgotPassword": {
     "step1Title": "Reset your password",
@@ -772,5 +782,143 @@
     "MONTHLY_CREATED": "Monthly creation limit reached. Please try again later or upgrade your plan.",
     "FREE_PLAN": "Free plan cannot be paid. Please select a paid plan to continue.",
     "DAILY_LIMIT": "Daily limit exceeded. Try again tomorrow or contact support."
+  },
+  "referralProgram": {
+    "title": "Referral Program",
+    "subtitle": "Sign the agreement to activate your referral code and start earning rewards.",
+    "unavailable": {
+      "title": "Referral Program is temporarily unavailable",
+      "subtitle": "We are performing maintenance. Please try again later."
+    },
+    "agreement": {
+      "title": "Agreement",
+      "status": {
+        "signed": "Signed",
+        "notSigned": "Not signed"
+      },
+      "description": {
+        "notSigned": "You need to sign the referral agreement to activate your referral link.",
+        "signed": "Agreement is signed. You can share your referral link and track earnings."
+      },
+      "actions": {
+        "view": "View Agreement",
+        "sign": "Sign Agreement"
+      },
+      "acceptTerms": "I agree to the terms",
+      "contentUnavailable": "Agreement content is not available yet."
+    },
+    "code": {
+      "title": "Referral Code",
+      "tooltip": "Share your code to invite friends.",
+      "fieldLabel": "Your referral code"
+    },
+    "balance": {
+      "title": "Balance & Summary",
+      "available": "Available balance",
+      "pending": "Pending: {{amount}}",
+      "invited": "Invited",
+      "active": "Active",
+      "qualified": "Qualified",
+      "totalEarned": "Total earned"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "invitedUsers": "Invited Users",
+      "earningsHistory": "Earnings History",
+      "faq": "FAQ"
+    },
+    "overview": {
+      "howItWorks": {
+        "title": "How it works",
+        "steps": {
+          "1": "1) Share your invite code",
+          "2": "2) Your friend signs up and completes the required action",
+          "3": "3) You receive rewards for qualified referrals"
+        }
+      },
+      "recentEarnings": {
+        "title": "Recent earnings"
+      }
+    },
+    "table": {
+      "date": "Date",
+      "user": "User",
+      "amount": "Amount",
+      "status": "Status",
+      "joinedAt": "Joined at",
+      "reward": "Reward",
+      "reason": "Reason"
+    },
+    "faq": {
+      "q1": {
+        "title": "When do I receive rewards?",
+        "text": "Rewards are credited after the invited user completes the required action."
+      },
+      "q2": {
+        "title": "What is a qualified referral?",
+        "text": "A qualified referral is a user who meets the program conditions defined in the agreement."
+      },
+      "q3": {
+        "title": "What can I do with the money I earn?",
+        "text": "Payments are made once a month if your balance is above 0. For more details, please refer to the agreement."
+      }
+    },
+    "status": {
+      "PENDING": "Pending",
+      "REGISTERED": "Registered",
+      "QUALIFIED": "Qualified",
+      "CONFIRMED": "Confirmed",
+      "REVERSED": "Reversed"
+    },
+    "reason": {
+      "REFERRAL_BONUS": "Referral bonus",
+      "REFERRAL_PAYOUT": "Referral payout",
+      "REFERRAL_BONUS_REVERSAL": "Referral bonus reversal"
+    }
+  },
+  "common": {
+    "reload": "Reload",
+    "loading": "Loading...",
+    "close": "Close",
+    "copy": "Copy",
+    "dash": "—"
+  },
+  "bookmarkPrompt": {
+    "title": {
+      "desktop": "Add this site to your bookmarks",
+      "mobile": "Add this site to your Home Screen"
+    },
+    "subtitle": {
+      "desktop": "Bookmarks",
+      "mobile": "Home Screen / Installation"
+    },
+    "hint": {
+      "desktop": "This makes it easier to come back to the service without searching for the link.",
+      "mobile": "This makes the service faster to open — it will appear as an icon, almost like an app."
+    },
+    "alert": {
+      "canInstall": "This site can be installed as an app.<br/>Tap <b>Install</b> or open <b>How to add</b> for manual steps.",
+      "manualOnly": "Tap <b>How to add</b>, and we will show the instructions for your device."
+    },
+    "installAvailable": "Installation is available on this device.",
+    "actions": {
+      "dontShowAgain": "Don’t show again",
+      "howTo": "How to add",
+      "hide": "Hide",
+      "install": "Install",
+      "gotIt": "Got it"
+    },
+    "howTo": {
+      "ios_safari": "Tap <b>Share</b> (square with an arrow) and choose <b>Add to Home Screen</b>.<br/>If you don’t see it, scroll down in the action list.",
+      "ios_chrome": "On iPhone/iPad, all browsers use the same system share menu.<br/>Tap <b>Share</b> and choose <b>Add to Home Screen</b>.",
+      "ios_edge": "On iPhone/iPad, all browsers use the same system share menu.<br/>Tap <b>Share</b> and choose <b>Add to Home Screen</b>.",
+      "ios_firefox": "On iPhone/iPad, all browsers use the same system share menu.<br/>Tap <b>Share</b> and choose <b>Add to Home Screen</b>.",
+      "android_chrome": "Open the browser menu (⋮) and choose <b>Install app</b> or <b>Add to Home screen</b>.<br/>If an install prompt appears, you can accept it.",
+      "android_samsung": "Open the menu (≡ or ⋮) and choose <b>Add page to</b> → <b>Home screen</b>, or <b>Install app</b> (if available).",
+      "android_edge": "Open the menu (⋯) and choose <b>Apps</b> → <b>Install this site as an app</b>, or <b>Add to Home screen</b>.<br/>The wording may differ.",
+      "android_firefox": "Open the menu (⋮) and choose <b>Install</b> (if available) or <b>Add to Home screen</b>.",
+      "android_other": "Open the browser menu and look for <b>Add to Home screen</b> or <b>Install app</b>.",
+      "desktop": "Press <b>Ctrl + D</b> (Windows) or <b>Cmd + D</b> (Mac) to bookmark this site."
+    }
   }
 }

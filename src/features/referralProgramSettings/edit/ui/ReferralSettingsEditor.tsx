@@ -32,7 +32,6 @@ export default function ReferralSettingsEditor() {
     } = useReferralSettingsEditor();
 
     const formRef = useRef<ReferralSettingsFormRef | null>(null);
-
     const canDelete = useMemo(() => !!active?.id, [active?.id]);
 
     if (loading) {
@@ -40,7 +39,7 @@ export default function ReferralSettingsEditor() {
             <Box sx={{ p: 0 }}>
                 <Stack direction="row" alignItems="center" gap={1.5}>
                     <CircularProgress size={20} />
-                    <Typography>Loading referral settings...</Typography>
+                    <Typography>Загрузка настроек реферальной программы...</Typography>
                 </Stack>
             </Box>
         );
@@ -52,7 +51,7 @@ export default function ReferralSettingsEditor() {
                 <Stack direction="row" alignItems="center" gap={1.25}>
                     <FiAward size={22} />
                     <Typography variant="h5" fontWeight={700}>
-                        Referral Program Settings
+                        Настройки реферальной программы
                     </Typography>
                 </Stack>
 
@@ -63,7 +62,7 @@ export default function ReferralSettingsEditor() {
                         onClick={() => void loadAll()}
                         disabled={saving}
                     >
-                        Refresh
+                        Обновить
                     </Button>
 
                     <Button
@@ -73,7 +72,7 @@ export default function ReferralSettingsEditor() {
                         onClick={openDelete}
                         disabled={!canDelete || saving}
                     >
-                        Delete
+                        Удалить
                     </Button>
 
                     <Button
@@ -82,7 +81,7 @@ export default function ReferralSettingsEditor() {
                         onClick={() => formRef.current?.submit()}
                         disabled={saving}
                     >
-                        Save
+                        Сохранить
                     </Button>
                 </Stack>
             </Stack>

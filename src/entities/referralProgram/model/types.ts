@@ -17,6 +17,7 @@ export type ReferralEarningRow = {
     userMasked: string;
     amount: string;
     currency: string;
+    reason: string;
     status: "PENDING" | "CONFIRMED" | "REVERSED";
 };
 

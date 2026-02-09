@@ -16,21 +16,11 @@ export default function HomePage() {
     const { t } = useTranslation();
     const { loadInit } = useInitStore();
     const user = useUserStore((s) => s.user);
-    const isAuthenticated = !!(user || (typeof window !== "undefined" && localStorage.getItem("accessToken")));
+    const isAuthenticated = !!user;
     const [tab, setTab] = useState<TabKind>("cargo");
     const [page, setPage] = useState(1);
     const limit = 10;
 
-  //  const getTodayDate = () => {
-  //      const today = new Date();
-  //      return today.toISOString().split('T')[0];
-  //  };
-//
-  //  const getDefaultDatePlus30 = () => {
-  //      const date = new Date();
-  //      date.setDate(date.getDate() + 30);
-  //      return date.toISOString().split('T')[0];
-  //  };
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [filters, setFilters] = useState<PublicFilters>({});
