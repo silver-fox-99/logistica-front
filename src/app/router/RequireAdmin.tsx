@@ -14,7 +14,7 @@ export default function RequireAdmin({ children }: { children: JSX.Element }) {
     const run = async () => {
         try {
             if (user) {
-                setAllowed(!!user.is_admin);
+                setAllowed(user.is_admin);
                 return;
             }
             const res = await authApi.getMe();
