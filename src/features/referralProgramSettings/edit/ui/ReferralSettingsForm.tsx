@@ -100,8 +100,14 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
 
     const rewardType = useWatch({ control, name: "reward_type" });
     const linkMode = useWatch({ control, name: "linkMode" });
+    const selectedDocId = useWatch({ control, name: "document_id" });
     const selectedDocKey = useWatch({ control, name: "document_key" });
     const rewardValue = useWatch({ control, name: "reward_value" });
+
+    const selectedDoc = useMemo(() => {
+        if (!selectedDocId) return null;
+        return documents.find((d) => d.id === selectedDocId) ?? null;
+    }, [documents, selectedDocId]);
 
     const rewardPreview = useMemo(() => {
         if (rewardType !== ReferralRewardType.FIXED) return null;
@@ -313,30 +319,22 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                 />
 
                 {linkMode === "DOCUMENT_ID" && (
-                    <Controller
-                        name="document_id"
-                        control={control}
-                        render={({ field }) => (
-                            <Autocomplete
-                                fullWidth
-                                options={documents}
-                                value={documents.find((d) => String(d.id) === String(field.value)) ?? null}
-                                onChange={(_, v) => field.onChange(v?.id ?? null)}
-                                isOptionEqualToValue={(option, value) => String(option.id) === String(value.id)}
-                                getOptionLabel={(o) => docLabel(o)}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Документ"
-                                        placeholder="Выберите документ..."
-                                        helperText="Настройки будут привязаны к конкретной версии документа"
-                                    />
-                                )}
+                    <Autocomplete
+                        fullWidth
+                        options={documents}
+                        value={selectedDoc}
+                        onChange={(_, v) => setValue("document_id", v?.id ?? null, { shouldDirty: true })}
+                        getOptionLabel={(o) => docLabel(o)}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Документ"
+                                placeholder="Выберите документ..."
+                                helperText="Настройки будут привязаны к конкретной версии документа"
                             />
                         )}
                     />
                 )}
-
 
                 {linkMode === "DOCUMENT_KEY" && (
                     <Autocomplete
