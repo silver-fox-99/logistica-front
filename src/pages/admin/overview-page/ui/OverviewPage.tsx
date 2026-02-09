@@ -48,6 +48,7 @@ export default function AdminOverviewPage() {
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <Typography variant="body2" color="text.secondary">Период:</Typography>
                         <Select size="small" value={range} onChange={onRangeChange} sx={{ minWidth: 120 }}>
+                            <MenuItem value="1d">Последний 1 день</MenuItem>
                             <MenuItem value="7d">Последние 7 дней</MenuItem>
                             <MenuItem value="30d">Последние 30 дней</MenuItem>
                             <MenuItem value="90d">Последние 90 дней</MenuItem>
