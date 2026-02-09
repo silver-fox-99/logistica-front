@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo, useRef } from "react";
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 import { FiAward, FiRefreshCw, FiSave, FiTrash2 } from "react-icons/fi";

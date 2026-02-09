@@ -189,6 +189,11 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
     });
 
     useImperativeHandle(ref, () => ({ submit }), [submit]);
+    console.log(selectedDoc)
+    console.log(selectedDocKey)
+    console.log(selectedDocId);
+    console.log(settings)
+    console.log(documents)
 
     return (
         <Stack spacing={2}>
