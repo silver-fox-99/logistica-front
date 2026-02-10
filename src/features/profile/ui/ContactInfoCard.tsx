@@ -96,12 +96,6 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
             <form onSubmit={handleSubmit(submit)} noValidate>
                 <Stack spacing={1.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box className="contact-info-card__icon">
-                            <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7"/>
-                                <path d="M20.833 13.889c.48 0 .868.388.868.868v5.208h5.209a.868.868 0 1 1 0 1.736H21.7v5.209a.868.868 0 1 1-1.736 0V21.7h-5.208a.868.868 0 0 1 0-1.736h5.208v-5.208c0-.48.389-.868.868-.868" fill="#4472B8"/>
-                            </svg>
-                        </Box>
                         <Box sx={{ flex: 1 }}>
                             <Typography variant="h6" mb={1} className="contact-info-card__title">
                                 {t('profile.contactInfo.title')}
