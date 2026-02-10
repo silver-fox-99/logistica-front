@@ -339,13 +339,13 @@ export default function ShipmentRow({
     }, [i18n.resolvedLanguage, i18n.language]);
     
     const routeFrom = useMemo(() => {
-        const pickup = data.points?.find(item => item.type === "PICKUP") ?? data.points?.[0];
+        const pickup = data.points?.find(item => item.type === "PICKUP" || item.type === 'DEPARTURE') ?? data.points?.[0];
         if (pickup) return formatRoute(pickup);
         return data.routeFrom || "—";
     }, [data.points, data.routeFrom, formatRoute]);
     
     const routeTo = useMemo(() => {
-        const drop = data.points?.find(item => item.type === "DROPOFF") ?? data.points?.[data.points.length - 1];
+        const drop = data.points?.find(item => item.type === "DROPOFF" || item.type === 'ARRIVAL') ?? data.points?.[data.points.length - 1];
         if (drop) return formatRoute(drop);
         return data.routeTo || "—";
     }, [data.points, data.routeTo, formatRoute]);

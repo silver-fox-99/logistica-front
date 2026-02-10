@@ -1,4 +1,3 @@
-// src/pages/admin/transport/ui/AdminTransportPage.tsx
 import {
     Avatar,
     Box,
@@ -29,11 +28,20 @@ const fmtDT = (d?: string | null) =>
 const fmtD = (d?: string | null) =>
     d ? new Date(d).toLocaleDateString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit" }) : "—";
 
-function route(p: TransportItem["points"]): string {
-    if (!p?.length) return "—";
-    const from = p[0]?.city ?? p[0]?.region ?? p[0]?.country ?? "—";
-    const to   = p[p.length - 1]?.city ?? p[p.length - 1]?.region ?? p[p.length - 1]?.country ?? "—";
-    return `${from} → ${to}`;
+function pickLabel(p?: { country?: string | null; region?: string | null; city?: string | null } | null) {
+    return p?.city ?? p?.region ?? p?.country ?? "—";
+}
+
+function route(points: TransportItem["points"]): string {
+    if (!points?.length) return "—";
+
+    const pickups = points.filter((x) => x?.type === "DEPARTURE");
+    const dropoffs = points.filter((x) => x?.type === "ARRIVAL");
+
+    const fromPoint = pickups[0] ?? points[0]; // fallback если нет типа
+    const toPoint = dropoffs[dropoffs.length - 1] ?? points[points.length - 1];
+
+    return `${pickLabel(fromPoint)} → ${pickLabel(toPoint)}`;
 }
 
 export default function AdminTransportPage() {

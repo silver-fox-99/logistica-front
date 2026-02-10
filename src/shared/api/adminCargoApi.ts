@@ -10,7 +10,9 @@ export type CargoUser = {
     last_name: string | null;
 };
 
-export type CargoPoint = { country: string; region: string; city: string };
+export type PointType = "PICKUP" | "DROPOFF";
+
+export type CargoPoint = { country: string; region: string; city: string, type: PointType };
 
 export type CargoItem = {
     id: string;

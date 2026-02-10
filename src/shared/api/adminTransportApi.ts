@@ -1,5 +1,6 @@
 import api from "@/shared/api/axios";
 
+
 export type TransportUser = {
     id: string;
     is_admin: boolean;
@@ -10,7 +11,9 @@ export type TransportUser = {
     last_name: string | null;
 };
 
-export type TransportPoint = { country: string; region: string; city: string };
+type PointType = "ARRIVAL"| "DEPARTURE"
+
+export type TransportPoint = { country: string; region: string; city: string, type: PointType };
 
 export type TransportItem = {
     id: string;
