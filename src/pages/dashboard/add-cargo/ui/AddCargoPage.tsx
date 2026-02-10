@@ -67,7 +67,7 @@ export default function AddCargoPage() {
                 {isDesktop ? (
                     <AddCargoDesktopForm
                         t={t}
-                        i18nLang={form.getValues as any ? "" : ""} // можно не передавать вообще, оставлено для key при необходимости
+                        i18nLang={form.getValues as any ? "" : ""}
                         form={form}
                         onSubmit={onSubmit}
                         loadingInit={loadingInit}

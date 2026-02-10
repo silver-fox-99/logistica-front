@@ -324,7 +324,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
     }, [open, initial, countries, getRegions, ensureRegions, ensureCities, getCities]);
 
     const numericKeys: Array<keyof typeof form> = ["palletsCount", "carsCount", "weightT", "volumeM3", "lengthM", "widthM", "heightM", "priceAmount"];
-    const sanitizeDigits = (v: string) => v.replace(/\D/g, "");
+    const sanitizeDigits = (v: string) => v.replace(",", ".").replace(/[^\d.]/g, "");
     const numericInputProps: InputBaseComponentProps = { inputMode: "numeric", pattern: "[0-9]*" };
 
     const handleChange = (key: keyof typeof form) => (e: any) => {
