@@ -24,6 +24,9 @@ import { FiRefreshCw } from "react-icons/fi";
 
 import { useNotifications } from "@/features/notifications/list/model/useNotifications";
 import { NotificationType, type Notification } from "@/entities/notification/model/types";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const TABS: Array<{ label: string; type?: NotificationType }> = [
     { label: "Все", type: undefined },
@@ -86,6 +89,11 @@ export default function NotificationsPage() {
 
     const items = data?.items ?? [];
     const total = data?.total ?? 0;
+
+    const canViewNotifications = useAdminAccessStore((s) => s.hasPermission(viewCode('NOTIFICATIONS' as any)));
+
+
+    if (!canViewNotifications) return <NoAccess/>
 
     return (
         <Box sx={{ p: 3 }}>

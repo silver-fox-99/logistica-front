@@ -26,6 +26,9 @@ import IpBanDialog, { type IpBanFormValues } from "@/features/admin/ip-blacklist
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {FaBan} from "react-icons/fa";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const n = (v?: number, d = 0) => (typeof v === "number" ? v : d);
 const fmtDT = (d?: string | null) =>
@@ -35,6 +38,8 @@ export default function AdminBlacklistPage() {
     const navigate = useNavigate();
     const { items, total, pages, loading, error, params, setPage, setLimit, setSearch, refetch } =
         useIpBlacklist({ page: 1, limit: 20 });
+
+    const canViewBalckList = useAdminAccessStore((s) => s.hasPermission(viewCode('BLACKLIST' as any)));
 
     const totalSafe = n(total, 0);
     const pageSafe  = n(params.page, 1);
@@ -105,6 +110,8 @@ export default function AdminBlacklistPage() {
             toast.error(message);
         } finally { setBusy(false); }
     };
+
+    if (!canViewBalckList) return <NoAccess/>
 
     return (
         <Stack spacing={2}>

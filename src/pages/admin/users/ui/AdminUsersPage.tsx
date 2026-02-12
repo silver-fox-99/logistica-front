@@ -20,6 +20,9 @@ import { FiSearch, FiShield } from "react-icons/fi";
 import { useAdminUsers } from "@/features/admin/users-list/model/useAdminUsers";
 import type { AdminUser } from "@/shared/api/adminUsersApi";
 import {useNavigate} from "react-router-dom";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 // ---------- helpers ----------
 const fmt = (d?: string | null) =>
@@ -79,6 +82,8 @@ export default function AdminUsersPage() {
         setSearch,
     } = useAdminUsers({ page: 1, limit: 20, sort: "created_at", dir: "desc" });
 
+    const canViewUsers = useAdminAccessStore((s) => s.hasPermission(viewCode('USERS' as any)));
+
     const totalSafe = n(total, 0);
     const pagesSafe = n(pages, 1);
     const pageSafe = n(params.page, 1);
@@ -95,6 +100,10 @@ export default function AdminUsersPage() {
         );
 
     const navigate = useNavigate()
+
+    if (!canViewUsers) {
+        return <NoAccess />
+    }
 
     return (
         <Stack spacing={2}>

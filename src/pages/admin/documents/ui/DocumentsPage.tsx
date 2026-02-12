@@ -9,13 +9,16 @@ import { DeleteDocumentDialog } from "@/features/documents/manage/ui/DeleteDocum
 
 import { DocumentKey, DOCUMENT_KEY_LABELS } from "@/entities/document/model/constants";
 import type { DocumentEntity, CreateDocumentDto, UpdateDocumentDto } from "@/entities/document/model/types";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 export default function DocumentsPage() {
     const { groupedByKey, loading, error, reload, create, update, remove } = useDocuments();
 
     const keyList = useMemo(() => Object.values(DocumentKey), []);
     const [selectedKey, setSelectedKey] = useState<string>(keyList[0]);
-
+    const canViewDocuments = useAdminAccessStore((s) => s.hasPermission(viewCode('DOCUMENTS' as any)));
     const versions = useMemo(() => groupedByKey.get(selectedKey) ?? [], [groupedByKey, selectedKey]);
 
     const [editorOpen, setEditorOpen] = useState(false);
@@ -59,6 +62,8 @@ export default function DocumentsPage() {
         setDeleteOpen(false);
         setDeleting(null);
     }, [remove, deleting]);
+
+    if (!canViewDocuments) return <NoAccess/>
 
     return (
         <Stack gap={2}>

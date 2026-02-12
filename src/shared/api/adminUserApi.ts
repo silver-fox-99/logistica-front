@@ -2,6 +2,7 @@
 import api from "@/shared/api/axios";
 import type {AdminUser} from "@/shared/api/adminUsersApi.ts";
 import type {RegistrationStage, UserStatus} from "@/entities/user/model/user.types.ts";
+import type {AdminGroup} from "@/entities/adminGroup/model/types.ts";
 
 
 
@@ -20,7 +21,7 @@ export type AdminUserSessionsItem = {
 
 export type AdminUserGetResponse = {
     status: boolean;
-    data: { user: AdminUser; sessions: AdminUserSessionsItem[] };
+    data: { user: AdminUser; sessions: AdminUserSessionsItem[], groups: AdminGroup[] };
     message?: string;
 };
 

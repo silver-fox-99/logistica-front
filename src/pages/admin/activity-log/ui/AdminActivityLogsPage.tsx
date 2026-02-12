@@ -6,6 +6,9 @@ import { FiSearch, FiInfo, FiClock, FiSliders, FiRotateCcw, FiChevronDown, FiChe
 import { useActivityLogs } from "@/features/admin/activity-logs/model/useActivityLogs";
 import ActivityDetailsDialog from "@/features/admin/activity-logs/ui/ActivityDetailsDialog";
 import {  useState } from "react";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"] as const;
 
@@ -47,6 +50,9 @@ function ActivityFiltersBar({
 
     // единая высота / ширина контролов
     const controlSx = { minWidth: 200 };
+    const canViewActivityLogs = useAdminAccessStore((s) => s.hasPermission(viewCode('ACTIVITY_LOGS' as any)));
+
+    if (!canViewActivityLogs) return <NoAccess/>;
 
     return (
         <Paper variant="outlined" sx={{ p: 1.25, borderRadius: 2 }}>

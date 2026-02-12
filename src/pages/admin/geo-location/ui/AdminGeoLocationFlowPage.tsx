@@ -33,6 +33,9 @@ import { useGeoLocations } from "@/features/admin/geo-locations/model/useGeoLoca
 import GeoLocationDialog from "@/features/admin/geo-locations/ui/GeoLocationDialog";
 import GeoTreeFlow from "@/features/admin/geo-locations/ui/GeoTreeFlow";
 import GeoImportDialog from "@/features/admin/geo-locations/ui/GeoDatasetPanel.tsx";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const TYPES: (LocationType | "")[] = [
     "",
@@ -70,6 +73,8 @@ export default function AdminGeoLocationFlowPage() {
         remove,
         reload,
     } = useGeoLocations();
+
+    const canViewGeoLocation = useAdminAccessStore((s) => s.hasPermission(viewCode('GET_LOCATIONS' as any)));
 
     const [dlgOpen, setDlgOpen] = useState(false);
     const [dlgMode, setDlgMode] = useState<"create" | "edit">("create");
@@ -194,6 +199,8 @@ export default function AdminGeoLocationFlowPage() {
         await remove(row.id);
         if (wasSelected) setSelectedId(null);
     };
+
+    if (!canViewGeoLocation) return <NoAccess />;
 
     return (
         <Stack spacing={2}>

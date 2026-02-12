@@ -21,6 +21,9 @@ import { useAdminTransport } from "@/features/admin/transport-list/model/useAdmi
 import { adminTransportApi, type TransportItem } from "@/shared/api/adminTransportApi";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const n = (v?: number, d = 0) => (typeof v === "number" ? v : d);
 const fmtDT = (d?: string | null) =>
@@ -53,6 +56,7 @@ export default function AdminTransportPage() {
     const pageSafe  = n(params.page, 1);
     const pagesSafe = n(pages, 1);
     const limitSafe = n(params.limit, 20);
+    const canViewTransport = useAdminAccessStore((s) => s.hasPermission(viewCode('TRANSPORT' as any)));
 
     const [toDelete, setToDelete] = React.useState<TransportItem | null>(null);
     const [busy, setBusy] = React.useState(false);
@@ -68,6 +72,8 @@ export default function AdminTransportPage() {
             setBusy(false);
         }
     };
+
+    if (!canViewTransport) return <NoAccess/>
 
     return (
         <Stack spacing={2}>

@@ -101,10 +101,10 @@ export function useAddTransportForm() {
                 ok = false;
             }
 
-            if (!v.dateTo) {
-                setError("dateTo", { type: "required", message: t("addTransport.errors.required") });
-                ok = false;
-            }
+           // if (!v.dateTo) {
+           //     setError("dateTo", { type: "required", message: t("addTransport.errors.required") });
+           //     ok = false;
+           // }
 
             if (v.dateFrom && v.dateFromEnd && v.dateFromEnd < v.dateFrom) {
                 setError("dateFromEnd", { type: "validate", message: t("addTransport.errors.dateRangeOrder") });

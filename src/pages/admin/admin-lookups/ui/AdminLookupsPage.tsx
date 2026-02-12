@@ -9,13 +9,16 @@ import { ItemTable } from "@/features/admin/lookups/ui/ItemTable";
 import { GroupDialog } from "@/features/admin/lookups/ui/GroupDialog";
 import { ItemDialog } from "@/features/admin/lookups/ui/ItemDialog";
 import { lookupsApi, type LookupGroup, type LookupItem } from "@/shared/api/lookupsApi";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 export default function AdminLookupsPage() {
     const { groups, current, setCurrent, items, setItems, loading, error, reloadGroups, reloadItems } = useLookups();
 
     const [openGroup, setOpenGroup] = useState<null | { mode: "create" | "edit"; group?: LookupGroup }>(null);
     const [openItem, setOpenItem] = useState<null | { mode: "create" | "edit"; item?: LookupItem }>(null);
-
+    const canViewLookups = useAdminAccessStore((s) => s.hasPermission(viewCode('LOOKUPS' as any)));
     const headerRight = useMemo(() => (
         <Stack direction="row" spacing={1}>
             <Button variant="outlined" startIcon={<FiPlus />} onClick={() => setOpenGroup({ mode: "create" })}>
@@ -52,7 +55,7 @@ export default function AdminLookupsPage() {
 
     if (loading) return <Container><Typography color="text.secondary">Загрузка…</Typography></Container>;
     if (error)   return <Container><Alert severity="error">{error}</Alert></Container>;
-
+    if (!canViewLookups) return <NoAccess/>
     return (
         <Container disableGutters>
             <Stack spacing={2}>

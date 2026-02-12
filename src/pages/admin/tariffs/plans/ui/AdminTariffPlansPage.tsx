@@ -32,6 +32,9 @@ import {
 } from "@/shared/api/tariffsApi";
 import { ENTITLEMENTS } from "@/shared/config/entitlements";
 import { BiBlock } from "react-icons/bi";
+import { useAdminAccessStore } from "@/entities/adminAccess/model/adminAccess.store";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
 
 type PlanFormState = UpsertTariffPlanPayload & { price_text?: string };
 
@@ -85,7 +88,7 @@ function PlanDialog({
     billingPeriods: { value: BillingPeriod; label: string }[];
 }) {
     const [state, setState] = useState<PlanFormState>(emptyPlan());
-
+    const canViewTariffs = useAdminAccessStore((s) => s.hasPermission(viewCode('TARIFF_PLANS' as any)));
     useEffect(() => {
         if (initial) {
             setState({
@@ -109,6 +112,8 @@ function PlanDialog({
             entitlements: { ...(prev.entitlements ?? {}), [key]: value },
         }));
     };
+
+    if (!canViewTariffs) return <NoAccess />;
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">

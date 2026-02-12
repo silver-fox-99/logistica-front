@@ -21,6 +21,9 @@ import { useAdminCargo } from "@/features/admin/cargo-list/model/useAdminCargo";
 import { adminCargoApi, type CargoItem } from "@/shared/api/adminCargoApi.ts";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const n = (v?: number, d = 0) => (typeof v === "number" ? v : d);
 const fmtDT = (d?: string | null) =>
@@ -60,6 +63,8 @@ export default function AdminCargoPage() {
     const [toDelete, setToDelete] = React.useState<CargoItem | null>(null);
     const [busy, setBusy] = React.useState(false);
 
+    const canViewCargo = useAdminAccessStore((s) => s.hasPermission(viewCode('CARGO' as any)));
+
     const confirmDelete = async () => {
         if (!toDelete) return;
         setBusy(true);
@@ -75,6 +80,8 @@ export default function AdminCargoPage() {
             setBusy(false);
         }
     };
+
+    if (!canViewCargo) return <NoAccess/>
 
     return (
         <Stack spacing={2}>

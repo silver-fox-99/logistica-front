@@ -32,6 +32,9 @@ import {
     type IssueSubscriptionPayload,
 } from "@/shared/api/tariffsApi";
 import { ENTITLEMENTS, formatEntitlementValue } from "@/shared/config/entitlements";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 const fmt = (d?: string | null) =>
     d
@@ -304,6 +307,7 @@ export default function AdminTariffSubscriptionsPage() {
 
     const [cancelId, setCancelId] = useState<string | null>(null);
     const [cancelLoading, setCancelLoading] = useState(false);
+    const canViewTariffs = useAdminAccessStore((s) => s.hasPermission(viewCode('TARIFF_PLANS' as any)));
 
     useEffect(() => {
         const loadPlans = async () => {
@@ -429,6 +433,8 @@ export default function AdminTariffSubscriptionsPage() {
         return map;
     }, [plans]);
 
+    if (!canViewTariffs) return <NoAccess />
+
     const renderEntitlements = (ent: Entitlements | null | undefined) => (
         <Stack spacing={1}>
             {ENTITLEMENTS.map((item) => (
@@ -446,15 +452,16 @@ export default function AdminTariffSubscriptionsPage() {
 
     return (
         <Stack spacing={2}>
+            <Stack flex={1} spacing={0.25}>
+                <Typography variant="h5" fontWeight={800}>
+                    Подписки пользователей
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    Загрузите пользователя по ID, чтобы управлять планами, квотами и историей.
+                </Typography>
+            </Stack>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ sm: "center" }}>
-                <Stack flex={1} spacing={0.25}>
-                    <Typography variant="h5" fontWeight={800}>
-                        Подписки пользователей
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Загрузите пользователя по ID, чтобы управлять планами, квотами и историей.
-                    </Typography>
-                </Stack>
+
                 <TextField
                     size="small"
                     placeholder="Введите ID пользователя"

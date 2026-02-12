@@ -12,12 +12,15 @@ import PowerUsersTable from "@/widgets/dashboard/PowerUsersTable";
 import RecentActivity from "@/widgets/dashboard/RecentActivity";
 import { FiTrendingUp, FiUsers, FiPackage, FiTruck } from "react-icons/fi";
 import TopInfoViewersTable from "@/widgets/dashboard/TopInfoViewersTable.tsx";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 export default function AdminOverviewPage() {
     const [range, setRange] = useState<Range>("30d");
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<Awaited<ReturnType<typeof dashboardApi.getOverview>> | null>(null);
-
+    const canViewDashboard = useAdminAccessStore((s) => s.hasPermission(viewCode('DASHBOARD' as any)));
     const load = async (r: Range) => {
         setLoading(true);
         try {
@@ -34,6 +37,10 @@ export default function AdminOverviewPage() {
     const avgTransport = useMemo(() => data?.kpi.avgPrice7d.transport ?? 0, [data]);
 
     const onRangeChange = (e: SelectChangeEvent) => setRange(e.target.value as Range);
+
+    if (!canViewDashboard) {
+        return <NoAccess/>
+    }
 
     return (
         <Box>

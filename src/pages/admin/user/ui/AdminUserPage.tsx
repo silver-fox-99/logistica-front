@@ -18,13 +18,17 @@ import UserInvoices from "@/widgets/admin/users/UserInvoices";
 import { adminUsersApi } from "@/shared/api/adminUsersApi";
 import { authApi } from "@/shared/api/authApi";
 import { useUserStore } from "@/entities/user/model/user.store";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 export default function AdminUserPage() {
     const { id = "" } = useParams();
     const navigate = useNavigate();
-    const { user, sessions, loading, err, setUser } = useAdminUser(id);
+    const { user, sessions, groups, loading, err, setUser, setGroups } = useAdminUser(id);
     const setCurrentUser = useUserStore((s) => s.setUser);
     const [impersonating, setImpersonating] = useState(false);
+    const canViewUserDetails = useAdminAccessStore((s) => s.hasPermission(viewCode('USER_DETAILS' as any)));
 
     const handleImpersonate = async () => {
         if (!id) return;
@@ -51,6 +55,9 @@ export default function AdminUserPage() {
             setImpersonating(false);
         }
     };
+
+
+    if (!canViewUserDetails) return <NoAccess/>
 
     if (loading) return <Container><Typography color="text.secondary">Загрузка…</Typography></Container>;
     if (!user)   return <Container><Alert severity="error">{err ?? " Пользователь не найден"}</Alert></Container>;
@@ -94,7 +101,7 @@ export default function AdminUserPage() {
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 6 }}>
-                        <AdminToggle user={user} onUpdated={(u) => setUser(u)}/>
+                        <AdminToggle userGroups={groups} onGroupsUpdated={(g) => setGroups(g)} user={user} onUserUpdated={(u) => setUser(u)}/>
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 6 }}>

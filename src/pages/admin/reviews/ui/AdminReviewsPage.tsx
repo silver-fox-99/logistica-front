@@ -18,12 +18,16 @@ import { FiRefreshCcw, FiCheck, FiX, FiTrash2 } from "react-icons/fi";
 import { userReviewsApi } from "@/shared/api/userReviewsApi";
 import type { UserReview } from "@/entities/user-reviews/model/types";
 import { toast } from "react-toastify";
+import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
+import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
 
 export default function AdminReviewsPage() {
     const [statusFilter, setStatusFilter] = useState<"ALL" | "PENDING" | "PUBLISHED" | "REJECTED">("ALL");
     const [reviews, setReviews] = useState<UserReview[]>([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
+    const canViewReviews = useAdminAccessStore((s) => s.hasPermission(viewCode('REVIEWS' as any)));
 
     const fetchReviews = useCallback(
         async (nextPage = 1) => {
@@ -105,6 +109,8 @@ export default function AdminReviewsPage() {
             toast.error(e?.message || "Не удалось обновить статус");
         }
     };
+
+    if (!canViewReviews) return <NoAccess/>
 
     return (
         <Stack spacing={3}>

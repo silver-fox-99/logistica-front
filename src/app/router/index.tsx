@@ -32,11 +32,11 @@ import AdminLookupsPage from "@/pages/admin/admin-lookups/ui/AdminLookupsPage.ts
 import AdminOverviewPage from "@/pages/admin/overview-page";
 import AdminReviewsPage from "@/pages/admin/reviews";
 import AdminTariffPlansPage from "@/pages/admin/tariffs/plans";
-import AdminTariffSubscriptionsPage from "@/pages/admin/tariffs/subscriptions";
 import DocumentsPage from "@/pages/admin/documents";
 import ReferralSettingsPage from "@/pages/admin/referral-settings";
 import ReferralPage from "@/pages/dashboard/referral";
 import NotificationsPage from "@/pages/admin/notifications";
+import GroupsRoles from "@/pages/admin/groups-roles";
 
 
 const router = createBrowserRouter([
@@ -96,10 +96,10 @@ const router = createBrowserRouter([
             { path: "initial-data", element: <AdminLookupsPage />},
             { path: "reviews", element: <AdminReviewsPage /> },
             { path: "tariffs/plans", element: <AdminTariffPlansPage /> },
-            { path: "tariffs/subscriptions", element: <AdminTariffSubscriptionsPage /> },
             { path: "documents", element: <DocumentsPage />},
             { path: "referral-settings", element: <ReferralSettingsPage />},
-            { path: "notifications", element: <NotificationsPage />}
+            { path: "notifications", element: <NotificationsPage />},
+            { path: "groups-roles", element: <GroupsRoles />}
         ],
     },
     {
