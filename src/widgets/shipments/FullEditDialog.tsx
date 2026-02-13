@@ -76,6 +76,15 @@ type Props = {
     onSubmit: (payload: any) => Promise<void> | void;
 };
 
+const POINT_TYPES = {
+    cargo: { from: "PICKUP", to: "DROPOFF" },
+    transport: { from: "DEPARTURE", to: "ARRIVAL" },
+} as const;
+
+function pickPointByType(points: GeoPoint[] | undefined, type: string, fallbackIndex: number) {
+    return points?.find((p) => p?.type === type) ?? points?.[fallbackIndex];
+}
+
 /** ===== Helpers ===== */
 const toStr = (v: unknown, fallback = ""): string => (v == null ? fallback : String(v));
 
@@ -286,27 +295,29 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
     useEffect(() => {
         if (!open) return;
 
-        const p1 = initial?.points?.[0];
-        const p2 = initial?.points?.[1];
-        if (!p1 && !p2) return;
+        const types = POINT_TYPES[kind];
+        const pFrom = pickPointByType(initial?.points, types.from, 0);
+        const pTo   = pickPointByType(initial?.points, types.to, 1);
+
+        if (!pFrom && !pTo) return;
 
         hydratingRef.current = true;
 
-        const p1_countryId = findCountryIdLoose(countries, p1?.country);
+        const p1_countryId = findCountryIdLoose(countries, pFrom?.country);
         const p1Regions = getRegions(p1_countryId);
         if (p1_countryId) ensureRegions(p1_countryId);
-        const p1_regionId = findRegionIdLoose(p1Regions, p1?.region);
+        const p1_regionId = findRegionIdLoose(p1Regions, pFrom?.region);
         if (p1_countryId && p1_regionId) ensureCities(p1_countryId, p1_regionId);
         const p1Cities = getCities(p1_countryId, p1_regionId);
-        const p1_cityId = findCityIdLoose(p1Cities, p1?.city);
+        const p1_cityId = findCityIdLoose(p1Cities, pFrom?.city);
 
-        const p2_countryId = findCountryIdLoose(countries, p2?.country);
+        const p2_countryId = findCountryIdLoose(countries, pTo?.country);
         const p2Regions = getRegions(p2_countryId);
         if (p2_countryId) ensureRegions(p2_countryId);
-        const p2_regionId = findRegionIdLoose(p2Regions, p2?.region);
+        const p2_regionId = findRegionIdLoose(p2Regions, pTo?.region);
         if (p2_countryId && p2_regionId) ensureCities(p2_countryId, p2_regionId);
         const p2Cities = getCities(p2_countryId, p2_regionId);
-        const p2_cityId = findCityIdLoose(p2Cities, p2?.city);
+        const p2_cityId = findCityIdLoose(p2Cities, p2_regionId ? pTo?.city : pTo?.city);
 
         setForm((prev) => ({
             ...prev,
@@ -321,7 +332,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         setTimeout(() => {
             hydratingRef.current = false;
         }, 0);
-    }, [open, initial, countries, getRegions, ensureRegions, ensureCities, getCities]);
+    }, [open, initial, kind, countries, getRegions, ensureRegions, ensureCities, getCities]);
+
 
     const numericKeys: Array<keyof typeof form> = ["palletsCount", "carsCount", "weightT", "volumeM3", "lengthM", "widthM", "heightM", "priceAmount"];
     const sanitizeDigits = (v: string) => v.replace(",", ".").replace(/[^\d.]/g, "");
@@ -438,6 +450,11 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                 return;
             }
 
+            const types = POINT_TYPES[kind];
+
+            const fromExisting = pickPointByType(initial?.points, types.from, 0);
+            const toExisting   = pickPointByType(initial?.points, types.to, 1);
+
             const payload: any = {
                 date_from: date_from ?? null,
                 date_to: form.unloadDate || null,
@@ -459,15 +476,15 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
                 points: [
                     {
-                        id: initial?.points?.[0]?.id,
-                        type: initial?.points?.[0]?.type,
+                        id: fromExisting?.id,
+                        type: types.from,
                         country: form.p1_countryId,
                         region: form.p1_regionId,
                         city: form.p1_cityId,
                     },
                     {
-                        id: initial?.points?.[1]?.id,
-                        type: initial?.points?.[1]?.type,
+                        id: toExisting?.id,
+                        type: types.to,
                         country: form.p2_countryId,
                         region: form.p2_regionId,
                         city: form.p2_cityId,
