@@ -682,6 +682,9 @@
     "invitationCode": "Invitation code",
     "enterInvitationCode": "Enter an invitation code if you have one",
     "accountType": "Account type",
+    "acceptAgreementPrefix": "I accept the",
+    "userAgreement": "User Agreement",
+    "acceptAgreementRequired": "Please confirm that you accept the User Agreement",
     "accountTypes": {
       "shipper": "Shipper",
       "logist": "Logistics specialist",

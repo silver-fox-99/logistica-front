@@ -29,7 +29,7 @@ export default function LanguageSwitcher() {
     const rawLang = i18n.resolvedLanguage || i18n.language || "uz";
     const currentLang = (rawLang.split?.("-")?.[0] || rawLang) as keyof typeof langToCountry;
 
-    const currentFlag = useMemo(() => flagUrlCircle(langToCountry[currentLang] ?? "gb"), [currentLang]);
+    const currentFlag = useMemo(() => flagUrlCircle(langToCountry[currentLang] ?? "uz"), [currentLang]);
     const [flagError, setFlagError] = useState(false);
 
     const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget);
@@ -37,6 +37,7 @@ export default function LanguageSwitcher() {
 
     const changeLang = async (lng: string) => {
         await i18n.changeLanguage(lng);
+        console.log(lng);
         localStorage.setItem("i18nextLng", lng);
         setFlagError(false);
         handleClose();

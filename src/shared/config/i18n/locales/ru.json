@@ -682,6 +682,9 @@
     "invitationCode": "Пригласительный код",
     "enterInvitationCode": "Введите пригласительный код если есть",
     "accountType": "Тип аккаунта",
+    "acceptAgreementPrefix": "Я принимаю",
+    "userAgreement": "пользовательское соглашение",
+    "acceptAgreementRequired": "Подтвердите, что принимаете пользовательское соглашение",
     "accountTypes": {
       "shipper": "Грузоотправитель",
       "logist": "Логист",

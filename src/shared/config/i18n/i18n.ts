@@ -25,8 +25,9 @@ void i18n
             transKeepBasicHtmlNodesFor: ["br", "b", "strong", "i", "em"],
         },
         detection: {
-            order: ["localStorage", "navigator", "htmlTag", "cookie"],
-            caches: ["localStorage"]
+            order: ["localStorage", "cookie"],
+            caches: ["localStorage"],
+            lookupLocalStorage: "i18nextLng",
         },
         returnEmptyString: false
     });

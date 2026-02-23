@@ -19,7 +19,7 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
     const schema = z.object({
         phone: z.string().min(1, t("register.phoneRequired"))
             .refine(v => matchIsValidTel(v), t("register.phoneInvalid")),
-        acceptAgreement: z.boolean().refine((v) => v === true, "Подтвердите, что принимаете пользовательское соглашение"),
+        acceptAgreement: z.boolean().refine((v) => v === true, t("register.acceptAgreementRequired")),
     });
 
     const { control, handleSubmit, formState: { isSubmitting, errors } } =
@@ -73,14 +73,14 @@ export default function StepPhone({ defaultCountry = "UZ", onNext }: StepPhonePr
                             }
                             label={
                                 <Typography variant="body2" color="text.secondary">
-                                    Я принимаю{" "}
+                                    {t("register.acceptAgreementPrefix")}{" "}
                                     <a
                                         href={agreementUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         style={{ color: "#4472B8", fontWeight: 600 }}
                                     >
-                                        пользовательское соглашение
+                                        {t("register.userAgreement")}
                                     </a>
                                 </Typography>
                             }

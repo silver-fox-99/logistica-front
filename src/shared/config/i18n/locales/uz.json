@@ -639,7 +639,7 @@
     "emptyInvoices": "Hisob-fakturalar yo‘q"
   },
   "register": {
-    "step1Title": "Hisob yaratish",
+    "step1Title": "Akkaunt yaratish",
     "step1Subtitle": "SMS-kod olish va davom etish uchun telefon raqamingizni kiriting.",
     "step2Title": "Kodni kiriting",
     "step2Subtitle": "Biz {{phone}} raqamiga SMS yubordik. Quyida kodni kiriting.",
@@ -678,11 +678,14 @@
     "registerButton": "Ro'yxatdan o'tish",
     "registrationSuccess": "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!",
     "registrationError": "Ro'yxatdan o'tishda xatolik",
-    "alreadyHaveAccount": "Hisobingiz bormi?",
+    "alreadyHaveAccount": "Akkaunt  mavjudmi?",
     "signInButton": "Kirish",
     "invitationCode": "Taklifnoma kodi",
     "enterInvitationCode": "Agar bo‘lsa, taklifnoma kodini kiriting",
     "accountType": "Hisob turi",
+    "acceptAgreementPrefix": "Men",
+    "userAgreement": "foydalanuvchi kelishuvini qabul qilaman",
+    "acceptAgreementRequired": "Foydalanuvchi kelishuvini qabul qilganingizni tasdiqlang",
     "accountTypes": {
       "shipper": "Yuk jo‘natuvchi",
       "logist": "Logist",
