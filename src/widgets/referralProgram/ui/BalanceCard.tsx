@@ -67,19 +67,19 @@ function BalanceCardBase({ kpi }: Props) {
                             <Typography fontWeight={800}>{kpi.invited}</Typography>
                         </Box>
 
-                        <Box>
-                            <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                                {t("referralProgram.balance.active")}
-                            </Typography>
-                            <Typography fontWeight={800}>{kpi.active}</Typography>
-                        </Box>
+                        {/*<Box>*/}
+                        {/*    <Typography variant="body2" sx={{ opacity: 0.75 }}>*/}
+                        {/*        {t("referralProgram.balance.active")}*/}
+                        {/*    </Typography>*/}
+                        {/*    <Typography fontWeight={800}>{kpi.active}</Typography>*/}
+                        {/*</Box>*/}
 
-                        <Box>
-                            <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                                {t("referralProgram.balance.qualified")}
-                            </Typography>
-                            <Typography fontWeight={800}>{kpi.qualified}</Typography>
-                        </Box>
+                        {/*<Box>*/}
+                        {/*    <Typography variant="body2" sx={{ opacity: 0.75 }}>*/}
+                        {/*        {t("referralProgram.balance.qualified")}*/}
+                        {/*    </Typography>*/}
+                        {/*    <Typography fontWeight={800}>{kpi.qualified}</Typography>*/}
+                        {/*</Box>*/}
 
                         <Box>
                             <Typography variant="body2" sx={{ opacity: 0.75 }}>
