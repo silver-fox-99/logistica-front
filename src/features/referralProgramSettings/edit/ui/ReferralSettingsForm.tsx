@@ -23,6 +23,10 @@ import type { DocumentEntity } from "@/entities/document/model/types";
 import { safeJsonParseObject } from "@/shared/lib/json/safeJsonParseObject";
 import type { UpsertReferralSettingsDto } from "../model/useReferralSettingsEditor";
 import { formatIntWithDots } from "@/shared/lib/format/formatIntWithDots";
+import {
+    ReferralTiersEditor,
+    type TierFormValue
+} from "@/features/referralProgramSettings/edit/ui/ReferralTiersEditor.tsx";
 
 type LinkMode = "NONE" | "DOCUMENT_ID" | "DOCUMENT_KEY";
 
@@ -36,6 +40,7 @@ type FormValues = {
     document_id: string | null;
     document_key: string | null;
     meta_json: string;
+    tiers: TierFormValue[];
 };
 
 export type ReferralSettingsFormRef = {
@@ -91,6 +96,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             linkMode: "NONE",
             document_id: null,
             document_key: null,
+            tiers: [],
             meta_json: "{}",
         },
         mode: "onChange",
@@ -124,6 +130,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                 document_id: null,
                 document_key: null,
                 meta_json: "{}",
+                tiers: [],
             });
             return;
         }
@@ -142,6 +149,11 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             document_id: active.document?.id ?? null,
             document_key: active.document_key ?? null,
             meta_json: JSON.stringify(active.meta ?? {}, null, 2),
+            tiers: (active.tiers ?? []).map((t) => ({
+                from: t.from ?? 0,
+                to: t.to ?? null,
+                reward_value: t.reward_value ?? "0",
+            })),
         });
 
         requestAnimationFrame(() => {
@@ -169,6 +181,38 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
         }
     }, [linkMode, setValue]);
 
+    function validateTiersClient(tiers: TierFormValue[]): string | null {
+        if (!Array.isArray(tiers) || tiers.length === 0) return null;
+        if (tiers[0].from !== 0) return 'First tier must start from "0".';
+
+        for (let i = 0; i < tiers.length; i++) {
+            const t = tiers[i];
+            const isLast = i === tiers.length - 1;
+
+            if (!Number.isInteger(t.from) || t.from < 0) return `Tier #${i + 1}: "From" must be an integer ≥ 0.`;
+
+            if (t.to === null) {
+                if (!isLast) return `Tier #${i + 1}: "To" can be empty only for the last tier.`;
+            } else {
+                if (!Number.isInteger(t.to) || t.to < 0) return `Tier #${i + 1}: "To" must be an integer ≥ 0.`;
+                if (t.to < t.from) return `Tier #${i + 1}: "To" must be ≥ "From".`;
+            }
+
+            if (!/^\d+(\.\d+)?$/.test(t.reward_value ?? "")) {
+                return `Tier #${i + 1}: reward must be numeric (e.g. 10 or 10.5).`;
+            }
+
+            if (i > 0) {
+                const prev = tiers[i - 1];
+                if (prev.to === null) return `Tier #${i}: open-ended tier must be the last tier.`;
+                const expectedFrom = prev.to + 1;
+                if (t.from !== expectedFrom) return `Tier #${i + 1}: "From" must be ${expectedFrom}.`;
+            }
+        }
+
+        return null;
+    }
+
     const submit = handleSubmit(async (values) => {
         setError(null);
 
@@ -183,6 +227,12 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             return;
         }
 
+        const tiersError = validateTiersClient(values.tiers);
+        if (tiersError) {
+            setError(tiersError);
+            return;
+        }
+
         const dto: UpsertReferralSettingsDto = {
             is_enabled: values.is_enabled,
             trigger: values.trigger,
@@ -192,6 +242,11 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
             meta: metaRes.data,
             document_id: values.linkMode === "DOCUMENT_ID" ? values.document_id : undefined,
             document_key: values.linkMode === "DOCUMENT_KEY" ? values.document_key : undefined,
+            tiers: values.tiers.map((t) => ({
+                from: t.from,
+                to: t.to ?? null,
+                reward_value: t.reward_value,
+            })),
         };
 
         if (values.linkMode === "NONE") {
@@ -389,6 +444,14 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                     )}
                 />
             </Stack>
+
+            <Divider />
+
+            <ReferralTiersEditor
+                control={control}
+                rewardType={rewardType}
+                setTopError={setError}
+            />
 
             <Divider />
 

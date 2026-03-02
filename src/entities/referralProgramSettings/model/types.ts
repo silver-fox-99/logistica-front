@@ -10,6 +10,12 @@ export enum ReferralRewardType {
     PERCENT = "PERCENT",
 }
 
+export type ReferralTier = {
+    from: number;
+    to: number | null;
+    reward_value: string;
+};
+
 export type ReferralProgramSettings = {
     id: string;
     is_enabled: boolean;
@@ -17,6 +23,7 @@ export type ReferralProgramSettings = {
     reward_type: ReferralRewardType;
     reward_value: string;
     reward_currency: string | null;
+    tiers: ReferralTier[];
     document: DocumentEntity | null;
     document_key: string | null;
     meta: Record<string, any>;
@@ -32,6 +39,7 @@ export type CreateReferralProgramSettingsDto = Partial<{
     reward_currency: string | null;
     document_id: string | null;
     document_key: string | null;
+    tiers: ReferralTier[];
     meta: Record<string, any>;
 }>;
 
