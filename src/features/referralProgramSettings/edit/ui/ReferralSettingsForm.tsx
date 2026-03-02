@@ -344,11 +344,7 @@ const ReferralSettingsForm = forwardRef<ReferralSettingsFormRef, Props>(function
                             placeholder={rewardType === ReferralRewardType.PERCENT ? "10.5" : "10000"}
                             {...field}
                             error={!!errors.reward_value}
-                            helperText={
-                                rewardType === ReferralRewardType.PERCENT
-                                    ? "Процент (например: 10.5)"
-                                    : `Фиксированная сумма (число). Предпросмотр: ${rewardPreview ?? "0"}`
-                            }
+                            helperText={ `Фиксированная сумма (число). Предпросмотр: ${rewardPreview ?? "0"}`}
                         />
                     )}
                 />
