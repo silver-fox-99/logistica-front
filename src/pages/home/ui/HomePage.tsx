@@ -97,7 +97,7 @@ export default function HomePage() {
                             <PublicShipmentCard
                                 data={item}
                                 cta={{
-                                    label: t("homePage.moreDetails"),
+                                    label: isAuthenticated ? t("homePage.moreDetails") : t("header.register"),
                                     href: isAuthenticated ? "/dashboard/search" : "/auth/register",
                                     icon: <FiChevronRight />,
                                 }}
