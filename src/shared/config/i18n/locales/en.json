@@ -43,6 +43,7 @@
     "validationWarning": "Fill in all required fields",
     "step": "Step",
     "of": "of",
+
     "steps": {
       "datesRoutes": "Dates and Routes",
       "cargoInfo": "Cargo Information",
@@ -51,6 +52,10 @@
       "contacts": "Contacts"
     },
     "fields": {
+      "pickupPoints": "Pickup points",
+      "dropoffPoints": "Dropoff points",
+      "pickupPoint": "Pickup point",
+      "dropoffPoint": "Dropoff point",
       "dateFrom": "Loading Date",
       "dateFromStart": "Loading Date (from)",
       "dateFromEnd": "Loading Date (to)",
@@ -106,7 +111,12 @@
     "buttons": {
       "back": "Back",
       "continue": "Continue",
-      "submit": "Submit"
+      "submit": "Submit",
+      "addPickupPoint": "Add pickup point",
+      "addDropoffPoint": "Add dropoff point",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removePoint": "Remove point"
     },
     "errors": {
       "required": "Required",
@@ -140,6 +150,10 @@
       "contacts": "Contacts"
     },
     "fields": {
+      "pickupPoints": "Loading points",
+      "dropoffPoints": "Unloading points",
+      "pickupPoint": "Loading point",
+      "dropoffPoint": "Unloading point",
       "dateFrom": "Loading Date",
       "dateTo": "Unloading Date",
       "loadPlace": "Loading Place",
@@ -194,7 +208,12 @@
     "buttons": {
       "back": "Back",
       "continue": "Continue",
-      "submit": "Submit"
+      "submit": "Submit",
+      "addPickupPoint": "Add loading point",
+      "addDropoffPoint": "Add unloading point",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removePoint": "Remove point"
     },
     "errors": {
       "required": "Required",
@@ -501,7 +520,11 @@
       "cargoTypeBulk": "Bulk",
       "cargoTypePallets": "Pallets",
       "bargainAllowed": "Allowed",
-      "bargainForbidden": "Forbidden"
+      "bargainForbidden": "Forbidden",
+      "addPoint": "Add point",
+      "removePoint": "Remove point",
+      "address": "Address",
+      "errorPointsRequired": "Please select at least a country for each point"
     },
     "filters": {
       "title": "Filters",

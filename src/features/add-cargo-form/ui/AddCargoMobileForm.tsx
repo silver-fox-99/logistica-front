@@ -1,17 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, Grid, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import type { AddCargoFormValues } from "../model/types";
-import {type UseFormReturn, useWatch} from "react-hook-form";
+import {type UseFormReturn} from "react-hook-form";
 import { Controller } from "react-hook-form";
 
-import { PlaceRowField } from "./PlaceRowField";
+
 import { PriceField } from "./PriceField";
 import { onDigitsOnlyKeyDown, onDigitsOnlyPaste } from "@/shared/lib/numericInput";
 
 import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
 import { RHFLookupMultiAutocomplete } from "@/shared/ui/lookup/RHFLookupMultiAutocomplete";
 import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
+import {CargoPointsFieldArray} from "@/features/add-cargo-form/ui/CargoPointsFieldArray.tsx";
 
 type Props = {
     t: (k: string) => string;
@@ -32,8 +33,8 @@ type Props = {
     getLocalizedLabel: (o: LookupOpt) => string;
 
     geo: any;
-    pickupCountryError?: string;
-    dropoffCountryError?: string;
+    pickupCountryErrors?: Array<string | undefined>;
+    dropoffCountryErrors?: Array<string | undefined>;
 };
 
 export function AddCargoMobileForm({
@@ -54,8 +55,8 @@ export function AddCargoMobileForm({
                                        getLocalizedLabel,
 
                                        geo,
-                                       pickupCountryError,
-                                       dropoffCountryError,
+                                       pickupCountryErrors,
+                                       dropoffCountryErrors,
                                    }: Props) {
     const [activeStep, setActiveStep] = useState(0);
 
@@ -71,12 +72,6 @@ export function AddCargoMobileForm({
         ],
         [t]
     );
-
-    const pickupCountryId = useWatch({ control, name: "pickups.0.countryId" });
-    const pickupRegionId  = useWatch({ control, name: "pickups.0.regionId" });
-
-    const dropoffCountryId = useWatch({ control, name: "dropoffs.0.countryId" });
-    const dropoffRegionId  = useWatch({ control, name: "dropoffs.0.regionId" });
 
     const handleNext = () => setActiveStep((p) => p + 1);
     const handleBack = () => setActiveStep((p) => p - 1);
@@ -141,43 +136,25 @@ export function AddCargoMobileForm({
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Stack spacing={1}>
-                                <PlaceRowField
-                                    kind="pickup"
-                                    index={0}
-                                    control={control}
-                                    setValue={setValue}
-                                    countries={geo.countries}
-                                    regions={geo.getRegions(pickupCountryId)}
-                                    cities={geo.getCities(pickupCountryId, pickupRegionId)}
-                                    loadingCountries={geo.loading.countries}
-                                    loadingRegions={geo.loading.regionsFor === (pickupCountryId || "")}
-                                    loadingCities={geo.loading.citiesFor === `${pickupCountryId || ""}/${pickupRegionId || ""}`}
-                                    errorText={pickupCountryError}
-                                    onCountryLoad={(id) => geo.ensureRegions(id)}
-                                    onRegionLoad={(countryId, regionId) => geo.ensureCities(countryId, regionId)}
-                                />
-                            </Stack>
+                            <CargoPointsFieldArray
+                                t={t}
+                                kind="pickup"
+                                name="pickups"
+                                form={form}
+                                geo={geo}
+                                errorMessages={pickupCountryErrors}
+                            />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Stack spacing={1}>
-                                <PlaceRowField
-                                    kind="dropoff"
-                                    index={0}
-                                    control={control}
-                                    setValue={setValue}
-                                    countries={geo.countries}
-                                    regions={geo.getRegions(dropoffCountryId)}
-                                    cities={geo.getCities(dropoffCountryId, dropoffRegionId)}
-                                    loadingCountries={geo.loading.countries}
-                                    loadingRegions={geo.loading.regionsFor === (dropoffCountryId || "")}
-                                    loadingCities={geo.loading.citiesFor === `${dropoffCountryId || ""}/${dropoffRegionId || ""}`}
-                                    errorText={dropoffCountryError}
-                                    onCountryLoad={(id) => geo.ensureRegions(id)}
-                                    onRegionLoad={(countryId, regionId) => geo.ensureCities(countryId, regionId)}
-                                />
-                            </Stack>
+                            <CargoPointsFieldArray
+                                t={t}
+                                kind="dropoff"
+                                name="dropoffs"
+                                form={form}
+                                geo={geo}
+                                errorMessages={dropoffCountryErrors}
+                            />
                         </Grid>
                     </Grid>
                 )}

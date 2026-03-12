@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, Grid, Stack, TextField, Typography } from "@mui/material";
-import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
+import { Box, Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
+import { Controller, type UseFormReturn } from "react-hook-form";
 
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
@@ -8,8 +8,9 @@ import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
 import { onDigitsOnlyKeyDown, onDigitsOnlyPaste } from "@/shared/lib/numericInput";
 
 import type { AddTransportFormValues } from "../model/types";
-import { PlaceRowField } from "./PlaceRowField";
+
 import { PriceField } from "./PriceField";
+import { TransportPointsFieldArray } from "./TransportPointsFieldArray";
 
 type Props = {
     t: (k: string) => string;
@@ -28,8 +29,8 @@ type Props = {
     getLocalizedLabel: (o: LookupOpt) => string;
 
     geo: any;
-    loadCountryError?: string;
-    unloadCountryError?: string;
+    loadCountryErrors?: Array<string | undefined>;
+    unloadCountryErrors?: Array<string | undefined>;
 };
 
 export function AddTransportMobileForm({
@@ -48,8 +49,8 @@ export function AddTransportMobileForm({
                                            getLocalizedLabel,
 
                                            geo,
-                                           loadCountryError,
-                                           unloadCountryError,
+                                           loadCountryErrors,
+                                           unloadCountryErrors,
                                        }: Props) {
     const { register, control, setValue, formState } = form;
 
@@ -66,11 +67,6 @@ export function AddTransportMobileForm({
         [t]
     );
 
-    const loadCountryId = useWatch({ control, name: "loadPlaces.0.countryId" });
-    const loadRegionId = useWatch({ control, name: "loadPlaces.0.regionId" });
-
-    const unloadCountryId = useWatch({ control, name: "unloadPlaces.0.countryId" });
-    const unloadRegionId = useWatch({ control, name: "unloadPlaces.0.regionId" });
 
     const handleNext = () => setActiveStep((s) => Math.min(s + 1, steps.length - 1));
     const handleBack = () => setActiveStep((s) => Math.max(s - 1, 0));
@@ -135,43 +131,25 @@ export function AddTransportMobileForm({
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Stack spacing={1}>
-                                <PlaceRowField
-                                    kind="load"
-                                    index={0}
-                                    control={control}
-                                    setValue={setValue}
-                                    countries={geo.countries}
-                                    regions={geo.getRegions(loadCountryId)}
-                                    cities={geo.getCities(loadCountryId, loadRegionId)}
-                                    loadingCountries={geo.loading.countries}
-                                    loadingRegions={geo.loading.regionsFor === (loadCountryId || "")}
-                                    loadingCities={geo.loading.citiesFor === `${loadCountryId || ""}/${loadRegionId || ""}`}
-                                    errorText={loadCountryError}
-                                    onCountryLoad={(id) => geo.ensureRegions(id)}
-                                    onRegionLoad={(countryId, regionId) => geo.ensureCities(countryId, regionId)}
-                                />
-                            </Stack>
+                            <TransportPointsFieldArray
+                                t={t}
+                                kind="load"
+                                name="loadPlaces"
+                                form={form}
+                                geo={geo}
+                                errorMessages={loadCountryErrors}
+                            />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Stack spacing={1}>
-                                <PlaceRowField
-                                    kind="unload"
-                                    index={0}
-                                    control={control}
-                                    setValue={setValue}
-                                    countries={geo.countries}
-                                    regions={geo.getRegions(unloadCountryId)}
-                                    cities={geo.getCities(unloadCountryId, unloadRegionId)}
-                                    loadingCountries={geo.loading.countries}
-                                    loadingRegions={geo.loading.regionsFor === (unloadCountryId || "")}
-                                    loadingCities={geo.loading.citiesFor === `${unloadCountryId || ""}/${unloadRegionId || ""}`}
-                                    errorText={unloadCountryError}
-                                    onCountryLoad={(id) => geo.ensureRegions(id)}
-                                    onRegionLoad={(countryId, regionId) => geo.ensureCities(countryId, regionId)}
-                                />
-                            </Stack>
+                            <TransportPointsFieldArray
+                                t={t}
+                                kind="unload"
+                                name="unloadPlaces"
+                                form={form}
+                                geo={geo}
+                                errorMessages={unloadCountryErrors}
+                            />
                         </Grid>
                     </Grid>
                 )}

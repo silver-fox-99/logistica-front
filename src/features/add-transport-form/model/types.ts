@@ -1,8 +1,14 @@
-export type TransportPlace = {
+export type Place = {
     countryId: string | null;
     regionId: string | null;
     cityId: string | null;
     address: string;
+};
+
+export type Dims = {
+    length: string;
+    width: string;
+    height: string;
 };
 
 export type AddTransportFormValues = {
@@ -10,8 +16,8 @@ export type AddTransportFormValues = {
     dateFromEnd: string;
     dateTo: string;
 
-    loadPlaces: TransportPlace[];
-    unloadPlaces: TransportPlace[];
+    loadPlaces: Place[];
+    unloadPlaces: Place[];
 
     vehicleType: string;
     vehiclesCount: string;
@@ -19,11 +25,7 @@ export type AddTransportFormValues = {
     capacityTons: string;
     volumeM3: string;
 
-    dims: {
-        length: string;
-        width: string;
-        height: string;
-    };
+    dims: Dims;
 
     currency: string;
     price: string;
@@ -34,6 +36,6 @@ export type AddTransportFormValues = {
 
     contactSecondary: string;
     email: string;
-    note: string;
     extraPhoneAsMain: boolean;
+    note: string;
 };

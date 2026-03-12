@@ -15,6 +15,7 @@ export type PublicPoint = {
     city_ru?: string | null;
     city_uz?: string | null;
     address?: string | null;
+    order?: number | null
 };
 
 export type PublicFilters = {

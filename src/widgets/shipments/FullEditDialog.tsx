@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {Fragment, useEffect, useMemo, useRef, useState} from "react";
 import {
     Dialog,
     DialogTitle,
@@ -81,9 +81,22 @@ const POINT_TYPES = {
     transport: { from: "DEPARTURE", to: "ARRIVAL" },
 } as const;
 
-function pickPointByType(points: GeoPoint[] | undefined, type: string, fallbackIndex: number) {
-    return points?.find((p) => p?.type === type) ?? points?.[fallbackIndex];
-}
+type EditPoint = {
+    id?: string;
+    type: string;
+    countryId: string;
+    regionId: string;
+    cityId: string;
+    address: string;
+};
+
+const createEmptyPoint = (type: string): EditPoint => ({
+    type,
+    countryId: "",
+    regionId: "",
+    cityId: "",
+    address: "",
+});
 
 /** ===== Helpers ===== */
 const toStr = (v: unknown, fallback = ""): string => (v == null ? fallback : String(v));
@@ -190,7 +203,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         if (open) void loadInit();
     }, [open, loadInit]);
 
-    const { countries, getRegions, getCities, loadCountries, ensureRegions, ensureCities } = useGeoCascade();
+    const { countries, getRegions, getCities, loadCountries, } = useGeoCascade();
 
     const [filtersData, setFiltersData] = useState<null | { vehicle_types: VehicleTypeOpt[] }>(null);
     const [loadingFilters, setLoadingFilters] = useState(false);
@@ -198,19 +211,13 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
     const initLoad = splitInitialLoadRange(initial?.dateFrom);
 
     const [form, setForm] = useState(() => ({
-        // date_from (диапазон загрузки)
         loadFrom: initLoad.from,
         loadTo: initLoad.to,
-
-        // date_to (дата выгрузки)
         unloadDate: toDateInput(initial?.dateTo),
 
         vehicleType: initial?.vehicleType || "ANY",
-
-        // ✅ для обоих
         carsCount: toStr(initial?.carsCount ?? ""),
 
-        // common
         weightT: toStr(initial?.weightT),
         volumeM3: toStr(initial?.volumeM3),
         hasDimensions: toBool(initial?.hasDimensions, false),
@@ -221,23 +228,26 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         priceAmount: toStr(initial?.priceAmount),
         note: toStr(initial?.note),
 
-        // cargo only
-        loadType: Array.isArray(initial?.loadType) ? initial!.loadType! : initial?.loadType ? [initial.loadType as any] : ["ANY"],
+        loadType: Array.isArray(initial?.loadType)
+            ? initial.loadType
+            : initial?.loadType
+                ? [initial.loadType as any]
+                : ["ANY"],
+
         cargoType: initial?.cargoType || "GENERAL",
         allowPartialLoad: toBool(initial?.allowPartialLoad, false),
         palletsCount: toStr(initial?.palletsCount),
 
-        // transport only
         bargain: initial?.bargain || "ALLOWED",
-
-        // geo ids
-        p1_countryId: "",
-        p1_regionId: "",
-        p1_cityId: "",
-        p2_countryId: "",
-        p2_regionId: "",
-        p2_cityId: "",
     }));
+
+    const [fromPoints, setFromPoints] = useState<EditPoint[]>([
+        createEmptyPoint(POINT_TYPES[kind].from),
+    ]);
+
+    const [toPoints, setToPoints] = useState<EditPoint[]>([
+        createEmptyPoint(POINT_TYPES[kind].to),
+    ]);
 
     const hydratingRef = useRef(false);
 
@@ -257,6 +267,22 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
     useEffect(() => {
         if (open) void loadCountries();
     }, [open, loadCountries]);
+
+    useEffect(() => {
+        const types = POINT_TYPES[kind];
+
+        setFromPoints((prev) =>
+            prev.length
+                ? prev.map((p) => ({ ...p, type: types.from }))
+                : [createEmptyPoint(types.from)]
+        );
+
+        setToPoints((prev) =>
+            prev.length
+                ? prev.map((p) => ({ ...p, type: types.to }))
+                : [createEmptyPoint(types.to)]
+        );
+    }, [kind]);
 
     // переливаем форму при смене initial
     useEffect(() => {
@@ -291,48 +317,83 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         }));
     }, [open, initial, kind]);
 
+    const updatePoint = (
+        side: "from" | "to",
+        index: number,
+        patch: Partial<EditPoint>
+    ) => {
+        const setter = side === "from" ? setFromPoints : setToPoints;
+
+        setter((prev) =>
+            prev.map((item, i) => {
+                if (i !== index) return item;
+
+                const next = { ...item, ...patch };
+
+                if ("countryId" in patch) {
+                    next.regionId = "";
+                    next.cityId = "";
+                }
+
+                if ("regionId" in patch) {
+                    next.cityId = "";
+                }
+
+                return next;
+            })
+        );
+    };
+
+    const addPoint = (side: "from" | "to") => {
+        const type = side === "from" ? POINT_TYPES[kind].from : POINT_TYPES[kind].to;
+        const setter = side === "from" ? setFromPoints : setToPoints;
+        setter((prev) => [...prev, createEmptyPoint(type)]);
+    };
+
+    const removePoint = (side: "from" | "to", index: number) => {
+        const setter = side === "from" ? setFromPoints : setToPoints;
+        setter((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)));
+    };
+
     // Hydrate geo ids from initial.points
     useEffect(() => {
         if (!open) return;
 
         const types = POINT_TYPES[kind];
-        const pFrom = pickPointByType(initial?.points, types.from, 0);
-        const pTo   = pickPointByType(initial?.points, types.to, 1);
+        const sorted = [...(initial?.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-        if (!pFrom && !pTo) return;
+        const rawFrom = sorted.filter((p) => p?.type === types.from);
+        const rawTo = sorted.filter((p) => p?.type === types.to);
 
-        hydratingRef.current = true;
+        const mapPoint = (point: GeoPoint | undefined, type: string): EditPoint => {
+            const countryId = findCountryIdLoose(countries, point?.country);
+            const regions = countryId ? getRegions(countryId) : [];
+            const regionId = findRegionIdLoose(regions, point?.region);
+            const cities = countryId && regionId ? getCities(countryId, regionId) : [];
+            const cityId = findCityIdLoose(cities, point?.city);
 
-        const p1_countryId = findCountryIdLoose(countries, pFrom?.country);
-        const p1Regions = getRegions(p1_countryId);
-        if (p1_countryId) ensureRegions(p1_countryId);
-        const p1_regionId = findRegionIdLoose(p1Regions, pFrom?.region);
-        if (p1_countryId && p1_regionId) ensureCities(p1_countryId, p1_regionId);
-        const p1Cities = getCities(p1_countryId, p1_regionId);
-        const p1_cityId = findCityIdLoose(p1Cities, pFrom?.city);
+            return {
+                id: point?.id,
+                type,
+                countryId,
+                regionId,
+                cityId,
+                address: point?.address ?? "",
+            };
+        };
 
-        const p2_countryId = findCountryIdLoose(countries, pTo?.country);
-        const p2Regions = getRegions(p2_countryId);
-        if (p2_countryId) ensureRegions(p2_countryId);
-        const p2_regionId = findRegionIdLoose(p2Regions, pTo?.region);
-        if (p2_countryId && p2_regionId) ensureCities(p2_countryId, p2_regionId);
-        const p2Cities = getCities(p2_countryId, p2_regionId);
-        const p2_cityId = findCityIdLoose(p2Cities, p2_regionId ? pTo?.city : pTo?.city);
+        setFromPoints(
+            rawFrom.length
+                ? rawFrom.map((p) => mapPoint(p, types.from))
+                : [createEmptyPoint(types.from)]
+        );
 
-        setForm((prev) => ({
-            ...prev,
-            p1_countryId,
-            p1_regionId,
-            p1_cityId,
-            p2_countryId,
-            p2_regionId,
-            p2_cityId,
-        }));
-
-        setTimeout(() => {
-            hydratingRef.current = false;
-        }, 0);
-    }, [open, initial, kind, countries, getRegions, ensureRegions, ensureCities, getCities]);
+        setToPoints(
+            rawTo.length
+                ? rawTo.map((p) => mapPoint(p, types.to))
+                : [createEmptyPoint(types.to)]
+        );
+    }, [open, initial, kind, countries, getRegions, getCities]);
 
 
     const numericKeys: Array<keyof typeof form> = ["palletsCount", "carsCount", "weightT", "volumeM3", "lengthM", "widthM", "heightM", "priceAmount"];
@@ -353,11 +414,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                 return next;
             }
 
-            // каскад гео
-            if (key === "p1_countryId") return { ...prev, p1_countryId: value, p1_regionId: "", p1_cityId: "" };
-            if (key === "p1_regionId") return { ...prev, p1_regionId: value, p1_cityId: "" };
-            if (key === "p2_countryId") return { ...prev, p2_countryId: value, p2_regionId: "", p2_cityId: "" };
-            if (key === "p2_regionId") return { ...prev, p2_regionId: value, p2_cityId: "" };
+
 
             return { ...prev, [key]: value };
         });
@@ -367,10 +424,121 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
         setForm((prev) => ({ ...prev, [key]: checked }));
     };
 
-    const p1_regions = getRegions(form.p1_countryId);
-    const p1_cities = getCities(form.p1_countryId, form.p1_regionId);
-    const p2_regions = getRegions(form.p2_countryId);
-    const p2_cities = getCities(form.p2_countryId, form.p2_regionId);
+    const renderPointGroup = (
+        side: "from" | "to",
+        title: string,
+        points: EditPoint[]
+    ) => {
+        return (
+            <>
+                <Grid size={{ xs: 12 }}>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between">
+                        <Typography sx={{ fontWeight: 800 }}>{title}</Typography>
+                        <Button size="small" onClick={() => addPoint(side)}>
+                            {t("shipments.editDialog.addPoint")}
+                        </Button>
+                    </Stack>
+                </Grid>
+
+                {points.map((point, index) => {
+                    const regions = getRegions(point.countryId);
+                    const cities = getCities(point.countryId, point.regionId);
+
+                    return (
+                        <Fragment key={`${side}-${index}-${point.id ?? "new"}`}>
+                            <Grid size={{ xs: 12 }}>
+                                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                        {title} #{index + 1}
+                                    </Typography>
+
+                                    {points.length > 1 && (
+                                        <Button
+                                            size="small"
+                                            color="error"
+                                            onClick={() => removePoint(side, index)}
+                                        >
+                                            {t("shipments.editDialog.removePoint")}
+                                        </Button>
+                                    )}
+                                </Stack>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel>{t("shipments.editDialog.country")}</InputLabel>
+                                    <Select
+                                        label={t("shipments.editDialog.country")}
+                                        value={point.countryId}
+                                        onChange={(e) =>
+                                            updatePoint(side, index, { countryId: String(e.target.value) })
+                                        }
+                                    >
+                                        {countries.map((c) => (
+                                            <MenuItem key={c.id} value={c.id}>
+                                                {getLocalizedGeoName(c)}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel>{t("shipments.editDialog.region")}</InputLabel>
+                                    <Select
+                                        label={t("shipments.editDialog.region")}
+                                        value={point.regionId}
+                                        onChange={(e) =>
+                                            updatePoint(side, index, { regionId: String(e.target.value) })
+                                        }
+                                    >
+                                        <MenuItem value="">—</MenuItem>
+                                        {regions.map((r) => (
+                                            <MenuItem key={r.id} value={r.id}>
+                                                {getLocalizedGeoName(r)}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel>{t("shipments.editDialog.city")}</InputLabel>
+                                    <Select
+                                        label={t("shipments.editDialog.city")}
+                                        value={point.cityId}
+                                        onChange={(e) =>
+                                            updatePoint(side, index, { cityId: String(e.target.value) })
+                                        }
+                                    >
+                                        <MenuItem value="">—</MenuItem>
+                                        {cities.map((c) => (
+                                            <MenuItem key={c.id} value={c.id}>
+                                                {getLocalizedGeoName(c)}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <TextField
+                                    label={t("shipments.editDialog.address")}
+                                    value={point.address}
+                                    onChange={(e) =>
+                                        updatePoint(side, index, { address: e.target.value })
+                                    }
+                                    fullWidth
+                                />
+                            </Grid>
+                        </Fragment>
+                    );
+                })}
+            </>
+        );
+    };
 
     // ====== Options from store (замена хардкода) ======
     const loadTypeOptions = useMemo(() => {
@@ -452,15 +620,37 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
 
             const types = POINT_TYPES[kind];
 
-            const fromExisting = pickPointByType(initial?.points, types.from, 0);
-            const toExisting   = pickPointByType(initial?.points, types.to, 1);
+            const preparedFromPoints = fromPoints.map((point, index) => ({
+                id: point.id,
+                type: types.from,
+                country: point.countryId || null,
+                region: point.regionId || null,
+                city: point.cityId || null,
+                address: point.address || null,
+                order: index,
+            }));
+
+            const preparedToPoints = toPoints.map((point, index) => ({
+                id: point.id,
+                type: types.to,
+                country: point.countryId || null,
+                region: point.regionId || null,
+                city: point.cityId || null,
+                address: point.address || null,
+                order: index,
+            }));
+
+            if (preparedFromPoints.some((p) => !p.country) || preparedToPoints.some((p) => !p.country)) {
+                toast.error(t("shipments.editDialog.errorPointsRequired"));
+                return;
+            }
 
             const payload: any = {
                 date_from: date_from ?? null,
                 date_to: form.unloadDate || null,
 
                 vehicle_type: form.vehicleType || "ANY",
-                cars_count: toNumberOr(form.carsCount, 1), // ✅ всегда
+                cars_count: toNumberOr(form.carsCount, 1),
 
                 weight_t: toOptionalNumber(form.weightT),
                 volume_m3: toOptionalNumber(form.volumeM3),
@@ -474,22 +664,7 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                 price_amount: toOptionalNumber(form.priceAmount),
                 note: form.note || null,
 
-                points: [
-                    {
-                        id: fromExisting?.id,
-                        type: types.from,
-                        country: form.p1_countryId,
-                        region: form.p1_regionId,
-                        city: form.p1_cityId,
-                    },
-                    {
-                        id: toExisting?.id,
-                        type: types.to,
-                        country: form.p2_countryId,
-                        region: form.p2_regionId,
-                        city: form.p2_cityId,
-                    },
-                ],
+                points: [...preparedFromPoints, ...preparedToPoints],
             };
 
             if (kind === "cargo") {
@@ -757,97 +932,8 @@ export default function FullEditDialog({ open, kind, initial, onClose, onSubmit 
                                 <Divider sx={{ my: 0.25 }} />
                             </Grid>
 
-                            {/* FROM */}
-                            <Grid size={{xs:12}}>
-                                <Typography sx={{ fontWeight: 800 }}>{t("shipments.editDialog.from")}</Typography>
-                            </Grid>
-
-                            <Grid size={{xs:12, md: 4}}>
-                                <FormControl fullWidth>
-                                    <InputLabel>{t("shipments.editDialog.country")}</InputLabel>
-                                    <Select label={t("shipments.editDialog.country")} value={form.p1_countryId} onChange={handleChange("p1_countryId")}>
-                                        {countries.map((c) => (
-                                            <MenuItem key={c.id} value={c.id}>
-                                                {getLocalizedGeoName(c)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            <Grid size={{xs:12, md: 4}}>
-                                <FormControl fullWidth>
-                                    <InputLabel>{t("shipments.editDialog.region")}</InputLabel>
-                                    <Select label={t("shipments.editDialog.region")} value={form.p1_regionId} onChange={handleChange("p1_regionId")}>
-                                        <MenuItem value="">—</MenuItem>
-                                        {p1_regions.map((r) => (
-                                            <MenuItem key={r.id} value={r.id}>
-                                                {getLocalizedGeoName(r)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            <Grid size={{xs:12, md: 4}}>
-                                <FormControl fullWidth>
-                                    <InputLabel>{t("shipments.editDialog.city")}</InputLabel>
-                                    <Select label={t("shipments.editDialog.city")} value={form.p1_cityId} onChange={handleChange("p1_cityId")}>
-                                        <MenuItem value="">—</MenuItem>
-                                        {p1_cities.map((c) => (
-                                            <MenuItem key={c.id} value={c.id}>
-                                                {getLocalizedGeoName(c)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            {/* TO */}
-                            <Grid size={{xs:12}}>
-                                <Typography sx={{ fontWeight: 800 }}>{t("shipments.editDialog.to")}</Typography>
-                            </Grid>
-
-                            <Grid size={{xs:12, md: 4}}>
-                                <FormControl fullWidth>
-                                    <InputLabel>{t("shipments.editDialog.country")}</InputLabel>
-                                    <Select label={t("shipments.editDialog.country")} value={form.p2_countryId} onChange={handleChange("p2_countryId")}>
-                                        {countries.map((c) => (
-                                            <MenuItem key={c.id} value={c.id}>
-                                                {getLocalizedGeoName(c)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            <Grid size={{xs:12, md: 4}}>
-                                <FormControl fullWidth>
-                                    <InputLabel>{t("shipments.editDialog.region")}</InputLabel>
-                                    <Select label={t("shipments.editDialog.region")} value={form.p2_regionId} onChange={handleChange("p2_regionId")}>
-                                        <MenuItem value="">—</MenuItem>
-                                        {p2_regions.map((r) => (
-                                            <MenuItem key={r.id} value={r.id}>
-                                                {getLocalizedGeoName(r)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            <Grid size={{xs:12, md: 4}}>
-                                <FormControl fullWidth>
-                                    <InputLabel>{t("shipments.editDialog.city")}</InputLabel>
-                                    <Select label={t("shipments.editDialog.city")} value={form.p2_cityId} onChange={handleChange("p2_cityId")}>
-                                        <MenuItem value="">—</MenuItem>
-                                        {p2_cities.map((c) => (
-                                            <MenuItem key={c.id} value={c.id}>
-                                                {getLocalizedGeoName(c)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
+                            {renderPointGroup("from", t("shipments.editDialog.from"), fromPoints)}
+                            {renderPointGroup("to", t("shipments.editDialog.to"), toPoints)}
 
                             <Grid size={{xs:12}}>
                                 <TextField

@@ -5,13 +5,19 @@ export type GeoPoint = {
     country?: string | null;
     country_ru?: string | null;
     country_uz?: string | null;
+
     region?: string | null;
     region_ru?: string | null;
     region_uz?: string | null;
+
     city?: string | null;
     city_ru?: string | null;
     city_uz?: string | null;
+
+    address?: string | null;
+
     type?: string | null;
+    order?: number | null;
     id?: string;
 };
 
@@ -55,17 +61,20 @@ export type ShipmentRowData = {
 
 export type CargoApiItem = {
     id: string;
-    user?: { first_name?: string; last_name?: string; email?: string; phone?: string; };
-    points: { 
-        country?: string; 
+    user?: { first_name?: string; last_name?: string; email?: string; phone?: string };
+    points: {
+        country?: string;
         country_ru?: string | null;
         country_uz?: string | null;
-        region?: string; 
+        region?: string;
         region_ru?: string | null;
         region_uz?: string | null;
         city?: string;
         city_ru?: string | null;
         city_uz?: string | null;
+        address?: string | null;
+        type?: string | null;
+        order?: number | null;
     }[];
     date_from: string | string[];
     date_to: string | string[];
@@ -79,7 +88,6 @@ export type CargoApiItem = {
     price_currency: string;
     price_amount: string | number;
     payment_method?: "BANK_TRANSFER" | "CASH" | "CARD";
-    
 
     vehicle_type?: string;
     load_type?: string[];
@@ -92,7 +100,7 @@ export type CargoApiItem = {
     note?: string;
     contact_extra_phone?: string;
     extra_phone_as_main?: boolean;
-    view_count: string
+    view_count: string;
 };
 
 export type TransportApiItem = CargoApiItem;

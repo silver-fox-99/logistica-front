@@ -43,6 +43,7 @@ type ShipmentDetailsContentProps = {
     onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
     onCopy?: (id: string) => void;
+    formatRoute: (point?: GeoPoint, withAddress?: boolean) => string;
 };
 
 function ShipmentDetailsContent({
@@ -56,7 +57,19 @@ function ShipmentDetailsContent({
                                     onEdit,
                                     onDelete,
                                     onCopy,
+                                    formatRoute
                                 }: ShipmentDetailsContentProps) {
+
+    const sortedPoints = [...(data.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    const loadPoints = sortedPoints.filter(
+        (item) => item.type === "PICKUP" || item.type === "DEPARTURE"
+    );
+
+    const unloadPoints = sortedPoints.filter(
+        (item) => item.type === "DROPOFF" || item.type === "ARRIVAL"
+    );
+
     return (
         <Grid container spacing={2}>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -180,6 +193,54 @@ function ShipmentDetailsContent({
                 </Stack>
             </Grid>
 
+            <Grid size={{ xs: 12 }}>
+                <Typography variant="subtitle2" fontWeight={600} mb={1}>
+                    {t("userReviews.form.routeTitle")}
+                </Typography>
+
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Typography variant="body2" fontWeight={600} mb={1}>
+                            {t("shipments.shipmentCard.load")}
+                        </Typography>
+
+                        <Stack spacing={0.75}>
+                            {loadPoints.length > 0 ? (
+                                loadPoints.map((point, index) => (
+                                    <Typography key={`load-${point.id ?? index}`} variant="body2" color="text.secondary">
+                                        {index + 1}. {formatRoute(point, true)}
+                                    </Typography>
+                                ))
+                            ) : (
+                                <Typography variant="body2" color="text.secondary">
+                                    —
+                                </Typography>
+                            )}
+                        </Stack>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Typography variant="body2" fontWeight={600} mb={1}>
+                            {t("shipments.shipmentCard.unload")}
+                        </Typography>
+
+                        <Stack spacing={0.75}>
+                            {unloadPoints.length > 0 ? (
+                                unloadPoints.map((point, index) => (
+                                    <Typography key={`unload-${point.id ?? index}`} variant="body2" color="text.secondary">
+                                        {index + 1}. {formatRoute(point, true)}
+                                    </Typography>
+                                ))
+                            ) : (
+                                <Typography variant="body2" color="text.secondary">
+                                    —
+                                </Typography>
+                            )}
+                        </Stack>
+                    </Grid>
+                </Grid>
+            </Grid>
+
             {data.note && (
                 <Grid size={{ xs: 12 }}>
                     <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
@@ -235,6 +296,7 @@ type ShipmentDetailsModalProps = {
     findLocalizedLabel: ReturnType<typeof useLocalizedLookup>["findLocalizedLabel"];
     t: TFunction;
     loading: boolean;
+    formatRoute: (point?: GeoPoint, withAddress?: boolean) => string;
 };
 
 function ShipmentDetailsModal({
@@ -246,6 +308,7 @@ function ShipmentDetailsModal({
                                    findLocalizedLabel,
                                    t,
                                    loading,
+                                  formatRoute
                                }: ShipmentDetailsModalProps) {
     const title = `${t('shipments.shipmentCard.orderDetailsTitle', 'Детали заявки')} · ${kind === "cargo" ? t('shipments.shipmentCard.cargo') : t('shipments.shipmentCard.transport')}`;
 
@@ -271,6 +334,7 @@ function ShipmentDetailsModal({
                         findLocalizedLabel={findLocalizedLabel}
                         t={t}
                         showActions={false}
+                        formatRoute={formatRoute}
                     />
                 ) : (
                     <Typography variant="body2" color="text.secondary">
@@ -313,42 +377,61 @@ export default function ShipmentRow({
     const [detailsData, setDetailsData] = useState<ShipmentRowData | null>(null);
     const [detailsLoading, setDetailsLoading] = useState(false);
 
-    const formatRoute = useCallback((point?: GeoPoint) => {
-        if (!point) return "—";
-        const parts: string[] = [];
-        
-        const lang = i18n.resolvedLanguage || i18n.language || "uz";
-        
-        const getLocalized = (base?: string | null, ru?: string | null, uz?: string | null) => {
-            if (!base) return null;
-            if (lang === "ru" && ru) return ru;
-            if (lang === "uz" && uz) return uz;
-            return base;
-        };
-        
-        const country = getLocalized(point.country, point.country_ru, point.country_uz);
-        if (country) parts.push(country);
-        
-        const region = getLocalized(point.region, point.region_ru, point.region_uz);
-        if (region) parts.push(region);
-        
-        const city = getLocalized(point.city, point.city_ru, point.city_uz);
-        if (city) parts.push(city);
-        
-        return parts.length > 0 ? parts.join(", ") : "—";
-    }, [i18n.resolvedLanguage, i18n.language]);
-    
+    const formatRoute = useCallback(
+        (point?: GeoPoint, withAddress = false) => {
+            if (!point) return "—";
+
+            const parts: string[] = [];
+            const lang = i18n.resolvedLanguage || i18n.language || "uz";
+
+            const getLocalized = (base?: string | null, ru?: string | null, uz?: string | null) => {
+                if (!base) return null;
+                if (lang === "ru" && ru) return ru;
+                if (lang === "uz" && uz) return uz;
+                return base;
+            };
+
+            const country = getLocalized(point.country, point.country_ru, point.country_uz);
+            const region = getLocalized(point.region, point.region_ru, point.region_uz);
+            const city = getLocalized(point.city, point.city_ru, point.city_uz);
+
+            if (country) parts.push(country);
+            if (region) parts.push(region);
+            if (city) parts.push(city);
+            if (withAddress && point.address) parts.push(point.address);
+
+            return parts.length > 0 ? parts.join(", ") : "—";
+        },
+        [i18n.resolvedLanguage, i18n.language]
+    );
+
+    const sortedPoints = useMemo(
+        () => [...(data.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+        [data.points]
+    );
+
+    const loadPoints = useMemo(
+        () => sortedPoints.filter((item) => item.type === "PICKUP" || item.type === "DEPARTURE"),
+        [sortedPoints]
+    );
+
+    const unloadPoints = useMemo(
+        () => sortedPoints.filter((item) => item.type === "DROPOFF" || item.type === "ARRIVAL"),
+        [sortedPoints]
+    );
+
+    const primaryLoadPoint = loadPoints[0] ?? sortedPoints[0];
+    const primaryUnloadPoint = unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
+
     const routeFrom = useMemo(() => {
-        const pickup = data.points?.find(item => item.type === "PICKUP" || item.type === 'DEPARTURE') ?? data.points?.[0];
-        if (pickup) return formatRoute(pickup);
+        if (primaryLoadPoint) return formatRoute(primaryLoadPoint);
         return data.routeFrom || "—";
-    }, [data.points, data.routeFrom, formatRoute]);
-    
+    }, [primaryLoadPoint, data.routeFrom, formatRoute]);
+
     const routeTo = useMemo(() => {
-        const drop = data.points?.find(item => item.type === "DROPOFF" || item.type === 'ARRIVAL') ?? data.points?.[data.points.length - 1];
-        if (drop) return formatRoute(drop);
+        if (primaryUnloadPoint) return formatRoute(primaryUnloadPoint);
         return data.routeTo || "—";
-    }, [data.points, data.routeTo, formatRoute]);
+    }, [primaryUnloadPoint, data.routeTo, formatRoute]);
 
     useEffect(() => {
         loadInit();
@@ -440,11 +523,13 @@ export default function ShipmentRow({
                 {/* ЛЕВАЯ КОЛОНКА */}
                 <Grid size={{ xs: 12, md: 8 }}>
                     <Stack spacing={1}>
-                        <Stack 
-                            direction="row" 
-                            spacing={1.5} 
+
+
+                        <Stack
+                            direction="row"
+                            spacing={1.5}
                             alignItems="center"
-                            sx={{ 
+                            sx={{
                                 flexWrap: { xs: "wrap", md: "nowrap" }
                             }}
                         >
@@ -455,8 +540,36 @@ export default function ShipmentRow({
                                         {routeFrom}
                                     </Typography>
                                 </Tooltip>
+
+                                {loadPoints.length > 1 && (
+                                    <Tooltip title={`${t('addTransport.fields.pickupPoints')}: ${loadPoints.length}`}>
+                                        <Box
+                                            sx={{
+                                                minWidth: 20,
+                                                height: 20,
+                                                px: 0.5,
+                                                borderRadius: "999px",
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                bgcolor: "primary.main",
+                                                color: "primary.contrastText",
+                                                fontSize: 11,
+                                                fontWeight: 700,
+                                                lineHeight: 1,
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            {loadPoints.length > 99 ? "99+" : loadPoints.length}
+                                        </Box>
+                                    </Tooltip>
+                                )}
                             </Box>
-                            <Typography color="text.secondary" sx={{ flexShrink: 0 }}>→</Typography>
+
+                            <Typography color="text.secondary" sx={{ flexShrink: 0 }}>
+                                →
+                            </Typography>
+
                             <Box display="inline-flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, flexShrink: 0 }}>
                                 <FiMapPin />
                                 <Tooltip title={routeTo}>
@@ -464,19 +577,41 @@ export default function ShipmentRow({
                                         {routeTo}
                                     </Typography>
                                 </Tooltip>
-                            </Box>
 
+                                {unloadPoints.length > 1 && (
+                                    <Tooltip title={`${t('addTransport.fields.dropoffPoints')}: ${unloadPoints.length}`}>
+                                        <Box
+                                            sx={{
+                                                minWidth: 20,
+                                                height: 20,
+                                                px: 0.5,
+                                                borderRadius: "999px",
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                bgcolor: "primary.main",
+                                                color: "primary.contrastText",
+                                                fontSize: 11,
+                                                fontWeight: 700,
+                                                lineHeight: 1,
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            {unloadPoints.length > 99 ? "99+" : unloadPoints.length}
+                                        </Box>
+                                    </Tooltip>
+                                )}
+                            </Box>
                         </Stack>
 
-                        {/* Тип карточки и даты */}
                         <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
                             <Chip
                                 size="small"
                                 icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}
                                 label={
                                     kind === "cargo"
-                                        ? t('shipments.shipmentCard.cargo')
-                                        : `${t('shipments.shipmentCard.transport')}${
+                                        ? t("shipments.shipmentCard.cargo")
+                                        : `${t("shipments.shipmentCard.transport")}${
                                             data.vehicleType
                                                 ? `: ${findLocalizedLabel(lookups?.vehicleType ?? [], data.vehicleType) || data.vehicleType}`
                                                 : ""
@@ -484,6 +619,7 @@ export default function ShipmentRow({
                                 }
                                 className={`shipment-row__chip ${kind === "cargo" ? "shipment-row__chip--cargo" : "shipment-row__chip--transport"}`}
                             />
+
                             <Chip
                                 size="small"
                                 icon={<FiClock />}
@@ -492,63 +628,18 @@ export default function ShipmentRow({
                                     const loadFrom = data.loadWindow?.from ?? data.dates.from;
                                     const loadTo = data.loadWindow?.to ?? data.loadWindow?.from ?? data.dates.from;
                                     const unload = data.dates.to;
+
                                     const loadPart = data.loadWindow
-                                        ? `${t('shipments.shipmentCard.load')}: ${formatDate(loadFrom)} – ${formatDate(loadTo)}`
-                                        : `${t('shipments.shipmentCard.load')}: ${formatDate(loadFrom)}`;
-                                    const unloadPart = unload ? `${t('shipments.shipmentCard.unload')}: ${formatDate(unload)}` : "";
+                                        ? `${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)} – ${formatDate(loadTo)}`
+                                        : `${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)}`;
+
+                                    const unloadPart = unload ? `${t("shipments.shipmentCard.unload")}: ${formatDate(unload)}` : "";
+
                                     return unloadPart ? `${loadPart} / ${unloadPart}` : loadPart;
                                 })()}
                                 className="shipment-row__chip shipment-row__chip--dates"
                             />
-
                         </Stack>
-
-                        <Stack spacing={1}>
-                            <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                                {data.distanceKm > 0 && (
-                                    <Chip
-                                        size="small"
-                                        color="primary"
-                                        label={`${data.distanceKm} km`}
-                                        className="shipment-row__chip shipment-row__chip--distance"
-                                    />
-                                )}
-                                {data.dims && (
-                                    <Chip
-                                        size="small"
-                                        variant="outlined"
-                                        icon={<FiPackage />}
-                                        label={data.dims}
-                                        className="shipment-row__chip shipment-row__chip--dimensions"
-                                    />
-                                )}
-                            </Stack>
-
-                            <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                                {data.typeTags.map((t) => (
-                                    <Chip
-                                        key={t}
-                                        size="small"
-                                        variant="outlined"
-                                        label={t}
-                                        className="shipment-row__chip shipment-row__chip--type"
-                                    />
-                                ))}
-                            </Stack>
-                        </Stack>
-
-                        {!!data.badges?.length && (
-                            <Stack direction="row" spacing={1} flexWrap="wrap" className="shipment-row__badges">
-                                {data.badges.map((b) => (
-                                    <Chip
-                                        key={b}
-                                        size="small"
-                                        label={b}
-                                        className="shipment-row__chip shipment-row__chip--badge"
-                                    />
-                                ))}
-                            </Stack>
-                        )}
                     </Stack>
                 </Grid>
 
@@ -675,6 +766,7 @@ export default function ShipmentRow({
                         onEdit={onEdit}
                         onDelete={onDelete}
                         onCopy={onCopy}
+                        formatRoute={formatRoute}
                     />
                 </>
             )}
@@ -688,6 +780,7 @@ export default function ShipmentRow({
                 lookups={lookups}
                 findLocalizedLabel={findLocalizedLabel}
                 t={t}
+                formatRoute={formatRoute}
                 loading={detailsLoading}
             />
         </>

@@ -10,9 +10,16 @@ import { useGeoCascade } from "@/shared/lib/useGeoCascade";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { onDigitsOnlyChange } from "@/shared/lib/numericInput";
 
-import type { AddCargoFormValues } from "./types";
+import type { AddCargoFormValues, Place } from "./types";
 
 export const PHONE_RE = /^\+?[1-9]\d{9,19}$/;
+
+const EMPTY_PLACE: Place = {
+    countryId: null,
+    regionId: null,
+    cityId: null,
+    address: "",
+};
 
 export function getTodayDate() {
     const today = new Date();
@@ -31,22 +38,20 @@ export function toIntOrZero(v: string) {
     return Math.round(n * 100) / 100;
 }
 
-
 export function toNullableNum(v: string) {
     const s = (v ?? "").trim();
     if (!s) return undefined;
 
     const normalized = s.replace(",", ".");
-
     const n = Number(normalized);
+
     if (!Number.isFinite(n)) return undefined;
 
     return Math.round(n * 100) / 100;
 }
 
-
 export function useAddCargoForm() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
 
     const { getLocalizedLabel } = useLocalizedLookup();
@@ -54,15 +59,13 @@ export function useAddCargoForm() {
 
     const geo = useGeoCascade();
 
-    // init
     useEffect(() => {
         loadInit();
     }, [loadInit]);
 
     useEffect(() => {
         void geo.loadCountries();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [geo]);
 
     const currencyOpts = useMemo(() => lookups?.currency ?? [], [lookups]);
     const vehicleOpts = useMemo(() => lookups?.vehicleType ?? [], [lookups]);
@@ -79,8 +82,8 @@ export function useAddCargoForm() {
             dateFromEnd: getTodayDate(),
             dateTo: "",
 
-            pickups: [{ countryId: null, regionId: null, cityId: null, address: "" }],
-            dropoffs: [{ countryId: null, regionId: null, cityId: null, address: "" }],
+            pickups: [EMPTY_PLACE],
+            dropoffs: [EMPTY_PLACE],
 
             cargoType: "",
             vehicleType: "",
@@ -119,13 +122,11 @@ export function useAddCargoForm() {
         if (!cur) setValue("currency", lookups.currency?.[0]?.slug ?? "", { shouldDirty: false });
         if (!veh) setValue("vehicleType", lookups.vehicleType?.[0]?.slug ?? "", { shouldDirty: false });
         if (!car) setValue("cargoType", lookups.cargoTypes?.[0]?.slug ?? "", { shouldDirty: false });
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lookups, loadingInit]);
+    }, [getValues, lookups, loadingInit, setValue]);
 
     const registerDigits = useCallback(
         (name: keyof AddCargoFormValues | `dims.${"length" | "width" | "height"}`) => {
-            const r:any = register(name as any);
+            const r: any = register(name as any);
             return {
                 ...r,
                 onChange: (e: any) => {
@@ -135,6 +136,37 @@ export function useAddCargoForm() {
             } satisfies UseFormRegisterReturn;
         },
         [register]
+    );
+
+    const validatePlaces = useCallback(
+        (
+            places: Place[],
+            fieldName: "pickups" | "dropoffs",
+            emptyMessage: string
+        ) => {
+            let ok = true;
+
+            if (!places?.length) {
+                setError(`${fieldName}.0.countryId` as any, {
+                    type: "required",
+                    message: emptyMessage,
+                });
+                return false;
+            }
+
+            places.forEach((place, index) => {
+                if (!place.countryId) {
+                    setError(`${fieldName}.${index}.countryId` as any, {
+                        type: "required",
+                        message: emptyMessage,
+                    });
+                    ok = false;
+                }
+            });
+
+            return ok;
+        },
+        [setError]
     );
 
     const validateBusiness = useCallback(
@@ -154,43 +186,68 @@ export function useAddCargoForm() {
             }
 
             if (v.dateFrom && v.dateFromEnd && v.dateFromEnd < v.dateFrom) {
-                setError("dateFromEnd", { type: "validate", message: t("addCargo.errors.dateRangeOrder") });
+                setError("dateFromEnd", {
+                    type: "validate",
+                    message: t("addCargo.errors.dateRangeOrder"),
+                });
                 ok = false;
             }
 
             if (v.dateFromEnd && v.dateTo && v.dateTo < v.dateFromEnd) {
-                setError("dateTo", { type: "validate", message: t("addCargo.errors.dateOrder") });
+                setError("dateTo", {
+                    type: "validate",
+                    message: t("addCargo.errors.dateOrder"),
+                });
                 ok = false;
             }
 
-            if (!v.pickups?.[0]?.countryId) {
-                setError("pickups.0.countryId", { type: "required", message: t("addCargo.errors.selectCountryLoad") });
+            if (
+                !validatePlaces(
+                    v.pickups,
+                    "pickups",
+                    t("addCargo.errors.selectCountryLoad")
+                )
+            ) {
                 ok = false;
             }
 
-            if (!v.dropoffs?.[0]?.countryId) {
-                setError("dropoffs.0.countryId", { type: "required", message: t("addCargo.errors.selectCountryUnload") });
+            if (
+                !validatePlaces(
+                    v.dropoffs,
+                    "dropoffs",
+                    t("addCargo.errors.selectCountryUnload")
+                )
+            ) {
                 ok = false;
             }
 
             if (!v.cargoType) {
-                setError("cargoType", { type: "required", message: t("addCargo.errors.selectCargoType") });
+                setError("cargoType", {
+                    type: "required",
+                    message: t("addCargo.errors.selectCargoType"),
+                });
                 ok = false;
             }
 
             if (!v.vehicleType) {
-                setError("vehicleType", { type: "required", message: t("addCargo.errors.selectVehicleType") });
+                setError("vehicleType", {
+                    type: "required",
+                    message: t("addCargo.errors.selectVehicleType"),
+                });
                 ok = false;
             }
 
             if (v.contactSecondary && !PHONE_RE.test(v.contactSecondary)) {
-                setError("contactSecondary", { type: "pattern", message: t("addCargo.errors.invalidPhone") });
+                setError("contactSecondary", {
+                    type: "pattern",
+                    message: t("addCargo.errors.invalidPhone"),
+                });
                 ok = false;
             }
 
             return ok;
         },
-        [clearErrors, setError, t]
+        [clearErrors, setError, t, validatePlaces]
     );
 
     const getGeoName = useCallback(
@@ -205,28 +262,46 @@ export function useAddCargoForm() {
         (v: AddCargoFormValues): CreateCargoDto => {
             const bargain = v.bargaining === "possible" ? "ALLOWED" : "NOT_ALLOWED";
 
-            const firstPickup = v.pickups?.[0] ?? { countryId: "", regionId: "", cityId: "", address: "" };
-            const firstDrop = v.dropoffs?.[0] ?? { countryId: "", regionId: "", cityId: "", address: "" };
+            const normalizedPickups = (v.pickups ?? []).filter((item) => !!item.countryId);
+            const normalizedDropoffs = (v.dropoffs ?? []).filter((item) => !!item.countryId);
 
             const anyDim =
                 (toNullableNum(v.dims.length) ?? 0) > 0 ||
                 (toNullableNum(v.dims.width) ?? 0) > 0 ||
                 (toNullableNum(v.dims.height) ?? 0) > 0;
 
+            const firstPickup = normalizedPickups[0] ?? EMPTY_PLACE;
             const countryFromName = getGeoName(firstPickup.countryId) || "Unknown";
 
-            const dateFromPayload =
-                v.dateFromEnd && v.dateFromEnd !== v.dateFrom ? [v.dateFrom, v.dateFromEnd].filter(Boolean) : v.dateFrom || "";
+            const dateFromPayload = v.dateFrom;
+
+            const pickupPoints = normalizedPickups.map((point, index) => ({
+                type: "PICKUP" as const,
+                country: point.countryId || "",
+                region: point.regionId || "",
+                city: point.cityId || "",
+                address: point.address || "",
+                order: index,
+            }));
+
+            const dropoffPoints = normalizedDropoffs.map((point, index) => ({
+                type: "DROPOFF" as const,
+                country: point.countryId || "",
+                region: point.regionId || "",
+                city: point.cityId || "",
+                address: point.address || "",
+                order: index,
+            }));
 
             return {
-                date_from: dateFromPayload as CreateCargoDto["date_from"],
+                date_from: dateFromPayload,
                 date_to: v.dateTo || "",
 
                 country_from: countryFromName,
 
-                vehicle_type: (v.vehicleType as CreateCargoDto["vehicle_type"]) || "ANY",
-                load_type: v.loadType as CreateCargoDto["load_type"],
-                cargo_type: (v.cargoType as CreateCargoDto["cargo_type"]) || "GENERAL",
+                vehicle_type: v.vehicleType || "ANY",
+                load_type: v.loadType,
+                cargo_type: v.cargoType || "GENERAL",
                 allow_partial_load: !!v.allowPartial,
 
                 weight_t: toIntOrZero(v.weightTons),
@@ -255,22 +330,7 @@ export function useAddCargoForm() {
                 note: v.note || undefined,
                 extra_phone_as_main: v.extraPhoneAsMain,
 
-                points: [
-                    {
-                        type: "PICKUP",
-                        country: firstPickup.countryId || "",
-                        region: firstPickup.regionId || "",
-                        city: firstPickup.cityId || "",
-                        address: firstPickup.address || "",
-                    },
-                    {
-                        type: "DROPOFF",
-                        country: firstDrop.countryId || "",
-                        region: firstDrop.regionId || "",
-                        city: firstDrop.cityId || "",
-                        address: firstDrop.address || "",
-                    },
-                ],
+                points: [...pickupPoints, ...dropoffPoints],
             };
         },
         [getGeoName]
@@ -280,10 +340,12 @@ export function useAddCargoForm() {
         (error: any) => {
             const code = error?.response?.data?.code;
             const serverMessage = error?.response?.data?.message;
+
             if (code) {
                 const translated = t(`apiErrors.${code}`, serverMessage);
                 if (translated) return translated;
             }
+
             return serverMessage || t("addCargo.errorMessage");
         },
         [t]
@@ -317,12 +379,19 @@ export function useAddCargoForm() {
 
     const onSubmit = handleSubmit(onValid, onInvalid);
 
-    // helper errors used in UI
-    const pickupCountryError = (formState.errors.pickups as any)?.[0]?.countryId?.message as string | undefined;
-    const dropoffCountryError = (formState.errors.dropoffs as any)?.[0]?.countryId?.message as string | undefined;
+    const pickupCountryErrors =
+        ((formState.errors.pickups ?? []) as any[]).map(
+            (item) => item?.countryId?.message as string | undefined
+        ) ?? [];
+
+    const dropoffCountryErrors =
+        ((formState.errors.dropoffs ?? []) as any[]).map(
+            (item) => item?.countryId?.message as string | undefined
+        ) ?? [];
 
     return {
         t,
+        i18nLang: i18n.language,
         getLocalizedLabel,
         lookups,
         loadingInit,
@@ -344,8 +413,8 @@ export function useAddCargoForm() {
         getValues,
         formState,
 
-        pickupCountryError,
-        dropoffCountryError,
+        pickupCountryErrors,
+        dropoffCountryErrors,
 
         onSubmit,
     };

@@ -51,6 +51,10 @@
       "contacts": "Контакты"
     },
     "fields": {
+      "pickupPoints": "Точки загрузки",
+      "dropoffPoints": "Точки выгрузки",
+      "pickupPoint": "Точка загрузки",
+      "dropoffPoint": "Точка выгрузки",
       "dateFrom": "Дата загрузки",
       "dateFromStart": "Дата загрузки (с)",
       "dateFromEnd": "Дата загрузки (по)",
@@ -106,7 +110,12 @@
     "buttons": {
       "back": "Назад",
       "continue": "Продолжить",
-      "submit": "Отправить"
+      "submit": "Отправить",
+      "addPickupPoint": "Добавить точку загрузки",
+      "addDropoffPoint": "Добавить точку выгрузки",
+      "moveUp": "Переместить вверх",
+      "moveDown": "Переместить вниз",
+      "removePoint": "Удалить точку"
     },
     "errors": {
       "required": "Обязательно",
@@ -139,6 +148,10 @@
       "contacts": "Контакты"
     },
     "fields": {
+      "pickupPoints": "Точки загрузки",
+      "dropoffPoints": "Точки выгрузки",
+      "pickupPoint": "Точка загрузки",
+      "dropoffPoint": "Точка выгрузки",
       "dateFrom": "Дата загрузки",
       "dateTo": "Дата выгрузки",
       "loadPlace": "Место загрузки",
@@ -193,7 +206,12 @@
     "buttons": {
       "back": "Назад",
       "continue": "Продолжить",
-      "submit": "Отправить"
+      "submit": "Отправить",
+      "addPickupPoint": "Добавить точку загрузки",
+      "addDropoffPoint": "Добавить точку выгрузки",
+      "moveUp": "Переместить вверх",
+      "moveDown": "Переместить вниз",
+      "removePoint": "Удалить точку"
     },
     "errors": {
       "required": "Обязательно",
@@ -474,6 +492,10 @@
       "bargain": "Торг",
       "weight": "Вес, т",
       "volume": "Объем, м³",
+      "addPoint": "Добавить точку",
+      "removePoint": "Удалить точку",
+      "address": "Адрес",
+      "errorPointsRequired": "Для каждой точки нужно выбрать хотя бы страну",
       "specifyDimensions": "Указать габариты кузова",
       "length": "Длина, м",
       "width": "Ширина, м",

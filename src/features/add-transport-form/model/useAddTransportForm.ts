@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -10,13 +9,23 @@ import { useInitStore } from "@/shared/store/initStore";
 import { useGeoCascade } from "@/shared/lib/useGeoCascade";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 
-import type { AddTransportFormValues } from "./types";
-import {getTodayDate, PHONE_RE, toIntOrZero} from "@/features/add-cargo-form/model/useAddCargoForm.ts";
+import type { AddTransportFormValues, Place } from "./types";
+import { getTodayDate, PHONE_RE, toIntOrZero } from "@/features/add-cargo-form/model/useAddCargoForm";
+
+const EMPTY_PLACE: Place = {
+    countryId: null,
+    regionId: null,
+    cityId: null,
+    address: "",
+};
 
 function toNullableNum(v: string) {
     const s = (v ?? "").trim();
     if (!s) return undefined;
-    const n = parseInt(s, 10);
+
+    const normalized = s.replace(",", ".");
+    const n = Number(normalized);
+
     return Number.isFinite(n) ? n : undefined;
 }
 
@@ -34,8 +43,7 @@ export function useAddTransportForm() {
 
     useEffect(() => {
         void geo.loadCountries();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [geo]);
 
     const vehicleOpts = useMemo(() => lookups?.vehicleType ?? [], [lookups]);
     const payMethodOpts = useMemo(() => lookups?.paymentMethods ?? [], [lookups]);
@@ -47,11 +55,11 @@ export function useAddTransportForm() {
         shouldUnregister: false,
         defaultValues: {
             dateFrom: getTodayDate(),
-            dateFromEnd: getTodayDate(),
+            dateFromEnd: "",
             dateTo: "",
 
-            loadPlaces: [{ countryId: null, regionId: null, cityId: null, address: "" }],
-            unloadPlaces: [{ countryId: null, regionId: null, cityId: null, address: "" }],
+            loadPlaces: [EMPTY_PLACE],
+            unloadPlaces: [EMPTY_PLACE],
 
             vehicleType: "",
             vehiclesCount: "1",
@@ -77,7 +85,6 @@ export function useAddTransportForm() {
 
     const { setValue, getValues, setError, clearErrors, handleSubmit, formState } = form;
 
-    // defaults from lookups
     useEffect(() => {
         if (!lookups || loadingInit) return;
 
@@ -86,9 +93,38 @@ export function useAddTransportForm() {
 
         if (!cur) setValue("currency", lookups.currency?.[0]?.slug ?? "USD", { shouldDirty: false });
         if (!veh) setValue("vehicleType", lookups.vehicleType?.[0]?.slug ?? "", { shouldDirty: false });
+    }, [getValues, lookups, loadingInit, setValue]);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lookups, loadingInit]);
+    const validatePlaces = useCallback(
+        (
+            places: Place[],
+            fieldName: "loadPlaces" | "unloadPlaces",
+            emptyMessage: string
+        ) => {
+            let ok = true;
+
+            if (!places?.length) {
+                setError(`${fieldName}.0.countryId` as any, {
+                    type: "required",
+                    message: emptyMessage,
+                });
+                return false;
+            }
+
+            places.forEach((place, index) => {
+                if (!place.countryId) {
+                    setError(`${fieldName}.${index}.countryId` as any, {
+                        type: "required",
+                        message: emptyMessage,
+                    });
+                    ok = false;
+                }
+            });
+
+            return ok;
+        },
+        [setError]
+    );
 
     const validateBusiness = useCallback(
         (v: AddTransportFormValues) => {
@@ -97,81 +133,95 @@ export function useAddTransportForm() {
             let ok = true;
 
             if (!v.dateFrom) {
-                setError("dateFrom", { type: "required", message: t("addTransport.errors.required") });
-                ok = false;
-            }
-
-           // if (!v.dateTo) {
-           //     setError("dateTo", { type: "required", message: t("addTransport.errors.required") });
-           //     ok = false;
-           // }
-
-            if (v.dateFrom && v.dateFromEnd && v.dateFromEnd < v.dateFrom) {
-                setError("dateFromEnd", { type: "validate", message: t("addTransport.errors.dateRangeOrder") });
-                ok = false;
-            }
-
-            if (v.dateFromEnd && v.dateTo && v.dateTo < v.dateFromEnd) {
-                setError("dateTo", { type: "validate", message: t("addTransport.errors.dateOrder") });
-                ok = false;
-            }
-
-            if (!v.loadPlaces?.[0]?.countryId) {
-                setError("loadPlaces.0.countryId" as any, {
+                setError("dateFrom", {
                     type: "required",
-                    message: t("addTransport.errors.selectCountryLoad"),
+                    message: t("addTransport.errors.required"),
                 });
                 ok = false;
             }
 
-            if (!v.unloadPlaces?.[0]?.countryId) {
-                setError("unloadPlaces.0.countryId" as any, {
-                    type: "required",
-                    message: t("addTransport.errors.selectCountryUnload"),
+            if (v.dateFrom && v.dateTo && v.dateTo < v.dateFrom) {
+                setError("dateTo", {
+                    type: "validate",
+                    message: t("addTransport.errors.dateOrder"),
                 });
+                ok = false;
+            }
+
+            if (
+                !validatePlaces(
+                    v.loadPlaces,
+                    "loadPlaces",
+                    t("addTransport.errors.selectCountryLoad")
+                )
+            ) {
+                ok = false;
+            }
+
+            if (
+                !validatePlaces(
+                    v.unloadPlaces,
+                    "unloadPlaces",
+                    t("addTransport.errors.selectCountryUnload")
+                )
+            ) {
                 ok = false;
             }
 
             if (!v.vehicleType) {
-                setError("vehicleType", { type: "required", message: t("addTransport.errors.selectVehicleType") });
+                setError("vehicleType", {
+                    type: "required",
+                    message: t("addTransport.errors.selectVehicleType"),
+                });
                 ok = false;
             }
 
-          //  if (!v.paymentTerm) {
-          //      setError("paymentTerm", { type: "required", message: t("addTransport.errors.selectPaymentTerm") });
-          //      ok = false;
-          //  }
-
             if (v.contactSecondary && !PHONE_RE.test(v.contactSecondary)) {
-                setError("contactSecondary", { type: "pattern", message: t("addTransport.errors.invalidPhone") });
+                setError("contactSecondary", {
+                    type: "pattern",
+                    message: t("addTransport.errors.invalidPhone"),
+                });
                 ok = false;
             }
 
             return ok;
         },
-        [clearErrors, setError, t]
+        [clearErrors, setError, t, validatePlaces]
     );
 
     const toDto = useCallback((v: AddTransportFormValues): CreateTransportDto => {
         const bargain = v.bargaining === "possible" ? "ALLOWED" : "NOT_ALLOWED";
 
-        const firstLoad = v.loadPlaces?.[0] ?? { countryId: "", regionId: "", cityId: "", address: "" };
-        const firstUnload = v.unloadPlaces?.[0] ?? { countryId: "", regionId: "", cityId: "", address: "" };
+        const normalizedLoadPlaces = (v.loadPlaces ?? []).filter((item) => !!item.countryId);
+        const normalizedUnloadPlaces = (v.unloadPlaces ?? []).filter((item) => !!item.countryId);
 
         const anyDim =
             (toNullableNum(v.dims.length) ?? 0) > 0 ||
             (toNullableNum(v.dims.width) ?? 0) > 0 ||
             (toNullableNum(v.dims.height) ?? 0) > 0;
 
-        const dateFromPayload =
-            v.dateFromEnd && v.dateFromEnd !== v.dateFrom
-                ? [v.dateFrom, v.dateFromEnd].filter(Boolean)
-                : v.dateFrom || "";
+        const departurePoints = normalizedLoadPlaces.map((point, index) => ({
+            type: "DEPARTURE" as const,
+            country: point.countryId || "",
+            region: point.regionId || "",
+            city: point.cityId || "",
+            address: point.address || "",
+            order: index,
+        }));
+
+        const arrivalPoints = normalizedUnloadPlaces.map((point, index) => ({
+            type: "ARRIVAL" as const,
+            country: point.countryId || "",
+            region: point.regionId || "",
+            city: point.cityId || "",
+            address: point.address || "",
+            order: index,
+        }));
 
         return {
             images: undefined,
 
-            date_from: dateFromPayload as CreateTransportDto["date_from"],
+            date_from: v.dateFrom,
             date_to: v.dateTo || "",
 
             vehicle_type: (v.vehicleType as CreateTransportDto["vehicle_type"]) || "ANY",
@@ -201,22 +251,7 @@ export function useAddTransportForm() {
             extra_phone_as_main: v.extraPhoneAsMain,
             note: v.note || undefined,
 
-            points: [
-                {
-                    type: "DEPARTURE",
-                    country: firstLoad.countryId || "",
-                    region: firstLoad.regionId || "",
-                    city: firstLoad.cityId || "",
-                    address: firstLoad.address || "",
-                },
-                {
-                    type: "ARRIVAL",
-                    country: firstUnload.countryId || "",
-                    region: firstUnload.regionId || "",
-                    city: firstUnload.cityId || "",
-                    address: firstUnload.address || "",
-                },
-            ],
+            points: [...departurePoints, ...arrivalPoints],
         };
     }, []);
 
@@ -224,10 +259,12 @@ export function useAddTransportForm() {
         (error: any) => {
             const code = error?.response?.data?.code;
             const serverMessage = error?.response?.data?.message;
+
             if (code) {
                 const translated = t(`apiErrors.${code}`, serverMessage);
                 if (translated) return translated;
             }
+
             return serverMessage || t("addTransport.errorMessage");
         },
         [t]
@@ -261,13 +298,19 @@ export function useAddTransportForm() {
 
     const onSubmit = handleSubmit(onValid, onInvalid);
 
-    const loadCountryError = ((formState.errors.loadPlaces as any)?.[0]?.countryId?.message as string | undefined) ?? undefined;
-    const unloadCountryError =
-        ((formState.errors.unloadPlaces as any)?.[0]?.countryId?.message as string | undefined) ?? undefined;
+    const loadCountryErrors =
+        ((formState.errors.loadPlaces ?? []) as any[]).map(
+            (item) => item?.countryId?.message as string | undefined
+        ) ?? [];
+
+    const unloadCountryErrors =
+        ((formState.errors.unloadPlaces ?? []) as any[]).map(
+            (item) => item?.countryId?.message as string | undefined
+        ) ?? [];
 
     return {
         t,
-        i18n,
+        i18nLang: i18n.language,
         getLocalizedLabel,
         loadingInit,
 
@@ -280,8 +323,8 @@ export function useAddTransportForm() {
 
         form,
 
-        loadCountryError,
-        unloadCountryError,
+        loadCountryErrors,
+        unloadCountryErrors,
 
         onSubmit,
     };

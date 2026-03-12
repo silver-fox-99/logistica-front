@@ -9,7 +9,7 @@ import { AddTransportMobileForm } from "@/features/add-transport-form/ui/AddTran
 export default function AddTransportPage() {
     const {
         t,
-        i18n,
+        i18nLang,
         getLocalizedLabel,
         loadingInit,
 
@@ -23,8 +23,8 @@ export default function AddTransportPage() {
         form,
         onSubmit,
 
-        loadCountryError,
-        unloadCountryError,
+        loadCountryErrors,
+        unloadCountryErrors,
     } = useAddTransportForm();
 
     const theme = useTheme();
@@ -66,7 +66,7 @@ export default function AddTransportPage() {
                 {isDesktop ? (
                     <AddTransportDesktopForm
                         t={t}
-                        i18nLang={i18n.language}
+                        i18nLang={i18nLang}
                         form={form}
                         onSubmit={onSubmit}
                         loadingInit={loadingInit}
@@ -76,13 +76,13 @@ export default function AddTransportPage() {
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
                         geo={geo}
-                        loadCountryError={loadCountryError}
-                        unloadCountryError={unloadCountryError}
+                        loadCountryErrors={loadCountryErrors}
+                        unloadCountryErrors={unloadCountryErrors}
                     />
                 ) : (
                     <AddTransportMobileForm
                         t={t}
-                        i18nLang={i18n.language}
+                        i18nLang={i18nLang}
                         form={form}
                         onSubmit={onSubmit}
                         loadingInit={loadingInit}
@@ -92,8 +92,8 @@ export default function AddTransportPage() {
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
                         geo={geo}
-                        loadCountryError={loadCountryError}
-                        unloadCountryError={unloadCountryError}
+                        loadCountryErrors={loadCountryErrors}
+                        unloadCountryErrors={unloadCountryErrors}
                     />
                 )}
             </Paper>

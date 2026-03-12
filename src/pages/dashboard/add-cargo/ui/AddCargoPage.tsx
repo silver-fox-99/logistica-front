@@ -10,6 +10,7 @@ import { AddCargoDesktopForm } from "@/features/add-cargo-form/ui/AddCargoDeskto
 export default function AddCargoPage() {
     const {
         t,
+        i18nLang,
         getLocalizedLabel,
         loadingInit,
 
@@ -25,8 +26,8 @@ export default function AddCargoPage() {
         form,
         onSubmit,
 
-        pickupCountryError,
-        dropoffCountryError,
+        pickupCountryErrors,
+        dropoffCountryErrors,
     } = useAddCargoForm();
 
     const theme = useTheme();
@@ -67,7 +68,7 @@ export default function AddCargoPage() {
                 {isDesktop ? (
                     <AddCargoDesktopForm
                         t={t}
-                        i18nLang={form.getValues as any ? "" : ""}
+                        i18nLang={i18nLang}
                         form={form}
                         onSubmit={onSubmit}
                         loadingInit={loadingInit}
@@ -79,13 +80,13 @@ export default function AddCargoPage() {
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
                         geo={geo}
-                        pickupCountryError={pickupCountryError}
-                        dropoffCountryError={dropoffCountryError}
+                        pickupCountryErrors={pickupCountryErrors}
+                        dropoffCountryErrors={dropoffCountryErrors}
                     />
                 ) : (
                     <AddCargoMobileForm
                         t={t}
-                        i18nLang={""}
+                        i18nLang={i18nLang}
                         form={form}
                         onSubmit={onSubmit}
                         loadingInit={loadingInit}
@@ -97,8 +98,8 @@ export default function AddCargoPage() {
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
                         geo={geo}
-                        pickupCountryError={pickupCountryError}
-                        dropoffCountryError={dropoffCountryError}
+                        pickupCountryErrors={pickupCountryErrors}
+                        dropoffCountryErrors={dropoffCountryErrors}
                     />
                 )}
             </Paper>

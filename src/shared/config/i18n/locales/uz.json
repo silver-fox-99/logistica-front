@@ -51,6 +51,10 @@
       "contacts": "Kontaktlar"
     },
     "fields": {
+      "pickupPoints": "Yuklash nuqtalari",
+      "dropoffPoints": "Tushirish nuqtalari",
+      "pickupPoint": "Yuklash nuqtasi",
+      "dropoffPoint": "Tushirish nuqtasi",
       "dateFrom": "Yuklash ortish sanasi",
       "dateFromStart": "Yuklash sanasi (dan)",
       "dateFromEnd": "Yuklash sanasi (gacha)",
@@ -106,7 +110,12 @@
     "buttons": {
       "back": "Orqaga",
       "continue": "Davom etish",
-      "submit": "Yuborish"
+      "submit": "Yuborish",
+      "addPickupPoint": "Yuklash nuqtasini qo‘shish",
+      "addDropoffPoint": "Tushirish nuqtasini qo‘shish",
+      "moveUp": "Yuqoriga ko‘chirish",
+      "moveDown": "Pastga ko‘chirish",
+      "removePoint": "Nuqtani o‘chirish"
     },
     "errors": {
       "required": "Majburiy",
@@ -140,6 +149,10 @@
       "contacts": "Aloqalar"
     },
     "fields": {
+      "pickupPoints": "Yuklash nuqtalari",
+      "dropoffPoints": "Tushirish nuqtalari",
+      "pickupPoint": "Yuklash nuqtasi",
+      "dropoffPoint": "Tushirish nuqtasi",
       "dateFrom": "Yuklash ortish sanasi",
       "dateTo": "Yuk tushirish sanasi",
       "loadPlace": "Yuklash joyi",
@@ -194,7 +207,12 @@
     "buttons": {
       "back": "Orqaga",
       "continue": "Davom etish",
-      "submit": "Yuborish"
+      "submit": "Yuborish",
+      "addPickupPoint": "Yuklash nuqtasini qo‘shish",
+      "addDropoffPoint": "Tushirish nuqtasini qo‘shish",
+      "moveUp": "Yuqoriga ko‘chirish",
+      "moveDown": "Pastga ko‘chirish",
+      "removePoint": "Nuqtani o‘chirish"
     },
     "errors": {
       "required": "Majburiy",
@@ -473,6 +491,10 @@
       "vehiclesCount": "Mashinalar soni",
       "bargain": "Savdolashish",
       "weight": "Og'irlik, t",
+      "addPoint": "Nuqta qo‘shish",
+      "removePoint": "Nuqtani o‘chirish",
+      "address": "Manzil",
+      "errorPointsRequired": "Har bir nuqta uchun kamida mamlakat tanlang",
       "volume": "Hajm, m³",
       "specifyDimensions": "Kuzov o'lchamlarini ko'rsatish",
       "length": "Uzunlik, m",
