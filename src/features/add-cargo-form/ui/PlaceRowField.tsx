@@ -60,23 +60,31 @@ export const PlaceRowField = React.memo(function PlaceRowField({
     const country = useController({ control, name: `${base}.countryId` as any });
     const region = useController({ control, name: `${base}.regionId` as any });
     const city = useController({ control, name: `${base}.cityId` as any });
+    const address = useController({ control, name: `${base}.address` as any });
 
     const countryValue = useMemo(
         () => (country.field.value ? countries.find((c) => c.id === country.field.value) ?? null : null),
         [countries, country.field.value]
     );
+
     const regionValue = useMemo(
         () => (region.field.value ? regions.find((r) => r.id === region.field.value) ?? null : null),
         [regions, region.field.value]
     );
+
     const cityValue = useMemo(
         () => (city.field.value ? cities.find((c) => c.id === city.field.value) ?? null : null),
         [cities, city.field.value]
     );
 
-    const countryLabel = kind === "pickup" ? t("addCargo.fields.countryLoad") : t("addCargo.fields.countryUnload");
-    const regionLabel = kind === "pickup" ? t("addCargo.fields.regionLoad") : t("addCargo.fields.regionUnload");
-    const cityLabel = kind === "pickup" ? t("addCargo.fields.cityLoad") : t("addCargo.fields.cityUnload");
+    const countryLabel =
+        kind === "pickup" ? t("addCargo.fields.countryLoad") : t("addCargo.fields.countryUnload");
+    const regionLabel =
+        kind === "pickup" ? t("addCargo.fields.regionLoad") : t("addCargo.fields.regionUnload");
+    const cityLabel =
+        kind === "pickup" ? t("addCargo.fields.cityLoad") : t("addCargo.fields.cityUnload");
+    const addressLabel =
+        kind === "pickup" ? t("addCargo.fields.addressLoad") : t("addCargo.fields.addressUnload");
 
     return (
         <Stack spacing={1.25}>
@@ -90,7 +98,6 @@ export const PlaceRowField = React.memo(function PlaceRowField({
 
                     country.field.onChange(id);
 
-                    // clear deps
                     setValue(`${base}.regionId` as any, null, { shouldDirty: true });
                     setValue(`${base}.cityId` as any, null, { shouldDirty: true });
 
@@ -99,7 +106,12 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                 noOptionsText={loadingCountries ? "Loading..." : t("addCargo.fields.noOptions") || "No options"}
                 loading={loadingCountries}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={countryLabel} placeholder={t("addCargo.fields.startTypingCountry")} />
+                    <TextField
+                        {...params}
+                        fullWidth
+                        label={countryLabel}
+                        placeholder={t("addCargo.fields.startTypingCountry")}
+                    />
                 )}
             />
 
@@ -112,7 +124,6 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                     const id = v?.id ?? null;
                     region.field.onChange(id);
 
-                    // clear dep
                     setValue(`${base}.cityId` as any, null, { shouldDirty: true });
 
                     onRegionLoad?.(country.field.value ?? null, id);
@@ -120,7 +131,12 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                 disabled={!countryValue || regions.length === 0}
                 loading={loadingRegions}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={regionLabel} placeholder={t("addCargo.fields.startTypingRegion")} />
+                    <TextField
+                        {...params}
+                        fullWidth
+                        label={regionLabel}
+                        placeholder={t("addCargo.fields.startTypingRegion")}
+                    />
                 )}
             />
 
@@ -133,8 +149,24 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                 disabled={!countryValue || cities.length === 0}
                 loading={loadingCities}
                 renderInput={(params) => (
-                    <TextField {...params} fullWidth label={cityLabel} placeholder={t("addCargo.fields.startTypingCity")} />
+                    <TextField
+                        {...params}
+                        fullWidth
+                        label={cityLabel}
+                        placeholder={t("addCargo.fields.startTypingCity")}
+                    />
                 )}
+            />
+
+            <TextField
+                fullWidth
+                label={addressLabel}
+                placeholder={t("addCargo.fields.enterAddress")}
+                value={address.field.value ?? ""}
+                onChange={address.field.onChange}
+                onBlur={address.field.onBlur}
+                name={address.field.name}
+                inputRef={address.field.ref}
             />
 
             {showRemove && (
