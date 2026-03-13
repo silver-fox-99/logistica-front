@@ -218,10 +218,19 @@ export function useAddTransportForm() {
             order: index,
         }));
 
+        const dateFromPayload =
+            v.dateFrom && v.dateFromEnd
+                ? v.dateFrom === v.dateFromEnd
+                    ? [v.dateFrom]
+                    : [v.dateFrom, v.dateFromEnd]
+                : v.dateFrom
+                    ? [v.dateFrom]
+                    : [];
+
         return {
             images: undefined,
 
-            date_from: v.dateFrom,
+            date_from: dateFromPayload,
             date_to: v.dateTo || "",
 
             vehicle_type: (v.vehicleType as CreateTransportDto["vehicle_type"]) || "ANY",

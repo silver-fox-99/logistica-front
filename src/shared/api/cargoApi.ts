@@ -57,7 +57,7 @@ export type CargoPointDto = {
 };
 
 export type CreateCargoDto = {
-    date_from: string;
+    date_from: string[];
     date_to: string;
     pickup_dates?: string[];
 

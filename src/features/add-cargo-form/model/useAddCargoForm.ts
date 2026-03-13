@@ -273,7 +273,14 @@ export function useAddCargoForm() {
             const firstPickup = normalizedPickups[0] ?? EMPTY_PLACE;
             const countryFromName = getGeoName(firstPickup.countryId) || "Unknown";
 
-            const dateFromPayload = v.dateFrom;
+            const dateFromPayload =
+                v.dateFrom && v.dateFromEnd
+                    ? v.dateFrom === v.dateFromEnd
+                        ? [v.dateFrom]
+                        : [v.dateFrom, v.dateFromEnd]
+                    : v.dateFrom
+                        ? [v.dateFrom]
+                        : [];
 
             const pickupPoints = normalizedPickups.map((point, index) => ({
                 type: "PICKUP" as const,

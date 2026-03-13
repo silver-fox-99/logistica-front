@@ -9,7 +9,7 @@ import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/t
 import ShipmentRow from "@/widgets/shipments/ShipmentRow";
 
 import ConfirmDialog from "@/widgets/common/ConfirmDialog";
-import FullEditDialog from "@/widgets/shipments/FullEditDialog";
+import FullEditDialog from "@/widgets/shipments/full-edit-dialog/ui/FullEditDialog.tsx";
 import CopyShipmentDialog from "@/widgets/shipments/CopyShipmentDialog";
 
 import {
@@ -109,7 +109,11 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
         },
         [items]
     );
-    const closeEdit = useCallback(() => setEditOpen(false), []);
+
+    const closeEdit = useCallback(() => {
+        setEditOpen(false);
+        setEditItem(null);
+    }, []);
 
     const handleFavoriteChange = useCallback((id: string, isFav: boolean) => {
         setFavoriteIds((prev) => {
@@ -119,6 +123,109 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
             return next;
         });
     }, []);
+
+    const editInitial = useMemo(() => {
+        if (!editItem) return undefined;
+
+        const rawDateFrom =
+            (editItem as any)?.date_from ??
+            (editItem as any)?.dateFrom ??
+            null;
+
+        const normalizedDateFrom =
+            Array.isArray(rawDateFrom) && rawDateFrom.length
+                ? rawDateFrom
+                : editItem?.loadWindow?.from || editItem?.loadWindow?.to
+                    ? [editItem?.loadWindow?.from, editItem?.loadWindow?.to].filter(
+                        (v): v is string => typeof v === "string" && v.length > 0
+                    )
+                    : null;
+
+        return {
+            id: editItem.id,
+            dateFrom: normalizedDateFrom,
+            dateTo:
+                (editItem as any)?.date_to ??
+                editItem?.dates?.to ??
+                null,
+
+            vehicleType:
+                (editItem as any)?.vehicle_type ??
+                editItem?.vehicleType ??
+                "ANY",
+
+            loadType:
+                (editItem as any)?.load_type ??
+                (editItem as any)?.loadType ??
+                ["ANY"],
+
+            cargoType:
+                (editItem as any)?.cargo_type ??
+                (editItem as any)?.cargoType ??
+                "GENERAL",
+
+            allowPartialLoad:
+                (editItem as any)?.allow_partial_load ??
+                (editItem as any)?.allowPartialLoad ??
+                false,
+
+            palletsCount:
+                (editItem as any)?.pallets_count ??
+                (editItem as any)?.palletsCount ??
+                null,
+
+            carsCount:
+                (editItem as any)?.cars_count ??
+                (editItem as any)?.carsCount ??
+                null,
+
+            bargain:
+                (editItem as any)?.bargain ??
+                (kind === "transport" ? "ALLOWED" : null),
+
+            weightT:
+                (editItem as any)?.weight_t ??
+                editItem?.weightT ??
+                null,
+
+            volumeM3:
+                (editItem as any)?.volume_m3 ??
+                editItem?.volumeM3 ??
+                null,
+
+            hasDimensions:
+                (editItem as any)?.has_dimensions ??
+                (editItem as any)?.hasDimensions ??
+                false,
+
+            lengthM:
+                (editItem as any)?.length_m ??
+                (editItem as any)?.length ??
+                null,
+
+            widthM:
+                (editItem as any)?.width_m ??
+                (editItem as any)?.width ??
+                null,
+
+            heightM:
+                (editItem as any)?.height_m ??
+                (editItem as any)?.height ??
+                null,
+
+            priceCurrency:
+                (editItem as any)?.price_currency ??
+                "USD",
+
+            priceAmount:
+                (editItem as any)?.price_amount ??
+                parsePriceAmount(editItem?.price ?? "") ??
+                null,
+
+            note: editItem?.note ?? null,
+            points: editItem?.points ?? [],
+        };
+    }, [editItem, kind]);
 
     const handleUp = useCallback(
         async (id: string) => {
@@ -282,40 +389,7 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
                 kind={kind}
                 onClose={closeEdit}
                 onSubmit={handleEditSubmit}
-                initial={{
-                    id: editItem?.id ?? undefined,
-                    dateFrom: (
-                        editItem?.loadWindow?.from || editItem?.loadWindow?.to
-                            ? [editItem?.loadWindow?.from, editItem?.loadWindow?.to].filter(
-                                (v): v is string => typeof v === "string" && v.length > 0
-                            )
-                            : null
-                    ),
-                    dateTo: editItem?.dates?.to ?? null,
-                    vehicleType: editItem?.vehicleType ?? "ANY",
-
-                    loadType: (editItem as any)?.loadType ?? ["ANY"],
-                    cargoType: (editItem as any)?.cargoType ?? "GENERAL",
-                    allowPartialLoad: (editItem as any)?.allowPartialLoad ?? false,
-                    palletsCount: (editItem as any)?.palletsCount ?? null,
-
-                    carsCount: (editItem as any)?.carsCount ?? null,
-                    bargain: (editItem as any)?.bargain ?? (kind === "transport" ? "ALLOWED" : null),
-
-                    weightT: editItem?.weightT ?? (editItem as any)?.weight_t ?? null,
-                    volumeM3: editItem?.volumeM3 ?? (editItem as any)?.volume_m3 ?? null,
-
-                    hasDimensions: (editItem as any)?.hasDimensions ?? (editItem as any)?.has_dimensions ?? false,
-                    lengthM: (editItem as any)?.length ?? (editItem as any)?.length_m ?? null,
-                    widthM: (editItem as any)?.width ?? (editItem as any)?.width_m ?? null,
-                    heightM: (editItem as any)?.height ?? (editItem as any)?.height_m ?? null,
-
-                    priceCurrency: (editItem as any)?.price_currency ?? "USD",
-                    priceAmount: parsePriceAmount(editItem?.price ?? "") ?? (editItem as any)?.price_amount ?? null,
-
-                    note: editItem?.note ?? null,
-                    points: editItem?.points ?? [],
-                }}
+                initial={editInitial}
             />
 
             <CopyShipmentDialog open={copyOpen} onClose={closeCopy} onSubmit={handleCopySubmit} initial={copyInitial} />
