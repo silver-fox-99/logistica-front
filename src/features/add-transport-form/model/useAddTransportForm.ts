@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +32,7 @@ function toNullableNum(v: string) {
 export function useAddTransportForm() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups, loadInit, loading: loadingInit } = useInitStore();
     const geo = useGeoCascade();
@@ -287,12 +287,15 @@ export function useAddTransportForm() {
             }
 
             try {
+                setLoading(true)
                 const payload = toDto(values);
                 await transportApi.create(payload);
                 toast.success(t("addTransport.successMessage"));
                 navigate("/dashboard/requests");
             } catch (error: any) {
                 toast.error(getErrorMessage(error));
+            } finally {
+                setLoading(false)
             }
         },
         [getErrorMessage, navigate, t, toDto, validateBusiness]
@@ -335,6 +338,7 @@ export function useAddTransportForm() {
         loadCountryErrors,
         unloadCountryErrors,
 
+        loading,
         onSubmit,
     };
 }

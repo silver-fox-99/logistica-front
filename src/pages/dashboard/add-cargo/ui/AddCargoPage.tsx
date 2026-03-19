@@ -28,6 +28,7 @@ export default function AddCargoPage() {
 
         pickupCountryErrors,
         dropoffCountryErrors,
+        loading
     } = useAddCargoForm();
 
     const theme = useTheme();
@@ -73,6 +74,7 @@ export default function AddCargoPage() {
                         onSubmit={onSubmit}
                         loadingInit={loadingInit}
                         cargoOpts={cargoOpts}
+                        loading={loading}
                         vehicleOpts={vehicleOpts}
                         loadOpts={loadOpts}
                         payMethodOpts={payMethodOpts}
@@ -86,6 +88,7 @@ export default function AddCargoPage() {
                 ) : (
                     <AddCargoMobileForm
                         t={t}
+                        loading={loading}
                         i18nLang={i18nLang}
                         form={form}
                         onSubmit={onSubmit}

@@ -33,6 +33,7 @@ type Props = {
     geo: any;
     loadCountryErrors?: Array<string | undefined>;
     unloadCountryErrors?: Array<string | undefined>;
+    loading: boolean
 };
 
 export function AddTransportDesktopForm({
@@ -53,6 +54,7 @@ export function AddTransportDesktopForm({
                                             geo,
                                             loadCountryErrors,
                                             unloadCountryErrors,
+                                            loading
                                         }: Props) {
     const { register, control, setValue, formState } = form;
 
@@ -340,7 +342,7 @@ export function AddTransportDesktopForm({
 
                 <Grid size={{ xs: 12 }}>
                     <Stack direction="row" justifyContent="center" mt={1.5}>
-                        <Button type="submit" variant="contained" sx={{ minWidth: 280 }} disabled={loadingInit}>
+                        <Button type="submit" variant="contained" sx={{ minWidth: 280 }} disabled={loadingInit || loading}>
                             {t("addTransport.buttonSubmit")}
                         </Button>
                     </Stack>

@@ -35,6 +35,7 @@ type Props = {
     geo: any;
     pickupCountryErrors?: Array<string | undefined>;
     dropoffCountryErrors?: Array<string | undefined>;
+    loading: boolean;
 };
 
 export function AddCargoMobileForm({
@@ -57,6 +58,7 @@ export function AddCargoMobileForm({
                                        geo,
                                        pickupCountryErrors,
                                        dropoffCountryErrors,
+                                        loading
                                    }: Props) {
     const [activeStep, setActiveStep] = useState(0);
 
@@ -444,7 +446,7 @@ export function AddCargoMobileForm({
                 </Typography>
 
                 {activeStep === steps.length - 1 ? (
-                    <Button type="submit" variant="contained" sx={{ minWidth: 100 }} disabled={loadingInit}>
+                    <Button type="submit" variant="contained" sx={{ minWidth: 100 }} disabled={loadingInit || loading}>
                         {t("addCargo.buttons.submit")}
                     </Button>
                 ) : (

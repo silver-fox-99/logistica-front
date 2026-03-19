@@ -31,6 +31,7 @@ type Props = {
     geo: any;
     loadCountryErrors?: Array<string | undefined>;
     unloadCountryErrors?: Array<string | undefined>;
+    loading: boolean
 };
 
 export function AddTransportMobileForm({
@@ -51,6 +52,7 @@ export function AddTransportMobileForm({
                                            geo,
                                            loadCountryErrors,
                                            unloadCountryErrors,
+                                            loading
                                        }: Props) {
     const { register, control, setValue, formState } = form;
 
@@ -395,7 +397,7 @@ export function AddTransportMobileForm({
                 </Typography>
 
                 {activeStep === steps.length - 1 ? (
-                    <Button type="submit" variant="contained" sx={{ minWidth: 100 }} disabled={loadingInit}>
+                    <Button type="submit" variant="contained" sx={{ minWidth: 100 }} disabled={loadingInit || loading}>
                         {t("addTransport.buttons.submit")}
                     </Button>
                 ) : (

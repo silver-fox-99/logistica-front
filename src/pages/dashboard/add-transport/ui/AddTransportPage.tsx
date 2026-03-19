@@ -25,6 +25,7 @@ export default function AddTransportPage() {
 
         loadCountryErrors,
         unloadCountryErrors,
+        loading
     } = useAddTransportForm();
 
     const theme = useTheme();
@@ -76,6 +77,7 @@ export default function AddTransportPage() {
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
                         geo={geo}
+                        loading={loading}
                         loadCountryErrors={loadCountryErrors}
                         unloadCountryErrors={unloadCountryErrors}
                     />
@@ -92,6 +94,7 @@ export default function AddTransportPage() {
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
                         geo={geo}
+                        loading={loading}
                         loadCountryErrors={loadCountryErrors}
                         unloadCountryErrors={unloadCountryErrors}
                     />

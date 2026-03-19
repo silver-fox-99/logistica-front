@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import { useForm, type FieldErrors, type UseFormRegisterReturn } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -55,6 +55,7 @@ export function useAddCargoForm() {
     const navigate = useNavigate();
 
     const { getLocalizedLabel } = useLocalizedLookup();
+    const [loading, setLoading] = useState(false)
     const { lookups, loadInit, loading: loadingInit } = useInitStore();
 
     const geo = useGeoCascade();
@@ -366,12 +367,15 @@ export function useAddCargoForm() {
             }
 
             try {
+                setLoading(true)
                 const payload = toDto(values);
                 await cargoApi.create(payload);
                 toast.success(t("addCargo.successMessage"));
                 navigate("/dashboard/requests");
             } catch (error: any) {
                 toast.error(getErrorMessage(error));
+            } finally {
+                setLoading(false)
             }
         },
         [getErrorMessage, navigate, t, toDto, validateBusiness]
@@ -424,5 +428,6 @@ export function useAddCargoForm() {
         dropoffCountryErrors,
 
         onSubmit,
+        loading
     };
 }
