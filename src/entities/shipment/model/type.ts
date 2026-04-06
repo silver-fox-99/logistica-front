@@ -101,6 +101,9 @@ export type CargoApiItem = {
     contact_extra_phone?: string;
     extra_phone_as_main?: boolean;
     view_count: string;
+    updated_at: string;
+    sort_updated_at: string;
+    up_count: string;
 };
 
 export type TransportApiItem = CargoApiItem;

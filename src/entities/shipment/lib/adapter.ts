@@ -1,4 +1,3 @@
-// entities/shipment/lib/adapter.ts
 import type { CargoApiItem, TransportApiItem, ShipmentRowData, GeoPoint } from "../model/type";
 
 import { formatPrice } from "@/shared/utils/formatPrice";
@@ -143,6 +142,9 @@ export function adaptCargo(i: CargoApiItem): any {
         extraPhoneAsMain: i.extra_phone_as_main ?? false,
         viewCount: i.view_count ?? '0',
         isFavorite: Boolean((i as any).is_favorite),
+        updated_at: i.updated_at ?? undefined,
+        sort_updated_at: i.sort_updated_at ?? undefined,
+        up_count: i.up_count ?? undefined,
     };
 }
 

@@ -381,30 +381,102 @@ export function AddTransportMobileForm({
 
             <Box
                 sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
                     pt: 2,
-                    borderTop: "1px solid #E0E0E0",
+                    mt: 1,
+                    borderTop: "1px solid",
+                    borderColor: "divider",
                 }}
             >
-                <Button onClick={handleBack} disabled={activeStep === 0} sx={{ minWidth: 100 }}>
-                    {t("addTransport.buttons.back")}
-                </Button>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1.5,
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            flex: "1 1 220px",
+                            minWidth: 0,
+                        }}
+                    >
+                        <Button
+                            onClick={handleBack}
+                            disabled={activeStep === 0}
+                            variant="outlined"
+                            sx={{
+                                minWidth: 96,
+                                textTransform: "none",
+                                borderRadius: 2,
+                                flexShrink: 0,
+                            }}
+                        >
+                            {t("addTransport.buttons.back")}
+                        </Button>
 
-                <Typography variant="body2" color="text.secondary">
-                    {activeStep + 1} / {steps.length}
-                </Typography>
+                        <Box
+                            sx={{
+                                px: 1.25,
+                                py: 0.875,
+                                borderRadius: 2,
+                                bgcolor: "action.hover",
+                                color: "text.secondary",
+                                fontSize: 14,
+                                fontWeight: 700,
+                                lineHeight: 1,
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {activeStep + 1} / {steps.length}
+                        </Box>
+                    </Box>
 
-                {activeStep === steps.length - 1 ? (
-                    <Button type="submit" variant="contained" sx={{ minWidth: 100 }} disabled={loadingInit || loading}>
-                        {t("addTransport.buttons.submit")}
-                    </Button>
-                ) : (
-                    <Button variant="contained" onClick={handleNext} sx={{ minWidth: 100 }}>
-                        {t("addTransport.buttons.continue")}
-                    </Button>
-                )}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            gap: 1,
+                            flex: "1 1 260px",
+                            justifyContent: "flex-end",
+                            flexWrap: "wrap",
+                        }}
+                    >
+                        {activeStep < steps.length - 1 && (
+                            <Button
+                                variant="outlined"
+                                onClick={handleNext}
+                                sx={{
+                                    minWidth: 120,
+                                    textTransform: "none",
+                                    borderRadius: 2,
+                                }}
+                            >
+                                {t("addTransport.buttons.continue")}
+                            </Button>
+                        )}
+
+                        {activeStep > 0 && (
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={loadingInit || loading}
+                                sx={{
+                                    minWidth: 150,
+                                    textTransform: "none",
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    boxShadow: "none",
+                                }}
+                            >
+                                {t("addTransport.buttons.submit")}
+                            </Button>
+                        )}
+                    </Box>
+                </Box>
             </Box>
         </Box>
     );

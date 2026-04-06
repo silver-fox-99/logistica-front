@@ -37,6 +37,7 @@ import ReferralSettingsPage from "@/pages/admin/referral-settings";
 import ReferralPage from "@/pages/dashboard/referral";
 import NotificationsPage from "@/pages/admin/notifications";
 import GroupsRoles from "@/pages/admin/groups-roles";
+import MyShipmentsManagePage from "@/pages/dashboard/my-shipments-manage";
 
 
 const router = createBrowserRouter([
@@ -67,7 +68,7 @@ const router = createBrowserRouter([
             {path: "company", element: <CompanyPage/>},
             {path: "staff", element: <StaffPage/>},
             {path: "payments", element: <PaymentsPage/>},
-            {path: "requests", element: <ShipmentsListPage scope="my"/>},
+            {path: "requests", element: <MyShipmentsManagePage />},
             {path: "user-reviews", element: <UserReviewsPage/>},
             {path: "referral", element: <ReferralPage/>},
 

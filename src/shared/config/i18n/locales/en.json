@@ -408,7 +408,8 @@
     "actions": {
       "back": "Back",
       "next": "Next",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "perPage": "Per page"
     },
     "total": "Total: {{count}}",
     "messages": {
@@ -420,7 +421,9 @@
       "orderDeleted": "Order successfully deleted!",
       "orderDeleteError": "Error deleting order",
       "orderUpdated": "Order successfully updated!",
-      "orderUpdateError": "Error updating order"
+      "orderUpdateError": "Error updating order",
+      "bulkUpdateNotReady": "Bulk update is not available yet.",
+      "bulkActionError": "Bulk action failed"
     },
     "deleteDialog": {
       "title": "Confirm deletion",
@@ -486,7 +489,7 @@
       "titleCargo": "Edit cargo order",
       "titleTransport": "Edit transport order",
       "loadingDateFrom": "Loading date from",
-      "loadingDateTo": "Loading date to",
+      "loadingDateTo": "Unloading date to",
       "vehicleType": "Vehicle type",
       "loadType": "Load type",
       "cargoType": "Cargo type",
@@ -557,6 +560,38 @@
       "error": "Error working with favorites",
       "add": "Add to favorites",
       "remove": "Remove from favorites"
+    },
+    "manage": {
+      "title": "Manage my shipments",
+      "subtitle": "Manage your orders, select multiple items, and apply bulk actions.",
+      "selectedCount": "Selected: {{count}}",
+      "selectPage": "Select page",
+      "unselectPage": "Unselect page",
+      "clearSelection": "Clear selection",
+      "bulkActions": "Bulk actions",
+      "bulkDrawerTitle": "Bulk actions · {{count}} selected",
+      "bulkDrawerSubtitle": "Choose an action for selected items. This panel is designed to be extended with new bulk operations.",
+      "actionType": "Action",
+      "selectedCountShort": "Selected: {{count}}",
+      "selectPageShort": "Select page",
+      "unselectPageShort": "Unselect",
+      "clearSelectionShort": "Clear",
+      "bulkActionsShort": "Bulk",
+      "actions": {
+        "raise": "Raise selected",
+        "update": "Bulk update",
+        "delete": "Delete selected"
+      },
+      "raiseDescription": "All selected items will be raised.",
+      "deleteDescription": "Selected items will be deleted. This action cannot be undone.",
+      "bulkRaiseSuccess": "Bulk raise completed",
+      "bulkDeleteSuccess": "Bulk delete completed",
+      "bulkUpdateSuccess": "Bulk update completed",
+      "pickupPointsCount": "Pickup points: {{count}}",
+      "dropoffPointsCount": "Drop-off points: {{count}}",
+      "viewsCount": "Views: {{count}}",
+      "upCount": "Raised: {{count}}",
+      "updatedAt": "Updated: {{value}}"
     }
   },
   "company": {

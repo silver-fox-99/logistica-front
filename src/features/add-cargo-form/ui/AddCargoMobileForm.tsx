@@ -13,6 +13,7 @@ import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete"
 import { RHFLookupMultiAutocomplete } from "@/shared/ui/lookup/RHFLookupMultiAutocomplete";
 import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
 import {CargoPointsFieldArray} from "@/features/add-cargo-form/ui/CargoPointsFieldArray.tsx";
+import {FiArrowLeft, FiArrowRight} from "react-icons/fi";
 
 type Props = {
     t: (k: string) => string;
@@ -430,30 +431,73 @@ export function AddCargoMobileForm({
 
             <Box
                 sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
                     pt: 2,
-                    borderTop: "1px solid #E0E0E0",
+                    mt: 1,
+                    borderTop: "1px solid",
+                    borderColor: "divider",
                 }}
             >
-                <Button onClick={handleBack} disabled={activeStep === 0} sx={{ minWidth: 100 }}>
-                    {t("addCargo.buttons.back")}
-                </Button>
-
-                <Typography variant="body2" color="text.secondary">
-                    {activeStep + 1} / {steps.length}
-                </Typography>
-
-                {activeStep === steps.length - 1 ? (
-                    <Button type="submit" variant="contained" sx={{ minWidth: 100 }} disabled={loadingInit || loading}>
-                        {t("addCargo.buttons.submit")}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                    }}
+                >
+                    <Button
+                        onClick={handleBack}
+                        disabled={activeStep === 0}
+                        variant="outlined"
+                        sx={{
+                            minWidth: 44,
+                            width: 44,
+                            height: 44,
+                            p: 0,
+                            borderRadius: 2,
+                            flexShrink: 0,
+                        }}
+                    >
+                        <FiArrowLeft size={18} />
                     </Button>
-                ) : (
-                    <Button variant="contained" onClick={handleNext} sx={{ minWidth: 100 }}>
-                        {t("addCargo.buttons.continue")}
-                    </Button>
-                )}
+
+                    {activeStep < steps.length - 1 && (
+                        <Button
+                            variant="outlined"
+                            onClick={handleNext}
+                            sx={{
+                                minWidth: 44,
+                                width: 44,
+                                height: 44,
+                                p: 0,
+                                borderRadius: 2,
+                                flexShrink: 0,
+                            }}
+                        >
+                            <FiArrowRight size={18} />
+                        </Button>
+                    )}
+
+                    {activeStep > 0 && (
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={loadingInit || loading}
+                            sx={{
+                                height: 44,
+                                px: 2,
+                                ml: "auto",
+                                minWidth: 140,
+                                textTransform: "none",
+                                borderRadius: 2,
+                                fontWeight: 700,
+                                boxShadow: "none",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {t("addCargo.buttons.submit")}
+                        </Button>
+                    )}
+                </Box>
             </Box>
         </Box>
     );
