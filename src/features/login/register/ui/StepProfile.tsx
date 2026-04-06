@@ -18,7 +18,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { authApi } from "@/shared/api/authApi.ts";
-import { useNavigate } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { useUserStore } from "@/entities/user/model/user.store.ts";
 
 const PROFILE_TYPES = ["Грузоотправитель", "Логист", "Перевозчик", "Другое"] as const;
@@ -39,6 +39,8 @@ type StepProfileProps = {
 
 export default function StepProfile({ defaultValues }: StepProfileProps) {
     const { t } = useTranslation();
+    const { code } = useParams<{ code?: string }>();
+    const referralCodeFromUrl = code ? decodeURIComponent(code) : "";
     const [showPwd, setShowPwd] = useState(false);
     const [showPwd2, setShowPwd2] = useState(false);
     const navigate = useNavigate();
@@ -71,7 +73,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
             type: "Другое",
             password: "",
             confirmPassword: "",
-            code: "",
+            code: referralCodeFromUrl,
             ...defaultValues,
         },
         mode: "onTouched",
@@ -79,7 +81,12 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
 
     const submit = async (data: ProfileFormValues) => {
         try {
-            const res = await authApi.completeRegister(data);
+            const payload: ProfileFormValues = {
+                ...data,
+                code: referralCodeFromUrl || data.code?.trim() || undefined,
+            };
+
+            const res = await authApi.completeRegister(payload);
             setUser(res.data);
             toast.success(t("register.registrationSuccess"));
             navigate("/dashboard/profile");
@@ -193,6 +200,7 @@ export default function StepProfile({ defaultValues }: StepProfileProps) {
                 placeholder={t('register.enterInvitationCode')}
                 autoComplete="given-code"
                 fullWidth
+                disabled={!!code}
                 {...register("code")}
                 error={!!errors.code}
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
