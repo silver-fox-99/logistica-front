@@ -4,7 +4,11 @@ import {
     Box,
     Button,
     Divider,
+    FormControl,
     FormControlLabel,
+    InputLabel,
+    MenuItem,
+    Select,
     Stack,
     Switch,
     TextField,
@@ -14,6 +18,11 @@ import type {
     AdPlacement,
     CreateAdPlacementPayload,
 } from "@/entities/ads/model/types";
+import {
+    findPlacementOption,
+    getPlacementsByPage,
+    getUniquePages,
+} from "@/entities/ads/model/placementOptions.helpers";
 
 type Props = {
     initialValues?: AdPlacement | null;
@@ -33,8 +42,8 @@ type FormState = {
 
 function getInitialState(initialValues?: AdPlacement | null): FormState {
     return {
-        page: initialValues?.page ?? "",
-        placement_key: initialValues?.placement_key ?? "",
+        page: initialValues?.page ?? "/dashboard/search",
+        placement_key: initialValues?.placement_key ?? "top-list",
         title: initialValues?.title ?? "",
         is_active: initialValues?.is_active ?? true,
         rotation_enabled: initialValues?.rotation_enabled ?? false,
@@ -56,33 +65,47 @@ export function AdPlacementForm(props: Props) {
         setForm(getInitialState(initialValues));
     }, [initialValues]);
 
+    const pageOptions = React.useMemo(() => getUniquePages(), []);
+    const placementOptions = React.useMemo(
+        () => getPlacementsByPage(form.page),
+        [form.page],
+    );
+
     const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
 
-    const fillHomeExample = () => {
+    const handlePageChange = (page: string) => {
+        const nextPlacements = getPlacementsByPage(page);
+        const firstPlacement = nextPlacements[0];
+
         setForm((prev) => ({
             ...prev,
-            page: "/",
-            placement_key: "home_hero",
-            title: "Главный баннер на главной",
-            is_active: true,
-            rotation_enabled: true,
-            rotation_interval_sec: 5,
+            page,
+            placement_key: firstPlacement?.placementKey ?? "",
+            title: firstPlacement?.defaultTitle ?? "",
+            rotation_enabled: firstPlacement?.defaultRotationEnabled ?? false,
+            rotation_interval_sec: firstPlacement?.defaultRotationIntervalSec ?? 5,
         }));
     };
 
-    const fillCatalogExample = () => {
+    const handlePlacementChange = (placementKey: string) => {
+        const selected = findPlacementOption(form.page, placementKey);
+
         setForm((prev) => ({
             ...prev,
-            page: "/catalog",
-            placement_key: "catalog_top",
-            title: "Баннер над каталогом",
-            is_active: true,
-            rotation_enabled: false,
-            rotation_interval_sec: 5,
+            placement_key: placementKey,
+            title: prev.title || selected?.defaultTitle || "",
+            rotation_enabled: selected?.defaultRotationEnabled ?? prev.rotation_enabled,
+            rotation_interval_sec:
+                selected?.defaultRotationIntervalSec ?? prev.rotation_interval_sec,
         }));
     };
+
+    const selectedPlacement = React.useMemo(
+        () => findPlacementOption(form.page, form.placement_key),
+        [form.page, form.placement_key],
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -102,57 +125,63 @@ export function AdPlacementForm(props: Props) {
             <Stack spacing={2.5}>
                 <Alert severity="info">
                     Placement — это рекламная зона на определённой странице сайта.
-                    После создания вы сможете добавлять внутрь него баннеры.
+                    Сейчас доступны только заранее настроенные места размещения.
                 </Alert>
-
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                    <Button
-                        type="button"
-                        variant="outlined"
-                        size="small"
-                        onClick={fillHomeExample}
-                    >
-                        Пример для главной
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outlined"
-                        size="small"
-                        onClick={fillCatalogExample}
-                    >
-                        Пример для каталога
-                    </Button>
-                </Stack>
 
                 <Divider />
 
-                <TextField
-                    label="Страница"
-                    value={form.page}
-                    onChange={(e) => setField("page", e.target.value)}
-                    fullWidth
-                    required
-                    placeholder="/"
-                    helperText='Укажите путь страницы, где будет размещаться рекламный блок. Примеры: "/", "/catalog", "/profile".'
-                />
+                <FormControl fullWidth required>
+                    <InputLabel>Страница</InputLabel>
+                    <Select
+                        label="Страница"
+                        value={form.page}
+                        onChange={(e) => handlePageChange(e.target.value)}
+                    >
+                        {pageOptions.map((item) => (
+                            <MenuItem key={item.value} value={item.value}>
+                                {item.label} ({item.value})
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
-                <TextField
-                    label="Ключ placement"
-                    value={form.placement_key}
-                    onChange={(e) => setField("placement_key", e.target.value)}
-                    fullWidth
-                    required
-                    placeholder="home_hero"
-                    helperText='Уникальный технический ключ. Лучше использовать латиницу, snake_case. Пример: "home_hero", "catalog_top", "profile_sidebar".'
-                />
+                <Typography variant="caption" color="text.secondary">
+                    Выберите страницу, на которой будет показываться рекламный блок.
+                </Typography>
+
+                <FormControl fullWidth required>
+                    <InputLabel>Место размещения</InputLabel>
+                    <Select
+                        label="Место размещения"
+                        value={form.placement_key}
+                        onChange={(e) => handlePlacementChange(e.target.value)}
+                    >
+                        {placementOptions.map((item) => (
+                            <MenuItem key={item.placementKey} value={item.placementKey}>
+                                {item.placementLabel} ({item.placementKey})
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <Typography variant="caption" color="text.secondary">
+                    Это конкретная зона на странице, куда будет добавлен баннер.
+                </Typography>
+
+                {selectedPlacement ? (
+                    <Alert severity="success">
+                        Выбрано место: <strong>{selectedPlacement.pageLabel}</strong> →{" "}
+                        <strong>{selectedPlacement.placementLabel}</strong>
+                    </Alert>
+                ) : null}
 
                 <TextField
                     label="Название"
                     value={form.title}
                     onChange={(e) => setField("title", e.target.value)}
                     fullWidth
-                    placeholder="Главный баннер на главной"
-                    helperText="Необязательное поле. Нужно для удобства менеджеров и администраторов в панели."
+                    placeholder="Баннер над результатами поиска"
+                    helperText="Необязательное поле. Используется для удобства в админке."
                 />
 
                 <Divider />
@@ -165,16 +194,14 @@ export function AdPlacementForm(props: Props) {
                     control={
                         <Switch
                             checked={form.is_active}
-                            onChange={(e) =>
-                                setField("is_active", e.target.checked)
-                            }
+                            onChange={(e) => setField("is_active", e.target.checked)}
                         />
                     }
                     label="Placement активен"
                 />
 
                 <Typography variant="caption" color="text.secondary">
-                    Если выключить placement, баннеры в этой зоне не будут показываться на сайте.
+                    Если выключить placement, баннеры в этой зоне не будут показываться.
                 </Typography>
 
                 <FormControlLabel
@@ -190,7 +217,7 @@ export function AdPlacementForm(props: Props) {
                 />
 
                 <Typography variant="caption" color="text.secondary">
-                    Ротация нужна, если в одном placement несколько баннеров и их нужно показывать по очереди.
+                    Ротация нужна, если в одном месте будет несколько баннеров и их нужно показывать по очереди.
                 </Typography>
 
                 <TextField
@@ -202,7 +229,7 @@ export function AdPlacementForm(props: Props) {
                     }
                     inputProps={{ min: 1 }}
                     fullWidth
-                    helperText="Через сколько секунд переключать баннер при включённой ротации. Обычно используют 5–10 секунд."
+                    helperText="Через сколько секунд переключать баннер при включённой ротации."
                 />
 
                 <Button type="submit" variant="contained" disabled={loading}>
