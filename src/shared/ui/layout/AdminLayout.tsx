@@ -32,11 +32,10 @@ import {
     FiChevronLeft,
     FiChevronRight,
     FiAward,
-    FiLink2,
+    FiLink2, FiTruck,
 } from "react-icons/fi";
-import { BsGeoAltFill } from "react-icons/bs";
-import { MdOutlineAdminPanelSettings, MdRateReview } from "react-icons/md";
-import { FaTruck } from "react-icons/fa";
+import {BsGeoAlt} from "react-icons/bs";
+import {MdOutlineAdminPanelSettings, MdOutlineRateReview} from "react-icons/md";
 import { TbPremiumRights } from "react-icons/tb";
 import { HiOutlineDocumentText } from "react-icons/hi2";
 import { PiBellRingingLight } from "react-icons/pi";
@@ -63,9 +62,9 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin", icon: <FiBarChart2 />, label: "Обзор", end: true, requiredAny: [viewCode("DASHBOARD" as any)] },
     { to: "/admin/users", icon: <FiUsers />, label: "Пользователи", requiredAny: [viewCode("USERS" as any)] },
     { to: "/admin/cargo", icon: <FiPackage />, label: "Грузы", requiredAny: [viewCode("CARGO" as any)] },
-    { to: "/admin/transport", icon: <FaTruck />, label: "Транспорт", requiredAny: [viewCode("TRANSPORT" as any)] },
-    { to: "/admin/geo", icon: <BsGeoAltFill />, label: "Геолокации", requiredAny: [viewCode("GEO_LOCATIONS" as any)] },
-    { to: "/admin/reviews", icon: <MdRateReview />, label: "Отзывы", requiredAny: [viewCode("REVIEWS" as any)] },
+    { to: "/admin/transport", icon: <FiTruck />, label: "Транспорт", requiredAny: [viewCode("TRANSPORT" as any)] },
+    { to: "/admin/geo", icon: <BsGeoAlt />, label: "Геолокации", requiredAny: [viewCode("GEO_LOCATIONS" as any)] },
+    { to: "/admin/reviews", icon: <MdOutlineRateReview />, label: "Отзывы", requiredAny: [viewCode("REVIEWS" as any)] },
     { to: "/admin/documents", icon: <HiOutlineDocumentText />, label: "Документы", requiredAny: [viewCode("DOCUMENTS" as any)] },
     { to: "/admin/referral-settings", icon: <FiAward />, label: "Реферальная система", requiredAny: [viewCode("REFERRAL_SETTINGS" as any)] },
     { to: "/admin/tariffs/plans", icon: <TbPremiumRights />, label: "Тарифы", requiredAny: [viewCode("TARIFF_PLANS" as any)] },
