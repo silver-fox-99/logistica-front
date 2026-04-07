@@ -32,6 +32,7 @@ import {
     FiChevronLeft,
     FiChevronRight,
     FiAward,
+    FiLink2,
 } from "react-icons/fi";
 import { BsGeoAltFill } from "react-icons/bs";
 import { MdOutlineAdminPanelSettings, MdRateReview } from "react-icons/md";
@@ -70,6 +71,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/initial-data", icon: <FiDatabase />, label: "Справочники", requiredAny: [viewCode("LOOKUPS" as any)] },
     { to: "/admin/black-list", icon: <FiShield />, label: "Чёрный список", requiredAny: [viewCode("BLACKLIST" as any)] },
     { to: "/admin/notifications", icon: <PiBellRingingLight />, label: "Уведомления", requiredAny: [viewCode("NOTIFICATION" as any)] },
+    { to: "/admin/integrations", icon: <FiLink2 />, label: "Интеграции", requiredAny: [viewCode("INTEGRATIONS" as any)] },
     { to: "/admin/activity-logs", icon: <FiSettings />, label: "Журнал активности", requiredAny: [viewCode("ACTIVITY_LOGS" as any)] },
     {
         to: "/admin/groups-roles",

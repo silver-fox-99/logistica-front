@@ -38,6 +38,7 @@ import ReferralPage from "@/pages/dashboard/referral";
 import NotificationsPage from "@/pages/admin/notifications";
 import GroupsRoles from "@/pages/admin/groups-roles";
 import MyShipmentsManagePage from "@/pages/dashboard/my-shipments-manage";
+import AdminIntegrationsPage from "@/pages/admin/integrations";
 
 
 const router = createBrowserRouter([
@@ -100,7 +101,8 @@ const router = createBrowserRouter([
             { path: "documents", element: <DocumentsPage />},
             { path: "referral-settings", element: <ReferralSettingsPage />},
             { path: "notifications", element: <NotificationsPage />},
-            { path: "groups-roles", element: <GroupsRoles />}
+            { path: "groups-roles", element: <GroupsRoles />},
+            { path: "integrations", element: <AdminIntegrationsPage />}
         ],
     },
     {

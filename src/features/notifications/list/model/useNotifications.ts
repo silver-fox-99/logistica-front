@@ -1,17 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ListNotificationsResponse, NotificationType } from "@/entities/notification/model/types";
 import { notificationsApi } from "@/shared/api/notifications.api";
-
-function useDebouncedValue<T>(value: T, delayMs = 350) {
-    const [debounced, setDebounced] = useState(value);
-
-    useEffect(() => {
-        const id = setTimeout(() => setDebounced(value), delayMs);
-        return () => clearTimeout(id);
-    }, [value, delayMs]);
-
-    return debounced;
-}
+import {useDebouncedValue} from "@/shared/lib/hooks/useDebouncedValue.ts";
 
 export function useNotifications() {
     const [type, setType] = useState<NotificationType | undefined>(undefined);
