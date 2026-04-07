@@ -43,6 +43,7 @@ import { PiBellRingingLight } from "react-icons/pi";
 
 import type { AdminPermissionTarget } from "@/entities/adminPermission/model/types";
 import { useAdminAccessStore } from "@/entities/adminAccess/model/adminAccess.store";
+import {LuNewspaper} from "react-icons/lu";
 
 type NavItemConfig = {
     to: string;
@@ -72,6 +73,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/black-list", icon: <FiShield />, label: "Чёрный список", requiredAny: [viewCode("BLACKLIST" as any)] },
     { to: "/admin/notifications", icon: <PiBellRingingLight />, label: "Уведомления", requiredAny: [viewCode("NOTIFICATION" as any)] },
     { to: "/admin/integrations", icon: <FiLink2 />, label: "Интеграции", requiredAny: [viewCode("INTEGRATIONS" as any)] },
+    { to: "/admin/ads", icon: <LuNewspaper />, label: "Реклама", requiredAny: [viewCode("ADS" as any)] },
     { to: "/admin/activity-logs", icon: <FiSettings />, label: "Журнал активности", requiredAny: [viewCode("ACTIVITY_LOGS" as any)] },
     {
         to: "/admin/groups-roles",

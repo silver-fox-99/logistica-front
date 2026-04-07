@@ -29,11 +29,19 @@ export const DeleteIntegrationTokenDialog = React.memo(function DeleteIntegratio
                                                                                              }: Props) {
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-            <DialogTitle>Delete token</DialogTitle>
+            <DialogTitle>Удаление токена</DialogTitle>
 
             <DialogContent>
                 <Typography variant="body2">
-                    Are you sure you want to delete this integration token?
+                    Вы уверены, что хотите удалить этот токен интеграции?
+                </Typography>
+
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                >
+                    После удаления внешняя система больше не сможет использовать этот токен для доступа к API.
                 </Typography>
 
                 {item && (
@@ -45,7 +53,7 @@ export const DeleteIntegrationTokenDialog = React.memo(function DeleteIntegratio
 
             <DialogActions>
                 <Button onClick={onClose} disabled={loading}>
-                    Cancel
+                    Отмена
                 </Button>
                 <Button
                     color="error"
@@ -53,7 +61,7 @@ export const DeleteIntegrationTokenDialog = React.memo(function DeleteIntegratio
                     onClick={onConfirm}
                     disabled={loading}
                 >
-                    Delete
+                    Удалить
                 </Button>
             </DialogActions>
         </Dialog>

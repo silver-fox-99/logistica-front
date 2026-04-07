@@ -27,12 +27,15 @@ export const RevealedTokenAlert = React.memo(function RevealedTokenAlert({
                     onClick={onCopy}
                     sx={{ textTransform: "none" }}
                 >
-                    Copy
+                    Скопировать
                 </Button>
             }
         >
             <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5 }}>
-                Save this token now.
+                Сохраните токен сейчас.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.75 }}>
+                Полный токен обычно показывается только один раз после создания или перевыпуска.
             </Typography>
             <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
                 {token}

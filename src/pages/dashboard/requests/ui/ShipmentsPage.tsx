@@ -7,9 +7,10 @@ import type { ShipmentsKind } from "@/entities/shipment/model/type";
 import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
 
 import { ShipmentsListBody } from "@/widgets/shipments/ShipmentsListBody";
+import { ShipmentsFilterDrawerForm } from "@/widgets/shipments/ShipmentsFilterDrawerForm.tsx";
+import { PublicPlacementBanner } from "@/widgets/public-ads/ui/PublicPlacementBanner";
 
 import "./MyShipmentsPage.scss";
-import {ShipmentsFilterDrawerForm} from "@/widgets/shipments/ShipmentsFilterDrawerForm.tsx";
 
 type Props = { scope: "public" | "my" };
 
@@ -21,7 +22,6 @@ export default function ShipmentsListPage({ scope }: Props) {
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
-
 
     const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(DEFAULT_KIND);
     const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(DEFAULT_FILTERS);
@@ -35,10 +35,33 @@ export default function ShipmentsListPage({ scope }: Props) {
 
     return (
         <>
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "divider", mb: 2, width: "100%", boxSizing: "border-box" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
+            <Paper
+                variant="outlined"
+                sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    borderColor: "divider",
+                    mb: 2,
+                    width: "100%",
+                    boxSizing: "border-box",
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        flexWrap: { xs: "wrap", sm: "nowrap" },
+                    }}
+                >
                     <Box className="shipments-page__icon">
-                        <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                            width="42"
+                            height="42"
+                            viewBox="0 0 42 42"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
                             <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7" />
                             <circle cx="18" cy="18" r="6" stroke="#4472B8" strokeWidth="2.5" fill="none" />
                             <path d="M24 24L28 28" stroke="#4472B8" strokeWidth="2.5" strokeLinecap="round" />
@@ -47,10 +70,19 @@ export default function ShipmentsListPage({ scope }: Props) {
 
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h6" mb={1} className="shipments-page__title">
-                            {scope === "my" ? t("shipments.myShipments.title") : t("shipments.myShipments.searchTitle")}
+                            {scope === "my"
+                                ? t("shipments.myShipments.title")
+                                : t("shipments.myShipments.searchTitle")}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" mb={2} className="shipments-page__subtitle">
-                            {scope === "my" ? t("shipments.myShipments.description") : t("shipments.myShipments.searchDescription")}
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            mb={2}
+                            className="shipments-page__subtitle"
+                        >
+                            {scope === "my"
+                                ? t("shipments.myShipments.description")
+                                : t("shipments.myShipments.searchDescription")}
                         </Typography>
                     </Box>
 
@@ -69,7 +101,13 @@ export default function ShipmentsListPage({ scope }: Props) {
                 </Box>
             </Paper>
 
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" sx={{ mb: 1, width: "100%" }}>
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1}
+                alignItems={{ xs: "stretch", sm: "center" }}
+                justifyContent="space-between"
+                sx={{ mb: 1, width: "100%" }}
+            >
                 <Button
                     variant="contained"
                     startIcon={<FiSliders />}
@@ -79,6 +117,12 @@ export default function ShipmentsListPage({ scope }: Props) {
                     {t("shipments.filter.button")}
                 </Button>
             </Stack>
+
+            <PublicPlacementBanner
+                page="/dashboard/search"
+                placementKey="top-list"
+                height={240}
+            />
 
             <div key={listKey}>
                 <ShipmentsListBody
@@ -102,7 +146,6 @@ export default function ShipmentsListPage({ scope }: Props) {
                     setReloadKey((k) => k + 1);
                 }}
             />
-
         </>
     );
 }

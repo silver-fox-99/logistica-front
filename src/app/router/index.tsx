@@ -39,6 +39,8 @@ import NotificationsPage from "@/pages/admin/notifications";
 import GroupsRoles from "@/pages/admin/groups-roles";
 import MyShipmentsManagePage from "@/pages/dashboard/my-shipments-manage";
 import AdminIntegrationsPage from "@/pages/admin/integrations";
+import AdsPage from "@/pages/admin/ads/ui/AdsPage.tsx";
+import AdsDetailsPage from "@/pages/admin/ads/ui/AdsDetailsPage.tsx";
 
 
 const router = createBrowserRouter([
@@ -102,7 +104,9 @@ const router = createBrowserRouter([
             { path: "referral-settings", element: <ReferralSettingsPage />},
             { path: "notifications", element: <NotificationsPage />},
             { path: "groups-roles", element: <GroupsRoles />},
-            { path: "integrations", element: <AdminIntegrationsPage />}
+            { path: "integrations", element: <AdminIntegrationsPage />},
+            { path: "ads", element: <AdsPage />},
+            { path: "ads/:id", element: <AdsDetailsPage />}
         ],
     },
     {

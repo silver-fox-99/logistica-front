@@ -1,4 +1,3 @@
-
 import {
     Alert,
     Box,
@@ -29,10 +28,10 @@ export default function AdminIntegrationsPage() {
             >
                 <Box>
                     <Typography variant="h4" fontWeight={800}>
-                        Integrations
+                        Интеграции
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Manage API tokens for external company integrations.
+                        Управление API-токенами для внешних интеграций компании.
                     </Typography>
                 </Box>
 
@@ -44,7 +43,7 @@ export default function AdminIntegrationsPage() {
                         disabled={state.loading || state.submitting}
                         sx={{ textTransform: "none", borderRadius: 2 }}
                     >
-                        Refresh
+                        Обновить
                     </Button>
 
                     <Button
@@ -54,7 +53,7 @@ export default function AdminIntegrationsPage() {
                         disabled={state.submitting}
                         sx={{ textTransform: "none", borderRadius: 2 }}
                     >
-                        Create token
+                        Создать токен
                     </Button>
                 </Stack>
             </Stack>
@@ -103,10 +102,10 @@ export default function AdminIntegrationsPage() {
 
             <IntegrationTokenDialog
                 open={state.createOpen}
-                title="Create integration token"
+                title="Создание токена интеграции"
                 form={state.form}
                 loading={state.submitting}
-                submitLabel="Create"
+                submitLabel="Создать"
                 userOptions={state.userOptions}
                 usersLoading={state.usersLoading}
                 ownerInputValue={state.formOwnerInput}
@@ -118,10 +117,10 @@ export default function AdminIntegrationsPage() {
 
             <IntegrationTokenDialog
                 open={state.editOpen}
-                title="Edit integration token"
+                title="Редактирование токена интеграции"
                 form={state.form}
                 loading={state.submitting}
-                submitLabel="Save"
+                submitLabel="Сохранить"
                 userOptions={state.userOptions}
                 usersLoading={state.usersLoading}
                 ownerInputValue={state.formOwnerInput}

@@ -60,8 +60,8 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
     return (
         <Card sx={{ borderRadius: 3 }}>
             <CardHeader
-                title="Integration tokens"
-                subheader={`Total: ${total}`}
+                title="Токены интеграции"
+                subheader={`Всего: ${total}`}
                 action={loading ? <CircularProgress size={22} /> : null}
             />
 
@@ -70,15 +70,15 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Owner</TableCell>
-                                <TableCell>Company</TableCell>
-                                <TableCell>Prefix</TableCell>
-                                <TableCell>Status</TableCell>
+                                <TableCell>Название</TableCell>
+                                <TableCell>Владелец</TableCell>
+                                <TableCell>Компания</TableCell>
+                                <TableCell>Префикс</TableCell>
+                                <TableCell>Статус</TableCell>
                                 <TableCell>Scopes</TableCell>
-                                <TableCell>Usage</TableCell>
-                                <TableCell>Expires</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell>Использование</TableCell>
+                                <TableCell>Истекает</TableCell>
+                                <TableCell align="right">Действия</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -87,7 +87,7 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                                 <TableRow>
                                     <TableCell colSpan={9}>
                                         <Typography variant="body2" color="text.secondary">
-                                            No integration tokens found
+                                            Токены интеграции не найдены
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -109,12 +109,12 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                                         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                                             <Chip
                                                 size="small"
-                                                label={item.status}
+                                                label={item.status === "ACTIVE" ? "Активный" : item.status}
                                                 color={item.status === "ACTIVE" ? "success" : "default"}
                                             />
                                             <Chip
                                                 size="small"
-                                                label={item.is_active ? "Enabled" : "Disabled"}
+                                                label={item.is_active ? "Включён" : "Выключен"}
                                                 variant="outlined"
                                             />
                                         </Stack>
@@ -148,7 +148,7 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                                             justifyContent="flex-end"
                                             alignItems="center"
                                         >
-                                            <Tooltip title="Edit">
+                                            <Tooltip title="Редактировать">
                                                 <span>
                                                     <IconButton
                                                         size="small"
@@ -160,7 +160,7 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                                                 </span>
                                             </Tooltip>
 
-                                            <Tooltip title="Regenerate">
+                                            <Tooltip title="Перевыпустить токен">
                                                 <span>
                                                     <IconButton
                                                         size="small"
@@ -172,7 +172,7 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                                                 </span>
                                             </Tooltip>
 
-                                            <Tooltip title={item.is_active ? "Disable" : "Enable"}>
+                                            <Tooltip title={item.is_active ? "Выключить" : "Включить"}>
                                                 <span>
                                                     <Switch
                                                         checked={item.is_active}
@@ -182,7 +182,7 @@ export const IntegrationTokensTable = React.memo(function IntegrationTokensTable
                                                 </span>
                                             </Tooltip>
 
-                                            <Tooltip title="Delete">
+                                            <Tooltip title="Удалить">
                                                 <span>
                                                     <IconButton
                                                         size="small"

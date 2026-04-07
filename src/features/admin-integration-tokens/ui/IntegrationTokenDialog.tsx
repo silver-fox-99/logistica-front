@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    Alert,
     Autocomplete,
     Button,
     Chip,
@@ -13,6 +14,7 @@ import {
     Select,
     Stack,
     TextField,
+    Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
@@ -59,107 +61,127 @@ export const IntegrationTokenDialog = React.memo(function IntegrationTokenDialog
             <DialogTitle>{title}</DialogTitle>
 
             <DialogContent dividers>
-                <Grid container spacing={2}>
-                    <Grid size={{ xs: 12 }}>
-                        <Autocomplete
-                            options={userOptions}
-                            value={form.owner}
-                            loading={usersLoading}
-                            inputValue={ownerInputValue}
-                            onInputChange={(_, value) => onOwnerInputChange(value)}
-                            onChange={(_, value) => {
-                                onFormChange("owner", value);
-                                onFormChange("user_id", value?.id ?? "");
-                            }}
-                            getOptionLabel={(option) => getIntegrationOwnerLabel(option)}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Token owner"
-                                    placeholder="Find user"
-                                />
-                            )}
-                        />
-                    </Grid>
+                <Stack spacing={2.5}>
+                    <Alert severity="info">
+                        Токен интеграции нужен для безопасного доступа внешней системы к вашему API.
+                        Заполняйте поля внимательно: после создания токен может быть показан только один раз.
+                    </Alert>
 
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            fullWidth
-                            label="Name"
-                            value={form.name}
-                            onChange={(e) => onFormChange("name", e.target.value)}
-                            placeholder="For example, ERP integration"
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            fullWidth
-                            label="Company"
-                            value={form.company_name}
-                            onChange={(e) => onFormChange("company_name", e.target.value)}
-                            placeholder="For example, Acme Logistics"
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            fullWidth
-                            label="Usage limit"
-                            type="number"
-                            value={form.usage_limit}
-                            onChange={(e) => onFormChange("usage_limit", e.target.value)}
-                            placeholder="Leave empty for unlimited"
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            fullWidth
-                            type="datetime-local"
-                            label="Expires at"
-                            value={form.expires_at}
-                            onChange={(e) => onFormChange("expires_at", e.target.value)}
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12 }}>
-                        <FormControl fullWidth>
-                            <InputLabel>Scopes</InputLabel>
-                            <Select
-                                multiple
-                                label="Scopes"
-                                value={form.scopes}
-                                onChange={(e) =>
-                                    onFormChange("scopes", e.target.value as IntegrationScope[])
-                                }
-                                renderValue={(selected) => (
-                                    <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
-                                        {(selected as string[]).map((value) => (
-                                            <Chip key={value} size="small" label={value} />
-                                        ))}
-                                    </Stack>
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12 }}>
+                            <Autocomplete
+                                options={userOptions}
+                                value={form.owner}
+                                loading={usersLoading}
+                                inputValue={ownerInputValue}
+                                onInputChange={(_, value) => onOwnerInputChange(value)}
+                                onChange={(_, value) => {
+                                    onFormChange("owner", value);
+                                    onFormChange("user_id", value?.id ?? "");
+                                }}
+                                getOptionLabel={(option) => getIntegrationOwnerLabel(option)}
+                                isOptionEqualToValue={(option, value) => option.id === value.id}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Владелец токена"
+                                        placeholder="Найдите пользователя"
+                                        helperText="Укажите, кому принадлежит токен. Это помогает понять, кто отвечает за интеграцию."
+                                    />
                                 )}
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField
+                                fullWidth
+                                label="Название"
+                                value={form.name}
+                                onChange={(e) => onFormChange("name", e.target.value)}
+                                placeholder="Например, ERP integration"
+                                helperText="Внутреннее название токена. Пример: ERP integration, CRM sync, Warehouse API."
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField
+                                fullWidth
+                                label="Компания"
+                                value={form.company_name}
+                                onChange={(e) => onFormChange("company_name", e.target.value)}
+                                placeholder="Например, Acme Logistics"
+                                helperText="Название компании или внешней системы, которая использует токен."
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField
+                                fullWidth
+                                label="Лимит использования"
+                                type="number"
+                                value={form.usage_limit}
+                                onChange={(e) => onFormChange("usage_limit", e.target.value)}
+                                placeholder="Оставьте пустым для безлимита"
+                                helperText="Сколько раз токен можно использовать. Если оставить пустым, лимита не будет."
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField
+                                fullWidth
+                                type="datetime-local"
+                                label="Дата истечения"
+                                value={form.expires_at}
+                                onChange={(e) => onFormChange("expires_at", e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                helperText="После этой даты токен перестанет работать. Можно оставить пустым, если срок не ограничен."
+                            />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <FormControl fullWidth>
+                                <InputLabel>Scopes</InputLabel>
+                                <Select
+                                    multiple
+                                    label="Scopes"
+                                    value={form.scopes}
+                                    onChange={(e) =>
+                                        onFormChange("scopes", e.target.value as IntegrationScope[])
+                                    }
+                                    renderValue={(selected) => (
+                                        <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
+                                            {(selected as string[]).map((value) => (
+                                                <Chip key={value} size="small" label={value} />
+                                            ))}
+                                        </Stack>
+                                    )}
+                                >
+                                    {AVAILABLE_INTEGRATION_SCOPES.map((scope) => (
+                                        <MenuItem key={scope} value={scope}>
+                                            {scope}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: "block", mt: 1 }}
                             >
-                                {AVAILABLE_INTEGRATION_SCOPES.map((scope) => (
-                                    <MenuItem key={scope} value={scope}>
-                                        {scope}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                Scopes определяют, к каким разделам API будет доступ у токена. Выдавайте только необходимые права.
+                            </Typography>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </Stack>
             </DialogContent>
 
             <DialogActions>
                 <Button onClick={onClose} disabled={loading}>
-                    Cancel
+                    Отмена
                 </Button>
                 <Button variant="contained" onClick={onSubmit} disabled={loading}>
-                    {loading ? "Saving..." : submitLabel}
+                    {loading ? "Сохранение..." : submitLabel}
                 </Button>
             </DialogActions>
         </Dialog>
