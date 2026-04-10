@@ -50,6 +50,7 @@ const emptyPlan = (defaultPeriod?: BillingPeriod | null): PlanFormState => ({
     description: "",
     is_active: true,
     is_default: false,
+    can_auto_bump: false,
     priority: 0,
     price_text: "",
     currency: "",
@@ -427,6 +428,7 @@ export default function AdminTariffPlansPage() {
             name: payload.name.trim(),
             description: payload.description ?? null,
             is_active: !!payload.is_active,
+            can_auto_bump: !!payload.can_auto_bump,
             is_default: !!payload.is_default,
             priority: priorityValue,
             price:

@@ -9,6 +9,7 @@ export type EntitlementKey =
     | "order_details_views_per_day_limit"
     | "can_create_companies"
     | "company_limit"
+    | "can_auto_bump"
     | "members_per_company_limit";
 
 export type Entitlements = Partial<Record<Extract<EntitlementKey, string>, number | boolean | null>>;
@@ -66,6 +67,7 @@ export type TariffPlan = {
     description?: string | null;
     is_active: boolean;
     is_default: boolean;
+    can_auto_bump: boolean;
     priority?: number | null;
     price?: number | string | null;
     currency?: string | null;
@@ -81,6 +83,7 @@ export type UpsertTariffPlanPayload = {
     description?: string | null;
     is_active?: boolean;
     is_default?: boolean;
+    can_auto_bump?: boolean;
     priority?: number | null;
     price?: number | string | null;
     currency?: string | null;
@@ -156,6 +159,7 @@ const normalizePlan = (raw: any): TariffPlan => ({
     code: raw?.code ?? "",
     name: raw?.name ?? "",
     description: raw?.description ?? null,
+    can_auto_bump: raw?.can_auto_bump ?? false,
     is_active: raw?.is_active ?? raw?.isActive ?? false,
     is_default: raw?.is_default ?? raw?.isDefault ?? false,
     priority: raw?.priority ?? null,
