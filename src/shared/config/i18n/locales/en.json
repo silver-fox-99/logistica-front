@@ -644,6 +644,7 @@
     "subtitle": "Choose the tariff that fits you. Purchases are processed via support for now.",
     "refresh": "Refresh",
     "loading": "Loading…",
+    "autoBump": "Automatically move orders to the top",
     "current": "Current plan",
     "perks": "Included perks",
     "cargoLimit": "Cargo limit/month:",

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Card, CardContent, Tab, Tabs } from "@mui/material";
-import type { Entitlements, TariffInvoice, TariffMeResponse, TariffPlan, TariffSubscription } from "@/shared/api/tariffsApi";
 import { LimitsTab } from "./LimitsTab";
 import { HistoryTab } from "./HistoryTab";
 import { InvoicesTab } from "./InvoicesTab";
 import { useTranslation } from "react-i18next";
+import type {
+    Entitlements, TariffInvoice,
+    TariffMeResponse,
+    TariffPlan,
+    TariffSubscription
+} from "@/entities/tariff-plan/model/types.ts";
 
 type Props = {
     effectiveEntitlements: Entitlements | null;

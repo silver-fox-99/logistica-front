@@ -15,11 +15,11 @@ import {
     useTheme,
 } from "@mui/material";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import type { TariffPlan, TariffSubscription } from "@/shared/api/tariffsApi.ts";
 
 import { buildLimitItemsConfig } from "@/entities/tariff/lib/limits.ts";
 import { useTranslation } from "react-i18next";
 import { formatDateTimeEnGB } from "@/shared/lib/format/formatDateTime.ts";
+import type {TariffPlan, TariffSubscription} from "@/entities/tariff-plan/model/types.ts";
 
 type Props = {
     history: TariffSubscription[];

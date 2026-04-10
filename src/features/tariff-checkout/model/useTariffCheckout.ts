@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { tariffsApi, type TariffPlan } from "@/shared/api/tariffsApi";
+import { tariffsApi } from "@/shared/api/tariffsApi";
 import type { TFunction } from "i18next";
+import type {TariffPlan} from "@/entities/tariff-plan/model/types.ts";
 
 export const useTariffCheckout = (t: TFunction) => {
     const [loadingId, setLoadingId] = useState<string | null>(null);

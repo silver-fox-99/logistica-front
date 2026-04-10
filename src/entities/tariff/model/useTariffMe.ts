@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { tariffsApi, type Entitlements, type TariffMeResponse } from "@/shared/api/tariffsApi";
+import { tariffsApi } from "@/shared/api/tariffsApi";
+import type {Entitlements, TariffMeResponse} from "@/entities/tariff-plan/model/types.ts";
 
 export const useTariffMe = () => {
     const [effectiveEntitlements, setEffectiveEntitlements] = useState<Entitlements | null>(null);

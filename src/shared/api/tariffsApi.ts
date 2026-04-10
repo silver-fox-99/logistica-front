@@ -1,507 +1,443 @@
 import api from "@/shared/api/axios";
+import type {
+    BillingPeriod,
+    CheckoutResponse,
+    Entitlements,
+    IssueSubscriptionPayload,
+    TariffInvoice,
+    TariffMeResponse,
+    TariffPlan,
+    TariffPlansQuery,
+    TariffSubscription,
+    TariffsInitData,
+    UpdateEntitlementsPayload,
+    UpsertTariffPlanPayload,
+} from "@/entities/tariff-plan/model/types";
 
-export type BillingPeriod = string;
-
-export type EntitlementKey =
-    | "cargo_limit"
-    | "vehicle_limit"
-    | "can_view_order_details"
-    | "order_details_views_per_day_limit"
-    | "can_create_companies"
-    | "company_limit"
-    | "can_auto_bump"
-    | "members_per_company_limit";
-
-export type Entitlements = Partial<Record<Extract<EntitlementKey, string>, number | boolean | null>>;
-
-const ENTITLEMENT_KEYS: EntitlementKey[] = [
-    "cargo_limit",
-    "vehicle_limit",
-    "can_view_order_details",
-    "order_details_views_per_day_limit",
-    "can_create_companies",
-    "company_limit",
-    "members_per_company_limit",
-];
-
-const extractEntitlements = (payload: any): Entitlements => {
-    const out: Entitlements = {};
-    ENTITLEMENT_KEYS.forEach((key) => {
-        if (payload && payload[key] !== undefined) {
-            out[key] = payload[key] as any;
-        }
-    });
-    if (Array.isArray(payload?.entitlements)) {
-        payload.entitlements.forEach((item: any) => {
-            const rawKey = (item?.key ?? item?.entitlement_key ?? "").toString().toLowerCase();
-            const match = ENTITLEMENT_KEYS.find((k) => k === rawKey);
-            if (!match) return;
-            const boolVal =
-                typeof item?.bool_value === "boolean"
-                    ? item.bool_value
-                    : typeof item?.value === "boolean"
-                        ? item.value
-                        : undefined;
-            const intVal =
-                typeof item?.int_value === "number"
-                    ? item.int_value
-                    : typeof item?.value === "number"
-                        ? item.value
-                        : undefined;
-            if (boolVal !== undefined) {
-                out[match] = boolVal;
-            } else if (intVal !== undefined) {
-                out[match] = intVal;
-            } else {
-                out[match] = null;
-            }
-        });
-    }
-    return out;
-};
-
-export type TariffPlan = {
-    id: string;
-    code: string;
-    name: string;
-    description?: string | null;
-    is_active: boolean;
-    is_default: boolean;
-    can_auto_bump: boolean;
-    priority?: number | null;
-    price?: number | string | null;
-    currency?: string | null;
-    billing_period?: BillingPeriod | null;
-    entitlements?: Entitlements | null;
-    created_at?: string | null;
-    updated_at?: string | null;
-};
-
-export type UpsertTariffPlanPayload = {
-    code: string;
-    name: string;
-    description?: string | null;
-    is_active?: boolean;
-    is_default?: boolean;
-    can_auto_bump?: boolean;
-    priority?: number | null;
-    price?: number | string | null;
-    currency?: string | null;
-    billing_period?: BillingPeriod | null;
-    entitlements?: Entitlements;
-};
-
-export type TariffPlansQuery = {
-    q?: string;
-    is_active?: boolean;
-    is_default?: boolean;
-    billing_period?: BillingPeriod;
-    currency?: string;
-    limit?: number;
-    offset?: number;
-};
-
-export type TariffSubscription = {
-    id: string;
-    user_id: string;
-    plan_id: string;
-    status: string;
-    starts_at: string | null;
-    ends_at: string | null;
-    lifetime?: boolean;
-    source?: string | null;
-    note?: string | null;
-    plan?: TariffPlan | null;
-    entitlements?: Entitlements | null;
-    entitlements_overrides?: {
-        id?: string;
-        key: string;
-        int_value?: number | null;
-        bool_value?: boolean | null;
-        reason?: string | null;
-        created_at?: string | null;
-        updated_at?: string | null;
-    }[] | null;
-    created_at?: string | null;
-    updated_at?: string | null;
-};
-
-export type TariffsInitDictItem = { name?: string | null; value: string };
-export type TariffsInitData = {
-    billing_period?: TariffsInitDictItem[];
-    subscription_status?: TariffsInitDictItem[];
-    subscription_source?: TariffsInitDictItem[];
-    element_key?: TariffsInitDictItem[];
-};
-
-export type TariffInvoice = {
-    id: string;
-    user_id?: string;
-    plan_id?: string;
-    plan_name?: string;
-    plan_code?: string;
-    currency?: string;
-    subscription_id?: string;
-    invoice_id?: string;
-    provider?: string;
-    provider_uuid?: string;
-    status?: string;
-    provider_status?: string;
-    amount?: string | number | null;
-    checkout_url?: string | null;
-    short_link?: string | null;
-    created_at?: string | null;
-    updated_at?: string | null;
-};
-
-const normalizePlan = (raw: any): TariffPlan => ({
-    id: raw?.id ?? "",
-    code: raw?.code ?? "",
-    name: raw?.name ?? "",
-    description: raw?.description ?? null,
-    can_auto_bump: raw?.can_auto_bump ?? false,
-    is_active: raw?.is_active ?? raw?.isActive ?? false,
-    is_default: raw?.is_default ?? raw?.isDefault ?? false,
-    priority: raw?.priority ?? null,
-    price: raw?.price ?? null,
-    currency: raw?.currency ?? null,
-    billing_period: raw?.billing_period ?? raw?.billingPeriod ?? null,
-    entitlements: extractEntitlements(raw),
-    created_at: raw?.created_at ?? raw?.createdAt ?? null,
-    updated_at: raw?.updated_at ?? raw?.updatedAt ?? null,
-});
-
-const normalizeSubscription = (raw: any): TariffSubscription => ({
-    id: raw?.id ?? "",
-    user_id: raw?.user_id ?? raw?.userId ?? "",
-    plan_id: raw?.plan_id ?? raw?.planId ?? raw?.plan?.id ?? "",
-    status: raw?.status ?? "",
-    starts_at: raw?.starts_at ?? raw?.startsAt ?? null,
-    ends_at: raw?.ends_at ?? raw?.endsAt ?? null,
-    lifetime: raw?.lifetime ?? raw?.is_lifetime ?? raw?.isLifetime ?? undefined,
-    source: raw?.source ?? null,
-    note: raw?.note ?? null,
-    plan: raw?.plan ? normalizePlan(raw.plan) : raw?.plan ?? null,
-    entitlements: extractEntitlements(raw),
-    entitlements_overrides: Array.isArray(raw?.entitlements)
-        ? raw.entitlements.map((e: any) => ({
-            id: e?.id,
-            key: e?.key ?? "",
-            int_value: e?.int_value ?? null,
-            bool_value: e?.bool_value ?? null,
-            reason: e?.reason ?? null,
-            created_at: e?.created_at ?? null,
-            updated_at: e?.updated_at ?? null,
-        }))
-        : null,
-    created_at: raw?.created_at ?? raw?.createdAt ?? null,
-    updated_at: raw?.updated_at ?? raw?.updatedAt ?? null,
-});
-
-export type TariffMeResponse = {
-    effective_entitlements: Entitlements;
-    active_subscription: TariffSubscription | null;
-    usage?: {
-        monthKey?: string;
-        dayKey?: string;
-        cargo_creates_used?: number | string;
-        vehicle_creates_used?: number | string;
-        can_auto_bump: boolean;
-        order_details_views_used?: number | string;
-    } | null;
-    raw?: any;
-};
-
-const serializePlanPayload = (payload: UpsertTariffPlanPayload) => {
-    const base: Record<string, unknown> = {
-        code: payload.code,
-        name: payload.name,
-        description: payload.description,
-        is_active: payload.is_active,
-        is_default: payload.is_default,
-        priority: payload.priority,
-        price: payload.price,
-        currency: payload.currency,
-        billing_period: payload.billing_period,
-    };
-
-    ENTITLEMENT_KEYS.forEach((key) => {
-        if (payload.entitlements && key in payload.entitlements) {
-            base[key] = payload.entitlements[key as keyof Entitlements] as any;
-        }
-    });
-
-    return base;
-};
-
-export type CheckoutResponse = {
-    invoice_id: string;
-    subscription_id: string;
-    checkout_url: string | null;
-    short_link?: string | null;
-};
-
-export type IssueSubscriptionPayload = {
-    plan_id: string;
-    starts_at?: string | null;
-    ends_at?: string | null;
-    lifetime?: boolean;
-    note?: string | null;
-    source?: string | null;
-    cancel_previous?: boolean;
-    entitlements?: {
-        key: string;
-        int_value?: number | null;
-        bool_value?: boolean | null;
-        reason?: string | null;
-    }[];
-};
-
-export type SubscriptionEntitlementInput = {
-    key: string;
-    int_value?: number | null;
-    bool_value?: boolean | null;
-    reason?: string | null;
-};
-
-export type UpdateEntitlementsPayload = {
-    entitlements: SubscriptionEntitlementInput[];
-    replace?: boolean;
-};
-
-type ListResponse<T> = {
+type ListEnvelope<T> = {
     data?: {
         items?: T[];
         total?: number;
         page?: number;
         pages?: number;
         limit?: number;
+        offset?: number;
     };
     items?: T[];
     total?: number;
     page?: number;
     pages?: number;
     limit?: number;
+    offset?: number;
 };
 
-const extractList = <T>(raw: any) => {
-    const payload: ListResponse<T> = raw?.data ?? raw;
-    const items = (payload?.data?.items ?? payload?.items ?? []) as T[];
-    const total = payload?.data?.total ?? payload?.total ?? items.length;
-    const page = payload?.data?.page ?? payload?.page ?? 1;
-    const pages = payload?.data?.pages ?? payload?.pages ?? 1;
-    const limit = payload?.data?.limit ?? payload?.limit ?? (items.length || 10);
-    return { items, total, page, pages, limit };
+const getPayload = <T = any>(data: any): T => {
+    return (data?.data ?? data ?? {}) as T;
+};
+
+const getListPayload = <T>(data: any) => {
+    const payload = getPayload<ListEnvelope<T>>(data);
+    const nested = payload?.data;
+
+    const items = (nested?.items ?? payload?.items ?? []) as T[];
+    const total = nested?.total ?? payload?.total ?? items.length;
+    const page = nested?.page ?? payload?.page ?? 1;
+    const pages = nested?.pages ?? payload?.pages ?? 1;
+    const limit = nested?.limit ?? payload?.limit ?? items.length;
+    const offset = nested?.offset ?? payload?.offset ?? 0;
+
+    return { items, total, page, pages, limit, offset };
+};
+
+const toNullableNumber = (value: unknown): number | null => {
+    if (value === null || value === undefined || value === "") return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toBoolean = (value: unknown, fallback = false): boolean => {
+    if (typeof value === "boolean") return value;
+    if (value === null || value === undefined) return fallback;
+    return Boolean(value);
+};
+
+const extractEntitlements = (raw: any): Entitlements => {
+    const nested = raw?.entitlements && typeof raw.entitlements === "object" ? raw.entitlements : {};
+
+    return {
+        cargo_limit: raw?.cargo_limit ?? nested?.cargo_limit ?? null,
+        vehicle_limit: raw?.vehicle_limit ?? nested?.vehicle_limit ?? null,
+        can_view_order_details: toBoolean(
+            raw?.can_view_order_details ?? nested?.can_view_order_details,
+            false,
+        ),
+        order_details_views_per_day_limit:
+            raw?.order_details_views_per_day_limit ??
+            nested?.order_details_views_per_day_limit ??
+            null,
+        can_auto_bump: toBoolean(raw?.can_auto_bump ?? nested?.can_auto_bump, false),
+        can_create_companies: toBoolean(
+            raw?.can_create_companies ?? nested?.can_create_companies,
+            false,
+        ),
+        company_limit: raw?.company_limit ?? nested?.company_limit ?? null,
+        members_per_company_limit:
+            raw?.members_per_company_limit ?? nested?.members_per_company_limit ?? null,
+    };
+};
+
+const normalizePlan = (raw: any): TariffPlan => {
+    const entitlements = extractEntitlements(raw);
+
+    return {
+        id: raw?.id ?? "",
+        code: raw?.code ?? "",
+        name: raw?.name ?? "",
+        description: raw?.description ?? null,
+        is_active: toBoolean(raw?.is_active ?? raw?.isActive, false),
+        is_default: toBoolean(raw?.is_default ?? raw?.isDefault, false),
+        can_auto_bump: toBoolean(raw?.can_auto_bump ?? entitlements.can_auto_bump, false),
+        priority: toNullableNumber(raw?.priority),
+        price:
+            raw?.price === null || raw?.price === undefined || raw?.price === ""
+                ? null
+                : String(raw.price),
+        currency: raw?.currency ?? null,
+        billing_period: (raw?.billing_period ?? raw?.billingPeriod ?? null) as BillingPeriod | null,
+
+        cargo_limit: entitlements.cargo_limit ?? null,
+        vehicle_limit: entitlements.vehicle_limit ?? null,
+        can_view_order_details: entitlements.can_view_order_details ?? false,
+        order_details_views_per_day_limit:
+            entitlements.order_details_views_per_day_limit ?? null,
+        can_create_companies: entitlements.can_create_companies ?? false,
+        company_limit: entitlements.company_limit ?? null,
+        members_per_company_limit: entitlements.members_per_company_limit ?? null,
+
+        meta: raw?.meta ?? null,
+        entitlements,
+        created_at: raw?.created_at ?? raw?.createdAt ?? null,
+        updated_at: raw?.updated_at ?? raw?.updatedAt ?? null,
+    };
+};
+
+const normalizeSubscription = (raw: any): TariffSubscription => {
+    const entitlements = extractEntitlements(raw);
+
+    return {
+        id: raw?.id ?? "",
+        user_id: raw?.user_id ?? raw?.userId ?? "",
+        plan_id: raw?.plan_id ?? raw?.planId ?? raw?.plan?.id ?? "",
+        status: raw?.status ?? "",
+        starts_at: raw?.starts_at ?? raw?.startsAt ?? null,
+        ends_at: raw?.ends_at ?? raw?.endsAt ?? null,
+        lifetime: raw?.lifetime ?? raw?.is_lifetime ?? raw?.isLifetime ?? undefined,
+        source: raw?.source ?? null,
+        note: raw?.note ?? null,
+        plan: raw?.plan ? normalizePlan(raw.plan) : null,
+        entitlements,
+        entitlements_overrides: Array.isArray(raw?.entitlements_overrides)
+            ? raw.entitlements_overrides.map((item: any) => ({
+                id: item?.id,
+                key: item?.key ?? "",
+                int_value: item?.int_value ?? null,
+                bool_value: item?.bool_value ?? null,
+                reason: item?.reason ?? null,
+                created_at: item?.created_at ?? null,
+                updated_at: item?.updated_at ?? null,
+            }))
+            : Array.isArray(raw?.entitlements)
+                ? raw.entitlements.map((item: any) => ({
+                    id: item?.id,
+                    key: item?.key ?? item?.entitlement_key ?? "",
+                    int_value: item?.int_value ?? null,
+                    bool_value: item?.bool_value ?? null,
+                    reason: item?.reason ?? null,
+                    created_at: item?.created_at ?? null,
+                    updated_at: item?.updated_at ?? null,
+                }))
+                : null,
+        created_at: raw?.created_at ?? raw?.createdAt ?? null,
+        updated_at: raw?.updated_at ?? raw?.updatedAt ?? null,
+    };
+};
+
+const normalizeInvoice = (raw: any): TariffInvoice => {
+    return {
+        id: raw?.id ?? "",
+        user_id: raw?.user_id ?? raw?.userId,
+        plan_id: raw?.plan_id ?? raw?.planId,
+        plan_name: raw?.plan_name ?? raw?.planName,
+        plan_code: raw?.plan_code ?? raw?.planCode,
+        currency: raw?.currency,
+        subscription_id: raw?.subscription_id ?? raw?.subscriptionId,
+        invoice_id: raw?.invoice_id ?? raw?.invoiceId,
+        provider: raw?.provider,
+        provider_uuid: raw?.provider_uuid ?? raw?.providerUuid,
+        status: raw?.status,
+        provider_status: raw?.provider_status ?? raw?.providerStatus,
+        amount: raw?.amount ?? null,
+        checkout_url: raw?.checkout_url ?? raw?.checkoutUrl ?? null,
+        short_link: raw?.short_link ?? raw?.shortLink ?? null,
+        created_at: raw?.created_at ?? raw?.createdAt ?? null,
+        updated_at: raw?.updated_at ?? raw?.updatedAt ?? null,
+    };
+};
+
+const normalizePlanPayload = (
+    payload: UpsertTariffPlanPayload,
+): UpsertTariffPlanPayload => {
+    return {
+        code: payload.code.trim(),
+        name: payload.name.trim(),
+        description: payload.description?.trim() || null,
+        is_active: payload.is_active,
+        is_default: payload.is_default,
+        can_auto_bump: payload.can_auto_bump,
+        priority: payload.priority ?? null,
+        price:
+            payload.price === null || payload.price === undefined || payload.price === ""
+                ? null
+                : String(payload.price).trim(),
+        currency: payload.currency?.trim()?.toUpperCase() || null,
+        billing_period: payload.billing_period || null,
+
+        cargo_limit: payload.cargo_limit ?? null,
+        vehicle_limit: payload.vehicle_limit ?? null,
+        can_view_order_details: payload.can_view_order_details ?? false,
+        order_details_views_per_day_limit:
+            payload.order_details_views_per_day_limit ?? null,
+        can_create_companies: payload.can_create_companies ?? false,
+        company_limit: payload.company_limit ?? null,
+        members_per_company_limit: payload.members_per_company_limit ?? null,
+
+        meta: payload.meta,
+    };
+};
+
+const normalizeMeResponse = (data: any): TariffMeResponse => {
+    const payload = getPayload<any>(data);
+    const activeRaw = payload?.active_subscription ?? null;
+
+    return {
+        effective_entitlements: extractEntitlements(
+            payload?.effective_entitlements ?? payload,
+        ),
+        active_subscription: activeRaw ? normalizeSubscription(activeRaw) : null,
+        usage: payload?.usage ?? null,
+        raw: payload,
+    };
 };
 
 export const tariffsApi = {
-    async adminListPlans(params?: TariffPlansQuery) {
-        const { data } = await api.get<any>("/admin/tariffs/plans", { params });
-        const payload = (data as any)?.data ?? data ?? {};
-        const itemsRaw = payload?.items ?? [];
-        const items = Array.isArray(itemsRaw) ? itemsRaw.map(normalizePlan) : [];
-        const total = payload?.total ?? items.length;
-        const limit = payload?.limit ?? params?.limit ?? items.length;
-        const offset = payload?.offset ?? params?.offset ?? 0;
-        return { items, total, limit, offset };
+    adminListPlans: async (params?: TariffPlansQuery) => {
+        const { data } = await api.get("/admin/tariffs/plans", { params });
+        const payload = getListPayload<any>(data);
+
+        return {
+            items: payload.items.map(normalizePlan),
+            total: payload.total,
+            limit: payload.limit,
+            offset: payload.offset,
+        };
     },
 
-    async adminGetPlan(id: string) {
-        const { data } = await api.get<any>(`/admin/tariffs/plans/${id}`);
-        const payload = (data as any)?.data ?? data ?? {};
-        return normalizePlan(payload);
+    adminGetPlan: async (id: string) => {
+        const { data } = await api.get(`/admin/tariffs/plans/${id}`);
+        return normalizePlan(getPayload(data));
     },
 
-    async adminCreatePlan(payload: UpsertTariffPlanPayload) {
-        const { data } = await api.post<{ data: TariffPlan }>(
+    adminCreatePlan: async (payload: UpsertTariffPlanPayload) => {
+        const { data } = await api.post(
             "/admin/tariffs/plans",
-            serializePlanPayload(payload)
+            normalizePlanPayload(payload),
         );
-        const payloadData = (data as any)?.data ?? data ?? {};
-        return normalizePlan(payloadData);
+        return normalizePlan(getPayload(data));
     },
 
-    async adminUpdatePlan(id: string, payload: UpsertTariffPlanPayload) {
-        const { data } = await api.patch<{ data: TariffPlan }>(
+    adminUpdatePlan: async (id: string, payload: UpsertTariffPlanPayload) => {
+        const { data } = await api.patch(
             `/admin/tariffs/plans/${id}`,
-            serializePlanPayload(payload)
+            normalizePlanPayload(payload),
         );
-        const payloadData = (data as any)?.data ?? data ?? {};
-        return normalizePlan(payloadData);
+        return normalizePlan(getPayload(data));
     },
 
-    async adminDeactivatePlan(id: string) {
-        const { data } = await api.delete<{ data?: unknown }>(`/admin/tariffs/plans/${id}`);
-        const payload = (data as any)?.data ?? data ?? {};
-        return payload;
+    adminDeactivatePlan: async (id: string) => {
+        const { data } = await api.delete(`/admin/tariffs/plans/${id}`);
+        return getPayload(data);
     },
 
-    async adminHardDeletePlan(id: string) {
-        const { data } = await api.delete<{ data?: unknown }>(`/admin/tariffs/plans/${id}/hard`);
-        const payload = (data as any)?.data ?? data ?? {};
-        return payload;
+    adminHardDeletePlan: async (id: string) => {
+        const { data } = await api.delete(`/admin/tariffs/plans/${id}/hard`);
+        return getPayload(data);
     },
 
-    async adminInit(): Promise<TariffsInitData> {
-        const { data } = await api.get<any>("/admin/tariffs/init");
-        const payload = (data as any)?.data ?? data ?? {};
-        return payload as TariffsInitData;
+    adminInit: async (): Promise<TariffsInitData> => {
+        const { data } = await api.get("/admin/tariffs/init");
+        return getPayload<TariffsInitData>(data);
     },
 
-    async adminListUserSubscriptions(userId: string) {
-        const { data } = await api.get<any>(`/admin/tariffs/users/${userId}/subscriptions`);
-        const payload = (data as any)?.data ?? data ?? {};
-        const itemsRaw = payload?.items ?? [];
-        const items = Array.isArray(itemsRaw) ? itemsRaw.map(normalizeSubscription) : [];
-        const total = payload?.total ?? items.length;
-        const limit = payload?.limit ?? items.length;
-        const offset = payload?.offset ?? 0;
-        return { items, total, limit, offset };
+    adminListUserSubscriptions: async (userId: string) => {
+        const { data } = await api.get(`/admin/tariffs/users/${userId}/subscriptions`);
+        const payload = getListPayload<any>(data);
+
+        return {
+            items: payload.items.map(normalizeSubscription),
+            total: payload.total,
+            limit: payload.limit,
+            offset: payload.offset,
+        };
     },
 
-    async adminGetActiveSubscription(userId: string) {
-        const { data } = await api.get<any>(`/admin/tariffs/users/${userId}/subscriptions/active`);
-        const payload = (data as any)?.data ?? data ?? null;
+    adminGetActiveSubscription: async (userId: string) => {
+        const { data } = await api.get(
+            `/admin/tariffs/users/${userId}/subscriptions/active`,
+        );
+        const payload = getPayload<any>(data);
         return payload ? normalizeSubscription(payload) : null;
     },
 
-    async adminGetEffectiveEntitlements(userId: string): Promise<TariffMeResponse> {
-        const { data } = await api.get<any>(`/admin/tariffs/users/${userId}/effective-entitlements`);
-        const payload = (data as any)?.data ?? data ?? {};
-        const entitlements = extractEntitlements(payload);
-        const activeRaw = payload?.active_subscription ?? null;
-        const active = activeRaw ? normalizeSubscription(activeRaw) : null;
-        return {
-            effective_entitlements: entitlements,
-            active_subscription: active,
-            usage: payload?.usage ?? null,
-            raw: payload,
-        };
+    adminGetEffectiveEntitlements: async (
+        userId: string,
+    ): Promise<TariffMeResponse> => {
+        const { data } = await api.get(
+            `/admin/tariffs/users/${userId}/effective-entitlements`,
+        );
+        return normalizeMeResponse(data);
     },
 
-    async adminIssueSubscription(userId: string, payload: IssueSubscriptionPayload) {
-        const body: Record<string, unknown> = {
-            plan_id: payload.plan_id,
-            source: payload.source,
-            starts_at: payload.starts_at,
-            ends_at: payload.lifetime ? null : payload.ends_at,
-            is_lifetime: payload.lifetime,
-            note: payload.note,
-            cancel_previous: payload.cancel_previous,
-        };
-
-        if (payload.entitlements) {
-            body.entitlements = payload.entitlements.map((e) => ({
-                key: e.key,
-                int_value: e.int_value,
-                bool_value: e.bool_value,
-                reason: e.reason,
-            }));
-        }
-
-        const { data } = await api.post<{ data: TariffSubscription }>(
+    adminIssueSubscription: async (
+        userId: string,
+        payload: IssueSubscriptionPayload,
+    ) => {
+        const { data } = await api.post(
             `/admin/tariffs/users/${userId}/subscriptions`,
-            body
+            {
+                plan_id: payload.plan_id,
+                source: payload.source,
+                starts_at: payload.starts_at,
+                ends_at: payload.lifetime ? null : payload.ends_at,
+                is_lifetime: payload.lifetime,
+                note: payload.note,
+                cancel_previous: payload.cancel_previous,
+                entitlements: payload.entitlements?.map((item) => ({
+                    key: item.key,
+                    int_value: item.int_value,
+                    bool_value: item.bool_value,
+                    reason: item.reason,
+                })),
+            },
         );
-        const payloadData = (data as any)?.data ?? data ?? {};
-        return normalizeSubscription(payloadData);
+
+        return normalizeSubscription(getPayload(data));
     },
 
-    async adminCancelSubscription(id: string) {
-        const { data } = await api.patch<{ data: TariffSubscription }>(
-            `/admin/tariffs/subscriptions/${id}/cancel`
+    adminCancelSubscription: async (id: string) => {
+        const { data } = await api.patch(
+            `/admin/tariffs/subscriptions/${id}/cancel`,
         );
-        const payload = (data as any)?.data ?? data ?? {};
-        return payload;
+        return getPayload(data);
     },
 
-    async adminUpdateSubscriptionEntitlements(id: string, payload: UpdateEntitlementsPayload) {
-        const body = {
-            entitlements: payload.entitlements,
-            replace: payload.replace ?? false,
-        };
-        const { data } = await api.put<any>(`/admin/tariffs/subscriptions/${id}/entitlements`, body);
-        const payloadData = (data as any)?.data ?? data ?? {};
-        return payloadData;
+    adminUpdateSubscriptionEntitlements: async (
+        id: string,
+        payload: UpdateEntitlementsPayload,
+    ) => {
+        const { data } = await api.put(
+            `/admin/tariffs/subscriptions/${id}/entitlements`,
+            {
+                entitlements: payload.entitlements,
+                replace: payload.replace ?? false,
+            },
+        );
+
+        return getPayload(data);
     },
 
-    async adminListInvoices(userId: string) {
-        const { data } = await api.get<any>(`/admin/tariffs/invoices/${userId}/list`);
-        const payload = (data as any)?.data ?? data ?? {};
-        const itemsRaw = payload?.items ?? [];
-        const items = Array.isArray(itemsRaw) ? (itemsRaw as any[] as TariffInvoice[]) : [];
-        const total = payload?.total ?? items.length;
-        const limit = payload?.limit ?? items.length;
-        const offset = payload?.offset ?? 0;
-        return { items, total, limit, offset };
-    },
+    adminListInvoices: async (userId: string) => {
+        const { data } = await api.get(`/admin/tariffs/invoices/${userId}/list`);
+        const payload = getListPayload<any>(data);
 
-    async adminDeleteInvoice(id: string) {
-        const { data } = await api.delete<any>(`/admin/tariffs/invoices/${id}`);
-        const payload = (data as any)?.data ?? data ?? {};
-        return payload;
-    },
-
-    async listPublicPlans(params?: TariffPlansQuery) {
-        const { data } = await api.get<any>("/tariff-plans", { params });
-        const payload = (data as any)?.data ?? data ?? {};
-        const itemsRaw = payload?.items ?? [];
-        const items = Array.isArray(itemsRaw) ? itemsRaw.map(normalizePlan) : [];
-        const total = payload?.total ?? items.length;
-        const limit = payload?.limit ?? params?.limit ?? items.length;
-        const offset = payload?.offset ?? params?.offset ?? 0;
-        return { items, total, limit, offset };
-    },
-
-    async listMySubscriptions() {
-        const { data } = await api.get<ListResponse<TariffSubscription>>("/tariffs/subscriptions");
-        return extractList<TariffSubscription>(data);
-    },
-
-    async listMyHistory() {
-        const { data } = await api.get<any>("/tariffs/history");
-        const payload = (data as any)?.data ?? data ?? {};
-        const itemsRaw = payload?.items ?? [];
-        const items = Array.isArray(itemsRaw) ? itemsRaw.map(normalizeSubscription) : [];
-        const total = payload?.total ?? items.length;
-        const limit = payload?.limit ?? items.length;
-        const offset = payload?.offset ?? 0;
-        return { items, total, limit, offset };
-    },
-
-    async listMyInvoices() {
-        const { data } = await api.get<any>("/tariffs/invoices");
-        const payload = (data as any)?.data ?? data ?? {};
-        const itemsRaw = payload?.items ?? [];
-        const items = Array.isArray(itemsRaw) ? (itemsRaw as any[] as TariffInvoice[]) : [];
-        const total = payload?.total ?? items.length;
-        const limit = payload?.limit ?? items.length;
-        const offset = payload?.offset ?? 0;
-        return { items, total, limit, offset };
-    },
-
-    async getMyTariff(): Promise<TariffMeResponse> {
-        const { data } = await api.get<any>("/tariffs/me");
-        const payload = (data as any)?.data ?? data ?? {};
-        const entitlements = extractEntitlements(payload);
-        const activeRaw = payload?.active_subscription ?? null;
-        const active = activeRaw ? normalizeSubscription(activeRaw) : null;
         return {
-            effective_entitlements: entitlements,
-            active_subscription: active,
-            raw: payload,
+            items: payload.items.map(normalizeInvoice),
+            total: payload.total,
+            limit: payload.limit,
+            offset: payload.offset,
         };
     },
 
-    async adminAssignDefaultSubscription(userId: string) {
-        const { data } = await api.post<any>(`/admin/tariffs/users/${userId}/assign-default`);
-        const payload = (data as any)?.data ?? data ?? {};
-        return payload;
+    adminDeleteInvoice: async (id: string) => {
+        const { data } = await api.delete(`/admin/tariffs/invoices/${id}`);
+        return getPayload(data);
     },
 
-    async checkout(plan_id: string): Promise<CheckoutResponse> {
-        const { data } = await api.post<any>("/tariffs/checkout", { plan_id });
-        const payload = (data as any)?.data ?? data ?? {};
+    listPublicPlans: async (params?: TariffPlansQuery) => {
+        const { data } = await api.get("/tariff-plans", { params });
+        const payload = getListPayload<any>(data);
+
+        return {
+            items: payload.items.map(normalizePlan),
+            total: payload.total,
+            limit: payload.limit,
+            offset: payload.offset,
+        };
+    },
+
+    listMySubscriptions: async () => {
+        const { data } = await api.get("/tariffs/subscriptions");
+        const payload = getListPayload<any>(data);
+
+        return {
+            items: payload.items.map(normalizeSubscription),
+            total: payload.total,
+            page: payload.page,
+            pages: payload.pages,
+            limit: payload.limit,
+            offset: payload.offset,
+        };
+    },
+
+    listMyHistory: async () => {
+        const { data } = await api.get("/tariffs/history");
+        const payload = getListPayload<any>(data);
+
+        return {
+            items: payload.items.map(normalizeSubscription),
+            total: payload.total,
+            limit: payload.limit,
+            offset: payload.offset,
+        };
+    },
+
+    listMyInvoices: async () => {
+        const { data } = await api.get("/tariffs/invoices");
+        const payload = getListPayload<any>(data);
+
+        return {
+            items: payload.items.map(normalizeInvoice),
+            total: payload.total,
+            limit: payload.limit,
+            offset: payload.offset,
+        };
+    },
+
+    getMyTariff: async (): Promise<TariffMeResponse> => {
+        const { data } = await api.get("/tariffs/me");
+        return normalizeMeResponse(data);
+    },
+
+    adminAssignDefaultSubscription: async (userId: string) => {
+        const { data } = await api.post(
+            `/admin/tariffs/users/${userId}/assign-default`,
+        );
+        return getPayload(data);
+    },
+
+    checkout: async (plan_id: string): Promise<CheckoutResponse> => {
+        const { data } = await api.post("/tariffs/checkout", { plan_id });
+        const payload = getPayload<any>(data);
+
         return {
             invoice_id: payload?.invoice_id ?? payload?.id ?? "",
             subscription_id: payload?.subscription_id ?? "",

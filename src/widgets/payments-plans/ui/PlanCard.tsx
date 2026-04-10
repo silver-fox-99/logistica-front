@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import { Box, Button, Card, CardContent, Chip, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { FiArrowUpRight, FiCheckCircle, FiShield, FiX } from "react-icons/fi";
-import type { TariffPlan } from "@/shared/api/tariffsApi";
 import { priceLabel, normalizeValueDisplay } from "@/entities/tariff/lib/plan";
 import { formatEntitlementValue } from "@/shared/config/entitlements";
 import { useTranslation } from "react-i18next";
+import type {TariffPlan} from "@/entities/tariff-plan/model/types.ts";
 
 const pleasantGreen = "#2e7d32";
 const pleasantRed = "#d32f2f";
@@ -27,6 +27,7 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
             { label: t("paymentsNew.cargoLimit", "Cargo limit / month"), value: formatEntitlementValue("cargo_limit", plan.entitlements?.cargo_limit) },
             { label: t("paymentsNew.vehicleLimit", "Vehicle limit / month"), value: formatEntitlementValue("vehicle_limit", plan.entitlements?.vehicle_limit) },
             { label: t("paymentsNew.orderDetails", "Order details access"), value: formatEntitlementValue("can_view_order_details", plan.entitlements?.can_view_order_details) },
+            { label: t("paymentsNew.autoBump", "Can auto bump orders"), value: formatEntitlementValue("can_auto_bump", plan.entitlements?.can_auto_bump) },
             { label: t("paymentsNew.companies", "Company creation"), value: formatEntitlementValue("can_create_companies", plan.entitlements?.can_create_companies) },
         ],
         [plan, t]

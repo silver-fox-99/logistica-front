@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, Chip, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import { FiExternalLink } from "react-icons/fi";
-import type { TariffInvoice } from "@/shared/api/tariffsApi.ts";
 
 import { useTranslation } from "react-i18next";
 import {formatDateTimeEnGB} from "@/shared/lib/format/formatDateTime.ts";
+import type {TariffInvoice} from "@/entities/tariff-plan/model/types.ts";
 
 type Props = {
     invoices: TariffInvoice[];

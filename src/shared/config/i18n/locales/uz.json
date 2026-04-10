@@ -643,6 +643,7 @@
     "subtitle": "O'zingizga mos tarifni tanlang. Hozircha xarid qo'llab-quvvatlash orqali amalga oshiriladi.",
     "refresh": "Yangilash",
     "loading": "Yuklanmoqda…",
+    "autoBump": "Buyurtmalarni avtomatik yuqoriga chiqarish",
     "current": "Joriy reja",
     "perks": "Nima kiradi",
     "cargoLimit": "Oyiga yuk limiti:",

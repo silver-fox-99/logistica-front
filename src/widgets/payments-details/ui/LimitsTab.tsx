@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { Box, Card, CardContent, Chip, LinearProgress, Stack, Typography } from "@mui/material";
 import { FiCheckCircle } from "react-icons/fi";
-import type { Entitlements, TariffMeResponse } from "@/shared/api/tariffsApi";
 import { buildLimitItemsConfig, usageKeyMap } from "@/entities/tariff/lib/limits";
 import { useTranslation } from "react-i18next";
+import type {Entitlements, TariffMeResponse} from "@/entities/tariff-plan/model/types.ts";
 
 const pleasantGreen = "#2e7d32";
 const pleasantRed = "#d32f2f";

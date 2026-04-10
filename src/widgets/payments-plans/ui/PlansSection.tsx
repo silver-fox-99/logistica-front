@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import type { TariffPlan } from "@/shared/api/tariffsApi";
 import { PlanCard } from "./PlanCard";
 import { useTranslation } from "react-i18next";
+import type {TariffPlan} from "@/entities/tariff-plan/model/types.ts";
 
 type Props = {
     plans: TariffPlan[];

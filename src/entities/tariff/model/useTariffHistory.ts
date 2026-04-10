@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { tariffsApi, type TariffSubscription } from "@/shared/api/tariffsApi";
+import { tariffsApi } from "@/shared/api/tariffsApi";
 import type { TFunction } from "i18next";
+import type {TariffSubscription} from "@/entities/tariff-plan/model/types.ts";
 
 export const useTariffHistory = (t: TFunction) => {
     const [items, setItems] = useState<TariffSubscription[]>([]);
