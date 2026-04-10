@@ -20,6 +20,7 @@ export const usageKeyMap: Record<
     order_details_views_per_day_limit: "order_details_views_used",
     can_create_companies: null,
     company_limit: null,
+    can_auto_bump: "can_auto_bump",
     members_per_company_limit: null,
 };
 

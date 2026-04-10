@@ -206,6 +206,7 @@ export type TariffMeResponse = {
         dayKey?: string;
         cargo_creates_used?: number | string;
         vehicle_creates_used?: number | string;
+        can_auto_bump: boolean;
         order_details_views_used?: number | string;
     } | null;
     raw?: any;
