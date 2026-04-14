@@ -171,8 +171,18 @@ export type CheckoutResponse = {
     short_link?: string | null;
 };
 
+export type ApiEntitlementKey =
+    | "CARGO_LIMIT"
+    | "VEHICLE_LIMIT"
+    | "CAN_AUTO_BUMP"
+    | "CAN_VIEW_ORDER_DETAILS"
+    | "ORDER_DETAILS_VIEWS_PER_DAY_LIMIT"
+    | "CAN_CREATE_COMPANIES"
+    | "COMPANY_LIMIT"
+    | "MEMBERS_PER_COMPANY_LIMIT";
+
 export type SubscriptionEntitlementInput = {
-    key: string;
+    key: ApiEntitlementKey;
     int_value?: number | null;
     bool_value?: boolean | null;
     reason?: string | null;

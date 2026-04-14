@@ -12,7 +12,7 @@ export const ENTITLEMENTS: EntitlementMeta[] = [
     { key: "cargo_limit", label: "Создание грузов", type: "number", hint: "Максимум грузов в месяц" },
     { key: "vehicle_limit", label: "Создание транспорта", type: "number", hint: "Максимум транспорта в месяц" },
     { key: "can_auto_bump", label: "Авто поднятие заявок", type: "boolean" },
-    { key: "can_view_order_details", label: "Can view order details", type: "boolean" },
+    { key: "can_view_order_details", label: "Может просматривать детали заказов", type: "boolean" },
     { key: "order_details_views_per_day_limit", label: "Ежедневный просмотр подробностей", type: "number" },
     { key: "can_create_companies", label: "Возможность созданий компаний", type: "boolean" },
     { key: "company_limit", label: "Лимит компаний", type: "number" },

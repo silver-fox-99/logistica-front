@@ -16,38 +16,77 @@ import { FiCheck, FiX } from "react-icons/fi";
 
 import { ENTITLEMENTS } from "@/shared/config/entitlements";
 import type {
-    Entitlements,
+    ApiEntitlementKey,
+    EntitlementKey, SubscriptionEntitlementInput,
     TariffSubscription,
+    UpdateEntitlementsPayload,
 } from "@/entities/tariff-plan/model/types";
 
 type FormValues = {
     reason: string;
 } & Record<string, string | boolean>;
 
+const entitlementApiKeyMap: Record<EntitlementKey, ApiEntitlementKey> = {
+    cargo_limit: "CARGO_LIMIT",
+    vehicle_limit: "VEHICLE_LIMIT",
+    can_auto_bump: "CAN_AUTO_BUMP",
+    can_view_order_details: "CAN_VIEW_ORDER_DETAILS",
+    order_details_views_per_day_limit: "ORDER_DETAILS_VIEWS_PER_DAY_LIMIT",
+    can_create_companies: "CAN_CREATE_COMPANIES",
+    company_limit: "COMPANY_LIMIT",
+    members_per_company_limit: "MEMBERS_PER_COMPANY_LIMIT",
+};
+
 type Props = {
     open: boolean;
     subscription: TariffSubscription | null;
     onClose: () => void;
-    onSubmit: (entitlements: Entitlements, reason: string) => Promise<void> | void;
+    onSubmit: (payload: UpdateEntitlementsPayload) => Promise<void> | void;
     loading?: boolean;
 };
 
-const entitlementToFormDefaults = (subscription: TariffSubscription | null): FormValues => {
-    const source = subscription?.entitlements ?? {};
+const getSubscriptionValueMap = (subscription: TariffSubscription | null) => {
+    const map = new Map<string, { int_value?: number | null; bool_value?: boolean | null }>();
 
+    subscription?.entitlements_overrides?.forEach((item) => {
+        map.set(item.key, {
+            int_value: item.int_value ?? null,
+            bool_value: item.bool_value ?? null,
+        });
+    });
+
+    subscription?.entitlements_overrides?.forEach((item) => {
+        map.set(item.key, {
+            int_value: item.int_value ?? null,
+            bool_value: item.bool_value ?? null,
+        });
+    });
+
+    return map;
+};
+
+const entitlementToFormDefaults = (subscription: TariffSubscription | null): FormValues => {
     const result: FormValues = {
         reason: "",
     };
 
+    const overridesMap = getSubscriptionValueMap(subscription);
+
     ENTITLEMENTS.forEach((item) => {
-        const value = source[item.key];
+        const apiKey = entitlementApiKeyMap[item.key];
+        const overrideValue = overridesMap.get(apiKey);
 
         if (item.type === "boolean") {
-            result[item.key] = Boolean(value);
+            result[item.key] = Boolean(overrideValue?.bool_value);
             return;
         }
 
-        result[item.key] = value === null || value === undefined ? "" : String(value);
+        if (overrideValue?.int_value === null || overrideValue?.int_value === undefined) {
+            result[item.key] = "";
+            return;
+        }
+
+        result[item.key] = String(overrideValue.int_value);
     });
 
     return result;
@@ -72,26 +111,43 @@ export function EditEntitlementsDialog({
     const submitHandler = handleSubmit(async (values) => {
         const reason = String(values.reason || "").trim();
 
-        const nextEntitlements: Partial<Record<keyof Entitlements, number | boolean | null>> = {};
-
-        ENTITLEMENTS.forEach((item) => {
+        const entitlements: SubscriptionEntitlementInput[] = ENTITLEMENTS.flatMap<SubscriptionEntitlementInput>((item) => {
             const rawValue = values[item.key];
+            const apiKey = entitlementApiKeyMap[item.key];
 
             if (item.type === "boolean") {
-                nextEntitlements[item.key] = Boolean(rawValue);
-                return;
+                return [
+                    {
+                        key: apiKey,
+                        bool_value: Boolean(rawValue),
+                        reason,
+                    },
+                ];
             }
 
             if (rawValue === "" || rawValue === null || rawValue === undefined) {
-                nextEntitlements[item.key] = null;
-                return;
+                return [];
             }
 
             const parsed = Number(rawValue);
-            nextEntitlements[item.key] = Number.isFinite(parsed) ? parsed : null;
+
+            if (!Number.isFinite(parsed) || parsed < 0) {
+                return [];
+            }
+
+            return [
+                {
+                    key: apiKey,
+                    int_value: parsed,
+                    reason,
+                },
+            ];
         });
 
-        await onSubmit(nextEntitlements as Entitlements, reason);
+        await onSubmit({
+            entitlements,
+            replace: true,
+        });
     });
 
     return (
@@ -138,6 +194,8 @@ export function EditEntitlementsDialog({
                                         fullWidth
                                         value={field.value}
                                         onChange={field.onChange}
+                                        inputProps={{ min: 0 }}
+                                        helperText={item.hint || "Leave empty to remove override"}
                                     />
                                 )}
                             />
@@ -158,6 +216,7 @@ export function EditEntitlementsDialog({
                 <Button onClick={onClose} variant="outlined" startIcon={<FiX />} disabled={loading}>
                     Close
                 </Button>
+
                 <Button
                     onClick={submitHandler}
                     variant="contained"

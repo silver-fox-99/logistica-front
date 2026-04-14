@@ -19,9 +19,8 @@ import { tariffsApi } from "@/shared/api/tariffsApi";
 import { ENTITLEMENTS, formatEntitlementValue } from "@/shared/config/entitlements";
 import type {
     Entitlements,
-    SubscriptionEntitlementInput,
     TariffPlan,
-    TariffSubscription,
+    TariffSubscription, UpdateEntitlementsPayload,
 } from "@/entities/tariff-plan/model/types";
 import { IssueSubscriptionDialog } from "@/features/admin/tariffs/issue-subscription/ui/IssueSubscriptionDialog";
 import { EditEntitlementsDialog } from "@/features/admin/tariffs/edit-entitlements/ui/EditEntitlementsDialog";
@@ -118,38 +117,12 @@ export default function TariffCard({ userId }: TariffCardProps) {
         }
     };
 
-    const handleEntitlements = async (entitlements: Entitlements, reason: string) => {
+    const handleEntitlements = async (payload: UpdateEntitlementsPayload) => {
         if (!targetSub) return;
 
         setEditLoading(true);
         try {
-            const entList: SubscriptionEntitlementInput[] = [];
-
-            ENTITLEMENTS.forEach((meta) => {
-                const value = entitlements[meta.key];
-
-                if (value === undefined) return;
-
-                if (meta.type === "boolean") {
-                    entList.push({
-                        key: meta.key.toUpperCase(),
-                        bool_value: Boolean(value),
-                        reason,
-                    });
-                    return;
-                }
-
-                entList.push({
-                    key: meta.key.toUpperCase(),
-                    int_value: value === null ? null : Number(value),
-                    reason,
-                });
-            });
-
-            await tariffsApi.adminUpdateSubscriptionEntitlements(targetSub.id, {
-                entitlements: entList,
-                replace: false,
-            });
+            await tariffsApi.adminUpdateSubscriptionEntitlements(targetSub.id, payload);
 
             setEditOpen(false);
             await loadData();
