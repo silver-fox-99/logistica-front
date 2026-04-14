@@ -1,4 +1,5 @@
-import type { EntitlementKey } from "@/shared/api/tariffsApi";
+import type {EntitlementKey} from "@/entities/tariff-plan/model/types.ts";
+
 
 export type EntitlementMeta = {
     key: EntitlementKey;

@@ -1,4 +1,4 @@
-import type { TariffSubscription, Entitlements } from "@/shared/api/tariffsApi";
+import type {Entitlements, TariffSubscription} from "@/entities/tariff-plan/model/types.ts";
 
 export type RegistrationStage =
     | "PENDING"

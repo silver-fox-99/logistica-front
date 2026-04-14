@@ -1,4 +1,4 @@
-import type { TariffPlanFormValues, TariffPlanLike } from "./tariff-plan.types";
+import type { TariffPlanFormValues } from "./tariff-plan.types";
 import type {BillingPeriod, TariffPlan, UpsertTariffPlanPayload} from "@/entities/tariff-plan/model/types.ts";
 
 export const FALLBACK_BILLING_PERIODS: { value: BillingPeriod; label: string }[] = [
@@ -38,37 +38,43 @@ const toNullableNumber = (value: unknown): number | null => {
 
 const toBoolean = (value: unknown): boolean => Boolean(value);
 
-export const mapPlanToFormValues = (plan: TariffPlanLike): TariffPlanFormValues => {
+export const mapPlanToFormValues = (plan: TariffPlan): TariffPlanFormValues => {
     const ent = plan.entitlements ?? {};
 
     return {
         code: plan.code ?? "",
         name: plan.name ?? "",
         description: plan.description ?? "",
-        is_active: !!plan.is_active,
-        is_default: !!plan.is_default,
+        is_active: Boolean(plan.is_active),
+        is_default: Boolean(plan.is_default),
         priority: plan.priority ?? 0,
         price_text:
             plan.price === null || plan.price === undefined || plan.price === ""
                 ? ""
                 : String(plan.price),
         currency: plan.currency ?? "",
-        billing_period: (plan.billing_period as BillingPeriod | null) ?? "",
+        billing_period: plan.billing_period ?? "",
 
-        cargo_limit: toNullableNumber(ent.cargo_limit),
-        vehicle_limit: toNullableNumber(ent.vehicle_limit),
-        can_view_order_details: toBoolean(ent.can_view_order_details),
-        order_details_views_per_day_limit: toNullableNumber(ent.order_details_views_per_day_limit),
-
-        // Важно: корневое значение приоритетнее, потому что DTO бека именно такое
+        cargo_limit: toNullableNumber(plan.cargo_limit ?? ent.cargo_limit),
+        vehicle_limit: toNullableNumber(plan.vehicle_limit ?? ent.vehicle_limit),
+        can_view_order_details: toBoolean(
+            plan.can_view_order_details ?? ent.can_view_order_details,
+        ),
+        order_details_views_per_day_limit: toNullableNumber(
+            plan.order_details_views_per_day_limit ??
+            ent.order_details_views_per_day_limit,
+        ),
         can_auto_bump:
             typeof plan.can_auto_bump === "boolean"
                 ? plan.can_auto_bump
                 : toBoolean(ent.can_auto_bump),
-
-        can_create_companies: toBoolean(ent.can_create_companies),
-        company_limit: toNullableNumber(ent.company_limit),
-        members_per_company_limit: toNullableNumber(ent.members_per_company_limit),
+        can_create_companies: toBoolean(
+            plan.can_create_companies ?? ent.can_create_companies,
+        ),
+        company_limit: toNullableNumber(plan.company_limit ?? ent.company_limit),
+        members_per_company_limit: toNullableNumber(
+            plan.members_per_company_limit ?? ent.members_per_company_limit,
+        ),
     };
 };
 

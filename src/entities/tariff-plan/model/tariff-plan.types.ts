@@ -1,4 +1,4 @@
-import type { BillingPeriod, TariffPlan, UpsertTariffPlanPayload } from "@/shared/api/tariffsApi";
+import type {BillingPeriod, TariffPlan, UpsertTariffPlanPayload} from "@/entities/tariff-plan/model/types.ts";
 
 export type TariffPlanFormValues = {
     code: string;

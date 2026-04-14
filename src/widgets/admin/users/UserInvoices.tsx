@@ -14,8 +14,9 @@ import {
     Tooltip,
 } from "@mui/material";
 import { FiTrash2, FiExternalLink } from "react-icons/fi";
-import { tariffsApi, type TariffInvoice } from "@/shared/api/tariffsApi";
+import { tariffsApi } from "@/shared/api/tariffsApi";
 import { toast } from "react-toastify";
+import type {TariffInvoice} from "@/entities/tariff-plan/model/types.ts";
 
 const fmt = (d?: string | null) =>
     d

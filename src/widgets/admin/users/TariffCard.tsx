@@ -14,17 +14,17 @@ import {
 import { FiEdit3, FiPlus, FiRefreshCw, FiX } from "react-icons/fi";
 import { BiBlock } from "react-icons/bi";
 import { toast } from "react-toastify";
-import {
-    tariffsApi,
-    type Entitlements,
-    type TariffPlan,
-    type TariffSubscription,
-} from "@/shared/api/tariffsApi";
+
+import { tariffsApi } from "@/shared/api/tariffsApi";
 import { ENTITLEMENTS, formatEntitlementValue } from "@/shared/config/entitlements";
-import {
-    IssueSubscriptionDialog,
-    EditEntitlementsDialog,
-} from "@/pages/admin/tariffs/subscriptions/ui/AdminTariffSubscriptionsPage";
+import type {
+    Entitlements,
+    SubscriptionEntitlementInput,
+    TariffPlan,
+    TariffSubscription,
+} from "@/entities/tariff-plan/model/types";
+import { IssueSubscriptionDialog } from "@/features/admin/tariffs/issue-subscription/ui/IssueSubscriptionDialog";
+import { EditEntitlementsDialog } from "@/features/admin/tariffs/edit-entitlements/ui/EditEntitlementsDialog";
 
 const fmt = (d?: string | null) =>
     d
@@ -63,6 +63,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                 tariffsApi.adminGetEffectiveEntitlements(userId),
                 tariffsApi.adminListPlans(),
             ]);
+
             setActive(activeRes);
             setEffective(effectiveRes.effective_entitlements);
             setPlans(plansRes.items);
@@ -81,11 +82,19 @@ export default function TariffCard({ userId }: TariffCardProps) {
 
     const planLookup = useMemo(() => {
         const map = new Map<string, TariffPlan>();
-        plans.forEach((p) => map.set(p.id, p));
+        plans.forEach((plan) => map.set(plan.id, plan));
         return map;
     }, [plans]);
 
-    const handleIssue = async (payload: any) => {
+    const handleIssue = async (payload: {
+        plan_id: string;
+        starts_at?: string | null;
+        ends_at?: string | null;
+        lifetime?: boolean;
+        note?: string | null;
+        source?: string | null;
+        cancel_previous?: boolean;
+    }) => {
         setIssueLoading(true);
         try {
             await tariffsApi.adminIssueSubscription(userId, {
@@ -94,7 +103,10 @@ export default function TariffCard({ userId }: TariffCardProps) {
                 ends_at: payload.lifetime ? null : payload.ends_at || undefined,
                 lifetime: payload.lifetime,
                 note: payload.note,
+                source: payload.source,
+                cancel_previous: payload.cancel_previous ?? true,
             });
+
             setIssueOpen(false);
             await loadData();
         } catch (e: any) {
@@ -108,26 +120,37 @@ export default function TariffCard({ userId }: TariffCardProps) {
 
     const handleEntitlements = async (entitlements: Entitlements, reason: string) => {
         if (!targetSub) return;
+
         setEditLoading(true);
         try {
-            const entList: import("@/shared/api/tariffsApi").SubscriptionEntitlementInput[] = [];
+            const entList: SubscriptionEntitlementInput[] = [];
+
             ENTITLEMENTS.forEach((meta) => {
-                const value = entitlements?.[meta.key];
+                const value = entitlements[meta.key];
+
                 if (value === undefined) return;
+
                 if (meta.type === "boolean") {
-                    entList.push({ key: meta.key.toUpperCase(), bool_value: !!value, reason });
-                } else {
                     entList.push({
                         key: meta.key.toUpperCase(),
-                        int_value: value === null ? null : Number(value),
+                        bool_value: Boolean(value),
                         reason,
                     });
+                    return;
                 }
+
+                entList.push({
+                    key: meta.key.toUpperCase(),
+                    int_value: value === null ? null : Number(value),
+                    reason,
+                });
             });
+
             await tariffsApi.adminUpdateSubscriptionEntitlements(targetSub.id, {
                 entitlements: entList,
                 replace: false,
             });
+
             setEditOpen(false);
             await loadData();
         } catch (e: any) {
@@ -141,6 +164,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
 
     const handleCancel = async () => {
         if (!cancelId) return;
+
         setCancelLoading(true);
         try {
             await tariffsApi.adminCancelSubscription(cancelId);
@@ -161,7 +185,8 @@ export default function TariffCard({ userId }: TariffCardProps) {
                 <Typography variant="h6" fontWeight={700}>
                     Тариф
                 </Typography>
-                <IconButton onClick={loadData} disabled={loading} size="small">
+
+                <IconButton onClick={() => void loadData()} disabled={loading} size="small">
                     <FiRefreshCw />
                 </IconButton>
             </Stack>
@@ -171,6 +196,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                     <Typography variant="body2" color="text.secondary">
                         Активной подписки нет
                     </Typography>
+
                     <Button
                         size="small"
                         variant="contained"
@@ -189,6 +215,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                             Тариф: {active.plan?.name ?? planLookup.get(active.plan_id)?.name ?? "—"} (
                             {active.plan?.code ?? planLookup.get(active.plan_id)?.code ?? active.plan_id})
                         </Typography>
+
                         <Chip
                             size="small"
                             label={active.status}
@@ -196,22 +223,26 @@ export default function TariffCard({ userId }: TariffCardProps) {
                             variant={active.status === "ACTIVE" ? "filled" : "outlined"}
                         />
                     </Stack>
+
                     <Typography variant="body2" color="text.secondary">
                         Начало: {fmt(active.starts_at)}
                     </Typography>
+
                     <Typography variant="body2" color="text.secondary">
                         Окончание: {active.lifetime ? "Бессрочно" : fmt(active.ends_at)}
                     </Typography>
+
                     <Typography variant="body2" color="text.secondary">
                         Источник: {active.source ?? "—"}
                     </Typography>
+
                     {active.note && (
                         <Typography variant="body2" color="text.secondary">
                             Комментарий: {active.note}
                         </Typography>
                     )}
 
-                    <Stack direction="row" spacing={1}>
+                    <Stack direction="row" spacing={1} flexWrap="wrap">
                         <Button
                             size="small"
                             variant="contained"
@@ -220,6 +251,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                         >
                             Сменить тариф
                         </Button>
+
                         <Button
                             size="small"
                             variant="outlined"
@@ -231,6 +263,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                         >
                             Редактировать квоты
                         </Button>
+
                         <Button
                             size="small"
                             variant="outlined"
@@ -248,6 +281,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                 <Typography variant="subtitle2" fontWeight={700}>
                     Текущие лимиты
                 </Typography>
+
                 {effective ? (
                     ENTITLEMENTS.map((ent) => (
                         <Stack key={ent.key} direction="row" spacing={1.25} alignItems="center">
@@ -255,7 +289,7 @@ export default function TariffCard({ userId }: TariffCardProps) {
                                 {ent.label}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {formatEntitlementValue(ent.key, effective?.[ent.key])}
+                                {formatEntitlementValue(ent.key, effective[ent.key])}
                             </Typography>
                         </Stack>
                     ))

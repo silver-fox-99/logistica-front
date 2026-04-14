@@ -1,4 +1,4 @@
-import type { TariffPlan } from "@/shared/api/tariffsApi";
+import type {TariffPlan} from "@/entities/tariff-plan/model/types.ts";
 
 export const priceLabel = (plan: TariffPlan) => {
     if (plan.price === undefined || plan.price === null || plan.price === "") return "—";
