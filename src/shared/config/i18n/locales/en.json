@@ -985,5 +985,29 @@
       "android_other": "Open the browser menu and look for <b>Add to Home screen</b> or <b>Install app</b>.",
       "desktop": "Press <b>Ctrl + D</b> (Windows) or <b>Cmd + D</b> (Mac) to bookmark this site."
     }
+  },
+  "listingAutoBump": {
+    "title": "Auto bump settings",
+    "description": "Configure automatic bumping for this listing. Minimum interval is 5 minutes and maximum duration is 3 days.",
+    "fields": {
+      "intervalMinutes": "Interval in minutes",
+      "durationDays": "Duration in days",
+      "startsAt": "Start time",
+      "enabled": "Enabled"
+    },
+    "actions": {
+      "open": "Auto bump",
+      "remove": "Remove"
+    },
+    "messages": {
+      "loadError": "Failed to load auto bump settings.",
+      "saveError": "Failed to save auto bump settings.",
+      "deleteError": "Failed to remove auto bump.",
+      "toggleError": "Failed to change auto bump status.",
+      "saved": "Auto bump settings saved.",
+      "deleted": "Auto bump removed.",
+      "enabled": "Auto bump enabled.",
+      "disabled": "Auto bump disabled."
+    }
   }
 }

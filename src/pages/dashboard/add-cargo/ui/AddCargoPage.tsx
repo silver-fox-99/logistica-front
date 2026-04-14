@@ -58,7 +58,13 @@ export default function AddCargoPage() {
                 </Box>
             </Paper>
 
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }} className="add-cargo-page__content-paper">
+            <Paper variant="outlined" sx={{
+                p: {
+                    xs: "14px !important",
+                    sm: "18px !important",
+                    md: "24px !important",
+                },
+            }} className="add-cargo-page__content-paper">
                 <Typography variant="h6" mb={1} className="add-cargo-page__title">
                     {t("addCargo.infoTitle")}
                 </Typography>

@@ -42,6 +42,7 @@ type Props = {
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
     onCopy: (id: string) => void;
+    onAutoBump: (id: string) => void;
 };
 
 function getUpdatedValue(data: ShipmentRowData) {
@@ -73,6 +74,7 @@ export function MyShipmentManageCard({
                                          onEdit,
                                          onDelete,
                                          onCopy,
+                                         onAutoBump,
                                      }: Props) {
     const { t, i18n } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
@@ -323,6 +325,16 @@ export function MyShipmentManageCard({
                             <Tooltip title={t("shipments.shipmentCard.copy")}>
                                 <IconButton onClick={() => onCopy(data.id)}>
                                     <FiCopy />
+                                </IconButton>
+                            </Tooltip>
+
+                            <Tooltip
+                                title={t("listingAutoBump.actions.open", {
+                                    defaultValue: "Auto bump",
+                                })}
+                            >
+                                <IconButton onClick={() => onAutoBump(data.id)}>
+                                    <FiClock />
                                 </IconButton>
                             </Tooltip>
 

@@ -22,6 +22,8 @@ import {
     transportPatch,
     transportUp,
 } from "@/shared/api/shipmentsActions";
+import {ListingAutoBumpDialog} from "@/entities/listing-auto-bump/ui/ListingAutoBumpDialog.tsx";
+import {mapShipmentKindToAutoBumpTarget} from "@/shared/lib/mapShipmentKindToAutoBumpTarget.ts";
 
 function parsePriceAmount(price?: string | null): number | null {
     if (!price) return null;
@@ -85,6 +87,9 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
+    const [autoBumpOpen, setAutoBumpOpen] = useState(false);
+    const [autoBumpTargetId, setAutoBumpTargetId] = useState<string | null>(null);
+
     const openCopy = useCallback((id: string) => {
         setCopyId(id);
         setCopyOpen(true);
@@ -103,6 +108,16 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
     const closeDelete = useCallback(() => {
         setDeleteOpen(false);
         setDeleteId(null);
+    }, []);
+
+    const openAutoBump = useCallback((id: string) => {
+        setAutoBumpTargetId(id);
+        setAutoBumpOpen(true);
+    }, []);
+
+    const closeAutoBump = useCallback(() => {
+        setAutoBumpOpen(false);
+        setAutoBumpTargetId(null);
     }, []);
 
     const openEdit = useCallback(
@@ -266,6 +281,7 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
                                 onEdit={openEdit}
                                 onDelete={openDelete}
                                 onCopy={openCopy}
+                                onAutoBump={openAutoBump}
                             />
                         </Grid>
                     ))}
@@ -360,6 +376,14 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
                 cancelText={t("shipments.deleteDialog.cancel")}
                 onClose={closeDelete}
                 onConfirm={confirmDelete}
+            />
+
+            <ListingAutoBumpDialog
+                open={autoBumpOpen}
+                targetType={mapShipmentKindToAutoBumpTarget(kind)}
+                targetId={autoBumpTargetId}
+                onClose={closeAutoBump}
+                onSaved={reload}
             />
         </>
     );

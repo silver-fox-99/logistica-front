@@ -56,7 +56,13 @@ export default function AddTransportPage() {
                 </Box>
             </Paper>
 
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }} className="add-transport-page__content-paper">
+            <Paper variant="outlined" sx={{
+                p: {
+                    xs: "14px !important",
+                    sm: "18px !important",
+                    md: "24px !important",
+                },
+            }} className="add-transport-page__content-paper">
                 <Typography variant="h6" mb={1} className="add-transport-page__title">
                     {t("addTransport.infoTitle")}
                 </Typography>

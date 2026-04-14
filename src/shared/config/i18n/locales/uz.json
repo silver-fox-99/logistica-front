@@ -985,5 +985,29 @@
       "android_other": "Brauzer menyusida <b>Add to Home screen</b> yoki <b>Install app</b> bandini toping.",
       "desktop": "Saytni xatcho‘plarga qo‘shish uchun <b>Ctrl + D</b> (Windows) yoki <b>Cmd + D</b> (Mac) ni bosing."
     }
+  },
+  "listingAutoBump": {
+    "title": "Avto ko‘tarish sozlamalari",
+    "description": "Ushbu e’lon uchun avtomatik ko‘tarishni sozlang. Minimal interval — 5 daqiqa, maksimal davomiylik — 3 kun.",
+    "fields": {
+      "intervalMinutes": "Daqiqalardagi interval",
+      "durationDays": "Davomiyligi kunlarda",
+      "startsAt": "Boshlanish vaqti",
+      "enabled": "Yoqilgan"
+    },
+    "actions": {
+      "open": "Avto ko‘tarish",
+      "remove": "O‘chirish"
+    },
+    "messages": {
+      "loadError": "Avto ko‘tarish sozlamalarini yuklab bo‘lmadi.",
+      "saveError": "Avto ko‘tarish sozlamalarini saqlab bo‘lmadi.",
+      "deleteError": "Avto ko‘tarishni o‘chirib bo‘lmadi.",
+      "toggleError": "Avto ko‘tarish holatini o‘zgartirib bo‘lmadi.",
+      "saved": "Avto ko‘tarish sozlamalari saqlandi.",
+      "deleted": "Avto ko‘tarish o‘chirildi.",
+      "enabled": "Avto ko‘tarish yoqildi.",
+      "disabled": "Avto ko‘tarish o‘chirildi."
+    }
   }
 }
