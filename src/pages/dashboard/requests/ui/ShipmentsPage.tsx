@@ -121,7 +121,6 @@ export default function ShipmentsListPage({ scope }: Props) {
             <PublicPlacementBanner
                 page="/dashboard/search"
                 placementKey="top-list"
-                height={240}
             />
 
             <div key={listKey}>

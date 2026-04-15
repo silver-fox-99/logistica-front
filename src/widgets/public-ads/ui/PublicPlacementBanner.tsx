@@ -3,6 +3,8 @@ import {
     Box,
     CircularProgress,
     Paper,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material";
 
 import type { AdBanner, AdPlacement } from "@/entities/ads/model/types";
@@ -11,7 +13,8 @@ import { publicAdsApi } from "@/shared/api/publicAdsApi";
 type Props = {
     page: string;
     placementKey: string;
-    height?: number | string;
+    height?: number | string | { xs?: number | string; sm?: number | string; md?: number | string; lg?: number | string };
+    fit?: "contain" | "cover";
 };
 
 function getActiveBanners(placement: AdPlacement | null): AdBanner[] {
@@ -26,6 +29,7 @@ function getActiveBanners(placement: AdPlacement | null): AdBanner[] {
         .filter((banner) => {
             if (banner.start_at) {
                 const start = new Date(banner.start_at).getTime();
+
                 if (!Number.isNaN(start) && start > now) {
                     return false;
                 }
@@ -33,6 +37,7 @@ function getActiveBanners(placement: AdPlacement | null): AdBanner[] {
 
             if (banner.end_at) {
                 const end = new Date(banner.end_at).getTime();
+
                 if (!Number.isNaN(end) && end < now) {
                     return false;
                 }
@@ -43,8 +48,22 @@ function getActiveBanners(placement: AdPlacement | null): AdBanner[] {
         .sort((a, b) => a.sort_order - b.sort_order);
 }
 
+const DEFAULT_HEIGHT = {
+    xs: 560,
+    sm: 180,
+    md: 240,
+};
+
 export function PublicPlacementBanner(props: Props) {
-    const { page, placementKey, height = 260 } = props;
+    const {
+        page,
+        placementKey,
+        height = DEFAULT_HEIGHT,
+        fit = "contain",
+    } = props;
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [loading, setLoading] = React.useState(true);
     const [placement, setPlacement] = React.useState<AdPlacement | null>(null);
@@ -60,7 +79,7 @@ export function PublicPlacementBanner(props: Props) {
             });
 
             setPlacement(response.data.data ?? null);
-        } catch {
+        } catch (error) {
             setPlacement(null);
         } finally {
             setLoading(false);
@@ -80,17 +99,14 @@ export function PublicPlacementBanner(props: Props) {
     }, [placement?.id, banners.length]);
 
     React.useEffect(() => {
-        if (!placement?.rotation_enabled) {
+        if (!placement?.rotation_enabled || banners.length <= 1) {
             return;
         }
 
-        if (banners.length <= 1) {
-            return;
-        }
-
-        const intervalSec = placement.rotation_interval_sec > 0
-            ? placement.rotation_interval_sec
-            : 5;
+        const intervalSec =
+            placement.rotation_interval_sec > 0
+                ? placement.rotation_interval_sec
+                : 5;
 
         const timer = window.setInterval(() => {
             setActiveIndex((prev) => (prev + 1) % banners.length);
@@ -99,9 +115,25 @@ export function PublicPlacementBanner(props: Props) {
         return () => {
             window.clearInterval(timer);
         };
-    }, [placement?.rotation_enabled, placement?.rotation_interval_sec, banners.length]);
+    }, [
+        placement?.rotation_enabled,
+        placement?.rotation_interval_sec,
+        banners.length,
+    ]);
 
     const currentBanner = banners[activeIndex];
+
+    const imageSrc = React.useMemo(() => {
+        if (!currentBanner) {
+            return "";
+        }
+
+        if (isMobile && currentBanner.mobile_image_url) {
+            return currentBanner.mobile_image_url;
+        }
+
+        return currentBanner.image_url;
+    }, [currentBanner, isMobile]);
 
     if (loading) {
         return (
@@ -122,8 +154,6 @@ export function PublicPlacementBanner(props: Props) {
         );
     }
 
-    console.log(currentBanner)
-
     if (!currentBanner) {
         return null;
     }
@@ -142,13 +172,15 @@ export function PublicPlacementBanner(props: Props) {
         >
             <Box
                 component="img"
-                src={currentBanner.image_url}
+                src={imageSrc}
                 alt={currentBanner.alt || currentBanner.title}
                 sx={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: fit,
+                    objectPosition: "center",
                     display: "block",
+                    backgroundColor: "#f5f5f5",
                 }}
             />
 
@@ -165,6 +197,8 @@ export function PublicPlacementBanner(props: Props) {
                         color: "#fff",
                         fontSize: 14,
                         fontWeight: 600,
+                        lineHeight: 1.2,
+                        zIndex: 1,
                     }}
                 >
                     {currentBanner.button_label}
@@ -179,6 +213,7 @@ export function PublicPlacementBanner(props: Props) {
                         bottom: 14,
                         display: "flex",
                         gap: 0.75,
+                        zIndex: 1,
                     }}
                 >
                     {banners.map((banner, index) => (
