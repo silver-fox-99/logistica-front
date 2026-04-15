@@ -397,6 +397,7 @@
       "searchTitle": "Search orders",
       "searchDescription": "Find suitable orders from other users."
     },
+    "autoDeleteNotice": "Listings older than 2 months from the date of creation will be automatically deleted. To restore a listing, please contact support.",
     "filter": {
       "button": "Filter",
       "period": "Period:",

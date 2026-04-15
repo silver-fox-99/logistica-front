@@ -396,6 +396,7 @@
       "searchTitle": "Buyurtmalarni qidirish",
       "searchDescription": "Boshqa foydalanuvchilarning mos buyurtmalarini toping."
     },
+    "autoDeleteNotice": "Yaratilgan sanadan boshlab 2 oydan oshgan e’lonlar avtomatik ravishda o‘chiriladi. E’lonni tiklash uchun ma’muriyatga murojaat qiling.",
     "filter": {
       "button": "Filtr",
       "period": "Davr:",

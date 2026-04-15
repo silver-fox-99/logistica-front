@@ -2,66 +2,81 @@ import api from "@/shared/api/axios";
 
 export type CargoUser = {
     id: string;
-    is_admin: boolean;
+    is_admin?: boolean;
     avatar: string | null;
-    phone: string;
-    email: string | null;
+    phone: string | null;
+    email?: string | null;
     first_name: string | null;
     last_name: string | null;
 };
 
 export type PointType = "PICKUP" | "DROPOFF";
 
-export type CargoPoint = { country: string; region: string; city: string, type: PointType };
+export type CargoPoint = {
+    id?: string;
+    country?: string | null;
+    region?: string | null;
+    city?: string | null;
+    address?: string | null;
+    type: PointType;
+};
 
 export type CargoItem = {
     id: string;
     user_id: string;
-    user: CargoUser;
+    user?: CargoUser | null;
     images: string[];
-    date_from: string;        // "2025-10-18"
-    date_to: string;          // "2025-10-21"
-    vehicle_type: string;     // "ANY" ...
-    load_type: string[];      // ["FULL", "PARTIAL"] ...
-    cargo_type: string;       // "PALLETS" ...
+    date_from: string[] | string | null;
+    date_to: string | null;
+    vehicle_type: string;
+    load_type: string[];
+    cargo_type: string;
     allow_partial_load: boolean;
-    weight_t: string;         // "21.000"
-    volume_m3: string;        // "96.000"
-    cars_count: number;
-    pallets_count: number;
+    weight_t: string | null;
+    volume_m3: string | null;
+    cars_count: number | null;
+    pallets_count: number | null;
     has_dimensions: boolean;
     length_m: string | null;
     width_m: string | null;
     height_m: string | null;
-    price_currency: string;   // "USD"
-    price_amount: string;     // "200.00"
-    payment_method: string;   // "BANK_TRANSFER"
-    payment_term: string;     // "PREPAID"
-    bargain: string;          // "ALLOWED"
+    price_currency: string;
+    price_amount: string | null;
+    payment_method: string | null;
+    payment_term: string | null;
+    bargain: string | null;
     contact_extra_phone: string | null;
     note: string | null;
     points: CargoPoint[];
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
+    sort_updated_at?: string | null;
+    up_count?: number;
+    view_count?: number;
+};
+
+export type AdminCargoListData = {
+    data: CargoItem[];
+    total: number;
+    page: number;
+    pages: number;
+    limit: number;
 };
 
 export type CargoListResponse = {
     status: boolean;
-    data: {
-        data: CargoItem[];
-        total: number;
-        page: number;
-        pages: number;
-        limit: number;
-    };
+    data: AdminCargoListData;
     message?: string;
 };
 
+export type CargoAdminStatus = "all" | "active" | "deleted";
+
 export type CargoQuery = {
     search?: string;
-    page?: number;   // 1-based
+    page?: number;
     limit?: number;
+    status?: CargoAdminStatus;
 };
 
 const BASE = "/cargo/admin/list";
@@ -71,8 +86,14 @@ export const adminCargoApi = {
         const { data } = await api.get<CargoListResponse>(BASE, { params });
         return data.data;
     },
+
     remove: async (id: string) => {
         const { data } = await api.delete(`/cargo/${id}/admin`);
+        return data;
+    },
+
+    restore: async (id: string) => {
+        const { data } = await api.patch(`/cargo/${id}/admin/restore`);
         return data;
     },
 };

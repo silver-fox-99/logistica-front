@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Paper, Stack, Typography} from "@mui/material";
 import { FiSliders } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 

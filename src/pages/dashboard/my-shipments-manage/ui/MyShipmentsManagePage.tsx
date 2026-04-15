@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import {Alert, Box, Button, Paper, Stack, Typography} from "@mui/material";
 import { FiLayers, FiSliders } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -232,6 +232,10 @@ export default function MyShipmentsManagePage() {
                     </Typography>
                 </Box>
             </Paper>
+
+            <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+                {t("shipments.autoDeleteNotice")}
+            </Alert>
 
             <Stack
                 direction={{ xs: "column", md: "row" }}
