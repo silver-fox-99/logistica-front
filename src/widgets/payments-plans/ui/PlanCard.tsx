@@ -122,7 +122,7 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
                         </Stack>
                     )}
 
-                    <Tooltip title={isCurrent ? t("paymentsNew.tooltips.current", "This is your current plan.") : t("paymentsNew.tooltips.upgrade", "Create an invoice to upgrade.")}>
+                    <Tooltip title={isCurrent ? t("paymentsNew.tooltips.current", "This is your current plan.") : t("paymentsNew.buttons.upgrade", "Create an invoice to upgrade.")}>
             <span>
               <Button
                   size="small"
@@ -141,12 +141,6 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
             </span>
                     </Tooltip>
                 </Stack>
-
-                {!isCurrent && (
-                    <Typography variant="caption" color="text.secondary">
-                        {t("paymentsNew.supportShort", "Purchase via support")}
-                    </Typography>
-                )}
             </CardContent>
         </Card>
     );
