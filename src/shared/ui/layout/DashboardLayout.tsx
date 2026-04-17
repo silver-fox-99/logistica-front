@@ -2,7 +2,8 @@ import { Outlet, NavLink } from "react-router-dom";
 import React, { useState, Fragment } from "react";
 import {
     Box, Container, Paper, Stack, Button, Divider, List, ListItemButton,
-    ListItemIcon, ListItemText, Drawer,  useMediaQuery
+    ListItemIcon, ListItemText, Drawer,  useMediaQuery,
+    CircularProgress
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import {
@@ -18,6 +19,9 @@ import Footer from "@/features/footer/Footer";
 import { useUserStore } from "@/entities/user/model/user.store";
 import "./DashboardLayout.scss";
 import BookmarkPromptDialog from "@/features/bookmarkPrompt/ui/BookmarkPromptDialog";
+import { CompanyWorkspaceSidebar } from "@/widgets/company/company-workspace-sidebar/ui/CompanyWorkspaceSidebar";
+import { useIsCompanyWorkspace } from "@/pages/dashboard/company/workspace/model/useIsCompanyWorkspace";
+import { useCompanySidebarCompany } from "@/pages/dashboard/company/workspace/model/useCompanySidebarCompany";
 
 function NavItem({ to, icon, label, onClick }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void }) {
     return (
@@ -124,24 +128,40 @@ export default function DashboardLayout() {
     const isMobile = useMediaQuery("(max-width:860px)");
     const [open, setOpen] = useState(false);
 
+    const isCompanyWorkspace = useIsCompanyWorkspace();
+    const { company, isLoading: isCompanyLoading } = useCompanySidebarCompany();
+
     const toggle = (state?: boolean) => setOpen(prev => (typeof state === "boolean" ? state : !prev));
     const closeOnItem = () => { if (isMobile) toggle(false); };
 
+    const sidebarContent = isCompanyWorkspace ? (
+        isCompanyLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                <CircularProgress size={28} />
+            </Box>
+        ) : company ? (
+            <CompanyWorkspaceSidebar company={company} onItemClick={closeOnItem} />
+        ) : (
+            <SidebarContent onItemClick={closeOnItem} />
+        )
+    ) : (
+        <SidebarContent onItemClick={closeOnItem} />
+    );
+
     return (
         <Box display="flex" flexDirection="column" minHeight="100dvh" className="dashboard-layout">
-            <Header 
-                isAuthenticated 
+            <Header
+                isAuthenticated
                 showBurger={isMobile}
                 onMenuClick={() => toggle(true)}
             />
 
             <BookmarkPromptDialog />
 
-
             <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32, overflow: "hidden" }}>
-                <Container 
+                <Container
                     maxWidth="lg"
-                    sx={{ 
+                    sx={{
                         maxWidth: { xs: "100%", md: "lg" },
                         px: { xs: "16px", md: 3 },
                         overflow: "hidden",
@@ -153,19 +173,18 @@ export default function DashboardLayout() {
                         }
                     }}
                 >
-                    <Stack 
-                        direction="row" 
-                        spacing={3} 
-                        alignItems="flex-start" 
-                        sx={{ 
-                            width: "100%", 
-                            maxWidth: "100%", 
+                    <Stack
+                        direction="row"
+                        spacing={3}
+                        alignItems="flex-start"
+                        sx={{
+                            width: "100%",
+                            maxWidth: "100%",
                             minWidth: 0,
                             boxSizing: "border-box",
                             overflow: "hidden"
                         }}
                     >
-
                         {isMobile ? (
                             <Drawer
                                 anchor="left"
@@ -174,11 +193,11 @@ export default function DashboardLayout() {
                                 PaperProps={{ sx: { width: 280, p: 1.5 } }}
                                 ModalProps={{ keepMounted: true }}
                             >
-                                <SidebarContent onItemClick={closeOnItem} />
+                                {sidebarContent}
                             </Drawer>
                         ) : (
-                            <Paper elevation={0} sx={{ p: 1.5, width: 260, flexShrink: 0 }}>
-                                <SidebarContent />
+                            <Paper elevation={0} sx={{ p: 1.5, width: 260, flexShrink: 0, borderRadius: 3 }}>
+                                {sidebarContent}
                             </Paper>
                         )}
 
@@ -197,6 +216,7 @@ export default function DashboardLayout() {
                     </Stack>
                 </Container>
             </Box>
+
             <Footer />
         </Box>
     );

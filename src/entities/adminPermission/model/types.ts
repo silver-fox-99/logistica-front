@@ -28,7 +28,8 @@ export enum AdminPermissionTarget {
     NOTIFICATION = "NOTIFICATION",
     DOCUMENTS = "DOCUMENTS",
     REFERRAL_SETTINGS = "REFERRAL_SETTINGS",
-    INTEGRATIONS = "INTEGRATIONS"
+    INTEGRATIONS = "INTEGRATIONS",
+    COMPANIES = "COMPANIES",
 }
 
 export type AdminPermission = {

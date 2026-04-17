@@ -1,4 +1,4 @@
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 
 import DashboardLayout from "@/shared/ui/layout/DashboardLayout";
 import RequireAuth from "./RequireAuth";
@@ -41,6 +41,18 @@ import MyShipmentsManagePage from "@/pages/dashboard/my-shipments-manage";
 import AdminIntegrationsPage from "@/pages/admin/integrations";
 import AdsPage from "@/pages/admin/ads/ui/AdsPage.tsx";
 import AdsDetailsPage from "@/pages/admin/ads/ui/AdsDetailsPage.tsx";
+import CompanyCreatePage from "@/pages/dashboard/company/create";
+import AdminCompaniesPage from "@/pages/admin/companies";
+import AdminCompanyPage from "@/pages/admin/companies/details";
+import CompanyWorkspaceLayout from "@/pages/dashboard/company/workspace/ui/CompanyWorkspaceLayout.tsx";
+import CompanyOverviewPage from "@/pages/dashboard/company/overview/ui/CompanyOverviewPage.tsx";
+import CompanyInfoPage from "@/pages/dashboard/company/info/ui/CompanyInfoPage.tsx";
+import CompanyDocumentsPage from "@/pages/dashboard/company/documents/ui/CompanyDocumentsPage.tsx";
+import CompanyTeamPage from "@/pages/dashboard/company/team/ui/CompanyTeamPage.tsx";
+import CompanyVerificationPage from "@/pages/dashboard/company/verification/ui/CompanyVerificationPage.tsx";
+import CompanySettingsPage from "@/pages/dashboard/company/settings/ui/CompanySettingsPage.tsx";
+import PublicCompanyPage from "@/pages/public/company";
+import CompanyInvitationAcceptPage from "@/pages/dashboard/company/invitation-accept";
 
 
 const router = createBrowserRouter([
@@ -69,6 +81,22 @@ const router = createBrowserRouter([
             {path: "search", element: <ShipmentsListPage scope="public"/>},
             {path: "profile", element: <ProfilePage/>},
             {path: "company", element: <CompanyPage/>},
+            {path: "company/create", element: <CompanyCreatePage/>},
+            {path: "invitations/:token", element: <CompanyInvitationAcceptPage /> },
+            {
+                path: "company/:id",
+                element: <CompanyWorkspaceLayout />,
+                children: [
+                    { index: true, element: <Navigate to="overview" replace /> },
+                    { path: "overview", element: <CompanyOverviewPage /> },
+                    { path: "info", element: <CompanyInfoPage /> },
+                    { path: "documents", element: <CompanyDocumentsPage /> },
+                    { path: "team", element: <CompanyTeamPage /> },
+                    { path: "verification", element: <CompanyVerificationPage /> },
+                    { path: "settings", element: <CompanySettingsPage /> },
+                ],
+            },
+
             {path: "staff", element: <StaffPage/>},
             {path: "payments", element: <PaymentsPage/>},
             {path: "requests", element: <MyShipmentsManagePage />},
@@ -78,7 +106,9 @@ const router = createBrowserRouter([
             {path: "security", element: <SecurityPage/>},
             {path: "help", element: <HelpSupportPage/>},
             {path: "create-cargo", element: <AddCargoPage/>},
-            {path: "create-transport", element: <AddTransportPage/>}
+            {path: "create-transport", element: <AddTransportPage/>},
+            {path: "companies/:id", element: <PublicCompanyPage /> },
+
         ],
     },
     {
@@ -92,6 +122,8 @@ const router = createBrowserRouter([
             { index: true, element: <AdminOverviewPage /> },
             { path: "users", element: <AdminUsersPage /> },
             { path: "user/:id", element: <AdminUserPage />},
+            { path: "companies", element: <AdminCompaniesPage /> },
+            { path: "companies/:id", element: <AdminCompanyPage /> },
             { path: "cargo", element: <AdminCargoPage /> },
             { path: "transport", element: <AdminTransportPage />},
             { path: "geo", element: <AdminGeoLocationsPage />},

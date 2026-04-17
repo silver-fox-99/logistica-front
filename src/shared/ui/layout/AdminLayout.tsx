@@ -33,6 +33,7 @@ import {
     FiChevronRight,
     FiAward,
     FiLink2, FiTruck,
+    FiBriefcase,
 } from "react-icons/fi";
 import {BsGeoAlt} from "react-icons/bs";
 import {MdOutlineAdminPanelSettings, MdOutlineRateReview} from "react-icons/md";
@@ -61,6 +62,7 @@ export function viewCode(target: AdminPermissionTarget) {
 const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin", icon: <FiBarChart2 />, label: "Обзор", end: true, requiredAny: [viewCode("DASHBOARD" as any)] },
     { to: "/admin/users", icon: <FiUsers />, label: "Пользователи", requiredAny: [viewCode("USERS" as any)] },
+    { to: "/admin/companies", icon: <FiBriefcase />, label: "Компании", requiredAny: [viewCode("COMPANIES" as any)] },
     { to: "/admin/cargo", icon: <FiPackage />, label: "Грузы", requiredAny: [viewCode("CARGO" as any)] },
     { to: "/admin/transport", icon: <FiTruck />, label: "Транспорт", requiredAny: [viewCode("TRANSPORT" as any)] },
     { to: "/admin/geo", icon: <BsGeoAlt />, label: "Геолокации", requiredAny: [viewCode("GEO_LOCATIONS" as any)] },
