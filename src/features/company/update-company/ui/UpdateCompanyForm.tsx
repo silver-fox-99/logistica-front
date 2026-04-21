@@ -8,6 +8,7 @@ import {
     Typography,
 } from "@mui/material";
 import { FiSave } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import type { Company } from "@/entities/company/model/types";
 import { useUpdateCompany } from "../model/useUpdateCompany";
 
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function UpdateCompanyForm({ company, onUpdated }: Props) {
+    const { t } = useTranslation();
     const { values, isSubmitting, error, success, setField, submit } = useUpdateCompany(company, onUpdated);
 
     return (
@@ -25,10 +27,10 @@ export function UpdateCompanyForm({ company, onUpdated }: Props) {
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h5" fontWeight={700}>
-                            Company information
+                            {t("companyInfoForm.title")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Complete your company profile before verification.
+                            {t("companyInfoForm.description")}
                         </Typography>
                     </Stack>
 
@@ -36,91 +38,91 @@ export function UpdateCompanyForm({ company, onUpdated }: Props) {
                     {success ? <Alert severity="success">{success}</Alert> : null}
 
                     <TextField
-                        label="Company name"
+                        label={t("companyInfoForm.fields.name")}
                         value={values.name ?? ""}
                         onChange={(e) => setField("name", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Legal name"
+                        label={t("companyInfoForm.fields.legalName")}
                         value={values.legal_name ?? ""}
                         onChange={(e) => setField("legal_name", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Registration number"
+                        label={t("companyInfoForm.fields.registrationNumber")}
                         value={values.registration_number ?? ""}
                         onChange={(e) => setField("registration_number", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Tax number"
+                        label={t("companyInfoForm.fields.taxNumber")}
                         value={values.tax_number ?? ""}
                         onChange={(e) => setField("tax_number", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Phone"
+                        label={t("companyInfoForm.fields.phone")}
                         value={values.phone ?? ""}
                         onChange={(e) => setField("phone", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Email"
+                        label={t("companyInfoForm.fields.email")}
                         value={values.email ?? ""}
                         onChange={(e) => setField("email", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Website"
+                        label={t("companyInfoForm.fields.website")}
                         value={values.website ?? ""}
                         onChange={(e) => setField("website", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Logo URL"
+                        label={t("companyInfoForm.fields.logo")}
                         value={values.logo ?? ""}
                         onChange={(e) => setField("logo", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Country"
+                        label={t("companyInfoForm.fields.country")}
                         value={values.country ?? ""}
                         onChange={(e) => setField("country", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Region"
+                        label={t("companyInfoForm.fields.region")}
                         value={values.region ?? ""}
                         onChange={(e) => setField("region", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="City"
+                        label={t("companyInfoForm.fields.city")}
                         value={values.city ?? ""}
                         onChange={(e) => setField("city", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Address"
+                        label={t("companyInfoForm.fields.address")}
                         value={values.address ?? ""}
                         onChange={(e) => setField("address", e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Description"
+                        label={t("companyInfoForm.fields.description")}
                         value={values.description ?? ""}
                         onChange={(e) => setField("description", e.target.value)}
                         fullWidth
@@ -143,7 +145,9 @@ export function UpdateCompanyForm({ company, onUpdated }: Props) {
                         }}
                     >
                         <FiSave size={18} />
-                        {isSubmitting ? "Saving..." : "Save changes"}
+                        {isSubmitting
+                            ? t("companyInfoForm.actions.saving")
+                            : t("companyInfoForm.actions.save")}
                     </Button>
                 </Stack>
             </CardContent>

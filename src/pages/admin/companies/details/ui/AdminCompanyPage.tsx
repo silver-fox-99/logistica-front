@@ -6,6 +6,8 @@ import {
     CircularProgress,
     Container,
     Stack,
+    Tab,
+    Tabs,
     Typography,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -18,6 +20,11 @@ import { AdminCompanyStatusForm } from "@/features/admin-company/update-status/u
 import { AdminDeleteCompanyDialog } from "@/features/admin-company/delete-company/ui/AdminDeleteCompanyDialog";
 
 import { AdminCompanyDocumentsCard } from "@/widgets/admin-companies/company-documents/ui/AdminCompanyDocumentsCard";
+import { AdminCompanyMembersCard } from "@/widgets/admin-companies/company-members/ui/AdminCompanyMembersCard";
+import { AdminCompanyInvitationsCard } from "@/widgets/admin-companies/company-invitations/ui/AdminCompanyInvitationsCard";
+import { AdminCompanyJoinRequestsCard } from "@/widgets/admin-companies/company-join-requests/ui/AdminCompanyJoinRequestsCard";
+
+type TabValue = "overview" | "members" | "invitations" | "joinRequests" | "documents";
 
 export default function AdminCompanyPage() {
     const { id = "" } = useParams();
@@ -26,8 +33,9 @@ export default function AdminCompanyPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const [tab, setTab] = useState<TabValue>("overview");
 
-    const load = async () => {
+    const loadCompany = async () => {
         try {
             setIsLoading(true);
             setError("");
@@ -37,7 +45,7 @@ export default function AdminCompanyPage() {
             const message =
                 e?.response?.data?.message ||
                 e?.message ||
-                "Failed to load company.";
+                "Не удалось загрузить компанию.";
             setError(Array.isArray(message) ? message[0] : message);
         } finally {
             setIsLoading(false);
@@ -45,14 +53,13 @@ export default function AdminCompanyPage() {
     };
 
     useEffect(() => {
-        if (id) {
-            load();
-        }
+        if (!id) return;
+        loadCompany();
     }, [id]);
 
     if (isLoading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
                 <CircularProgress />
             </Box>
         );
@@ -82,7 +89,7 @@ export default function AdminCompanyPage() {
                             {company.name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Управление компанией, статусом и документами.
+                            Управление компанией, участниками, заявками, приглашениями и документами.
                         </Typography>
                     </Stack>
 
@@ -96,9 +103,44 @@ export default function AdminCompanyPage() {
                     </Button>
                 </Stack>
 
-                <AdminCompanyStatusForm company={company} onUpdated={setCompany} />
-                <AdminUpdateCompanyForm company={company} onUpdated={setCompany} />
-                <AdminCompanyDocumentsCard companyId={company.id} />
+                <Tabs
+                    value={tab}
+                    onChange={(_, value: TabValue) => setTab(value)}
+                    variant="scrollable"
+                    allowScrollButtonsMobile
+                >
+                    <Tab value="overview" label="Обзор" />
+                    <Tab value="members" label="Участники" />
+                    <Tab value="invitations" label="Приглашения" />
+                    <Tab value="joinRequests" label="Заявки" />
+                    <Tab value="documents" label="Документы" />
+                </Tabs>
+
+                {tab === "overview" ? (
+                    <Stack spacing={2}>
+                        <AdminCompanyStatusForm company={company} onUpdated={setCompany} />
+                        <AdminUpdateCompanyForm company={company} onUpdated={setCompany} />
+                    </Stack>
+                ) : null}
+
+                {tab === "members" ? (
+                    <AdminCompanyMembersCard
+                        company={company}
+                        onCompanyUpdated={setCompany}
+                    />
+                ) : null}
+
+                {tab === "invitations" ? (
+                    <AdminCompanyInvitationsCard companyId={company.id} />
+                ) : null}
+
+                {tab === "joinRequests" ? (
+                    <AdminCompanyJoinRequestsCard companyId={company.id} />
+                ) : null}
+
+                {tab === "documents" ? (
+                    <AdminCompanyDocumentsCard companyId={company.id} />
+                ) : null}
 
                 <AdminDeleteCompanyDialog
                     open={deleteOpen}

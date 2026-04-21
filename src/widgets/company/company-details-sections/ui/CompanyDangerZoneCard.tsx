@@ -1,10 +1,13 @@
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     onDeleteClick: () => void;
 };
 
 export function CompanyDangerZoneCard({ onDeleteClick }: Props) {
+    const { t } = useTranslation();
+
     return (
         <Card
             variant="outlined"
@@ -17,10 +20,10 @@ export function CompanyDangerZoneCard({ onDeleteClick }: Props) {
                 <Stack spacing={2}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
-                            Danger zone
+                            {t("companyDangerZone.title")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            If you no longer need this company, you can delete it.
+                            {t("companyDangerZone.description")}
                         </Typography>
                     </Stack>
 
@@ -36,7 +39,7 @@ export function CompanyDangerZoneCard({ onDeleteClick }: Props) {
                             alignSelf: "flex-start",
                         }}
                     >
-                        Delete company
+                        {t("companyDangerZone.deleteButton")}
                     </Button>
                 </Stack>
             </CardContent>

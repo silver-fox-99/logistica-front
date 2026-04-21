@@ -9,6 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { FiTrash2, FiUpload } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import { useCompanyDocuments } from "../model/useCompanyDocuments";
 
 type Props = {
@@ -16,6 +17,8 @@ type Props = {
 };
 
 export function UploadCompanyDocumentForm({ companyId }: Props) {
+    const { t } = useTranslation();
+
     const {
         items,
         values,
@@ -30,6 +33,13 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
         remove,
     } = useCompanyDocuments(companyId);
 
+    const getDocumentStatusLabel = (status?: string | null) => {
+        if (!status) return "";
+        return t(`companyDocuments.statuses.${status}`, {
+            defaultValue: status,
+        });
+    };
+
     return (
         <Stack spacing={2}>
             <Card variant="outlined" sx={{ borderRadius: 4 }}>
@@ -37,10 +47,10 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
                     <Stack spacing={2}>
                         <Stack spacing={0.5}>
                             <Typography variant="h5" fontWeight={700}>
-                                Company documents
+                                {t("companyDocuments.form.title")}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Upload documents for company verification.
+                                {t("companyDocuments.form.description")}
                             </Typography>
                         </Stack>
 
@@ -49,28 +59,40 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
 
                         <TextField
                             select
-                            label="Document type"
+                            label={t("companyDocuments.form.documentType")}
                             value={values.type}
                             onChange={(e) => setField("type", e.target.value)}
                             fullWidth
                         >
-                            <MenuItem value="REGISTRATION_CERTIFICATE">Registration certificate</MenuItem>
-                            <MenuItem value="TAX_CERTIFICATE">Tax certificate</MenuItem>
-                            <MenuItem value="LICENSE">License</MenuItem>
-                            <MenuItem value="INSURANCE">Insurance</MenuItem>
-                            <MenuItem value="IDENTITY_DOCUMENT">Identity document</MenuItem>
-                            <MenuItem value="OTHER">Other</MenuItem>
+                            <MenuItem value="REGISTRATION_CERTIFICATE">
+                                {t("companyDocuments.types.REGISTRATION_CERTIFICATE")}
+                            </MenuItem>
+                            <MenuItem value="TAX_CERTIFICATE">
+                                {t("companyDocuments.types.TAX_CERTIFICATE")}
+                            </MenuItem>
+                            <MenuItem value="LICENSE">
+                                {t("companyDocuments.types.LICENSE")}
+                            </MenuItem>
+                            <MenuItem value="INSURANCE">
+                                {t("companyDocuments.types.INSURANCE")}
+                            </MenuItem>
+                            <MenuItem value="IDENTITY_DOCUMENT">
+                                {t("companyDocuments.types.IDENTITY_DOCUMENT")}
+                            </MenuItem>
+                            <MenuItem value="OTHER">
+                                {t("companyDocuments.types.OTHER")}
+                            </MenuItem>
                         </TextField>
 
                         <TextField
-                            label="Document title"
+                            label={t("companyDocuments.form.documentTitle")}
                             value={values.title}
                             onChange={(e) => setField("title", e.target.value)}
                             fullWidth
                         />
 
                         <TextField
-                            label="Description"
+                            label={t("companyDocuments.form.documentDescription")}
                             value={values.description}
                             onChange={(e) => setField("description", e.target.value)}
                             fullWidth
@@ -89,7 +111,7 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
                                 alignSelf: "flex-start",
                             }}
                         >
-                            Select file
+                            {t("companyDocuments.form.selectFile")}
                             <input
                                 hidden
                                 type="file"
@@ -100,7 +122,9 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
 
                         {values.file ? (
                             <Typography variant="body2" color="text.secondary">
-                                Selected file: {values.file.name}
+                                {t("companyDocuments.form.selectedFile", {
+                                    name: values.file.name,
+                                })}
                             </Typography>
                         ) : null}
 
@@ -119,7 +143,9 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
                             }}
                         >
                             <FiUpload size={18} />
-                            {isUploading ? "Uploading..." : "Upload document"}
+                            {isUploading
+                                ? t("companyDocuments.form.uploading")
+                                : t("companyDocuments.form.uploadDocument")}
                         </Button>
                     </Stack>
                 </CardContent>
@@ -129,16 +155,16 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
                 <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                     <Stack spacing={2}>
                         <Typography variant="h6" fontWeight={700}>
-                            Uploaded documents
+                            {t("companyDocuments.list.title")}
                         </Typography>
 
                         {isLoading ? (
                             <Typography variant="body2" color="text.secondary">
-                                Loading...
+                                {t("companyDocuments.list.loading")}
                             </Typography>
                         ) : items.length === 0 ? (
                             <Typography variant="body2" color="text.secondary">
-                                No documents uploaded yet.
+                                {t("companyDocuments.list.empty")}
                             </Typography>
                         ) : (
                             items.map((item) => (
@@ -163,11 +189,15 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
                                             {item.original_name}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Status: {item.status}
+                                            {t("companyDocuments.list.status", {
+                                                value: getDocumentStatusLabel(item.status),
+                                            })}
                                         </Typography>
                                         {item.review_comment ? (
                                             <Typography variant="body2" color="text.secondary">
-                                                Comment: {item.review_comment}
+                                                {t("companyDocuments.list.comment", {
+                                                    value: item.review_comment,
+                                                })}
                                             </Typography>
                                         ) : null}
                                     </Stack>
@@ -185,7 +215,9 @@ export function UploadCompanyDocumentForm({ companyId }: Props) {
                                         }}
                                     >
                                         <FiTrash2 size={16} />
-                                        {isDeletingId === item.id ? "Deleting..." : "Delete"}
+                                        {isDeletingId === item.id
+                                            ? t("companyDocuments.list.deleting")
+                                            : t("companyDocuments.list.delete")}
                                     </Button>
                                 </Stack>
                             ))

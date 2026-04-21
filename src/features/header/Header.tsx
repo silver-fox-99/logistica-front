@@ -66,7 +66,7 @@ export default function Header({
 
     const handleSelect = (user?: AdminUser | null) => {
         if (!user?.id) return;
-        navigate(`/dashboard/user-reviews?search=${encodeURIComponent(user.id)}`);
+        navigate(`/dashboard/user-reviews/${user.id}`);
         setSearchOpen(false);
     };
 

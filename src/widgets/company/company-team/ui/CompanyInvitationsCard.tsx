@@ -10,11 +10,10 @@ import {
 } from "@mui/material";
 import { FiCopy, FiExternalLink } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import type { CompanyInvitation } from "@/entities/company/model/types";
 import { companiesApi } from "@/shared/api/companiesApi";
 import {
-    companyInvitationStatusLabelMap,
-    companyRoleLabelMap,
     getUserDisplayName,
 } from "@/widgets/company/company-team/model/companyTeamUi";
 
@@ -29,37 +28,53 @@ export function CompanyInvitationsCard({
                                            isSubmitting = false,
                                            onCancel,
                                        }: Props) {
+    const { t } = useTranslation();
+
+    const roleLabel = (role?: string | null) =>
+        t(`companyRoles.${role}`, {
+            defaultValue: role || "",
+        });
+
+    const statusLabel = (status?: string | null) =>
+        t(`companyInvitationStatuses.${status}`, {
+            defaultValue: status || "",
+        });
+
     const handleCopyLink = async (token: string) => {
         try {
             const link = companiesApi.buildInvitationLink(token);
             await navigator.clipboard.writeText(link);
-            toast.success("Invitation link copied.");
+            toast.success(t("companyTeam.invitations.copySuccess"));
         } catch {
-            toast.error("Failed to copy invitation link.");
+            toast.error(t("companyTeam.invitations.copyError"));
         }
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 4 }}>
+        <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
-                            Invitations
+                            {t("companyTeam.invitations.title")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Track invitations sent to future company members.
+                            {t("companyTeam.invitations.description")}
                         </Typography>
                     </Stack>
 
                     {!invitations.length ? (
                         <Typography variant="body2" color="text.secondary">
-                            No invitations found.
+                            {t("companyTeam.invitations.empty")}
                         </Typography>
                     ) : (
                         <Stack divider={<Divider flexItem />} spacing={0}>
                             {invitations.map((invitation) => {
-                                const target = invitation.email || invitation.phone || "Unknown recipient";
+                                const target =
+                                    invitation.email ||
+                                    invitation.phone ||
+                                    t("companyTeam.invitations.unknownRecipient");
+
                                 const invitationLink = companiesApi.buildInvitationLink(invitation.token);
 
                                 return (
@@ -86,7 +101,9 @@ export function CompanyInvitationsCard({
 
                                                     {invitation.invited_by_user ? (
                                                         <Typography variant="body2" color="text.secondary">
-                                                            Sent by {getUserDisplayName(invitation.invited_by_user)}
+                                                            {t("companyTeam.invitations.sentBy", {
+                                                                name: getUserDisplayName(invitation.invited_by_user),
+                                                            })}
                                                         </Typography>
                                                     ) : null}
 
@@ -100,11 +117,11 @@ export function CompanyInvitationsCard({
 
                                             <Stack direction="row" spacing={1} flexWrap="wrap">
                                                 <Chip
-                                                    label={companyRoleLabelMap[invitation.role]}
+                                                    label={roleLabel(invitation.role)}
                                                     size="small"
                                                 />
                                                 <Chip
-                                                    label={companyInvitationStatusLabelMap[invitation.status]}
+                                                    label={statusLabel(invitation.status)}
                                                     size="small"
                                                     variant="outlined"
                                                 />
@@ -113,7 +130,11 @@ export function CompanyInvitationsCard({
 
                                         <Stack spacing={1}>
                                             <Typography variant="body2" color="text.secondary">
-                                                Expires: {invitation.expires_at ? new Date(invitation.expires_at).toLocaleString() : "No expiry"}
+                                                {t("companyTeam.invitations.expires", {
+                                                    value: invitation.expires_at
+                                                        ? new Date(invitation.expires_at).toLocaleString()
+                                                        : t("companyTeam.invitations.noExpiry"),
+                                                })}
                                             </Typography>
 
                                             <Typography
@@ -140,7 +161,7 @@ export function CompanyInvitationsCard({
                                                     startIcon={<FiCopy />}
                                                     onClick={() => handleCopyLink(invitation.token)}
                                                 >
-                                                    Copy link
+                                                    {t("companyTeam.invitations.copyLink")}
                                                 </Button>
 
                                                 <Button
@@ -151,7 +172,7 @@ export function CompanyInvitationsCard({
                                                     variant="outlined"
                                                     startIcon={<FiExternalLink />}
                                                 >
-                                                    Open link
+                                                    {t("companyTeam.invitations.openLink")}
                                                 </Button>
                                             </Stack>
 
@@ -161,7 +182,7 @@ export function CompanyInvitationsCard({
                                                 disabled={isSubmitting || invitation.status !== "PENDING"}
                                                 onClick={() => onCancel(invitation.id)}
                                             >
-                                                Cancel invitation
+                                                {t("companyTeam.invitations.cancelInvitation")}
                                             </Button>
                                         </Stack>
                                     </Stack>

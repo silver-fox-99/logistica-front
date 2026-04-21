@@ -11,6 +11,7 @@ import type {
 
 type UseCompanyTeamPageResult = {
     members: CompanyMember[];
+    membersHistory: CompanyMember[];
     invitations: CompanyInvitation[];
     joinRequests: CompanyJoinRequest[];
     isLoading: boolean;
@@ -37,6 +38,7 @@ type UseCompanyTeamPageResult = {
 
 export function useCompanyTeamPage(companyId: string): UseCompanyTeamPageResult {
     const [members, setMembers] = useState<CompanyMember[]>([]);
+    const [membersHistory, setMembersHistory] = useState<CompanyMember[]>([]);
     const [invitations, setInvitations] = useState<CompanyInvitation[]>([]);
     const [joinRequests, setJoinRequests] = useState<CompanyJoinRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -56,13 +58,15 @@ export function useCompanyTeamPage(companyId: string): UseCompanyTeamPageResult 
             setIsLoading(true);
             setError("");
 
-            const [membersData, invitationsData, joinRequestsData] = await Promise.all([
+            const [membersData, membersHistoryData, invitationsData, joinRequestsData] = await Promise.all([
                 companiesApi.listMembers(companyId),
+                companiesApi.listMembersHistory(companyId),
                 companiesApi.listInvitations(companyId),
                 companiesApi.listJoinRequests(companyId),
             ]);
 
             setMembers(membersData);
+            setMembersHistory(membersHistoryData);
             setInvitations(invitationsData);
             setJoinRequests(joinRequestsData);
         } catch (e: any) {
@@ -227,6 +231,7 @@ export function useCompanyTeamPage(companyId: string): UseCompanyTeamPageResult 
 
     return {
         members,
+        membersHistory,
         invitations,
         joinRequests,
         isLoading,

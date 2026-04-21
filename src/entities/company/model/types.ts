@@ -210,6 +210,42 @@ export type CompanyMember = {
     invited_by_user?: CompanyRelatedUser | null;
 };
 
+export type CompanyMembershipHistoryItem = {
+    id: string;
+    company_id: string;
+    user_id: string;
+    role: string;
+    status: string;
+    is_default: boolean;
+    permissions?: Record<string, boolean> | null;
+    invited_by_user_id?: string | null;
+    invited_at?: string | null;
+    joined_at?: string | null;
+    removed_at?: string | null;
+    note?: string | null;
+    meta?: Record<string, any> | null;
+    created_at: string;
+    updated_at: string;
+    company: {
+        id: string;
+        name: string;
+        legal_name?: string | null;
+        logo?: string | null;
+        country?: string | null;
+        region?: string | null;
+        city?: string | null;
+        status?: string | null;
+    };
+    invited_by_user?: {
+        id: string;
+        first_name?: string | null;
+        last_name?: string | null;
+        email?: string | null;
+        phone?: string | null;
+        avatar?: string | null;
+    } | null;
+};
+
 export type UpdateCompanyMemberPayload = {
     role?: CompanyMemberRole;
     status?: CompanyMemberStatus;
@@ -284,6 +320,21 @@ export type ReviewCompanyJoinRequestPayload = {
     review_comment?: string;
 };
 
+export type PublicCompanyMember = {
+    id: string;
+    role: CompanyMemberRole;
+    status: string;
+    joined_at: string | null;
+    user: {
+        id: string | null;
+        first_name: string | null;
+        last_name: string | null;
+        phone: string | null;
+        email: string | null;
+        avatar: string | null;
+    };
+};
+
 export type PublicCompanyProfile = {
     id: string;
     name: string;
@@ -300,6 +351,7 @@ export type PublicCompanyProfile = {
     status: "VERIFIED";
     verified_at: string | null;
     created_at: string;
+    members?: PublicCompanyMember[];
 };
 
 export type ListPublicCompaniesParams = {
@@ -347,4 +399,16 @@ export type CompanyInvitationPreview = {
         address: string | null;
         status: CompanyStatus;
     } | null;
+};
+
+export type UpdateCompanyMemberAdminPayload = {
+    role?: CompanyMemberRole;
+    status?: CompanyMemberStatus;
+    is_default?: boolean;
+    permissions?: Record<string, boolean>;
+    note?: string | null;
+};
+
+export type ChangeCompanyOwnerAdminPayload = {
+    demote_previous_owner_to_admin?: boolean;
 };

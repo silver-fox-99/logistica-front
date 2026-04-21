@@ -29,7 +29,7 @@ export function AdminCompanyStatusForm({ company, onUpdated }: Props) {
     } = useAdminUpdateCompanyStatus(company, onUpdated);
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 3 }}>
+        <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent>
                 <Stack spacing={2}>
                     <Typography variant="h6" fontWeight={700}>
@@ -41,20 +41,20 @@ export function AdminCompanyStatusForm({ company, onUpdated }: Props) {
 
                     <TextField
                         select
-                        label="Status"
+                        label="Статус"
                         value={status}
                         onChange={(e) => setStatus(e.target.value as any)}
                         fullWidth
                     >
-                        <MenuItem value="UNVERIFIED">UNVERIFIED</MenuItem>
-                        <MenuItem value="PENDING_REVIEW">PENDING_REVIEW</MenuItem>
-                        <MenuItem value="VERIFIED">VERIFIED</MenuItem>
-                        <MenuItem value="REJECTED">REJECTED</MenuItem>
-                        <MenuItem value="BLOCKED">BLOCKED</MenuItem>
+                        <MenuItem value="UNVERIFIED">Не подтверждена</MenuItem>
+                        <MenuItem value="PENDING_REVIEW">На проверке</MenuItem>
+                        <MenuItem value="VERIFIED">Подтверждена</MenuItem>
+                        <MenuItem value="REJECTED">Отклонена</MenuItem>
+                        <MenuItem value="BLOCKED">Заблокирована</MenuItem>
                     </TextField>
 
                     <TextField
-                        label="Verification comment"
+                        label="Комментарий к проверке"
                         value={verificationComment}
                         onChange={(e) => setVerificationComment(e.target.value)}
                         multiline

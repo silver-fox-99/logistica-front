@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+    Alert,
     Button,
     Dialog,
     DialogActions,
@@ -8,12 +9,14 @@ import {
     MenuItem,
     Stack,
     TextField,
+    Typography,
 } from "@mui/material";
 import type { CompanyMemberRole } from "@/entities/company/model/types";
 
 type Props = {
     open: boolean;
     isSubmitting?: boolean;
+    submitError?: string;
     onClose: () => void;
     onSubmit: (payload: { requested_role?: CompanyMemberRole; message?: string }) => Promise<void> | void;
 };
@@ -23,6 +26,7 @@ const roleOptions: CompanyMemberRole[] = ["VIEWER", "LOGIST", "MANAGER"];
 export function CreateCompanyJoinRequestDialog({
                                                    open,
                                                    isSubmitting = false,
+                                                   submitError = "",
                                                    onClose,
                                                    onSubmit,
                                                }: Props) {
@@ -49,6 +53,12 @@ export function CreateCompanyJoinRequestDialog({
 
             <DialogContent>
                 <Stack spacing={2} sx={{ pt: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                        Choose a preferred role and add a short message for the company.
+                    </Typography>
+
+                    {submitError ? <Alert severity="error">{submitError}</Alert> : null}
+
                     <TextField
                         select
                         label="Requested role"
@@ -75,7 +85,7 @@ export function CreateCompanyJoinRequestDialog({
                 </Stack>
             </DialogContent>
 
-            <DialogActions>
+            <DialogActions sx={{ px: 3, pb: 2 }}>
                 <Button onClick={onClose} disabled={isSubmitting}>
                     Cancel
                 </Button>

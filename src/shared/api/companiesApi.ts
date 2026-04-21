@@ -4,7 +4,7 @@ import type {
     CompanyDocument,
     CompanyInvitation, CompanyInvitationPreview,
     CompanyJoinRequest,
-    CompanyMember,
+    CompanyMember, CompanyMembershipHistoryItem,
     CreateCompanyInvitationPayload,
     CreateCompanyJoinRequestPayload,
     CreateCompanyPayload,
@@ -158,5 +158,19 @@ export const companiesApi = {
 
     buildInvitationLink: (token: string) => {
         return `${window.location.origin}/dashboard/invitations/${token}`;
+    },
+
+    listMembersHistory: async (companyId: string) => {
+        const { data } = await api.get<CompanyMember[]>(
+            `/companies/me/${companyId}/members/history`,
+        );
+        return data;
+    },
+
+    getUserMembershipHistory: async (userId: string) => {
+        const { data } = await api.get<CompanyMembershipHistoryItem[]>(
+            `/companies/profile-memberships/${userId}`,
+        );
+        return data;
     },
 };

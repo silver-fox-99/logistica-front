@@ -1,924 +1,121 @@
-import type React from "react";
-import { useEffect, useMemo, useState, useCallback } from "react";
-import {
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    Divider,
-    Paper,
-    Rating,
-    Stack,
-    TextField,
-    Typography
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
-import Autocomplete from "@mui/material/Autocomplete";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-import DirectionsOutlinedIcon from "@mui/icons-material/DirectionsOutlined";
-import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { useGeoCascade } from "@/shared/lib/useGeoCascade";
-import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
-import type { GeoImportItem } from "@/shared/api/geoImportApi";
-import { useTranslation } from "react-i18next";
-import { userReviewsApi } from "@/shared/api/userReviewsApi";
-import { adminUsersApi } from "@/shared/api/adminUsersApi";
-import type { UserProfileSummary, UserReview } from "@/entities/user-reviews/model/types";
-import { toast } from "react-toastify";
-import { useSearchParams } from "react-router-dom";
-import { useUserStore } from "@/entities/user/model/user.store";
-import { useNavigate } from "react-router-dom";
-import { formatDate } from "@/shared/utils/formatDate";
+import { Stack } from "@mui/material";
+import { memo } from "react";
+import { useUserReviewsPage } from "@/features/user-reviews-page/model/useUserReviewsPage";
+import { UserProfileSummaryCard } from "@/features/user-reviews-page/ui/UserProfileSummaryCard";
+import { CreateUserReviewCard } from "@/features/user-reviews-page/ui/CreateUserReviewCard";
+import { UserReviewsListCard } from "@/features/user-reviews-page/ui/UserReviewsListCard";
+import ProfileMembershipHistoryCard from "@/features/profile/ui/ProfileMembershipHistoryCard";
 
-type Place = {
-    countryId?: string | null;
-    regionId?: string | null;
-    cityId?: string | null;
-};
-
-export default function UserReviewsPage() {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const [loadPlace, setLoadPlace] = useState<Place>({});
-    const [unloadPlace, setUnloadPlace] = useState<Place>({});
-    const [routeDate, setRouteDate] = useState<string>("");
-    const [ratingValue, setRatingValue] = useState<number | null>(null);
-    const [comment, setComment] = useState<string>("");
-
-    const [userId, setUserId] = useState<string | null>(null);
-    const [profile, setProfile] = useState<UserProfileSummary | null>(null);
-    const [profileLoading, setProfileLoading] = useState(false);
-    const currentUserId = useUserStore((s) => s.user?.id);
-
-    const [reviews, setReviews] = useState<UserReview[]>([]);
-    const [page, setPage] = useState(1);
-    const [pages, setPages] = useState(1);
-    const [loadingReviews, setLoadingReviews] = useState(false);
-    const [creating, setCreating] = useState(false);
-    const [ratingFilter, setRatingFilter] = useState<number | null>(null);
-    const [avgRating, setAvgRating] = useState<number | null>(null);
-    const [ratingCountsAll, setRatingCountsAll] = useState<[number, number, number, number, number]>([0, 0, 0, 0, 0]);
-    const { getLocalizedGeoName } = useLocalizedGeo();
-    const { t } = useTranslation();
-    const mockTags = useMemo(
-        () => [
-            t("userReviews.tags.fastDelivery", "Быстрая доставка"),
-            t("userReviews.tags.reliability", "Надежность"),
-            t("userReviews.tags.positive", "Позитивный опыт"),
-            t("userReviews.tags.communication", "Отличная коммуникация"),
-        ],
-        [t]
-    );
+function UserReviewsPage() {
     const {
+        profile,
+        profileLoading,
+        membershipHistory,
+        membershipHistoryLoading,
+        reviews,
+        loadingReviews,
+        page,
+        pages,
+        ratingFilter,
+        ratingCountsAll,
+        avgRating,
+        ratingValue,
+        comment,
+        routeDate,
+        loadPlace,
+        unloadPlace,
         countries,
-        getRegions,
-        getCities,
-        loadCountries,
-        ensureRegions,
-        ensureCities,
+        loadRegionsList,
+        loadCitiesList,
+        unloadRegionsList,
+        unloadCitiesList,
         loading,
-        findById,
-    } = useGeoCascade();
+        findCountry,
+        findRegion,
+        findCity,
+        getLocalizedGeoName,
+        handleSelectLoadCountry,
+        handleSelectLoadRegion,
+        handleSelectLoadCity,
+        handleSelectUnloadCountry,
+        handleSelectUnloadRegion,
+        handleSelectUnloadCity,
+        setRouteDate,
+        setRatingValue,
+        setComment,
+        handleTagClick,
+        handleCreateReview,
+        handleLoadMore,
+        setRatingFilter,
+        geoNameById,
+        loadByUserId,
+        creating,
+        canRender,
+        mockTags,
+    } = useUserReviewsPage();
 
-    const loadGeoForReviews = useCallback(
-        async (list: UserReview[]) => {
-            const countryIds = new Set<string>();
-            const regionPairs = new Set<string>();
-
-            list.forEach((r) => {
-                if (r.pickup_country_id) countryIds.add(r.pickup_country_id);
-                if (r.dropoff_country_id) countryIds.add(r.dropoff_country_id);
-                if (r.pickup_country_id && r.pickup_region_id)
-                    regionPairs.add(`${r.pickup_country_id}|${r.pickup_region_id}`);
-                if (r.dropoff_country_id && r.dropoff_region_id)
-                    regionPairs.add(`${r.dropoff_country_id}|${r.dropoff_region_id}`);
-            });
-
-            try {
-                await Promise.all(Array.from(countryIds).map((id) => ensureRegions(id)));
-                await Promise.all(
-                    Array.from(regionPairs).map((pair) => {
-                        const [cid, rid] = pair.split("|");
-                        return ensureCities(cid, rid);
-                    })
-                );
-            } catch {
-                // ignore geo load errors here; graceful degradation
-            }
-        },
-        [ensureRegions, ensureCities]
-    );
-
-    const handleTagClick = (tag: string) => {
-        setComment((prev) => {
-            const trimmed = prev.trim();
-            if (!trimmed) return tag;
-            // avoid exact duplicate additions
-            if (trimmed.split(/\s*,?\s*/).includes(tag)) return prev;
-            return `${prev}${prev.endsWith(" ") ? "" : " "}${tag}`;
-        });
-    };
-
-    useEffect(() => {
-        void loadCountries();
-    }, [loadCountries]);
-    useEffect(() => {
-        if (reviews.length) {
-            void loadGeoForReviews(reviews);
-        }
-    }, [reviews, loadGeoForReviews]);
-
-    const loadRegionsList = useMemo(() => getRegions(loadPlace.countryId), [getRegions, loadPlace.countryId]);
-    const loadCitiesList = useMemo(
-        () => getCities(loadPlace.countryId, loadPlace.regionId),
-        [getCities, loadPlace.countryId, loadPlace.regionId]
-    );
-
-    const unloadRegionsList = useMemo(() => getRegions(unloadPlace.countryId), [getRegions, unloadPlace.countryId]);
-    const unloadCitiesList = useMemo(
-        () => getCities(unloadPlace.countryId, unloadPlace.regionId),
-        [getCities, unloadPlace.countryId, unloadPlace.regionId]
-    );
-
-    const findCountry = (id?: string | null) => countries.find((c) => c.id === id) ?? null;
-    const findRegion = (list: GeoImportItem[], id?: string | null) => list.find((r) => r.id === id) ?? null;
-    const findCity = (list: GeoImportItem[], id?: string | null) => list.find((c) => c.id === id) ?? null;
-    const formatRating = (value?: number | string | null) => {
-        const num = Number(value ?? 0);
-        return Number.isFinite(num) ? num.toFixed(1) : "0.0";
-    };
-    const geoNameById = useCallback(
-        (id?: string | null) => {
-            if (!id) return "";
-            const g = findById(id);
-            return g ? getLocalizedGeoName(g as any) : "";
-        },
-        [findById, getLocalizedGeoName]
-    );
-
-    const resetForm = () => {
-        setRatingValue(null);
-        setComment("");
-        setLoadPlace({});
-        setUnloadPlace({});
-        setRouteDate("");
-    };
-
-    const fetchProfile = useCallback(async (id: string) => {
-        setProfileLoading(true);
-        try {
-            const data = await userReviewsApi.getUserProfile(id);
-            setProfile(data);
-        } catch (e: any) {
-            toast.error(e?.message || t("userReviews.toasts.profileLoadError"));
-            setProfile(null);
-        } finally {
-            setProfileLoading(false);
-        }
-    }, [t]);
-
-    const fetchReviews = useCallback(
-        async (id: string, nextPage = 1, append = false) => {
-            setLoadingReviews(true);
-            try {
-                const data = await userReviewsApi.list(id, {
-                    page: nextPage,
-                    limit: 5,
-                    sort: "new",
-                });
-                const allItems = (data.items || []).filter((r) => !r.status || r.status === "PUBLISHED");
-
-                // посчитаем общие количества по звездам независимо от фильтра
-                const counts = [0, 0, 0, 0, 0];
-                let ratingsSum = 0;
-                allItems.forEach((r) => {
-                    const num = Number(r.rating ?? 0) || 0;
-                    const idx = Math.min(5, Math.max(1, Math.round(num))) - 1;
-                    counts[idx] += 1;
-                    ratingsSum += num;
-                });
-                setRatingCountsAll(counts as [number, number, number, number, number]);
-                setAvgRating(allItems.length ? ratingsSum / allItems.length : null);
-
-                const items =
-                    ratingFilter != null
-                        ? allItems.filter((r) => Math.round(Number(r.rating ?? 0)) === ratingFilter)
-                        : allItems;
-
-                setPage(data.page);
-                setPages(data.pages);
-                setReviews((prev) => (append ? [...prev, ...items] : items));
-            } catch (e: any) {
-                toast.error(e?.message || t("userReviews.toasts.reviewsLoadError"));
-                if (!append) {
-                    setReviews([]);
-                    setPage(1);
-                    setPages(1);
-                }
-            } finally {
-                setLoadingReviews(false);
-            }
-        },
-        [ratingFilter, t]
-    );
-
-    const loadByUserId = useCallback(
-        async (id: string) => {
-            if (currentUserId && id === currentUserId) {
-                toast.info(t("userReviews.toasts.selfProfileHint"));
-                navigate("/dashboard/profile");
-                return;
-            }
-            setUserId(id);
-            setAvgRating(null);
-            await fetchProfile(id);
-            await fetchReviews(id, 1, false);
-        },
-        [fetchProfile, fetchReviews, currentUserId, navigate]
-    );
-
-    const handleCreateReview = async () => {
-        if (!userId) {
-            toast.warn(t("userReviews.toasts.selectUser"));
-            return;
-        }
-        if (currentUserId && userId === currentUserId) {
-            toast.info(t("userReviews.toasts.selfReviewForbidden"));
-            return;
-        }
-        if (!ratingValue) {
-            toast.warn(t("userReviews.toasts.ratingRequired"));
-            return;
-        }
-        if (!routeDate) {
-            toast.warn(t("userReviews.toasts.dateRequired"));
-            return;
-        }
-        setCreating(true);
-        try {
-            const orderDateIso = routeDate ? new Date(`${routeDate}T00:00:00.000Z`).toISOString() : undefined;
-
-            await userReviewsApi.create(userId, {
-                rating: ratingValue,
-                comment: comment || "",
-                order_date: orderDateIso,
-                pickup_country_id: loadPlace.countryId || undefined,
-                pickup_region_id: loadPlace.regionId || undefined,
-                pickup_city_id: loadPlace.cityId || undefined,
-                dropoff_country_id: unloadPlace.countryId || undefined,
-                dropoff_region_id: unloadPlace.regionId || undefined,
-                dropoff_city_id: unloadPlace.cityId || undefined,
-            });
-            toast.success(t("userReviews.toasts.reviewSent"));
-            resetForm();
-            await fetchReviews(userId, 1, false);
-        } catch (e: any) {
-            toast.error(e?.message || t("userReviews.toasts.reviewSendError"));
-        } finally {
-            setCreating(false);
-        }
-    };
-
-    useEffect(() => {
-        const q = searchParams.get("search");
-        if (q) {
-            (async () => {
-                const query = q.trim();
-                if (!query) return;
-                try {
-                    const res = await adminUsersApi.list({ search: query, limit: 1, page: 1 });
-                    const first = res.items?.[0];
-                    if (first?.id && first.id !== currentUserId) {
-                        await loadByUserId(first.id);
-                        return;
-                    }
-                } catch {
-                    // fallback to direct load by id
-                }
-                if (currentUserId && query === currentUserId) {
-                    toast.info(t("userReviews.toasts.selfProfileHint"));
-                    navigate("/dashboard/profile");
-                    return;
-                }
-                await loadByUserId(query);
-            })();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams, currentUserId]);
-
-    // Перезагрузка при смене фильтра оценки
-    useEffect(() => {
-        if (userId) {
-            void fetchReviews(userId, 1, false);
-        }
-    }, [ratingFilter, userId, fetchReviews]);
+    if (!canRender) {
+        return null;
+    }
 
     return (
         <Stack spacing={3} sx={{ maxWidth: 1200, width: "100%", mx: "auto" }}>
-            {!userId && (
-                <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                        {t("userReviews.searchHint")}
-                    </Typography>
-                </Paper>
-            )}
+            <UserProfileSummaryCard
+                profile={profile}
+                profileLoading={profileLoading}
+                avgRating={avgRating}
+            />
 
-            {userId && (
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        p: { xs: 2, md: 3 },
-                        borderRadius: 2,
-                        boxShadow: "0px 8px 24px rgba(15, 23, 42, 0.06)",
-                        borderColor: "rgba(0,0,0,0.05)"
-                    }}
-                >
-                    {profileLoading ? (
-                        <Typography variant="body2" color="text.secondary">{t("userReviews.profile.loading")}</Typography>
-                    ) : profile ? (
-                        <Stack direction="row" spacing={2} alignItems="center">
-                            <Avatar sx={{ width: 64, height: 64 }} src={profile.avatar_url || undefined}>
-                                <PersonOutlineIcon fontSize="large" />
-                            </Avatar>
-                            <Stack spacing={0.5}>
-                                {profile.email && (
-                                    <Typography variant="body2" color="text.secondary">
-                                        {profile.email}
-                                    </Typography>
-                                )}
-                                {profile.phone && (
-                                    <Typography variant="body2" color="text.secondary">
-                                        {profile.phone}
-                                    </Typography>
-                                )}
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                {(() => {
-                                    const name =
-                                        [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
-                                        (profile as any).full_name ||
-                                        (profile as any).name ||
-                                        profile.email ||
-                                        profile.phone ||
-                                        "—";
-                                    return (
-                                        <Typography variant="h6" fontWeight={700}>
-                                            {name}
-                                        </Typography>
-                                    );
-                                })()}
-                                    {profile.is_admin ? <VerifiedIcon color="primary" fontSize="small" /> : null}
-                                </Stack>
-                                <Stack direction="row" spacing={2} alignItems="center">
-                                    {(() => {
-                                        const rawProfileRating =
-                                            profile.rating ??
-                                            (profile as any).rating_value ??
-                                            (profile as any).reviews_rating ??
-                                            null;
-                                        const displayRating = avgRating ?? (rawProfileRating != null ? Number(rawProfileRating) : 0);
-                                        return (
-                                            <Stack direction="row" spacing={0.5} alignItems="center">
-                                                <Rating
-                                                    value={displayRating}
-                                                    precision={0.1}
-                                                    readOnly
-                                                    size="small"
-                                                />
-                                                <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                                                    {formatRating(displayRating)}
-                                                </Typography>
-                                            </Stack>
-                                        );
-                                    })()}
-                                    {(
-                                        profile.location ||
-                                        (profile as any).meta?.geo ||
-                                        (profile as any).meta?.location
-                                    ) && (
-                                        <Chip
-                                            size="small"
-                                            label={`${t("userReviews.profile.location")}: ${
-                                                profile.location ||
-                                                (profile as any).meta?.geo ||
-                                                (profile as any).meta?.location
-                                            }`}
-                                            icon={<LocationOnOutlinedIcon />}
-                                            variant="outlined"
-                                            sx={{
-                                                borderColor: "divider",
-                                                bgcolor: "background.default",
-                                            }}
-                                        />
-                                    )}
-                                </Stack>
+            <ProfileMembershipHistoryCard
+                items={membershipHistory}
+                loading={membershipHistoryLoading}
+            />
 
-                                <Stack direction="row" spacing={3} flexWrap="wrap">
-                                    <InfoItem
-                                        icon={<CalendarTodayOutlinedIcon fontSize="small" />}
-                                        label={t("userReviews.profile.registeredAt")}
-                                        value={profile.created_at ? formatDate(profile.created_at) : "—"}
-                                    />
-                                    <InfoItem
-                                        icon={<Inventory2OutlinedIcon fontSize="small" />}
-                                        label={t("userReviews.profile.totalReviews")}
-                                        value={String(
-                                            profile.reviews_count ??
-                                            (profile as any).reviews ??
-                                            (profile as any).review_count ??
-                                            0
-                                        )}
-                                    />
-                                    <InfoItem
-                                        icon={<WorkHistoryOutlinedIcon fontSize="small" />}
-                                        label={t("userReviews.profile.totalOrders")}
-                                        value={String(
-                                            profile.orders_count ??
-                                            (profile as any).orders ??
-                                            (profile as any).order_count ??
-                                            0
-                                        )}
-                                    />
-                                </Stack>
-                            </Stack>
-                        </Stack>
-                    ) : (
-                        <Typography variant="body2" color="text.secondary">{t("userReviews.profile.notFound")}</Typography>
-                    )}
-                </Paper>
-            )}
+            <CreateUserReviewCard
+                countries={countries}
+                loadRegionsList={loadRegionsList}
+                loadCitiesList={loadCitiesList}
+                unloadRegionsList={unloadRegionsList}
+                unloadCitiesList={unloadCitiesList}
+                loading={loading}
+                ratingValue={ratingValue}
+                comment={comment}
+                routeDate={routeDate}
+                loadPlace={loadPlace}
+                unloadPlace={unloadPlace}
+                mockTags={mockTags}
+                getLocalizedGeoName={getLocalizedGeoName}
+                findCountry={findCountry}
+                findRegion={findRegion}
+                findCity={findCity}
+                onSelectLoadCountry={handleSelectLoadCountry}
+                onSelectLoadRegion={handleSelectLoadRegion}
+                onSelectLoadCity={handleSelectLoadCity}
+                onSelectUnloadCountry={handleSelectUnloadCountry}
+                onSelectUnloadRegion={handleSelectUnloadRegion}
+                onSelectUnloadCity={handleSelectUnloadCity}
+                onRouteDateChange={setRouteDate}
+                onRatingChange={setRatingValue}
+                onCommentChange={setComment}
+                onTagClick={handleTagClick}
+                onSubmit={handleCreateReview}
+                creating={creating}
+            />
 
-            {userId && (
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        p: { xs: 2, md: 3 },
-                        borderRadius: 2,
-                        borderColor: "rgba(0,0,0,0.05)",
-                        boxShadow: "0px 6px 20px rgba(15, 23, 42, 0.04)"
-                    }}
-                >
-                    <Stack spacing={3}>
-                        <Stack spacing={1}>
-                            <Typography variant="h6" fontWeight={700}>{t("userReviews.form.yourRatingTitle")}</Typography>
-                            <Typography variant="body2" color="text.secondary">{t("userReviews.form.yourRatingSubtitle")}</Typography>
-                        <Box
-                            sx={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 1,
-                                px: 1.5,
-                                py: 1,
-                                borderRadius: 2,
-                                bgcolor: "rgba(68,114,184,0.08)",
-                            }}
-                        >
-                            <Rating
-                                value={ratingValue ?? 0}
-                                onChange={(_, v) => setRatingValue(v)}
-                                size="large"
-                            />
-                            <Typography variant="body2" color="text.secondary">
-                                {t("userReviews.form.ratingSelect")}
-                            </Typography>
-                        </Box>
-                    </Stack>
-
-                    <Stack spacing={1.5}>
-                        <Typography variant="body1" fontWeight={700}>{t("userReviews.form.routeTitle")}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {t("userReviews.form.routeSubtitle")}
-                        </Typography>
-
-                        <Grid container spacing={2}>
-                            <Grid
-                                size={{ xs: 12, md: 6 }}
-                                sx={{ minWidth: 0, boxSizing: "border-box", width: { xs: "100%", md: "49%" } }}
-                            >
-                                <Stack spacing={1.25}>
-                                    <Typography variant="body2" color="text.primary" fontWeight={700}>
-                                        {t("userReviews.form.loadTitle")}
-                                    </Typography>
-                                    <Autocomplete
-                                        options={countries}
-                                        getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
-                                        value={findCountry(loadPlace.countryId)}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, v) => {
-                                            setLoadPlace({ countryId: v?.id ?? null, regionId: null, cityId: null });
-                                            void ensureRegions(v?.id ?? null);
-                                        }}
-                                        loading={loading.countries}
-                                        noOptionsText={
-                                            loading.countries
-                                                ? t("userReviews.form.options.loading")
-                                                : countries.length
-                                                    ? t("userReviews.form.options.empty")
-                                                    : t("userReviews.form.options.notLoaded")
-                                        }
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                label={t("addTransport.fields.countryLoad")}
-                                                placeholder={t("addTransport.fields.startTypingCountry")}
-                                            />
-                                        )}
-                                    />
-                                    <Autocomplete
-                                        options={loadRegionsList}
-                                        getOptionLabel={(o) => getLocalizedGeoName(o)}
-                                        value={findRegion(loadRegionsList, loadPlace.regionId)}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, v) => {
-                                            setLoadPlace((p) => ({ ...p, regionId: v?.id ?? null, cityId: null }));
-                                            void ensureCities(loadPlace.countryId ?? null, v?.id ?? null);
-                                        }}
-                                        loading={loading.regionsFor === (loadPlace.countryId || "")}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                label={t("addTransport.fields.regionLoad")}
-                                                placeholder={t("addTransport.fields.startTypingRegion")}
-                                            />
-                                        )}
-                                        disabled={!loadPlace.countryId}
-                                    />
-                                    <Autocomplete
-                                        options={loadCitiesList}
-                                        getOptionLabel={(o) => getLocalizedGeoName(o)}
-                                        value={findCity(loadCitiesList, loadPlace.cityId)}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, v) => {
-                                            setLoadPlace((p) => ({ ...p, cityId: v?.id ?? null }));
-                                        }}
-                                        loading={loading.citiesFor === `${loadPlace.countryId ?? ""}/${loadPlace.regionId ?? ""}`}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                label={t("addTransport.fields.cityLoad")}
-                                                placeholder={t("addTransport.fields.startTypingCity")}
-                                            />
-                                        )}
-                                        disabled={!loadPlace.countryId || !loadPlace.regionId}
-                                    />
-                                </Stack>
-                            </Grid>
-                            <Grid
-                                size={{ xs: 12, md: 6 }}
-                                sx={{ minWidth: 0, boxSizing: "border-box", width: { xs: "100%", md: "49%" } }}
-                            >
-                                <Stack spacing={1.25}>
-                                    <Typography variant="body2" color="text.primary" fontWeight={700}>
-                                        {t("userReviews.form.unloadTitle")}
-                                    </Typography>
-                                    <Autocomplete
-                                        options={countries}
-                                        getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
-                                        value={findCountry(unloadPlace.countryId)}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, v) => {
-                                            setUnloadPlace({ countryId: v?.id ?? null, regionId: null, cityId: null });
-                                            void ensureRegions(v?.id ?? null);
-                                        }}
-                                        loading={loading.countries}
-                                        noOptionsText={
-                                            loading.countries
-                                                ? t("userReviews.form.options.loading")
-                                                : countries.length
-                                                    ? t("userReviews.form.options.empty")
-                                                    : t("userReviews.form.options.notLoaded")
-                                        }
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                label={t("addTransport.fields.countryUnload")}
-                                                placeholder={t("addTransport.fields.startTypingCountry")}
-                                            />
-                                        )}
-                                    />
-                                    <Autocomplete
-                                        options={unloadRegionsList}
-                                        getOptionLabel={(o) => getLocalizedGeoName(o)}
-                                        value={findRegion(unloadRegionsList, unloadPlace.regionId)}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, v) => {
-                                            setUnloadPlace((p) => ({ ...p, regionId: v?.id ?? null, cityId: null }));
-                                            void ensureCities(unloadPlace.countryId ?? null, v?.id ?? null);
-                                        }}
-                                        loading={loading.regionsFor === (unloadPlace.countryId || "")}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                label={t("addTransport.fields.regionUnload")}
-                                                placeholder={t("addTransport.fields.startTypingRegion")}
-                                            />
-                                        )}
-                                        disabled={!unloadPlace.countryId}
-                                    />
-                                    <Autocomplete
-                                        options={unloadCitiesList}
-                                        getOptionLabel={(o) => getLocalizedGeoName(o)}
-                                        value={findCity(unloadCitiesList, unloadPlace.cityId)}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, v) => {
-                                            setUnloadPlace((p) => ({ ...p, cityId: v?.id ?? null }));
-                                        }}
-                                        loading={loading.citiesFor === `${unloadPlace.countryId ?? ""}/${unloadPlace.regionId ?? ""}`}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                label={t("addTransport.fields.cityUnload")}
-                                                placeholder={t("addTransport.fields.startTypingCity")}
-                                            />
-                                        )}
-                                        disabled={!unloadPlace.countryId || !unloadPlace.regionId}
-                                    />
-                                </Stack>
-                            </Grid>
-                        </Grid>
-
-                        <Stack spacing={1.25} sx={{ maxWidth: { xs: "100%", md: 320 } }}>
-                            <Typography variant="body2" color="text.primary" fontWeight={700}>{t("userReviews.form.routeDate")}</Typography>
-                            <TextField
-                                fullWidth
-                                value={routeDate}
-                                onChange={(e) => setRouteDate(e.target.value)}
-                                type="date"
-                                placeholder={t("userReviews.form.datePlaceholder")}
-                            />
-                        </Stack>
-                    </Stack>
-
-                        <Stack spacing={1.5}>
-                            <Typography variant="body1" fontWeight={700}>{t("userReviews.form.commentTitle")}</Typography>
-                            <Stack direction="row" flexWrap="wrap" gap={1}>
-                                {mockTags.map((tag) => (
-                                    <Chip
-                                        key={tag}
-                                        label={tag}
-                                        variant="outlined"
-                                        sx={{
-                                            borderColor: "divider",
-                                            bgcolor: "background.default",
-                                            "&:hover": { bgcolor: "action.hover" },
-                                        }}
-                                        onClick={() => handleTagClick(tag)}
-                                    />
-                                ))}
-                            </Stack>
-                            <TextField
-                                fullWidth
-                                multiline
-                                minRows={3}
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                placeholder={t("userReviews.form.commentPlaceholder")}
-                            />
-                            <Button
-                                variant="contained"
-                                size="large"
-                                sx={{ alignSelf: "flex-start", px: 4 }}
-                                onClick={handleCreateReview}
-                                disabled={creating || !userId}
-                            >
-                                {t("userReviews.form.send")}
-                            </Button>
-                        </Stack>
-                    </Stack>
-                </Paper>
-            )}
-
-            {userId && (
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        p: { xs: 2, md: 3 },
-                        borderRadius: 2,
-                        borderColor: "rgba(0,0,0,0.05)",
-                        boxShadow: "0px 6px 20px rgba(15, 23, 42, 0.04)"
-                    }}
-                >
-                    <Stack spacing={2.5}>
-                        <Stack spacing={0.5}>
-                            <Typography variant="h6" fontWeight={700}>{t("userReviews.reviews.title")}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {t("userReviews.reviews.subtitle")}
-                            </Typography>
-                        </Stack>
-
-                        <Stack direction="row" flexWrap="wrap" gap={1}>
-                        {[
-                            { label: t("userReviews.filters.all"), value: null, count: ratingCountsAll.reduce((a, b) => a + b, 0) },
-                            { label: t("userReviews.filters.rating", { value: 5 }), value: 5, count: ratingCountsAll[4] },
-                            { label: t("userReviews.filters.rating", { value: 4 }), value: 4, count: ratingCountsAll[3] },
-                            { label: t("userReviews.filters.rating", { value: 3 }), value: 3, count: ratingCountsAll[2] },
-                            { label: t("userReviews.filters.rating", { value: 2 }), value: 2, count: ratingCountsAll[1] },
-                            { label: t("userReviews.filters.rating", { value: 1 }), value: 1, count: ratingCountsAll[0] },
-                        ].map((item) => (
-                            <Chip
-                                key={item.label}
-                                label={`${item.label} (${item.count})`}
-                                color={ratingFilter === item.value ? "primary" : "default"}
-                                variant={ratingFilter === item.value ? "filled" : "outlined"}
-                                onClick={() => {
-                                    setRatingFilter(item.value);
-                                    setPage(1);
-                                }}
-                                sx={{
-                                    borderColor: ratingFilter === item.value ? "primary.main" : "divider",
-                                    borderRadius: 1,
-                                }}
-                            />
-                        ))}
-                    </Stack>
-
-                    <Stack spacing={2.25}>
-                        {loadingReviews && reviews.length === 0 && (
-                            <Typography variant="body2" color="text.secondary">{t("userReviews.reviews.loading")}</Typography>
-                        )}
-                        {!loadingReviews && reviews.length === 0 && (
-                            <Typography variant="body2" color="text.secondary">{t("userReviews.reviews.empty")}</Typography>
-                        )}
-                        {reviews.map((review, idx) => (
-                            <Box key={review.id}>
-                                <ReviewCard
-                                    data={review}
-                                    geoName={geoNameById}
-                                    onSelectAuthor={(id) => { if (id) void loadByUserId(id); }}
-                                />
-                                {idx < reviews.length - 1 && <Divider sx={{ mt: 2, mb: 1 }} />}
-                            </Box>
-                        ))}
-                    </Stack>
-
-                        <Box display="flex" justifyContent="center">
-                            <Button
-                                variant="outlined"
-                                sx={{ minWidth: 200 }}
-                                onClick={() => userId && fetchReviews(userId, page + 1, true)}
-                                disabled={loadingReviews || !userId || page >= pages}
-                            >
-                                {t("userReviews.reviews.loadMore")}
-                            </Button>
-                        </Box>
-                    </Stack>
-                </Paper>
-            )}
+            <UserReviewsListCard
+                reviews={reviews}
+                loadingReviews={loadingReviews}
+                page={page}
+                pages={pages}
+                ratingFilter={ratingFilter}
+                ratingCountsAll={ratingCountsAll}
+                onChangeRatingFilter={setRatingFilter}
+                onLoadMore={handleLoadMore}
+                geoNameById={geoNameById}
+                onSelectAuthor={loadByUserId}
+            />
         </Stack>
     );
 }
 
-function ReviewCard({
-    data,
-    geoName,
-    onSelectAuthor,
-}: {
-    data: UserReview;
-    geoName: (id?: string | null) => string;
-    onSelectAuthor?: (id?: string | null) => void;
-}) {
-    const { t } = useTranslation();
-    const routeFrom =
-        [data.pickup_country, data.pickup_region, data.pickup_city]
-            .filter(Boolean)
-            .join(", ") ||
-        [geoName(data.pickup_country_id), geoName(data.pickup_region_id), geoName(data.pickup_city_id)]
-            .filter(Boolean)
-            .join(", ") ||
-        data.pickup_city_id ||
-        data.pickup_region_id ||
-        data.pickup_country_id ||
-        "—";
-    const routeTo =
-        [data.dropoff_country, data.dropoff_region, data.dropoff_city]
-            .filter(Boolean)
-            .join(", ") ||
-        [geoName(data.dropoff_country_id), geoName(data.dropoff_region_id), geoName(data.dropoff_city_id)]
-            .filter(Boolean)
-            .join(", ") ||
-        data.dropoff_city_id ||
-        data.dropoff_region_id ||
-        data.dropoff_country_id ||
-        "—";
-    const created = data.order_date || data.created_at;
-    const createdLabel = created ? formatDate(created as any) : "";
-    const timeLabel = data.created_at ? formatDate(data.created_at as any) : "";
-    const text = data.comment || t("userReviews.reviewCard.noComment");
-    const ratingNum = Number(data.rating ?? 0);
-    const price =
-        data.price_amount != null &&
-        data.price_amount !== 0 &&
-        data.price_currency
-            ? `${data.price_amount} ${data.price_currency}`
-            : null;
-    const statusColor =
-        data.status === "PUBLISHED" ? "success" : data.status === "REJECTED" ? "error" : "warning";
-
-    const authorName =
-        [data.from_first_name, data.from_last_name].filter(Boolean).join(" ") ||
-        data.from_email ||
-        data.from_phone ||
-        data.from_user_id ||
-        t("userReviews.reviewCard.defaultTitle");
-    const authorAvatar = null;
-
-    return (
-        <Stack spacing={1.5}>
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                            <Avatar
-                                sx={{ width: 40, height: 40, cursor: data.from_user_id ? "pointer" : "default" }}
-                                src={authorAvatar || undefined}
-                                onClick={() => {
-                                    if (data.from_user_id) onSelectAuthor?.(data.from_user_id);
-                                }}
-                            >
-                                <PersonOutlineIcon />
-                            </Avatar>
-                    <Stack spacing={0.5}>
-                        <Typography
-                            variant="subtitle1"
-                            fontWeight={700}
-                            sx={{ cursor: data.from_user_id ? "pointer" : "default" }}
-                            onClick={() => {
-                                if (data.from_user_id) {
-                                    onSelectAuthor?.(data.from_user_id);
-                                }
-                            }}
-                        >
-                            {authorName}
-                        </Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <Rating value={ratingNum} readOnly size="small" />
-                            <Typography variant="body2" color="text.secondary">{Number.isFinite(ratingNum) ? ratingNum.toFixed(1) : ""}</Typography>
-                        </Stack>
-                        {data.status && (
-                            <Chip
-                                size="small"
-                                label={data.status}
-                                color={statusColor as any}
-                                variant="outlined"
-                                sx={{ alignSelf: "flex-start" }}
-                            />
-                        )}
-                        <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-                            <RouteLine from={routeFrom} to={routeTo} />
-                            <Stack direction="row" spacing={0.75} alignItems="center">
-                                <EventOutlinedIcon fontSize="small" color="action" />
-                                <Typography variant="body2" color="text.secondary">{createdLabel}</Typography>
-                            </Stack>
-                            {price && (
-                                <Typography variant="body2" color="text.secondary">
-                                    {price}
-                                </Typography>
-                            )}
-                            {data.order_id && (
-                                <Typography variant="body2" color="text.secondary">
-                                    Заказ: {data.order_id}
-                                </Typography>
-                            )}
-                        </Stack>
-                    </Stack>
-                </Stack>
-                <Typography variant="body2" color="text.secondary" minWidth={72} textAlign="right">
-                    {timeLabel}
-                </Typography>
-            </Stack>
-            <Typography variant="body2" color="text.primary" lineHeight={1.6}>
-                {text}
-            </Typography>
-        </Stack>
-    );
-}
-
-function RouteLine({ from, to }: { from: string; to: string }) {
-    return (
-        <Stack direction="row" spacing={0.75} alignItems="center">
-            <DirectionsOutlinedIcon fontSize="small" color="action" />
-            <Typography variant="body2" color="text.secondary">
-                {from} <Typography component="span" color="text.secondary">→</Typography> {to}
-            </Typography>
-        </Stack>
-    );
-}
-
-function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-    return (
-        <Stack direction="row" spacing={1} alignItems="center">
-            <Box color="text.secondary" display="flex" alignItems="center">{icon}</Box>
-            <Typography variant="body2" color="text.secondary">
-                {label}: <Typography component="span" color="text.primary" fontWeight={600}>{value}</Typography>
-            </Typography>
-        </Stack>
-    );
-}
+export default memo(UserReviewsPage);

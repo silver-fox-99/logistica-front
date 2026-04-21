@@ -48,7 +48,7 @@ export const companyRolePermissionMap: Record<CompanyMemberRole, CompanyPermissi
         "company_view",
         "company_manage",
         "members_view",
-        "members_manage",
+     //   "members_manage",
         "invitations_view",
         "invitations_manage",
         "join_requests_view",

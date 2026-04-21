@@ -254,7 +254,23 @@
       "description": "This section displays the main information about your profile. This data is visible to other users.",
       "location": "Location:",
       "registeredAt": "Registration Date:",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "activePlan": "Active plan",
+      "freePlan": "Free",
+      "utcTimezone": "UTC timezone"
+    },
+    "membershipHistory": {
+      "title": "Company history",
+      "description": "Shows current and past company memberships.",
+      "loading": "Loading company history...",
+      "empty": "No company history found.",
+      "loadError": "Failed to load company history",
+      "unknownCompany": "Unknown company",
+      "default": "Default",
+      "joinedAt": "Joined",
+      "removedAt": "Left",
+      "invitedBy": "Invited by",
+      "invitedAt": "Invited"
     },
     "contactInfo": {
       "title": "General Information",
@@ -282,7 +298,9 @@
       "title": "Reviews about you",
       "description": "Here you can see published reviews from other users.",
       "loading": "Loading reviews...",
-      "empty": "No reviews yet"
+      "empty": "No reviews yet",
+      "noComment": "No comment",
+      "defaultAuthor": "Review"
     }
   },
   "userReviews": {
@@ -650,7 +668,7 @@
     "perks": "Included perks",
     "cargoLimit": "Cargo limit/month:",
     "vehicleLimit": "Vehicle limit/month:",
-    "orderDetailsViews": "Order details views/day:",
+    "orderDetailsViews": "Order details views/month:",
     "orderDetails": "Order details:",
     "companies": "Companies:",
     "companyLimit": "Company limit",
@@ -1010,5 +1028,333 @@
       "enabled": "Auto bump enabled.",
       "disabled": "Auto bump disabled."
     }
+  },
+  "companyPage": {
+    "title": "Companies",
+    "subtitle": "Manage your companies or browse public company profiles.",
+    "createCompany": "Create company",
+    "segments": {
+      "public": "Explore companies",
+      "my": "My companies"
+    },
+    "section": {
+      "publicTitle": "Explore companies",
+      "publicSubtitle": "Browse companies and view their public pages.",
+      "myTitle": "My companies",
+      "mySubtitle": "Open your company workspaces and manage your companies."
+    },
+    "search": {
+      "publicPlaceholder": "Search by company name or location",
+      "myPlaceholder": "Search by company name, legal name, tax number, or phone"
+    },
+    "stats": {
+      "total": "Total: {{count}}"
+    },
+    "loading": "Loading companies...",
+    "empty": {
+      "title": "No companies found",
+      "publicDescription": "Try another company name or location.",
+      "myDescription": "Try creating a company or changing the search query."
+    },
+    "card": {
+      "unnamedCompany": "Unnamed company",
+      "legalName": "Legal name",
+      "location": "Location",
+      "contacts": "Contacts",
+      "notSpecified": "Not specified",
+      "noLocation": "No location",
+      "noContacts": "No contacts"
+    },
+    "actions": {
+      "publicPage": "Public page",
+      "openWorkspace": "Open workspace",
+      "viewPublicPage": "View public page"
+    },
+    "status": {
+      "UNVERIFIED": "Unverified",
+      "PENDING_REVIEW": "Pending review",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected",
+      "BLOCKED": "Blocked",
+      "UNKNOWN": "Unknown"
+    }
+  },
+  "publicCompany": {
+    "page": {
+      "notFound": "Company profile not found.",
+      "joinInfoAuthRequired": "You need to be logged in to submit a join request.",
+      "joinRequestSuccess": "Your join request has been sent successfully.",
+      "joinRequestError": "Failed to send join request."
+    },
+    "header": {
+      "verifiedCompany": "Verified company",
+      "profileFallback": "Public company profile",
+      "teamMembers": "Team members: {{count}}",
+      "descriptionFallback": "This company has not added a public description yet.",
+      "applyToJoin": "Apply to join",
+      "loginToApply": "Login to apply"
+    },
+    "overview": {
+      "title": "Overview",
+      "legalName": "Legal name",
+      "address": "Address",
+      "website": "Website",
+      "created": "Created"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "description": "Public company contact information.",
+      "website": "Website",
+      "email": "Email",
+      "phone": "Phone",
+      "notSpecified": "Not specified",
+      "applyToJoin": "Apply to join",
+      "loginToApply": "Login to apply",
+      "goBack": "Go back"
+    },
+    "members": {
+      "title": "Team members",
+      "description": "People publicly associated with this company.",
+      "empty": "No public team members are available yet.",
+      "unknownMember": "Unknown member",
+      "fallbackRole": "Member"
+    },
+    "joinDialog": {
+      "title": "Apply to join company",
+      "description": "Choose a preferred role and add a short message for the company.",
+      "requestedRole": "Requested role",
+      "message": "Message",
+      "messagePlaceholder": "Tell the company why you want to join.",
+      "cancel": "Cancel",
+      "sendRequest": "Send request"
+    },
+    "roles": {
+      "VIEWER": "Viewer",
+      "LOGIST": "Logistics specialist",
+      "MANAGER": "Manager",
+      "ADMIN": "Admin",
+      "OWNER": "Owner"
+    }
+  },
+  "companyWorkspace": {
+    "header": {
+      "description": "Manage company profile, documents, verification, and team access.",
+      "uploadDocuments": "Upload documents"
+    },
+    "sidebar": {
+      "backToCompanies": "Back to companies",
+      "overview": "Overview",
+      "companyInfo": "Company info",
+      "documents": "Documents",
+      "team": "Team",
+      "verification": "Verification",
+      "settings": "Settings",
+      "teamLockedHint": "Team management will become available after company verification."
+    }
+  },
+  "companyStatus": {
+    "UNVERIFIED": "Unverified",
+    "PENDING_REVIEW": "Pending review",
+    "VERIFIED": "Verified",
+    "REJECTED": "Rejected",
+    "BLOCKED": "Blocked"
+  },
+  "companyOverviewCards": {
+    "statusCard": {
+      "title": "Verification status",
+      "unverifiedHint": "Complete the company information and upload documents for verification.",
+      "pendingReviewHint": "Your company is under review. You can still view the profile and documents."
+    },
+    "progressCard": {
+      "title": "Profile completion",
+      "description": "Complete your company profile to speed up verification.",
+      "completed": "{{percent}}% completed"
+    },
+    "nextStepsCard": {
+      "title": "Next steps",
+      "description": "Follow these steps to unlock all company features.",
+      "completeInfoStep": "1. Complete company information.",
+      "uploadDocumentsStep": "2. Upload verification documents.",
+      "completeInfoButton": "Complete info",
+      "uploadDocumentsButton": "Upload documents",
+      "underReviewHint": "Your documents are under review. You can update profile details while waiting.",
+      "verifiedHint": "Your company is verified. Team management is now available."
+    }
+  },
+  "companyInfoForm": {
+    "title": "Company information",
+    "description": "Complete your company profile before verification.",
+    "fields": {
+      "name": "Company name",
+      "legalName": "Legal name",
+      "registrationNumber": "Registration number",
+      "taxNumber": "Tax number",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website",
+      "logo": "Logo URL",
+      "country": "Country",
+      "region": "Region",
+      "city": "City",
+      "address": "Address",
+      "description": "Description"
+    },
+    "actions": {
+      "saving": "Saving...",
+      "save": "Save changes"
+    }
+  },
+  "companyDocuments": {
+    "form": {
+      "title": "Company documents",
+      "description": "Upload documents for company verification.",
+      "documentType": "Document type",
+      "documentTitle": "Document title",
+      "documentDescription": "Description",
+      "selectFile": "Select file",
+      "selectedFile": "Selected file: {{name}}",
+      "uploading": "Uploading...",
+      "uploadDocument": "Upload document"
+    },
+    "list": {
+      "title": "Uploaded documents",
+      "loading": "Loading...",
+      "empty": "No documents uploaded yet.",
+      "status": "Status: {{value}}",
+      "comment": "Comment: {{value}}",
+      "deleting": "Deleting...",
+      "delete": "Delete"
+    },
+    "types": {
+      "REGISTRATION_CERTIFICATE": "Registration certificate",
+      "TAX_CERTIFICATE": "Tax certificate",
+      "LICENSE": "License",
+      "INSURANCE": "Insurance",
+      "IDENTITY_DOCUMENT": "Identity document",
+      "OTHER": "Other"
+    },
+    "statuses": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "UNDER_REVIEW": "Under review"
+    }
+  },
+  "companyTeam": {
+    "page": {
+      "title": "Team management",
+      "description": "Manage current members, review history, invitations, and join requests.",
+      "inviteMember": "Invite member",
+      "loading": "Loading..."
+    },
+    "tabs": {
+      "active": "Active members ({{count}})",
+      "history": "History ({{count}})",
+      "invitations": "Invitations ({{count}})",
+      "requests": "Join requests ({{count}})"
+    },
+    "history": {
+      "title": "Member history",
+      "description": "View previous and current membership records for this company.",
+      "empty": "No membership history found.",
+      "invitedAt": "Invited at",
+      "joinedAt": "Joined at",
+      "removedAt": "Removed at",
+      "invitedBy": "Invited by {{name}}",
+      "emptyDate": "—"
+    },
+    "invitations": {
+      "title": "Invitations",
+      "description": "Track invitations sent to future company members.",
+      "empty": "No invitations found.",
+      "sentBy": "Sent by {{name}}",
+      "unknownRecipient": "Unknown recipient",
+      "expires": "Expires: {{value}}",
+      "noExpiry": "No expiry",
+      "copyLink": "Copy link",
+      "openLink": "Open link",
+      "cancelInvitation": "Cancel invitation",
+      "copySuccess": "Invitation link copied.",
+      "copyError": "Failed to copy invitation link."
+    },
+    "requests": {
+      "title": "Join requests",
+      "description": "Review users who want to join the company.",
+      "empty": "No join requests found.",
+      "requestedAt": "Requested at {{value}}",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "members": {
+      "title": "Active members",
+      "description": "Manage current team members, their role, and access status.",
+      "empty": "No active members found.",
+      "invitedBy": "Invited by {{name}}",
+      "default": "Default",
+      "remove": "Remove",
+      "role": "Role",
+      "status": "Status",
+      "viewPermissions": "View permissions"
+    },
+    "inviteDialog": {
+      "title": "Invite team member",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "message": "Message",
+      "cancel": "Cancel",
+      "sendInvitation": "Send invitation"
+    }
+  },
+  "companyRoles": {
+    "OWNER": "Owner",
+    "ADMIN": "Admin",
+    "MANAGER": "Manager",
+    "LOGIST": "Logistics specialist",
+    "VIEWER": "Viewer"
+  },
+  "companyMemberStatuses": {
+    "ACTIVE": "Active",
+    "BLOCKED": "Blocked",
+    "REMOVED": "Removed"
+  },
+  "companyInvitationStatuses": {
+    "PENDING": "Pending",
+    "ACCEPTED": "Accepted",
+    "CANCELED": "Canceled",
+    "EXPIRED": "Expired",
+    "REJECTED": "Rejected"
+  },
+  "companyJoinRequestStatuses": {
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "CANCELED": "Canceled"
+  },
+  "companyVerification": {
+    "title": "Verification",
+    "description": "Track verification progress and review feedback from the moderation team.",
+    "messages": {
+      "unverified": "Complete company information and upload documents to start verification.",
+      "pendingReview": "Your company is currently under review. Please wait for the moderation result.",
+      "verified": "Your company has been verified successfully."
+    }
+  },
+  "companySettings": {
+    "title": "Settings",
+    "description": "Manage destructive actions and future company preferences."
+  },
+  "companyDangerZone": {
+    "title": "Danger zone",
+    "description": "If you no longer need this company, you can delete it.",
+    "deleteButton": "Delete company"
+  },
+  "deleteCompanyDialog": {
+    "title": "Delete company",
+    "description": "Are you sure you want to delete <strong>{{name}}</strong>? This action cannot be undone.",
+    "fallbackCompanyName": "this company",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete company"
   }
 }

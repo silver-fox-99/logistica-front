@@ -20,6 +20,7 @@ import {
     FiShield,
     FiUsers,
 } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import type { Company } from "@/entities/company/model/types";
 import { companyStatusMap } from "@/entities/company/model/companyStatus";
 import React from "react";
@@ -87,37 +88,38 @@ function CompanyNavItem({ to, icon, label, disabled, onClick }: CompanyNavItemPr
 export function CompanyWorkspaceSidebar({ company, onItemClick }: Props) {
     const navigate = useNavigate();
     const { id = "" } = useParams();
+    const { t } = useTranslation();
 
     const nav = [
         {
             to: `/dashboard/company/${id}/overview`,
-            label: "Overview",
+            label: t("companyWorkspace.sidebar.overview"),
             icon: <FiGrid />,
         },
         {
             to: `/dashboard/company/${id}/info`,
-            label: "Company info",
+            label: t("companyWorkspace.sidebar.companyInfo"),
             icon: <FiBriefcase />,
         },
         {
             to: `/dashboard/company/${id}/documents`,
-            label: "Documents",
+            label: t("companyWorkspace.sidebar.documents"),
             icon: <FiFileText />,
         },
         {
             to: `/dashboard/company/${id}/team`,
-            label: "Team",
+            label: t("companyWorkspace.sidebar.team"),
             icon: <FiUsers />,
             disabled: company.status !== "VERIFIED",
         },
         {
             to: `/dashboard/company/${id}/verification`,
-            label: "Verification",
+            label: t("companyWorkspace.sidebar.verification"),
             icon: <FiShield />,
         },
         {
             to: `/dashboard/company/${id}/settings`,
-            label: "Settings",
+            label: t("companyWorkspace.sidebar.settings"),
             icon: <FiSettings />,
         },
     ];
@@ -133,7 +135,7 @@ export function CompanyWorkspaceSidebar({ company, onItemClick }: Props) {
         <Stack spacing={1.5}>
             <CompanyNavItem
                 icon={<FiArrowLeft />}
-                label="Back to companies"
+                label={t("companyWorkspace.sidebar.backToCompanies")}
                 onClick={handleBack}
             />
 
@@ -172,7 +174,7 @@ export function CompanyWorkspaceSidebar({ company, onItemClick }: Props) {
                         },
                     }}
                 >
-                    Team management will become available after company verification.
+                    {t("companyWorkspace.sidebar.teamLockedHint")}
                 </Alert>
             ) : null}
 

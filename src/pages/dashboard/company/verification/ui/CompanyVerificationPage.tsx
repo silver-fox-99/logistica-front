@@ -1,10 +1,16 @@
 import { Alert, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useCompanyWorkspaceContext } from "@/pages/dashboard/company/workspace/model/useCompanyWorkspaceContext";
 import { companyStatusMap } from "@/entities/company/model/companyStatus";
 
 export default function CompanyVerificationPage() {
+    const { t } = useTranslation();
     const { company } = useCompanyWorkspaceContext();
+
     const status = companyStatusMap[company.status];
+    const statusLabel = t(`companyStatus.${company.status}`, {
+        defaultValue: status?.label || company.status,
+    });
 
     return (
         <Stack spacing={3}>
@@ -18,30 +24,30 @@ export default function CompanyVerificationPage() {
                             spacing={1}
                         >
                             <Typography variant="h5" fontWeight={700}>
-                                Verification
+                                {t("companyVerification.title")}
                             </Typography>
-                            <Chip label={status.label} color={status.color} size="small" />
+                            <Chip label={statusLabel} color={status.color} size="small" />
                         </Stack>
 
                         <Typography variant="body2" color="text.secondary">
-                            Track verification progress and review feedback from the moderation team.
+                            {t("companyVerification.description")}
                         </Typography>
 
                         {company.status === "UNVERIFIED" ? (
                             <Alert severity="info">
-                                Complete company information and upload documents to start verification.
+                                {t("companyVerification.messages.unverified")}
                             </Alert>
                         ) : null}
 
                         {company.status === "PENDING_REVIEW" ? (
                             <Alert severity="warning">
-                                Your company is currently under review. Please wait for the moderation result.
+                                {t("companyVerification.messages.pendingReview")}
                             </Alert>
                         ) : null}
 
                         {company.status === "VERIFIED" ? (
                             <Alert severity="success">
-                                Your company has been verified successfully.
+                                {t("companyVerification.messages.verified")}
                             </Alert>
                         ) : null}
 

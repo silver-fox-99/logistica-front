@@ -253,7 +253,23 @@
       "description": "Ushbu bo'limda profilingiz haqidagi asosiy ma'lumotlar ko'rsatilgan. Bu ma'lumotlar boshqa foydalanuvchilarga ko'rinadi uchun ham ochiq.",
       "location": "Joylashuv:",
       "registeredAt": "Ro'yxatdan o'tgan sana:",
-      "unknown": "Noma'lum"
+      "unknown": "Noma'lum",
+      "activePlan": "Faol tarif",
+      "freePlan": "Bepul",
+      "utcTimezone": "UTC vaqt zonasi"
+    },
+    "membershipHistory": {
+      "title": "Kompaniyalar tarixi",
+      "description": "Bu yerda kompaniyalardagi joriy va avvalgi a’zoliklar ko‘rsatiladi.",
+      "loading": "Kompaniyalar tarixi yuklanmoqda...",
+      "empty": "Kompaniyalar tarixi topilmadi.",
+      "loadError": "Kompaniyalar tarixini yuklab bo‘lmadi",
+      "unknownCompany": "Noma’lum kompaniya",
+      "default": "Asosiy",
+      "joinedAt": "Qo‘shilgan sana",
+      "removedAt": "Chiqgan sana",
+      "invitedBy": "Taklif qilgan",
+      "invitedAt": "Taklif yuborilgan sana"
     },
     "contactInfo": {
       "title": "Umumiy ma'lumot",
@@ -281,7 +297,9 @@
       "title": "Siz haqingizdagi sharhlar",
       "description": "Bu yerda boshqa foydalanuvchilar e'lon qilgan sharhlar ko'rsatiladi.",
       "loading": "Sharhlar yuklanmoqda...",
-      "empty": "Hozircha sharhlar yo'q"
+      "empty": "Hozircha sharhlar yo'q",
+      "noComment": "Izoh yo‘q",
+      "defaultAuthor": "Sharh"
     }
   },
   "userReviews": {
@@ -649,7 +667,7 @@
     "perks": "Nima kiradi",
     "cargoLimit": "Oyiga yuk limiti:",
     "vehicleLimit": "Oyiga transport limiti:",
-    "orderDetailsViews": "Buyurtma tafsilotlari/kun:",
+    "orderDetailsViews": "Buyurtma tafsilotlari/oy:",
     "orderDetails": "Buyurtma tafsilotlari:",
     "companies": "Kompaniyalar:",
     "companyLimit": "Kompaniya limiti",
@@ -1010,5 +1028,333 @@
       "enabled": "Avto ko‘tarish yoqildi.",
       "disabled": "Avto ko‘tarish o‘chirildi."
     }
+  },
+  "companyPage": {
+    "title": "Kompaniyalar",
+    "subtitle": "Kompaniyalaringizni boshqaring yoki kompaniyalarning ommaviy profillarini ko‘ring.",
+    "createCompany": "Kompaniya yaratish",
+    "segments": {
+      "public": "Kompaniyalarni ko‘rish",
+      "my": "Mening kompaniyalarim"
+    },
+    "section": {
+      "publicTitle": "Kompaniyalarni ko‘rish",
+      "publicSubtitle": "Kompaniyalarni ko‘rib chiqing va ularning ommaviy sahifalarini oching.",
+      "myTitle": "Mening kompaniyalarim",
+      "mySubtitle": "Kompaniya ish maydonlarini oching va kompaniyalaringizni boshqaring."
+    },
+    "search": {
+      "publicPlaceholder": "Kompaniya nomi yoki manzil bo‘yicha qidirish",
+      "myPlaceholder": "Kompaniya nomi, yuridik nomi, STIR yoki telefon bo‘yicha qidirish"
+    },
+    "stats": {
+      "total": "Jami: {{count}}"
+    },
+    "loading": "Kompaniyalar yuklanmoqda...",
+    "empty": {
+      "title": "Kompaniyalar topilmadi",
+      "publicDescription": "Boshqa kompaniya nomi yoki boshqa manzilni sinab ko‘ring.",
+      "myDescription": "Kompaniya yarating yoki qidiruv so‘rovini o‘zgartiring."
+    },
+    "card": {
+      "unnamedCompany": "Nomsiz kompaniya",
+      "legalName": "Yuridik nomi",
+      "location": "Joylashuv",
+      "contacts": "Kontaktlar",
+      "notSpecified": "Ko‘rsatilmagan",
+      "noLocation": "Joylashuv ko‘rsatilmagan",
+      "noContacts": "Kontaktlar ko‘rsatilmagan"
+    },
+    "actions": {
+      "publicPage": "Ommaviy sahifa",
+      "openWorkspace": "Ish maydonini ochish",
+      "viewPublicPage": "Ommaviy sahifani ko‘rish"
+    },
+    "status": {
+      "UNVERIFIED": "Tasdiqlanmagan",
+      "PENDING_REVIEW": "Ko‘rib chiqilmoqda",
+      "VERIFIED": "Tasdiqlangan",
+      "REJECTED": "Rad etilgan",
+      "BLOCKED": "Bloklangan",
+      "UNKNOWN": "Noma’lum"
+    }
+  },
+  "publicCompany": {
+    "page": {
+      "notFound": "Kompaniya profili topilmadi.",
+      "joinInfoAuthRequired": "Qo‘shilish so‘rovini yuborish uchun tizimga kirishingiz kerak.",
+      "joinRequestSuccess": "Kompaniyaga qo‘shilish so‘rovingiz muvaffaqiyatli yuborildi.",
+      "joinRequestError": "Qo‘shilish so‘rovini yuborib bo‘lmadi."
+    },
+    "header": {
+      "verifiedCompany": "Tasdiqlangan kompaniya",
+      "profileFallback": "Kompaniyaning ommaviy profili",
+      "teamMembers": "Jamoa a’zolari: {{count}}",
+      "descriptionFallback": "Bu kompaniya hali ommaviy tavsif qo‘shmagan.",
+      "applyToJoin": "Qo‘shilish uchun ariza berish",
+      "loginToApply": "Ariza berish uchun tizimga kiring"
+    },
+    "overview": {
+      "title": "Umumiy ma’lumot",
+      "legalName": "Yuridik nomi",
+      "address": "Manzil",
+      "website": "Sayt",
+      "created": "Yaratilgan"
+    },
+    "contacts": {
+      "title": "Kontaktlar",
+      "description": "Kompaniyaning ommaviy aloqa ma’lumotlari.",
+      "website": "Sayt",
+      "email": "Email",
+      "phone": "Telefon",
+      "notSpecified": "Ko‘rsatilmagan",
+      "applyToJoin": "Qo‘shilish uchun ariza berish",
+      "loginToApply": "Ariza berish uchun tizimga kiring",
+      "goBack": "Orqaga"
+    },
+    "members": {
+      "title": "Jamoa a’zolari",
+      "description": "Ushbu kompaniya bilan ommaviy bog‘langan odamlar.",
+      "empty": "Hozircha ommaviy jamoa a’zolari mavjud emas.",
+      "unknownMember": "Noma’lum a’zo",
+      "fallbackRole": "A’zo"
+    },
+    "joinDialog": {
+      "title": "Kompaniyaga qo‘shilish uchun ariza",
+      "description": "Kerakli rolni tanlang va kompaniya uchun qisqa xabar yozing.",
+      "requestedRole": "So‘ralayotgan rol",
+      "message": "Xabar",
+      "messagePlaceholder": "Nega qo‘shilmoqchi ekaningizni kompaniyaga yozing.",
+      "cancel": "Bekor qilish",
+      "sendRequest": "So‘rov yuborish"
+    },
+    "roles": {
+      "VIEWER": "Kuzatuvchi",
+      "LOGIST": "Logist",
+      "MANAGER": "Menejer",
+      "ADMIN": "Administrator",
+      "OWNER": "Egasi"
+    }
+  },
+  "companyWorkspace": {
+    "header": {
+      "description": "Kompaniya profili, hujjatlar, verifikatsiya va jamoa ruxsatlarini boshqaring.",
+      "uploadDocuments": "Hujjatlarni yuklash"
+    },
+    "sidebar": {
+      "backToCompanies": "Kompaniyalarga qaytish",
+      "overview": "Umumiy ko‘rinish",
+      "companyInfo": "Kompaniya ma’lumotlari",
+      "documents": "Hujjatlar",
+      "team": "Jamoa",
+      "verification": "Verifikatsiya",
+      "settings": "Sozlamalar",
+      "teamLockedHint": "Jamoani boshqarish kompaniya tasdiqlangandan keyin ochiladi."
+    }
+  },
+  "companyStatus": {
+    "UNVERIFIED": "Tasdiqlanmagan",
+    "PENDING_REVIEW": "Ko‘rib chiqilmoqda",
+    "VERIFIED": "Tasdiqlangan",
+    "REJECTED": "Rad etilgan",
+    "BLOCKED": "Bloklangan"
+  },
+  "companyOverviewCards": {
+    "statusCard": {
+      "title": "Verifikatsiya holati",
+      "unverifiedHint": "Kompaniya ma’lumotlarini to‘ldiring va verifikatsiya uchun hujjatlarni yuklang.",
+      "pendingReviewHint": "Kompaniyangiz ko‘rib chiqilmoqda. Siz hanuz profil va hujjatlarni ko‘rishingiz mumkin."
+    },
+    "progressCard": {
+      "title": "Profil to‘ldirilganligi",
+      "description": "Verifikatsiyani tezlashtirish uchun kompaniya profilingizni to‘ldiring.",
+      "completed": "{{percent}}% to‘ldirilgan"
+    },
+    "nextStepsCard": {
+      "title": "Keyingi qadamlar",
+      "description": "Kompaniyaning barcha funksiyalarini ochish uchun quyidagi qadamlarni bajaring.",
+      "completeInfoStep": "1. Kompaniya ma’lumotlarini to‘ldiring.",
+      "uploadDocumentsStep": "2. Verifikatsiya hujjatlarini yuklang.",
+      "completeInfoButton": "Ma’lumotlarni to‘ldirish",
+      "uploadDocumentsButton": "Hujjatlarni yuklash",
+      "underReviewHint": "Hujjatlaringiz ko‘rib chiqilmoqda. Kutish vaqtida profil ma’lumotlarini yangilashingiz mumkin.",
+      "verifiedHint": "Kompaniyangiz tasdiqlangan. Endi jamoani boshqarish mavjud."
+    }
+  },
+  "companyInfoForm": {
+    "title": "Kompaniya ma’lumotlari",
+    "description": "Verifikatsiyadan oldin kompaniya profilingizni to‘ldiring.",
+    "fields": {
+      "name": "Kompaniya nomi",
+      "legalName": "Yuridik nomi",
+      "registrationNumber": "Ro‘yxatdan o‘tish raqami",
+      "taxNumber": "Soliq raqami",
+      "phone": "Telefon",
+      "email": "Email",
+      "website": "Sayt",
+      "logo": "Logotip URL",
+      "country": "Mamlakat",
+      "region": "Hudud",
+      "city": "Shahar",
+      "address": "Manzil",
+      "description": "Tavsif"
+    },
+    "actions": {
+      "saving": "Saqlanmoqda...",
+      "save": "O‘zgarishlarni saqlash"
+    }
+  },
+  "companyDocuments": {
+    "form": {
+      "title": "Kompaniya hujjatlari",
+      "description": "Kompaniyani verifikatsiya qilish uchun hujjatlarni yuklang.",
+      "documentType": "Hujjat turi",
+      "documentTitle": "Hujjat nomi",
+      "documentDescription": "Tavsif",
+      "selectFile": "Faylni tanlash",
+      "selectedFile": "Tanlangan fayl: {{name}}",
+      "uploading": "Yuklanmoqda...",
+      "uploadDocument": "Hujjatni yuklash"
+    },
+    "list": {
+      "title": "Yuklangan hujjatlar",
+      "loading": "Yuklanmoqda...",
+      "empty": "Hozircha hujjatlar yuklanmagan.",
+      "status": "Holat: {{value}}",
+      "comment": "Izoh: {{value}}",
+      "deleting": "O‘chirilmoqda...",
+      "delete": "O‘chirish"
+    },
+    "types": {
+      "REGISTRATION_CERTIFICATE": "Ro‘yxatdan o‘tganlik guvohnomasi",
+      "TAX_CERTIFICATE": "Soliq sertifikati",
+      "LICENSE": "Litsenziya",
+      "INSURANCE": "Sug‘urta",
+      "IDENTITY_DOCUMENT": "Shaxsni tasdiqlovchi hujjat",
+      "OTHER": "Boshqa"
+    },
+    "statuses": {
+      "PENDING": "Kutilmoqda",
+      "APPROVED": "Tasdiqlangan",
+      "REJECTED": "Rad etilgan",
+      "UNDER_REVIEW": "Ko‘rib chiqilmoqda"
+    }
+  },
+  "companyTeam": {
+    "page": {
+      "title": "Jamoani boshqarish",
+      "description": "Joriy a’zolarni boshqaring, tarixni, taklifnomalarni va qo‘shilish so‘rovlarini ko‘ring.",
+      "inviteMember": "A’zoni taklif qilish",
+      "loading": "Yuklanmoqda..."
+    },
+    "tabs": {
+      "active": "Faol a’zolar ({{count}})",
+      "history": "Tarix ({{count}})",
+      "invitations": "Taklifnomalar ({{count}})",
+      "requests": "Qo‘shilish so‘rovlari ({{count}})"
+    },
+    "history": {
+      "title": "A’zolar tarixi",
+      "description": "Kompaniya bo‘yicha avvalgi va joriy a’zolik yozuvlarini ko‘ring.",
+      "empty": "A’zolik tarixi topilmadi.",
+      "invitedAt": "Taklif qilingan vaqt",
+      "joinedAt": "Qo‘shilgan vaqt",
+      "removedAt": "Olib tashlangan vaqt",
+      "invitedBy": "Taklif qilgan: {{name}}",
+      "emptyDate": "—"
+    },
+    "invitations": {
+      "title": "Taklifnomalar",
+      "description": "Kelajakdagi kompaniya a’zolariga yuborilgan taklifnomalarni kuzating.",
+      "empty": "Taklifnomalar topilmadi.",
+      "sentBy": "Yuborgan: {{name}}",
+      "unknownRecipient": "Noma’lum qabul qiluvchi",
+      "expires": "Amal qilish muddati: {{value}}",
+      "noExpiry": "Muddatsiz",
+      "copyLink": "Havolani nusxalash",
+      "openLink": "Havolani ochish",
+      "cancelInvitation": "Taklifnomani bekor qilish",
+      "copySuccess": "Taklifnoma havolasi nusxalandi.",
+      "copyError": "Taklifnoma havolasini nusxalab bo‘lmadi."
+    },
+    "requests": {
+      "title": "Qo‘shilish so‘rovlari",
+      "description": "Kompaniyaga qo‘shilmoqchi bo‘lgan foydalanuvchilarni ko‘rib chiqing.",
+      "empty": "Qo‘shilish so‘rovlari topilmadi.",
+      "requestedAt": "So‘rov yuborilgan vaqt: {{value}}",
+      "approve": "Tasdiqlash",
+      "reject": "Rad etish"
+    },
+    "members": {
+      "title": "Faol a’zolar",
+      "description": "Joriy jamoa a’zolari, ularning roli va kirish holatini boshqaring.",
+      "empty": "Faol a’zolar topilmadi.",
+      "invitedBy": "Taklif qilgan: {{name}}",
+      "default": "Asosiy",
+      "remove": "Olib tashlash",
+      "role": "Rol",
+      "status": "Holat",
+      "viewPermissions": "Ruxsatlarni ko‘rish"
+    },
+    "inviteDialog": {
+      "title": "Jamoa a’zosini taklif qilish",
+      "email": "Email",
+      "phone": "Telefon",
+      "role": "Rol",
+      "message": "Xabar",
+      "cancel": "Bekor qilish",
+      "sendInvitation": "Taklifnoma yuborish"
+    }
+  },
+  "companyRoles": {
+    "OWNER": "Egasi",
+    "ADMIN": "Administrator",
+    "MANAGER": "Menejer",
+    "LOGIST": "Logist",
+    "VIEWER": "Kuzatuvchi"
+  },
+  "companyMemberStatuses": {
+    "ACTIVE": "Faol",
+    "BLOCKED": "Bloklangan",
+    "REMOVED": "Olib tashlangan"
+  },
+  "companyInvitationStatuses": {
+    "PENDING": "Kutilmoqda",
+    "ACCEPTED": "Qabul qilingan",
+    "CANCELED": "Bekor qilingan",
+    "EXPIRED": "Muddati tugagan",
+    "REJECTED": "Rad etilgan"
+  },
+  "companyJoinRequestStatuses": {
+    "PENDING": "Kutilmoqda",
+    "APPROVED": "Tasdiqlangan",
+    "REJECTED": "Rad etilgan",
+    "CANCELED": "Bekor qilingan"
+  },
+  "companyVerification": {
+    "title": "Verifikatsiya",
+    "description": "Verifikatsiya jarayonini kuzating va moderatsiya jamoasining fikrlarini ko‘ring.",
+    "messages": {
+      "unverified": "Verifikatsiyani boshlash uchun kompaniya ma’lumotlarini to‘ldiring va hujjatlarni yuklang.",
+      "pendingReview": "Kompaniyangiz hozir ko‘rib chiqilmoqda. Iltimos, moderatsiya natijasini kuting.",
+      "verified": "Kompaniyangiz muvaffaqiyatli tasdiqlandi."
+    }
+  },
+  "companySettings": {
+    "title": "Sozlamalar",
+    "description": "Buzuvchi harakatlar va kelajakdagi kompaniya sozlamalarini boshqaring."
+  },
+  "companyDangerZone": {
+    "title": "Xavfli zona",
+    "description": "Agar bu kompaniya endi kerak bo‘lmasa, uni o‘chirishingiz mumkin.",
+    "deleteButton": "Kompaniyani o‘chirish"
+  },
+  "deleteCompanyDialog": {
+    "title": "Kompaniyani o‘chirish",
+    "description": "<strong>{{name}}</strong> ni o‘chirishni xohlaysizmi? Bu amalni bekor qilib bo‘lmaydi.",
+    "fallbackCompanyName": "ushbu kompaniya",
+    "cancel": "Bekor qilish",
+    "deleting": "O‘chirilmoqda...",
+    "delete": "Kompaniyani o‘chirish"
   }
 }

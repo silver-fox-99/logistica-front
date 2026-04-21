@@ -24,6 +24,7 @@ import {transportApi} from "@/shared/api/transportApi.ts";
 import { favoritesApi } from "@/shared/api/favoritesApi";
 import { formatDate } from "@/shared/utils/formatDate";
 import type { TransitionProps } from "@mui/material/transitions";
+import { FaBriefcase } from "react-icons/fa";
 
 const DetailsTransition = forwardRef(function DetailsTransition(
     props: TransitionProps & { children: ReactElement },
@@ -91,6 +92,20 @@ function ShipmentDetailsContent({
                             ) : (
                                 <Typography>{data.contact.name}</Typography>
                             )}
+                        </Stack>
+                    )}
+                    {data.contact?.company && (
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <FaBriefcase />
+                            {data.contact?.company ? (
+                                <Typography
+                                    component={RouterLink}
+                                    to={`/dashboard/companies/${data.contact?.company?.id}`}
+                                    sx={{ textDecoration: "none", color: "inherit" }}
+                                >
+                                    {data.contact?.company?.name}
+                                </Typography>
+                            ) : "-"}
                         </Stack>
                     )}
                     {data.contact?.email && (

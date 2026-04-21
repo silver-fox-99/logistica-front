@@ -1,5 +1,6 @@
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Company } from "@/entities/company/model/types";
 
 type Props = {
@@ -7,6 +8,8 @@ type Props = {
 };
 
 export function CompanyNextStepsCard({ company }: Props) {
+    const { t } = useTranslation();
+
     const needsInfo = !company.legal_name || !company.registration_number || !company.country;
     const needsDocuments = company.status === "UNVERIFIED";
     const underReview = company.status === "PENDING_REVIEW";
@@ -17,25 +20,30 @@ export function CompanyNextStepsCard({ company }: Props) {
                 <Stack spacing={2}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
-                            Next steps
+                            {t("companyOverviewCards.nextStepsCard.title")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Follow these steps to unlock all company features.
+                            {t("companyOverviewCards.nextStepsCard.description")}
                         </Typography>
                     </Stack>
 
                     {needsInfo ? (
                         <Stack spacing={1}>
                             <Typography variant="body2">
-                                1. Complete company information.
+                                {t("companyOverviewCards.nextStepsCard.completeInfoStep")}
                             </Typography>
                             <Button
                                 component={RouterLink}
                                 to="../info"
                                 variant="outlined"
-                                sx={{ alignSelf: "flex-start", textTransform: "none", borderRadius: 2, fontWeight: 700 }}
+                                sx={{
+                                    alignSelf: "flex-start",
+                                    textTransform: "none",
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                }}
                             >
-                                Complete info
+                                {t("companyOverviewCards.nextStepsCard.completeInfoButton")}
                             </Button>
                         </Stack>
                     ) : null}
@@ -43,28 +51,33 @@ export function CompanyNextStepsCard({ company }: Props) {
                     {needsDocuments ? (
                         <Stack spacing={1}>
                             <Typography variant="body2">
-                                2. Upload verification documents.
+                                {t("companyOverviewCards.nextStepsCard.uploadDocumentsStep")}
                             </Typography>
                             <Button
                                 component={RouterLink}
                                 to="../documents"
                                 variant="outlined"
-                                sx={{ alignSelf: "flex-start", textTransform: "none", borderRadius: 2, fontWeight: 700 }}
+                                sx={{
+                                    alignSelf: "flex-start",
+                                    textTransform: "none",
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                }}
                             >
-                                Upload documents
+                                {t("companyOverviewCards.nextStepsCard.uploadDocumentsButton")}
                             </Button>
                         </Stack>
                     ) : null}
 
                     {underReview ? (
                         <Typography variant="body2" color="text.secondary">
-                            Your documents are under review. You can update profile details while waiting.
+                            {t("companyOverviewCards.nextStepsCard.underReviewHint")}
                         </Typography>
                     ) : null}
 
                     {company.status === "VERIFIED" ? (
                         <Typography variant="body2" color="success.main" fontWeight={600}>
-                            Your company is verified. Team management is now available.
+                            {t("companyOverviewCards.nextStepsCard.verifiedHint")}
                         </Typography>
                     ) : null}
                 </Stack>

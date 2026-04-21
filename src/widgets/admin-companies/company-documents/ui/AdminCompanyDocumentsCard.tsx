@@ -21,7 +21,7 @@ export function AdminCompanyDocumentsCard({ companyId }: Props) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const load = async () => {
+    const loadDocuments = async () => {
         try {
             setIsLoading(true);
             setError("");
@@ -31,7 +31,7 @@ export function AdminCompanyDocumentsCard({ companyId }: Props) {
             const message =
                 e?.response?.data?.message ||
                 e?.message ||
-                "Failed to load documents.";
+                "Не удалось загрузить документы.";
             setError(Array.isArray(message) ? message[0] : message);
         } finally {
             setIsLoading(false);
@@ -39,7 +39,7 @@ export function AdminCompanyDocumentsCard({ companyId }: Props) {
     };
 
     useEffect(() => {
-        load();
+        loadDocuments();
     }, [companyId]);
 
     const updateDocument = async (
@@ -47,22 +47,18 @@ export function AdminCompanyDocumentsCard({ companyId }: Props) {
         status: CompanyDocumentStatus,
         reviewComment: string,
     ) => {
-        try {
-            const updated = await adminCompaniesApi.reviewDocument(companyId, documentId, {
-                status,
-                review_comment: reviewComment.trim() || null,
-            });
+        const updated = await adminCompaniesApi.reviewDocument(companyId, documentId, {
+            status,
+            review_comment: reviewComment.trim() || null,
+        });
 
-            setItems((prev) =>
-                prev.map((item) => (item.id === updated.id ? updated : item)),
-            );
-        } catch (e) {
-            console.error(e);
-        }
+        setItems((prev) =>
+            prev.map((item) => (item.id === updated.id ? updated : item)),
+        );
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 3 }}>
+        <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent>
                 <Stack spacing={2}>
                     <Typography variant="h6" fontWeight={700}>
@@ -74,7 +70,7 @@ export function AdminCompanyDocumentsCard({ companyId }: Props) {
                     {isLoading ? (
                         <Typography>Загрузка...</Typography>
                     ) : items.length === 0 ? (
-                        <Typography color="text.secondary">Документы не загружены</Typography>
+                        <Typography color="text.secondary">Документы ещё не загружены</Typography>
                     ) : (
                         items.map((item) => (
                             <AdminCompanyDocumentRow
@@ -101,11 +97,36 @@ function AdminCompanyDocumentRow(props: {
     const [status, setStatus] = useState<CompanyDocumentStatus>(item.status);
     const [reviewComment, setReviewComment] = useState(item.review_comment ?? "");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isOpening, setIsOpening] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleOpenFile = async () => {
+        try {
+            setIsOpening(true);
+            setError("");
+            await adminCompaniesApi.openDocumentFile(companyId, item.id);
+        } catch (e: any) {
+            const message =
+                e?.response?.data?.message ||
+                e?.message ||
+                "Не удалось открыть файл.";
+            setError(Array.isArray(message) ? message[0] : message);
+        } finally {
+            setIsOpening(false);
+        }
+    };
 
     const handleSave = async () => {
         try {
             setIsSubmitting(true);
+            setError("");
             await onSave(item.id, status, reviewComment);
+        } catch (e: any) {
+            const message =
+                e?.response?.data?.message ||
+                e?.message ||
+                "Не удалось сохранить решение.";
+            setError(Array.isArray(message) ? message[0] : message);
         } finally {
             setIsSubmitting(false);
         }
@@ -122,38 +143,44 @@ function AdminCompanyDocumentRow(props: {
             }}
         >
             <Typography fontWeight={700}>{item.title}</Typography>
+
             <Typography variant="body2" color="text.secondary">
-                {item.original_name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-                Type: {item.type}
+                Файл: {item.original_name}
             </Typography>
 
+            <Typography variant="body2" color="text.secondary">
+                Тип документа: {item.type}
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+                Текущий статус: {item.status}
+            </Typography>
+
+            {error ? <Alert severity="error">{error}</Alert> : null}
+
             <Button
-                component="a"
-                href={adminCompaniesApi.getDocumentFileUrl(companyId, item.id)}
-                target="_blank"
-                rel="noreferrer"
+                onClick={handleOpenFile}
+                disabled={isOpening}
                 variant="outlined"
                 sx={{ textTransform: "none", fontWeight: 700, alignSelf: "flex-start" }}
             >
-                Открыть файл
+                {isOpening ? "Открытие..." : "Открыть файл"}
             </Button>
 
             <TextField
                 select
-                label="Document status"
+                label="Статус документа"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as CompanyDocumentStatus)}
                 fullWidth
             >
-                <MenuItem value="PENDING">PENDING</MenuItem>
-                <MenuItem value="APPROVED">APPROVED</MenuItem>
-                <MenuItem value="REJECTED">REJECTED</MenuItem>
+                <MenuItem value="PENDING">На проверке</MenuItem>
+                <MenuItem value="APPROVED">Одобрен</MenuItem>
+                <MenuItem value="REJECTED">Отклонён</MenuItem>
             </TextField>
 
             <TextField
-                label="Review comment"
+                label="Комментарий к проверке"
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 multiline

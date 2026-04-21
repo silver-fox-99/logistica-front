@@ -8,10 +8,10 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { CompanyJoinRequest } from "@/entities/company/model/types";
 import {
-    companyJoinRequestStatusLabelMap,
-    companyRoleLabelMap,
     getUserDisplayName,
     getUserSecondaryText,
 } from "@/widgets/company/company-team/model/companyTeamUi";
@@ -29,28 +29,47 @@ export function CompanyJoinRequestsCard({
                                             onApprove,
                                             onReject,
                                         }: Props) {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    const roleLabel = (role?: string | null) =>
+        t(`companyRoles.${role}`, {
+            defaultValue: role || "",
+        });
+
+    const statusLabel = (status?: string | null) =>
+        t(`companyJoinRequestStatuses.${status}`, {
+            defaultValue: status || "",
+        });
+
+    const handleOpenUserProfile = (userId?: string | null) => {
+        if (!userId) return;
+        navigate(`/dashboard/user-reviews/${userId}`);
+    };
+
     return (
-        <Card variant="outlined" sx={{ borderRadius: 4 }}>
+        <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
-                            Join requests
+                            {t("companyTeam.requests.title")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Review users who want to join the company.
+                            {t("companyTeam.requests.description")}
                         </Typography>
                     </Stack>
 
                     {!requests.length ? (
                         <Typography variant="body2" color="text.secondary">
-                            No join requests found.
+                            {t("companyTeam.requests.empty")}
                         </Typography>
                     ) : (
                         <Stack divider={<Divider flexItem />} spacing={0}>
                             {requests.map((request) => {
                                 const displayName = getUserDisplayName(request.user);
                                 const secondaryText = getUserSecondaryText(request.user);
+                                const requestUserId = request.user?.id;
 
                                 return (
                                     <Stack
@@ -65,15 +84,41 @@ export function CompanyJoinRequestsCard({
                                             alignItems={{ xs: "flex-start", md: "center" }}
                                         >
                                             <Stack direction="row" spacing={1.5} alignItems="center">
-                                                <Avatar src={request.user?.avatar || undefined}>
+                                                <Avatar
+                                                    src={request.user?.avatar || undefined}
+                                                    sx={{
+                                                        cursor: requestUserId ? "pointer" : "default",
+                                                    }}
+                                                    onClick={() => handleOpenUserProfile(requestUserId)}
+                                                >
                                                     {displayName.slice(0, 1).toUpperCase()}
                                                 </Avatar>
 
                                                 <Stack spacing={0.35}>
-                                                    <Typography variant="subtitle1" fontWeight={700}>
+                                                    <Typography
+                                                        variant="subtitle1"
+                                                        fontWeight={700}
+                                                        sx={{
+                                                            cursor: requestUserId ? "pointer" : "default",
+                                                            "&:hover": requestUserId
+                                                                ? { textDecoration: "underline" }
+                                                                : undefined,
+                                                        }}
+                                                        onClick={() => handleOpenUserProfile(requestUserId)}
+                                                    >
                                                         {displayName}
                                                     </Typography>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{
+                                                            cursor: requestUserId ? "pointer" : "default",
+                                                            "&:hover": requestUserId
+                                                                ? { textDecoration: "underline" }
+                                                                : undefined,
+                                                        }}
+                                                        onClick={() => handleOpenUserProfile(requestUserId)}
+                                                    >
                                                         {secondaryText}
                                                     </Typography>
                                                     {request.message ? (
@@ -86,11 +131,11 @@ export function CompanyJoinRequestsCard({
 
                                             <Stack direction="row" spacing={1} flexWrap="wrap">
                                                 <Chip
-                                                    label={companyRoleLabelMap[request.requested_role]}
+                                                    label={roleLabel(request.requested_role)}
                                                     size="small"
                                                 />
                                                 <Chip
-                                                    label={companyJoinRequestStatusLabelMap[request.status]}
+                                                    label={statusLabel(request.status)}
                                                     size="small"
                                                     variant="outlined"
                                                 />
@@ -104,7 +149,9 @@ export function CompanyJoinRequestsCard({
                                             spacing={2}
                                         >
                                             <Typography variant="body2" color="text.secondary">
-                                                Requested at {new Date(request.created_at).toLocaleString()}
+                                                {t("companyTeam.requests.requestedAt", {
+                                                    value: new Date(request.created_at).toLocaleString(),
+                                                })}
                                             </Typography>
 
                                             {request.status === "PENDING" ? (
@@ -114,7 +161,7 @@ export function CompanyJoinRequestsCard({
                                                         onClick={() => onApprove(request.id)}
                                                         disabled={isSubmitting}
                                                     >
-                                                        Approve
+                                                        {t("companyTeam.requests.approve")}
                                                     </Button>
                                                     <Button
                                                         variant="outlined"
@@ -122,7 +169,7 @@ export function CompanyJoinRequestsCard({
                                                         onClick={() => onReject(request.id)}
                                                         disabled={isSubmitting}
                                                     >
-                                                        Reject
+                                                        {t("companyTeam.requests.reject")}
                                                     </Button>
                                                 </Stack>
                                             ) : null}

@@ -1,4 +1,5 @@
 import { Card, CardContent, LinearProgress, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import type { Company } from "@/entities/company/model/types";
 
 type Props = {
@@ -29,6 +30,7 @@ function calcCompletion(company: Company): number {
 }
 
 export function CompanyProgressCard({ company }: Props) {
+    const { t } = useTranslation();
     const percent = calcCompletion(company);
 
     return (
@@ -36,15 +38,15 @@ export function CompanyProgressCard({ company }: Props) {
             <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Stack spacing={1.5}>
                     <Typography variant="h6" fontWeight={700}>
-                        Profile completion
+                        {t("companyOverviewCards.progressCard.title")}
                     </Typography>
 
                     <Typography variant="body2" color="text.secondary">
-                        Complete your company profile to speed up verification.
+                        {t("companyOverviewCards.progressCard.description")}
                     </Typography>
 
                     <Typography variant="body2" fontWeight={600}>
-                        {percent}% completed
+                        {t("companyOverviewCards.progressCard.completed", { percent })}
                     </Typography>
 
                     <LinearProgress

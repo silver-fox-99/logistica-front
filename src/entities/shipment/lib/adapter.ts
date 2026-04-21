@@ -121,6 +121,7 @@ export function adaptCargo(i: CargoApiItem): any {
         contact: {
             userId: (i as any)?.user?.id,
             name,
+            company: (i as any)?.user?.company,
             email: i.user?.email,
             phone1: i.user?.phone,
             phone2: i.contact_extra_phone ?? undefined,

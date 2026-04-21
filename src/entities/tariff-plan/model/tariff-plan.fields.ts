@@ -50,8 +50,8 @@ export const TARIFF_LIMIT_FIELDS: TariffLimitFieldMeta[] = [
     },
     {
         key: "order_details_views_per_day_limit",
-        label: "Лимит просмотров подробностей заказа в день",
-        hint: "Сколько раз в день можно открывать детали заказов",
+        label: "Лимит просмотров подробностей заказа в месяц",
+        hint: "Сколько раз в месяц можно открывать детали заказов",
     },
     {
         key: "company_limit",

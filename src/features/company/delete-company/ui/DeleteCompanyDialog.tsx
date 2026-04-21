@@ -7,6 +7,7 @@ import {
     DialogTitle,
     Typography,
 } from "@mui/material";
+import { Trans, useTranslation } from "react-i18next";
 import { useDeleteCompany } from "../model/useDeleteCompany";
 
 type Props = {
@@ -17,27 +18,38 @@ type Props = {
 };
 
 export function DeleteCompanyDialog({ open, onClose, companyId, companyName }: Props) {
+    const { t } = useTranslation();
     const { submit, isSubmitting, error } = useDeleteCompany(companyId);
 
     const handleDelete = async () => {
         await submit();
     };
 
+    const safeCompanyName = companyName || t("deleteCompanyDialog.fallbackCompanyName");
+
     return (
         <Dialog open={open} onClose={isSubmitting ? undefined : onClose} fullWidth maxWidth="sm">
-            <DialogTitle>Delete company</DialogTitle>
+            <DialogTitle>{t("deleteCompanyDialog.title")}</DialogTitle>
+
             <DialogContent>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Are you sure you want to delete <strong>{companyName || "this company"}</strong>?
-                    This action cannot be undone.
+                    <Trans
+                        i18nKey="deleteCompanyDialog.description"
+                        values={{ name: safeCompanyName }}
+                        components={{ strong: <strong /> }}
+                    />
                 </Typography>
 
-                {error ? <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert> : null}
+                {error ? (
+                    <Alert severity="error" sx={{ mt: 2 }}>
+                        {error}
+                    </Alert>
+                ) : null}
             </DialogContent>
 
             <DialogActions sx={{ px: 3, pb: 2 }}>
                 <Button onClick={onClose} disabled={isSubmitting} sx={{ textTransform: "none" }}>
-                    Cancel
+                    {t("deleteCompanyDialog.cancel")}
                 </Button>
                 <Button
                     onClick={handleDelete}
@@ -46,7 +58,9 @@ export function DeleteCompanyDialog({ open, onClose, companyId, companyName }: P
                     variant="contained"
                     sx={{ textTransform: "none", fontWeight: 700 }}
                 >
-                    {isSubmitting ? "Deleting..." : "Delete company"}
+                    {isSubmitting
+                        ? t("deleteCompanyDialog.deleting")
+                        : t("deleteCompanyDialog.delete")}
                 </Button>
             </DialogActions>
         </Dialog>

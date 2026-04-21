@@ -1,4 +1,5 @@
 import { Alert, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import type { Company } from "@/entities/company/model/types";
 import { companyStatusMap } from "@/entities/company/model/companyStatus";
 
@@ -7,7 +8,12 @@ type Props = {
 };
 
 export function CompanyStatusCard({ company }: Props) {
+    const { t } = useTranslation();
+
     const status = companyStatusMap[company.status];
+    const statusLabel = t(`companyStatus.${company.status}`, {
+        defaultValue: status?.label || company.status,
+    });
 
     return (
         <Card variant="outlined" sx={{ borderRadius: 4 }}>
@@ -15,20 +21,20 @@ export function CompanyStatusCard({ company }: Props) {
                 <Stack spacing={2}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="h6" fontWeight={700}>
-                            Verification status
+                            {t("companyOverviewCards.statusCard.title")}
                         </Typography>
-                        <Chip label={status.label} color={status.color} size="small" />
+                        <Chip label={statusLabel} color={status.color} size="small" />
                     </Stack>
 
                     {company.status === "UNVERIFIED" && (
                         <Alert severity="info">
-                            Complete the company information and upload documents for verification.
+                            {t("companyOverviewCards.statusCard.unverifiedHint")}
                         </Alert>
                     )}
 
                     {company.status === "PENDING_REVIEW" && (
                         <Alert severity="warning">
-                            Your company is under review. You can still view the profile and documents.
+                            {t("companyOverviewCards.statusCard.pendingReviewHint")}
                         </Alert>
                     )}
 
