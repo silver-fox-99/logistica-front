@@ -59,6 +59,9 @@
       "addressLoad": "Loading address",
       "addressUnload": "Unloading address",
       "enterAddress": "Enter address",
+      "images": "Images",
+      "imagesHelper": "Upload photos of the cargo if available.",
+      "uploadImages": "Upload images",
       "dateFrom": "Loading Date",
       "dateFromStart": "Loading Date (from)",
       "dateFromEnd": "Loading Date (to)",
@@ -161,6 +164,9 @@
       "dateTo": "Unloading Date",
       "loadPlace": "Loading Place",
       "unloadPlace": "Unloading Place",
+      "images": "Images",
+      "imagesHelper": "Upload photos of the transport if available.",
+      "uploadImages": "Upload images",
       "countryLoad": "Loading Country",
       "regionLoad": "Loading Region",
       "cityLoad": "Loading City",
@@ -1356,5 +1362,17 @@
     "cancel": "Cancel",
     "deleting": "Deleting...",
     "delete": "Delete company"
+  },
+  "createCompanyForm": {
+    "title": "Create company",
+    "subtitle": "Start with the company name. You can complete the rest of the profile later.",
+    "fields": {
+      "name": "Company name",
+      "namePlaceholder": "Enter company name"
+    },
+    "actions": {
+      "create": "Create company",
+      "creating": "Creating..."
+    }
   }
 }

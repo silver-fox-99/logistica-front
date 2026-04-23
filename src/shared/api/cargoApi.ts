@@ -90,6 +90,7 @@ export type CreateCargoDto = {
     note?: string;
 
     points: CargoPointDto[];
+    images?: string[];
 };
 
 type CreateResponse<T = unknown> = {

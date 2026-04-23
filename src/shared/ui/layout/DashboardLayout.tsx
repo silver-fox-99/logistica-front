@@ -208,7 +208,8 @@ export default function DashboardLayout() {
                                 maxWidth: "100%",
                                 minWidth: 0,
                                 overflow: "hidden",
-                                boxSizing: "border-box"
+                                boxSizing: "border-box",
+                                mt: "12px !important"
                             }}
                         >
                             <Outlet />

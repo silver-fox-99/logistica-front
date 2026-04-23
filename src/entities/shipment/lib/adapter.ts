@@ -9,6 +9,44 @@ const money = (cur: string, amt: string | number) => {
     return formatted ? `${formatted} ${cur}` : undefined;
 };
 
+function toNum(value: unknown): number | null {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+}
+
+function adaptRoute(raw: any) {
+    if (!raw) return null;
+
+    const points = Array.isArray(raw.points)
+        ? raw.points
+            .map((point: any) => {
+                const lat = toNum(point?.lat);
+                const lon = toNum(point?.lon);
+
+                if (lat == null || lon == null) return null;
+
+                return {
+                    id: point?.id,
+                    type: point?.type,
+                    label: point?.label,
+                    lat,
+                    lon,
+                    order: point?.order ?? 0,
+                };
+            })
+            .filter(Boolean)
+        : [];
+
+    return {
+        points,
+        center: Array.isArray(raw.center) ? raw.center : null,
+        bounds: Array.isArray(raw.bounds) ? raw.bounds : null,
+        geometry: Array.isArray(raw.geometry) ? raw.geometry : [],
+        distance_m: toNum(raw.distance_m),
+        duration_s: toNum(raw.duration_s),
+    };
+}
+
 const dimStr = (l?: any, w?: any, h?: any) => {
     if (l == null || w == null || h == null) return undefined;
     return `${Number(l)}m × ${Number(w)}m × ${Number(h)}m`;
@@ -146,6 +184,8 @@ export function adaptCargo(i: CargoApiItem): any {
         updated_at: i.updated_at ?? undefined,
         sort_updated_at: i.sort_updated_at ?? undefined,
         up_count: i.up_count ?? undefined,
+        images: i.images ?? [],
+        route: adaptRoute((i as any).route),
     };
 }
 

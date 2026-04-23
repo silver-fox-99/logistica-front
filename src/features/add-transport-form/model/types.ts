@@ -38,4 +38,7 @@ export type AddTransportFormValues = {
     email: string;
     extraPhoneAsMain: boolean;
     note: string;
+    
+    images: File[];
+    imageUrls: string[];
 };

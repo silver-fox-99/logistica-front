@@ -11,6 +11,7 @@ import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { onDigitsOnlyChange } from "@/shared/lib/numericInput";
 
 import type { AddCargoFormValues, Place } from "./types";
+import {imgbbApi} from "@/shared/api/imgbbApi.ts";
 
 export const PHONE_RE = /^\+?[1-9]\d{9,19}$/;
 
@@ -108,10 +109,25 @@ export function useAddCargoForm() {
             contactSecondary: "",
             note: "",
             extraPhoneAsMain: false,
+            images: [],
+            imageUrls: [],
         },
     });
 
     const { register, setValue, getValues, setError, clearErrors, handleSubmit, control, formState } = form;
+
+
+    const images = form.watch("images");
+
+    const imagePreviews = useMemo(() => {
+        return (images ?? []).map((file) => URL.createObjectURL(file));
+    }, [images]);
+
+    useEffect(() => {
+        return () => {
+            imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [imagePreviews]);
 
     useEffect(() => {
         if (!lookups || loadingInit) return;
@@ -302,6 +318,8 @@ export function useAddCargoForm() {
             }));
 
             return {
+                images: v.imageUrls?.length ? v.imageUrls : undefined,
+
                 date_from: dateFromPayload,
                 date_to: v.dateTo || "",
 
@@ -367,15 +385,26 @@ export function useAddCargoForm() {
             }
 
             try {
-                setLoading(true)
-                const payload = toDto(values);
+                setLoading(true);
+
+                let uploadedUrls: string[] = values.imageUrls ?? [];
+
+                if (values.images?.length) {
+                    uploadedUrls = await imgbbApi.uploadMany(values.images);
+                }
+
+                const payload = toDto({
+                    ...values,
+                    imageUrls: uploadedUrls,
+                });
+
                 await cargoApi.create(payload);
                 toast.success(t("addCargo.successMessage"));
                 navigate("/dashboard/requests");
             } catch (error: any) {
                 toast.error(getErrorMessage(error));
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         },
         [getErrorMessage, navigate, t, toDto, validateBusiness]
@@ -428,6 +457,7 @@ export function useAddCargoForm() {
         dropoffCountryErrors,
 
         onSubmit,
-        loading
+        loading,
+        imagePreviews
     };
 }

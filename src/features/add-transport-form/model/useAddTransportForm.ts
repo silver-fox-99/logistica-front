@@ -1,10 +1,11 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
+import { imgbbApi } from "@/shared/api/imgbbApi";
 import { useInitStore } from "@/shared/store/initStore";
 import { useGeoCascade } from "@/shared/lib/useGeoCascade";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
@@ -80,10 +81,25 @@ export function useAddTransportForm() {
             email: "",
             note: "",
             extraPhoneAsMain: false,
+
+            images: [],
+            imageUrls: [],
         },
     });
 
-    const { setValue, getValues, setError, clearErrors, handleSubmit, formState } = form;
+    const { setValue, getValues, setError, clearErrors, handleSubmit, formState, watch } = form;
+
+    const watchedImages = watch("images");
+
+    const imagePreviews = useMemo(() => {
+        return (watchedImages ?? []).map((file) => URL.createObjectURL(file));
+    }, [watchedImages]);
+
+    useEffect(() => {
+        return () => {
+            imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [imagePreviews]);
 
     useEffect(() => {
         if (!lookups || loadingInit) return;
@@ -91,8 +107,17 @@ export function useAddTransportForm() {
         const cur = getValues("currency");
         const veh = getValues("vehicleType");
 
-        if (!cur) setValue("currency", lookups.currency?.[0]?.slug ?? "USD", { shouldDirty: false });
-        if (!veh) setValue("vehicleType", lookups.vehicleType?.[0]?.slug ?? "", { shouldDirty: false });
+        if (!cur) {
+            setValue("currency", lookups.currency?.[0]?.slug ?? "USD", {
+                shouldDirty: false,
+            });
+        }
+
+        if (!veh) {
+            setValue("vehicleType", lookups.vehicleType?.[0]?.slug ?? "", {
+                shouldDirty: false,
+            });
+        }
     }, [getValues, lookups, loadingInit, setValue]);
 
     const validatePlaces = useCallback(
@@ -140,7 +165,15 @@ export function useAddTransportForm() {
                 ok = false;
             }
 
-            if (v.dateFrom && v.dateTo && v.dateTo < v.dateFrom) {
+            if (v.dateFrom && v.dateFromEnd && v.dateFromEnd < v.dateFrom) {
+                setError("dateFromEnd", {
+                    type: "validate",
+                    message: t("addTransport.errors.dateRangeOrder"),
+                });
+                ok = false;
+            }
+
+            if (v.dateFromEnd && v.dateTo && v.dateTo < v.dateFromEnd) {
                 setError("dateTo", {
                     type: "validate",
                     message: t("addTransport.errors.dateOrder"),
@@ -228,7 +261,7 @@ export function useAddTransportForm() {
                     : [];
 
         return {
-            images: undefined,
+            images: v.imageUrls?.length ? v.imageUrls : undefined,
 
             date_from: dateFromPayload,
             date_to: v.dateTo || "",
@@ -287,15 +320,26 @@ export function useAddTransportForm() {
             }
 
             try {
-                setLoading(true)
-                const payload = toDto(values);
+                setLoading(true);
+
+                let uploadedUrls: string[] = values.imageUrls ?? [];
+
+                if (values.images?.length) {
+                    uploadedUrls = await imgbbApi.uploadMany(values.images);
+                }
+
+                const payload = toDto({
+                    ...values,
+                    imageUrls: uploadedUrls,
+                });
+
                 await transportApi.create(payload);
                 toast.success(t("addTransport.successMessage"));
                 navigate("/dashboard/requests");
             } catch (error: any) {
                 toast.error(getErrorMessage(error));
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         },
         [getErrorMessage, navigate, t, toDto, validateBusiness]
@@ -340,5 +384,6 @@ export function useAddTransportForm() {
 
         loading,
         onSubmit,
+        imagePreviews,
     };
 }

@@ -1,8 +1,10 @@
 import { Alert, Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
 import { FiPlusCircle } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import { useCreateCompany } from "../model/useCreateCompany";
 
 export function CreateCompanyForm() {
+    const { t } = useTranslation();
     const { values, error, isSubmitting, setField, submit } = useCreateCompany();
 
     return (
@@ -11,18 +13,18 @@ export function CreateCompanyForm() {
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h5" fontWeight={700}>
-                            Create company
+                            {t("createCompanyForm.title")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Start with the company name. You can complete the rest of the profile later.
+                            {t("createCompanyForm.subtitle")}
                         </Typography>
                     </Stack>
 
                     {error ? <Alert severity="error">{error}</Alert> : null}
 
                     <TextField
-                        label="Company name"
-                        placeholder="Enter company name"
+                        label={t("createCompanyForm.fields.name")}
+                        placeholder={t("createCompanyForm.fields.namePlaceholder")}
                         value={values.name}
                         onChange={(e) => setField("name", e.target.value)}
                         fullWidth
@@ -43,7 +45,9 @@ export function CreateCompanyForm() {
                         }}
                     >
                         <FiPlusCircle size={18} />
-                        {isSubmitting ? "Creating..." : "Create company"}
+                        {isSubmitting
+                            ? t("createCompanyForm.actions.creating")
+                            : t("createCompanyForm.actions.create")}
                     </Button>
                 </Stack>
             </CardContent>

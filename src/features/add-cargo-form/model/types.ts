@@ -41,4 +41,6 @@ export type AddCargoFormValues = {
     contactSecondary: string;
     extraPhoneAsMain: boolean;
     note: string;
+    images: File[];
+    imageUrls: string[];
 };

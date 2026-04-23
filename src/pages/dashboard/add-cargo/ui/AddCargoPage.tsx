@@ -28,7 +28,8 @@ export default function AddCargoPage() {
 
         pickupCountryErrors,
         dropoffCountryErrors,
-        loading
+        loading,
+        imagePreviews
     } = useAddCargoForm();
 
     const theme = useTheme();
@@ -90,6 +91,7 @@ export default function AddCargoPage() {
                         geo={geo}
                         pickupCountryErrors={pickupCountryErrors}
                         dropoffCountryErrors={dropoffCountryErrors}
+                        imagePreviews={imagePreviews}
                     />
                 ) : (
                     <AddCargoMobileForm
@@ -109,6 +111,7 @@ export default function AddCargoPage() {
                         geo={geo}
                         pickupCountryErrors={pickupCountryErrors}
                         dropoffCountryErrors={dropoffCountryErrors}
+                        imagePreviews={imagePreviews}
                     />
                 )}
             </Paper>

@@ -24,6 +24,7 @@ import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
 import { CargoPointsFieldArray } from "@/features/add-cargo-form/ui/CargoPointsFieldArray";
 import {FiBox, FiChevronDown, FiCreditCard, FiPackage, FiPhone} from "react-icons/fi";
 import type {IconType} from "react-icons";
+import {ImageUploadField} from "@/shared/ui/image-upload/ImageUploadField.tsx";
 
 type Props = {
     t: (k: string) => string;
@@ -47,6 +48,7 @@ type Props = {
     pickupCountryErrors?: Array<string | undefined>;
     dropoffCountryErrors?: Array<string | undefined>;
     loading: boolean;
+    imagePreviews: string[];
 };
 
 export function AddCargoMobileForm({
@@ -66,8 +68,10 @@ export function AddCargoMobileForm({
                                        pickupCountryErrors,
                                        dropoffCountryErrors,
                                        loading,
+                                        imagePreviews
                                    }: Props) {
-    const { register, control, setValue, formState } = form;
+    const { register, control, setValue, formState, watch } = form;
+    const images = watch("images");
 
     const [openedSections, setOpenedSections] = useState<number[]>([0]);
 
@@ -335,6 +339,24 @@ export function AddCargoMobileForm({
                                             label={t("addCargo.fields.allowPartialLabel")}
                                         />
                                     )}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <ImageUploadField
+                                    label={t("addCargo.fields.images")}
+                                    helperText={t("addCargo.fields.imagesHelper")}
+                                    uploadButtonText={t("addTransport.fields.uploadImages")}
+                                    files={images ?? []}
+                                    previews={imagePreviews}
+                                    disabled={loadingInit || loading}
+                                    maxFiles={5}
+                                    onChange={(files) => {
+                                        setValue("images", files, {
+                                            shouldDirty: true,
+                                            shouldValidate: false,
+                                        });
+                                    }}
                                 />
                             </Grid>
                         </Grid>

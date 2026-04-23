@@ -53,6 +53,8 @@ import CompanyVerificationPage from "@/pages/dashboard/company/verification/ui/C
 import CompanySettingsPage from "@/pages/dashboard/company/settings/ui/CompanySettingsPage.tsx";
 import PublicCompanyPage from "@/pages/public/company";
 import CompanyInvitationAcceptPage from "@/pages/dashboard/company/invitation-accept";
+import ShipmentDetailsPage from "@/pages/dashboard/shipments-details";
+import AdminTelegramNotificationsPage from "@/pages/admin/telegram-notifications";
 
 
 const router = createBrowserRouter([
@@ -79,9 +81,10 @@ const router = createBrowserRouter([
         children: [
             {index: true, element: <ProfilePage/>},
             {path: "search", element: <ShipmentsListPage scope="public"/>},
+            {path: "search/:kind/:id", element: <ShipmentDetailsPage /> },
             {path: "profile", element: <ProfilePage/>},
             {path: "company", element: <CompanyPage/>},
-            {path: "company/create", element: <CompanyCreatePage/>},
+            {path: "new/company ", element: <CompanyCreatePage/>},
             {path: "invitations/:token", element: <CompanyInvitationAcceptPage /> },
             {
                 path: "company/:id",
@@ -138,7 +141,8 @@ const router = createBrowserRouter([
             { path: "groups-roles", element: <GroupsRoles />},
             { path: "integrations", element: <AdminIntegrationsPage />},
             { path: "ads", element: <AdsPage />},
-            { path: "ads/:id", element: <AdsDetailsPage />}
+            { path: "ads/:id", element: <AdsDetailsPage />},
+            { path: "telegram-notifications", element: <AdminTelegramNotificationsPage /> },
         ],
     },
     {

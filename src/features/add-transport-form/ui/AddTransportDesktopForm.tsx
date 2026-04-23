@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, Stack, TextField, Typography } from "@mui/material";
 import { Controller, type UseFormReturn } from "react-hook-form";
@@ -7,6 +5,7 @@ import { Controller, type UseFormReturn } from "react-hook-form";
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
 import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
+import { ImageUploadField } from "@/shared/ui/image-upload/ImageUploadField";
 import { onDigitsOnlyKeyDown, onDigitsOnlyPaste } from "@/shared/lib/numericInput";
 
 import type { AddTransportFormValues } from "../model/types";
@@ -33,30 +32,29 @@ type Props = {
     geo: any;
     loadCountryErrors?: Array<string | undefined>;
     unloadCountryErrors?: Array<string | undefined>;
-    loading: boolean
+    loading: boolean;
+    imagePreviews: string[];
 };
 
 export function AddTransportDesktopForm({
                                             t,
                                             i18nLang,
-
                                             form,
                                             onSubmit,
                                             loadingInit,
-
                                             vehicleOpts,
                                             payMethodOpts,
                                             payTermOpts,
                                             currencyOpts,
-
                                             getLocalizedLabel,
-
                                             geo,
                                             loadCountryErrors,
                                             unloadCountryErrors,
-                                            loading
+                                            loading,
+                                            imagePreviews,
                                         }: Props) {
-    const { register, control, setValue, formState } = form;
+    const { register, control, setValue, formState, watch } = form;
+    const images = watch("images");
 
     return (
         <Box component="form" noValidate onSubmit={onSubmit}>
@@ -75,7 +73,7 @@ export function AddTransportDesktopForm({
 
                 <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
-                        label={t("addTransport.fields.dateFrom")}
+                        label={t("addCargo.fields.dateFromEnd")}
                         type="date"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
@@ -96,7 +94,6 @@ export function AddTransportDesktopForm({
                         helperText={formState.errors.dateTo?.message as any}
                     />
                 </Grid>
-
 
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <TransportPointsFieldArray
@@ -222,7 +219,12 @@ export function AddTransportDesktopForm({
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    <PriceField control={control} label={t("addTransport.fields.price")} currencyOpts={currencyOpts} getLocalizedLabel={getLocalizedLabel} />
+                    <PriceField
+                        control={control}
+                        label={t("addTransport.fields.price")}
+                        currencyOpts={currencyOpts}
+                        getLocalizedLabel={getLocalizedLabel}
+                    />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
@@ -267,6 +269,28 @@ export function AddTransportDesktopForm({
                                 errorText={(fieldState.error?.message as any) ?? undefined}
                             />
                         )}
+                    />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                    <Divider sx={{ my: 4 }} />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                    <ImageUploadField
+                        label={t("addTransport.fields.images")}
+                        helperText={t("addTransport.fields.imagesHelper")}
+                        uploadButtonText={t("addTransport.fields.uploadImages")}
+                        files={images ?? []}
+                        previews={imagePreviews}
+                        disabled={loadingInit || loading}
+                        maxFiles={5}
+                        onChange={(files) =>
+                            setValue("images", files, {
+                                shouldDirty: true,
+                                shouldValidate: false,
+                            })
+                        }
                     />
                 </Grid>
 

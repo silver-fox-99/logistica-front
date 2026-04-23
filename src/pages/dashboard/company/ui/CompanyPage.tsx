@@ -102,7 +102,7 @@ export default function CompanyPage() {
 
                         <Button
                             component={NavLink}
-                            to="/dashboard/company/create"
+                            to="/dashboard/new/company"
                             variant="contained"
                             startIcon={<FiPlus />}
                             sx={{ alignSelf: { xs: "stretch", md: "center" } }}
@@ -220,7 +220,7 @@ export default function CompanyPage() {
                             <Box pt={1}>
                                 <Button
                                     component={NavLink}
-                                    to="/dashboard/company/create"
+                                    to="/dashboard/new/company"
                                     variant="contained"
                                     startIcon={<FiPlus />}
                                 >

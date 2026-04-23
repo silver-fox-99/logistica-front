@@ -1,4 +1,3 @@
-
 export type ShipmentsKind = "cargo" | "transport";
 
 export type GeoPoint = {
@@ -16,9 +15,34 @@ export type GeoPoint = {
 
     address?: string | null;
 
+    display_name?: string | null;
+    latitude?: string | number | null;
+    longitude?: string | number | null;
+    geocoded?: boolean;
+    geocoded_at?: string | null;
+    geocode_source?: string | null;
+
     type?: string | null;
     order?: number | null;
     id?: string;
+};
+
+export type ShipmentRoutePoint = {
+    id?: string;
+    type?: string;
+    label?: string;
+    lat: number;
+    lon: number;
+    order?: number | null;
+};
+
+export type ShipmentRoute = {
+    points: ShipmentRoutePoint[];
+    center?: [number, number] | null;
+    bounds?: [[number, number], [number, number]] | null;
+    geometry?: [number, number][];
+    distance_m?: number | null;
+    duration_s?: number | null;
 };
 
 export type ShipmentRowData = {
@@ -38,7 +62,15 @@ export type ShipmentRowData = {
     repeats?: number;
     views?: number;
     points?: GeoPoint[];
-    contact?: { userId?: string; name?: string; email?: string; phone1?: string; phone2?: string; telegram?: string; company?: {
+    route?: ShipmentRoute | null;
+    contact?: {
+        userId?: string;
+        name?: string;
+        email?: string;
+        phone1?: string;
+        phone2?: string;
+        telegram?: string;
+        company?: {
             id?: string;
             name?: string;
             legal_name?: string | null;
@@ -50,8 +82,8 @@ export type ShipmentRowData = {
             member_role?: string;
             member_status?: string;
             joined_at?: string;
-        } | null; };
-    
+        } | null;
+    };
 
     vehicleType?: string;
     loadType?: string[];
@@ -68,13 +100,33 @@ export type ShipmentRowData = {
     extraPhoneAsMain?: boolean;
     viewCount?: string;
     isFavorite?: boolean;
+    images?: string[];
 };
-
 
 export type CargoApiItem = {
     id: string;
-    user?: { first_name?: string; last_name?: string; email?: string; phone?: string };
+    user?: {
+        id?: string;
+        first_name?: string;
+        last_name?: string;
+        email?: string;
+        phone?: string;
+        company?: {
+            id?: string;
+            name?: string;
+            legal_name?: string | null;
+            logo?: string | null;
+            country?: string | null;
+            region?: string | null;
+            city?: string | null;
+            status?: string;
+            member_role?: string;
+            member_status?: string;
+            joined_at?: string;
+        } | null;
+    };
     points: {
+        id?: string;
         country?: string;
         country_ru?: string | null;
         country_uz?: string | null;
@@ -85,18 +137,43 @@ export type CargoApiItem = {
         city_ru?: string | null;
         city_uz?: string | null;
         address?: string | null;
+        display_name?: string | null;
+        latitude?: string | number | null;
+        longitude?: string | number | null;
+        geocoded?: boolean;
+        geocoded_at?: string | null;
+        geocode_source?: string | null;
         type?: string | null;
         order?: number | null;
     }[];
+    route?: {
+        points?: Array<{
+            id?: string;
+            type?: string;
+            label?: string;
+            lat?: number | string | null;
+            lon?: number | string | null;
+            order?: number | null;
+        }>;
+        center?: [number, number] | null;
+        bounds?: [[number, number], [number, number]] | null;
+        geometry?: [number, number][];
+        distance_m?: number | null;
+        duration_s?: number | null;
+    } | null;
+    images?: string[];
+
     date_from: string | string[];
     date_to: string | string[];
     pickup_dates?: string[];
+
     has_dimensions: boolean;
     length_m: string | number | null;
     width_m: string | number | null;
     height_m: string | number | null;
     weight_t: string | number | null;
     volume_m3: string | number | null;
+
     price_currency: string;
     price_amount: string | number;
     payment_method?: "BANK_TRANSFER" | "CASH" | "CARD";
@@ -128,4 +205,4 @@ export type ListResponse<T> = {
     pages: number;
     limit: number;
     message?: string;
-}
+};

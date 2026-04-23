@@ -25,7 +25,8 @@ export default function AddTransportPage() {
 
         loadCountryErrors,
         unloadCountryErrors,
-        loading
+        loading,
+        imagePreviews,
     } = useAddTransportForm();
 
     const theme = useTheme();
@@ -56,13 +57,17 @@ export default function AddTransportPage() {
                 </Box>
             </Paper>
 
-            <Paper variant="outlined" sx={{
-                p: {
-                    xs: "14px !important",
-                    sm: "18px !important",
-                    md: "24px !important",
-                },
-            }} className="add-transport-page__content-paper">
+            <Paper
+                variant="outlined"
+                sx={{
+                    p: {
+                        xs: "14px !important",
+                        sm: "18px !important",
+                        md: "24px !important",
+                    },
+                }}
+                className="add-transport-page__content-paper"
+            >
                 <Typography variant="h6" mb={1} className="add-transport-page__title">
                     {t("addTransport.infoTitle")}
                 </Typography>
@@ -86,6 +91,7 @@ export default function AddTransportPage() {
                         loading={loading}
                         loadCountryErrors={loadCountryErrors}
                         unloadCountryErrors={unloadCountryErrors}
+                        imagePreviews={imagePreviews}
                     />
                 ) : (
                     <AddTransportMobileForm
@@ -103,6 +109,7 @@ export default function AddTransportPage() {
                         loading={loading}
                         loadCountryErrors={loadCountryErrors}
                         unloadCountryErrors={unloadCountryErrors}
+                        imagePreviews={imagePreviews}
                     />
                 )}
             </Paper>

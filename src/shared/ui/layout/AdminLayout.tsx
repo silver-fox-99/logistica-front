@@ -33,7 +33,7 @@ import {
     FiChevronRight,
     FiAward,
     FiLink2, FiTruck,
-    FiBriefcase,
+    FiBriefcase, FiSend,
 } from "react-icons/fi";
 import {BsGeoAlt} from "react-icons/bs";
 import {MdOutlineAdminPanelSettings, MdOutlineRateReview} from "react-icons/md";
@@ -74,6 +74,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/black-list", icon: <FiShield />, label: "Чёрный список", requiredAny: [viewCode("BLACKLIST" as any)] },
     { to: "/admin/notifications", icon: <PiBellRingingLight />, label: "Уведомления", requiredAny: [viewCode("NOTIFICATION" as any)] },
     { to: "/admin/integrations", icon: <FiLink2 />, label: "Интеграции", requiredAny: [viewCode("INTEGRATIONS" as any)] },
+    { to: "/admin/telegram-notifications", icon: <FiSend />, label: "Telegram", requiredAny: [viewCode("TELEGRAM_NOTIFICATIONS" as any)] },
     { to: "/admin/ads", icon: <LuNewspaper />, label: "Реклама", requiredAny: [viewCode("ADS" as any)] },
     { to: "/admin/activity-logs", icon: <FiSettings />, label: "Журнал активности", requiredAny: [viewCode("ACTIVITY_LOGS" as any)] },
     {

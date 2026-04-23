@@ -108,7 +108,10 @@
       "clearPhone": "Telefonni tozalash",
       "additionalInfo": "Qo'shimcha ma'lumot",
       "additionalInfoPlaceholder": "Qo'shimcha ma'lumot kiriting",
-      "removePoint": "Nuqtani o'chirish"
+      "removePoint": "Nuqtani o'chirish",
+      "images": "Rasmlar",
+      "imagesHelper": "Agar mavjud bo‘lsa, yuk rasmlarini yuklang.",
+      "uploadImages": "Rasmlarni yuklash"
     },
     "buttons": {
       "back": "Orqaga",
@@ -158,6 +161,9 @@
       "dropoffPoint": "Tushirish nuqtasi",
       "dateFrom": "Yuklash ortish sanasi",
       "dateTo": "Yuk tushirish sanasi",
+      "images": "Rasmlar",
+      "imagesHelper": "Agar mavjud bo‘lsa, transport rasmlarini yuklang.",
+      "uploadImages": "Rasmlarni yuklash",
       "loadPlace": "Yuklash joyi",
       "unloadPlace": "Tushirish joyi",
       "countryLoad": "Yuklash Yuk ortuvchi davlat",
@@ -1356,5 +1362,17 @@
     "cancel": "Bekor qilish",
     "deleting": "O‘chirilmoqda...",
     "delete": "Kompaniyani o‘chirish"
+  },
+  "createCompanyForm": {
+    "title": "Kompaniya yaratish",
+    "subtitle": "Avval kompaniya nomini kiriting. Qolgan profil ma’lumotlarini keyinroq to‘ldirishingiz mumkin.",
+    "fields": {
+      "name": "Kompaniya nomi",
+      "namePlaceholder": "Kompaniya nomini kiriting"
+    },
+    "actions": {
+      "create": "Kompaniya yaratish",
+      "creating": "Yaratilmoqda..."
+    }
   }
 }

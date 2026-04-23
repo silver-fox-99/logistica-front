@@ -70,7 +70,7 @@ export function CompanyEmptyState() {
 
                                     <Stack direction="column" spacing={1.25} sx={{ mt: 1, width: "100%" }}>
                                         <Button
-                                            onClick={() => navigate("/dashboard/company/create")}
+                                            onClick={() => navigate("/dashboard/new/company")}
                                             sx={{
                                                 height: 48,
                                                 borderRadius: 2,

@@ -16,6 +16,7 @@ import type { IconType } from "react-icons";
 import {
     FiChevronDown,
     FiCreditCard,
+    FiImage,
     FiMapPin,
     FiPhone,
     FiTruck,
@@ -25,6 +26,7 @@ import {
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
 import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
+import { ImageUploadField } from "@/shared/ui/image-upload/ImageUploadField";
 import { onDigitsOnlyKeyDown, onDigitsOnlyPaste } from "@/shared/lib/numericInput";
 
 import type { AddTransportFormValues } from "../model/types";
@@ -52,6 +54,7 @@ type Props = {
     loadCountryErrors?: Array<string | undefined>;
     unloadCountryErrors?: Array<string | undefined>;
     loading: boolean;
+    imagePreviews: string[];
 };
 
 export function AddTransportMobileForm({
@@ -69,8 +72,10 @@ export function AddTransportMobileForm({
                                            loadCountryErrors,
                                            unloadCountryErrors,
                                            loading,
+                                           imagePreviews,
                                        }: Props) {
-    const { register, control, setValue, formState } = form;
+    const { register, control, setValue, formState, watch } = form;
+    const images = watch("images");
 
     const [openedSections, setOpenedSections] = useState<number[]>([0]);
 
@@ -213,7 +218,7 @@ export function AddTransportMobileForm({
 
                             <Grid size={{ xs: 12 }}>
                                 <TextField
-                                    label={t("addTransport.fields.dateFrom")}
+                                    label={t("addTransport.fields.dateFromEnd")}
                                     type="date"
                                     InputLabelProps={{ shrink: true }}
                                     fullWidth
@@ -332,6 +337,24 @@ export function AddTransportMobileForm({
                                     {...register("volumeM3")}
                                     onKeyDown={onDigitsOnlyKeyDown as any}
                                     onPaste={onDigitsOnlyPaste as any}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <ImageUploadField
+                                    label={t("addTransport.fields.images")}
+                                    helperText={t("addTransport.fields.imagesHelper")}
+                                    uploadButtonText={t("addTransport.fields.uploadImages")}
+                                    files={images ?? []}
+                                    previews={imagePreviews}
+                                    disabled={loadingInit || loading}
+                                    maxFiles={5}
+                                    onChange={(files) =>
+                                        setValue("images", files, {
+                                            shouldDirty: true,
+                                            shouldValidate: false,
+                                        })
+                                    }
                                 />
                             </Grid>
                         </Grid>
@@ -645,7 +668,7 @@ export function AddTransportMobileForm({
                         boxShadow: "none",
                     }}
                 >
-                    {t("addTransport.buttons.submit")}
+                    {t("addTransport.buttonSubmit")}
                 </Button>
             </Box>
         </Box>
