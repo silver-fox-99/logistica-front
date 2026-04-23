@@ -16,7 +16,6 @@ import type { IconType } from "react-icons";
 import {
     FiChevronDown,
     FiCreditCard,
-    FiImage,
     FiMapPin,
     FiPhone,
     FiTruck,
