@@ -107,7 +107,7 @@ export default function Footer() {
         )}
 
         <div className="footer__bottom container">
-            © 2025 Logistica. All rights reserved.
+            © 2025-2026 Logistica. All rights reserved.
         </div>
     </div>
 }
