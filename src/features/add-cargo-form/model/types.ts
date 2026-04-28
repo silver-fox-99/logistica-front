@@ -1,14 +1,8 @@
-export type Place = {
-    countryId: string | null;
-    regionId: string | null;
-    cityId: string | null;
-    address: string;
-};
+import type {MapsLocationSuggestion} from "@/entities/maps/model/types.ts";
 
-export type Dims = {
-    length: string;
-    width: string;
-    height: string;
+export type Place = {
+    location: MapsLocationSuggestion | null;
+    address: string;
 };
 
 export type AddCargoFormValues = {
@@ -29,7 +23,11 @@ export type AddCargoFormValues = {
     weightTons: string;
     volumeM3: string;
 
-    dims: Dims;
+    dims: {
+        length: string;
+        width: string;
+        height: string;
+    };
 
     currency: string;
     price: string;
@@ -39,8 +37,9 @@ export type AddCargoFormValues = {
     bargaining: "possible" | "none";
 
     contactSecondary: string;
-    extraPhoneAsMain: boolean;
     note: string;
+    extraPhoneAsMain: boolean;
+
     images: File[];
     imageUrls: string[];
 };

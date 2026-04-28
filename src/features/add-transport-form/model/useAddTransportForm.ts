@@ -4,19 +4,16 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { transportApi, type CreateTransportDto } from "@/shared/api/transportApi";
+import { transportApi, type CreateTransportDto, type TransportPointDto } from "@/shared/api/transportApi";
 import { imgbbApi } from "@/shared/api/imgbbApi";
 import { useInitStore } from "@/shared/store/initStore";
-import { useGeoCascade } from "@/shared/lib/useGeoCascade";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 
 import type { AddTransportFormValues, Place } from "./types";
 import { getTodayDate, PHONE_RE, toIntOrZero } from "@/features/add-cargo-form/model/useAddCargoForm";
 
 const EMPTY_PLACE: Place = {
-    countryId: null,
-    regionId: null,
-    cityId: null,
+    location: null,
     address: "",
 };
 
@@ -30,21 +27,38 @@ function toNullableNum(v: string) {
     return Number.isFinite(n) ? n : undefined;
 }
 
+function toTransportPoint(
+    point: Place,
+    type: "DEPARTURE" | "ARRIVAL",
+    index: number,
+): TransportPointDto {
+    const location = point.location;
+
+    return {
+        type,
+        country: location?.country || "Unknown",
+        region: location?.region || null,
+        city: location?.city || null,
+        address: point.address || location?.address || null,
+        display_name: location?.display_name || null,
+        latitude: location?.latitude ? Number(location.latitude) : null,
+        longitude: location?.longitude ? Number(location.longitude) : null,
+        geocode_source: location?.source || "locationiq",
+        order: index,
+    };
+}
+
 export function useAddTransportForm() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+
     const [loading, setLoading] = useState(false);
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups, loadInit, loading: loadingInit } = useInitStore();
-    const geo = useGeoCascade();
 
     useEffect(() => {
         loadInit();
     }, [loadInit]);
-
-    useEffect(() => {
-        void geo.loadCountries();
-    }, [geo]);
 
     const vehicleOpts = useMemo(() => lookups?.vehicleType ?? [], [lookups]);
     const payMethodOpts = useMemo(() => lookups?.paymentMethods ?? [], [lookups]);
@@ -124,12 +138,12 @@ export function useAddTransportForm() {
         (
             places: Place[],
             fieldName: "loadPlaces" | "unloadPlaces",
-            emptyMessage: string
+            emptyMessage: string,
         ) => {
             let ok = true;
 
             if (!places?.length) {
-                setError(`${fieldName}.0.countryId` as any, {
+                setError(`${fieldName}.0.location` as any, {
                     type: "required",
                     message: emptyMessage,
                 });
@@ -137,8 +151,8 @@ export function useAddTransportForm() {
             }
 
             places.forEach((place, index) => {
-                if (!place.countryId) {
-                    setError(`${fieldName}.${index}.countryId` as any, {
+                if (!place.location) {
+                    setError(`${fieldName}.${index}.location` as any, {
                         type: "required",
                         message: emptyMessage,
                     });
@@ -148,7 +162,7 @@ export function useAddTransportForm() {
 
             return ok;
         },
-        [setError]
+        [setError],
     );
 
     const validateBusiness = useCallback(
@@ -181,23 +195,11 @@ export function useAddTransportForm() {
                 ok = false;
             }
 
-            if (
-                !validatePlaces(
-                    v.loadPlaces,
-                    "loadPlaces",
-                    t("addTransport.errors.selectCountryLoad")
-                )
-            ) {
+            if (!validatePlaces(v.loadPlaces, "loadPlaces", t("addTransport.errors.selectCountryLoad"))) {
                 ok = false;
             }
 
-            if (
-                !validatePlaces(
-                    v.unloadPlaces,
-                    "unloadPlaces",
-                    t("addTransport.errors.selectCountryUnload")
-                )
-            ) {
+            if (!validatePlaces(v.unloadPlaces, "unloadPlaces", t("addTransport.errors.selectCountryUnload"))) {
                 ok = false;
             }
 
@@ -219,37 +221,27 @@ export function useAddTransportForm() {
 
             return ok;
         },
-        [clearErrors, setError, t, validatePlaces]
+        [clearErrors, setError, t, validatePlaces],
     );
 
     const toDto = useCallback((v: AddTransportFormValues): CreateTransportDto => {
         const bargain = v.bargaining === "possible" ? "ALLOWED" : "NOT_ALLOWED";
 
-        const normalizedLoadPlaces = (v.loadPlaces ?? []).filter((item) => !!item.countryId);
-        const normalizedUnloadPlaces = (v.unloadPlaces ?? []).filter((item) => !!item.countryId);
+        const normalizedLoadPlaces = (v.loadPlaces ?? []).filter((item) => !!item.location);
+        const normalizedUnloadPlaces = (v.unloadPlaces ?? []).filter((item) => !!item.location);
 
         const anyDim =
             (toNullableNum(v.dims.length) ?? 0) > 0 ||
             (toNullableNum(v.dims.width) ?? 0) > 0 ||
             (toNullableNum(v.dims.height) ?? 0) > 0;
 
-        const departurePoints = normalizedLoadPlaces.map((point, index) => ({
-            type: "DEPARTURE" as const,
-            country: point.countryId || "",
-            region: point.regionId || "",
-            city: point.cityId || "",
-            address: point.address || "",
-            order: index,
-        }));
+        const departurePoints = normalizedLoadPlaces.map((point, index) =>
+            toTransportPoint(point, "DEPARTURE", index),
+        );
 
-        const arrivalPoints = normalizedUnloadPlaces.map((point, index) => ({
-            type: "ARRIVAL" as const,
-            country: point.countryId || "",
-            region: point.regionId || "",
-            city: point.cityId || "",
-            address: point.address || "",
-            order: index,
-        }));
+        const arrivalPoints = normalizedUnloadPlaces.map((point, index) =>
+            toTransportPoint(point, "ARRIVAL", index),
+        );
 
         const dateFromPayload =
             v.dateFrom && v.dateFromEnd
@@ -266,7 +258,7 @@ export function useAddTransportForm() {
             date_from: dateFromPayload,
             date_to: v.dateTo || "",
 
-            vehicle_type: (v.vehicleType as CreateTransportDto["vehicle_type"]) || "ANY",
+            vehicle_type: v.vehicleType || "ANY",
 
             cars_count: Math.max(1, toIntOrZero(v.vehiclesCount)),
             weight_t: toIntOrZero(v.capacityTons),
@@ -309,7 +301,7 @@ export function useAddTransportForm() {
 
             return serverMessage || t("addTransport.errorMessage");
         },
-        [t]
+        [t],
     );
 
     const onValid = useCallback(
@@ -334,6 +326,7 @@ export function useAddTransportForm() {
                 });
 
                 await transportApi.create(payload);
+
                 toast.success(t("addTransport.successMessage"));
                 navigate("/dashboard/requests");
             } catch (error: any) {
@@ -342,26 +335,26 @@ export function useAddTransportForm() {
                 setLoading(false);
             }
         },
-        [getErrorMessage, navigate, t, toDto, validateBusiness]
+        [getErrorMessage, navigate, t, toDto, validateBusiness],
     );
 
     const onInvalid = useCallback(
         (_errors: FieldErrors<AddTransportFormValues>) => {
             toast.warning(t("addTransport.validationWarning"));
         },
-        [t]
+        [t],
     );
 
     const onSubmit = handleSubmit(onValid, onInvalid);
 
     const loadCountryErrors =
         ((formState.errors.loadPlaces ?? []) as any[]).map(
-            (item) => item?.countryId?.message as string | undefined
+            (item) => item?.location?.message as string | undefined,
         ) ?? [];
 
     const unloadCountryErrors =
         ((formState.errors.unloadPlaces ?? []) as any[]).map(
-            (item) => item?.countryId?.message as string | undefined
+            (item) => item?.location?.message as string | undefined,
         ) ?? [];
 
     return {
@@ -374,8 +367,6 @@ export function useAddTransportForm() {
         vehicleOpts,
         payMethodOpts,
         payTermOpts,
-
-        geo,
 
         form,
 

@@ -18,8 +18,6 @@ export default function AddTransportPage() {
         payMethodOpts,
         payTermOpts,
 
-        geo,
-
         form,
         onSubmit,
 
@@ -87,7 +85,7 @@ export default function AddTransportPage() {
                         payTermOpts={payTermOpts}
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
-                        geo={geo}
+
                         loading={loading}
                         loadCountryErrors={loadCountryErrors}
                         unloadCountryErrors={unloadCountryErrors}
@@ -105,7 +103,7 @@ export default function AddTransportPage() {
                         payTermOpts={payTermOpts}
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
-                        geo={geo}
+
                         loading={loading}
                         loadCountryErrors={loadCountryErrors}
                         unloadCountryErrors={unloadCountryErrors}

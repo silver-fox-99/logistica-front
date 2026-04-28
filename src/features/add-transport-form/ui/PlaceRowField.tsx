@@ -1,187 +1,173 @@
-import React, { useMemo } from "react";
-import { Autocomplete, Stack, TextField, Typography } from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import { Autocomplete, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
-import type { GeoImportItem } from "@/shared/api/geoImportApi";
 import type { Control, UseFormSetValue } from "react-hook-form";
-import { useController } from "react-hook-form";
+import { Controller } from "react-hook-form";
+
+import { mapsApi } from "@/shared/api/mapsApi";
 
 import type { AddTransportFormValues } from "../model/types";
+import type {MapsLocationSuggestion} from "@/entities/maps/model/types.ts";
 
 type Props = {
     kind: "load" | "unload";
     index: number;
-
     control: Control<AddTransportFormValues>;
     setValue: UseFormSetValue<AddTransportFormValues>;
-
-    countries: GeoImportItem[];
-    regions: GeoImportItem[];
-    cities: GeoImportItem[];
-
-    loadingCountries: boolean;
-    loadingRegions: boolean;
-    loadingCities: boolean;
-
     errorText?: string;
-
-    onCountryLoad?: (id?: string | null) => void;
-    onRegionLoad?: (countryId?: string | null, regionId?: string | null) => void;
 };
 
 export const PlaceRowField = React.memo(function PlaceRowField({
                                                                    kind,
                                                                    index,
-
                                                                    control,
                                                                    setValue,
-
-                                                                   countries,
-                                                                   regions,
-                                                                   cities,
-
-                                                                   loadingCountries,
-                                                                   loadingRegions,
-                                                                   loadingCities,
-
                                                                    errorText,
-
-                                                                   onCountryLoad,
-                                                                   onRegionLoad,
                                                                }: Props) {
-    const { t } = useTranslation();
-    const { getLocalizedGeoName } = useLocalizedGeo();
+    const { t, i18n } = useTranslation();
 
     const base = kind === "load" ? `loadPlaces.${index}` : `unloadPlaces.${index}`;
+    const locationName = `${base}.location` as const;
+    const addressName = `${base}.address` as const;
 
-    const country = useController({ control, name: `${base}.countryId` as any });
-    const region = useController({ control, name: `${base}.regionId` as any });
-    const city = useController({ control, name: `${base}.cityId` as any });
-    const address = useController({ control, name: `${base}.address` as any });
+    const [inputValue, setInputValue] = useState("");
+    const [options, setOptions] = useState<MapsLocationSuggestion[]>([]);
+    const [loading, setLoading] = useState(false);
 
-    const countryValue = useMemo(
-        () => (country.field.value ? countries.find((c) => c.id === country.field.value) ?? null : null),
-        [countries, country.field.value]
-    );
+    const lang = useMemo(() => {
+        if (i18n.language.startsWith("ru")) return "ru";
+        if (i18n.language.startsWith("uz")) return "uz";
+        return "en";
+    }, [i18n.language]);
 
-    const regionValue = useMemo(
-        () => (region.field.value ? regions.find((r) => r.id === region.field.value) ?? null : null),
-        [regions, region.field.value]
-    );
-
-    const cityValue = useMemo(
-        () => (city.field.value ? cities.find((c) => c.id === city.field.value) ?? null : null),
-        [cities, city.field.value]
-    );
-
-    const countryLabel =
+    const locationLabel =
         kind === "load"
-            ? t("addTransport.fields.countryLoad")
-            : t("addTransport.fields.countryUnload");
-
-    const regionLabel =
-        kind === "load"
-            ? t("addTransport.fields.regionLoad")
-            : t("addTransport.fields.regionUnload");
-
-    const cityLabel =
-        kind === "load"
-            ? t("addTransport.fields.cityLoad")
-            : t("addTransport.fields.cityUnload");
+            ? t("addCargo.fields.pickupLocation")
+            : t("addCargo.fields.dropoffLocation");
 
     const addressLabel =
         kind === "load"
             ? t("addCargo.fields.addressLoad")
             : t("addCargo.fields.addressUnload");
 
+    useEffect(() => {
+        const q = inputValue.trim();
+
+        if (q.length < 2) {
+            setOptions([]);
+            return;
+        }
+
+        const timeoutId = window.setTimeout(async () => {
+            try {
+                setLoading(true);
+
+                const result = await mapsApi.searchLocations({
+                    q,
+                    lang,
+                    limit: 7,
+                });
+
+                setOptions(result);
+            } catch {
+                setOptions([]);
+            } finally {
+                setLoading(false);
+            }
+        }, 450);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [inputValue, lang]);
+
     return (
         <Stack spacing={1.25}>
-            <Autocomplete
-                options={countries}
-                getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
-                value={countryValue}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(_, v) => {
-                    const id = v?.id ?? null;
+            <Controller
+                name={locationName as any}
+                control={control}
+                render={({ field, fieldState }) => (
+                    <Autocomplete
+                        options={options}
+                        value={field.value ?? null}
+                        inputValue={inputValue}
+                        loading={loading}
+                        filterOptions={(items) => items}
+                        isOptionEqualToValue={(option, value) =>
+                            option.place_id === value.place_id
+                        }
+                        getOptionLabel={(option) => option.display_name || ""}
+                        onInputChange={(_, value) => {
+                            setInputValue(value);
+                        }}
+                        onChange={(_, value) => {
+                            field.onChange(value);
 
-                    country.field.onChange(id);
-
-                    setValue(`${base}.regionId` as any, null, { shouldDirty: true });
-                    setValue(`${base}.cityId` as any, null, { shouldDirty: true });
-
-                    onCountryLoad?.(id);
-                }}
-                noOptionsText={loadingCountries ? "Loading..." : t("addTransport.fields.noOptions") || "No options"}
-                loading={loadingCountries}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        fullWidth
-                        label={countryLabel}
-                        placeholder={t("addTransport.fields.startTypingCountry")}
+                            setValue(addressName as any, value?.address ?? "", {
+                                shouldDirty: true,
+                                shouldValidate: false,
+                            });
+                        }}
+                        noOptionsText={
+                            inputValue.trim().length < 2
+                                ? t("addCargo.fields.startTypingLocation")
+                                : t("addCargo.fields.noOptions")
+                        }
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                fullWidth
+                                label={locationLabel}
+                                placeholder={t("addCargo.fields.searchLocationPlaceholder")}
+                                error={!!fieldState.error || !!errorText}
+                                helperText={
+                                    (fieldState.error?.message as string | undefined) ||
+                                    errorText ||
+                                    ""
+                                }
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <>
+                                            {loading ? <CircularProgress size={18} /> : null}
+                                            {params.InputProps.endAdornment}
+                                        </>
+                                    ),
+                                }}
+                            />
+                        )}
+                        renderOption={(props, option) => (
+                            <li {...props} key={option.place_id}>
+                                <Stack spacing={0.25}>
+                                    <Typography variant="body2">
+                                        {option.display_name}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {[option.city, option.region, option.country]
+                                            .filter(Boolean)
+                                            .join(", ")}
+                                    </Typography>
+                                </Stack>
+                            </li>
+                        )}
                     />
                 )}
             />
 
-            <Autocomplete
-                options={regions}
-                getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
-                value={regionValue}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(_, v) => {
-                    const id = v?.id ?? null;
-                    region.field.onChange(id);
-
-                    setValue(`${base}.cityId` as any, null, { shouldDirty: true });
-
-                    onRegionLoad?.(country.field.value ?? null, id);
-                }}
-                disabled={!countryValue || regions.length === 0}
-                loading={loadingRegions}
-                renderInput={(params) => (
+            <Controller
+                name={addressName as any}
+                control={control}
+                render={({ field }) => (
                     <TextField
-                        {...params}
                         fullWidth
-                        label={regionLabel}
-                        placeholder={t("addTransport.fields.startTypingRegion")}
+                        label={addressLabel}
+                        placeholder={t("addCargo.fields.addressDetailsPlaceholder")}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        inputRef={field.ref}
                     />
                 )}
             />
-
-            <Autocomplete
-                options={cities}
-                getOptionLabel={(o) => getLocalizedGeoName(o) || o.name || ""}
-                value={cityValue}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(_, v) => city.field.onChange(v?.id ?? null)}
-                disabled={!countryValue || cities.length === 0}
-                loading={loadingCities}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        fullWidth
-                        label={cityLabel}
-                        placeholder={t("addTransport.fields.startTypingCity")}
-                    />
-                )}
-            />
-
-            <TextField
-                fullWidth
-                label={addressLabel}
-                placeholder={t("addCargo.fields.enterAddress")}
-                value={address.field.value ?? ""}
-                onChange={address.field.onChange}
-                onBlur={address.field.onBlur}
-                name={address.field.name}
-                inputRef={address.field.ref}
-            />
-
-            {!!errorText && (
-                <Typography variant="caption" color="error">
-                    {errorText}
-                </Typography>
-            )}
         </Stack>
     );
 });

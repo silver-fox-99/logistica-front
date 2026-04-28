@@ -56,7 +56,7 @@ export function ShipmentDetailsContent({
                                 {data.contact.userId ? (
                                     <Typography
                                         component={RouterLink}
-                                        to={`/dashboard/user-reviews?search=${data.contact.userId}`}
+                                        to={`/dashboard/user-reviews/${data.contact.userId}`}
                                         sx={{ textDecoration: "none", color: "inherit" }}
                                     >
                                         {data.contact.name}

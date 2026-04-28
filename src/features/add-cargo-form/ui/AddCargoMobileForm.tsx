@@ -44,7 +44,6 @@ type Props = {
 
     getLocalizedLabel: (o: LookupOpt) => string;
 
-    geo: any;
     pickupCountryErrors?: Array<string | undefined>;
     dropoffCountryErrors?: Array<string | undefined>;
     loading: boolean;
@@ -64,7 +63,7 @@ export function AddCargoMobileForm({
                                        payTermOpts,
                                        currencyOpts,
                                        getLocalizedLabel,
-                                       geo,
+
                                        pickupCountryErrors,
                                        dropoffCountryErrors,
                                        loading,
@@ -242,7 +241,6 @@ export function AddCargoMobileForm({
                                     kind="pickup"
                                     name="pickups"
                                     form={form}
-                                    geo={geo}
                                     errorMessages={pickupCountryErrors}
                                 />
                             </Grid>
@@ -253,7 +251,6 @@ export function AddCargoMobileForm({
                                     kind="dropoff"
                                     name="dropoffs"
                                     form={form}
-                                    geo={geo}
                                     errorMessages={dropoffCountryErrors}
                                 />
                             </Grid>

@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { InputBaseComponentProps } from "@mui/material";
+import type React from "react";
+import type { InputBaseComponentProps, SelectChangeEvent } from "@mui/material";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
-import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
-import { useGeoCascade } from "@/shared/lib/useGeoCascade";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
-
 
 import type {
     EditPoint,
@@ -21,9 +20,6 @@ import {
     buildInitialForm,
     buildInitialPoints,
     createEmptyPoint,
-    findGeoIdLoose,
-    hasMeaningfulCity,
-    hasMeaningfulRegion,
     normalizeLoadRange,
     toNumberOr,
     toOptionalNumber,
@@ -37,6 +33,23 @@ type UseFullEditDialogParams = {
     onSubmit: (payload: any) => Promise<void> | void;
 };
 
+type SelectOption = {
+    value: string;
+    label: string;
+};
+
+type LookupItem = {
+    slug: string;
+    label?: string;
+    label_ru?: string;
+    label_uz?: string;
+    [key: string]: unknown;
+};
+
+type FormChangeEvent =
+    | SelectChangeEvent<string>
+    | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+
 export function useFullEditDialog({
                                       open,
                                       kind,
@@ -45,24 +58,14 @@ export function useFullEditDialog({
                                       onSubmit,
                                   }: UseFullEditDialogParams) {
     const { t } = useTranslation();
-    const { getLocalizedGeoName } = useLocalizedGeo();
     const { getLocalizedLabel } = useLocalizedLookup();
 
     const lookups = useInitStore((s) => s.lookups);
     const loadInit = useInitStore((s) => s.loadInit);
 
-    const geo = useGeoCascade();
-    const {
-        countries,
-        getRegions,
-        getCities,
-        loadCountries,
-        ensureRegions,
-        ensureCities,
-    } = geo;
-
     const [filtersData, setFiltersData] = useState<null | { vehicle_types: VehicleTypeOpt[] }>(null);
     const [loadingFilters, setLoadingFilters] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const [form, setForm] = useState<FormState>(() => buildInitialForm(initial));
     const [fromPoints, setFromPoints] = useState<EditPoint[]>([
@@ -76,7 +79,7 @@ export function useFullEditDialog({
 
     const numericKeys = useMemo(
         () =>
-            new Set([
+            new Set<keyof FormState>([
                 "palletsCount",
                 "carsCount",
                 "weightT",
@@ -91,8 +94,8 @@ export function useFullEditDialog({
 
     const numericInputProps: InputBaseComponentProps = useMemo(
         () => ({
-            inputMode: "numeric",
-            pattern: "[0-9]*",
+            inputMode: "decimal",
+            pattern: "[0-9]*[.,]?[0-9]*",
         }),
         []
     );
@@ -100,15 +103,28 @@ export function useFullEditDialog({
     const sanitizeDigits = useCallback((v: string) => {
         const normalized = v.replace(",", ".");
         const parts = normalized.split(".");
-        if (parts.length <= 1) return normalized.replace(/[^\d]/g, "");
+
+        if (parts.length <= 1) {
+            return normalized.replace(/[^\d]/g, "");
+        }
+
         return `${parts[0].replace(/[^\d]/g, "")}.${parts
             .slice(1)
             .join("")
             .replace(/[^\d]/g, "")}`;
     }, []);
 
+    const toLookupOption = useCallback(
+        (item: LookupItem): SelectOption => ({
+            value: item.slug,
+            label: getLocalizedLabel(item as never),
+        }),
+        [getLocalizedLabel]
+    );
+
     const fetchFilters = useCallback(async () => {
         setLoadingFilters(true);
+
         try {
             const res = await publicShipmentsApi.getFilters();
             setFiltersData({ vehicle_types: res?.vehicle_types ?? [] });
@@ -123,76 +139,27 @@ export function useFullEditDialog({
     }, [initial]);
 
     const hydratePointsFromInitial = useCallback(() => {
-        const next = buildInitialPoints(kind, initial, countries);
+        const next = buildInitialPoints(kind, initial);
+
         setFromPoints(next.fromPoints);
         setToPoints(next.toPoints);
+
         hydratedIdRef.current = initial?.id ?? null;
-    }, [countries, initial, kind]);
-
-    const ensureDescendantsForPoints = useCallback(async () => {
-        const allPoints = [...fromPoints, ...toPoints];
-
-        for (const point of allPoints) {
-            if (point.countryId) {
-                await ensureRegions(point.countryId);
-            }
-
-            if (point.countryId && point.regionId) {
-                await ensureCities(point.countryId, point.regionId);
-            }
-        }
-    }, [ensureCities, ensureRegions, fromPoints, toPoints]);
-
-    const resolvePendingRegionCity = useCallback(
-        (point: EditPoint): EditPoint => {
-            let changed = false;
-            let next = point;
-
-            if (point.countryId && !point.regionId && hasMeaningfulRegion(point)) {
-                const regionId = findGeoIdLoose(getRegions(point.countryId), [point.rawRegionName!]);
-                if (regionId) {
-                    next = { ...next, regionId };
-                    changed = true;
-                }
-            }
-
-            if (point.countryId && next.regionId && !next.cityId && hasMeaningfulCity(next)) {
-                const cityId = findGeoIdLoose(
-                    getCities(point.countryId, next.regionId),
-                    [next.rawCityName!]
-                );
-                if (cityId) {
-                    next = { ...next, cityId };
-                    changed = true;
-                }
-            }
-
-            return changed ? next : point;
-        },
-        [getCities, getRegions]
-    );
-
-    const reconcilePendingGeo = useCallback(() => {
-        setFromPoints((prev) => {
-            const next = prev.map(resolvePendingRegionCity);
-            return next.some((item, index) => item !== prev[index]) ? next : prev;
-        });
-
-        setToPoints((prev) => {
-            const next = prev.map(resolvePendingRegionCity);
-            return next.some((item, index) => item !== prev[index]) ? next : prev;
-        });
-    }, [resolvePendingRegionCity]);
+    }, [initial, kind]);
 
     const syncPointTypesByKind = useCallback(() => {
         const types = POINT_TYPES[kind];
 
-        setFromPoints((prev) =>
-            prev.length ? prev.map((p) => ({ ...p, type: types.from })) : [createEmptyPoint(types.from)]
+        setFromPoints((prev: EditPoint[]) =>
+            prev.length
+                ? prev.map((point: EditPoint) => ({ ...point, type: types.from }))
+                : [createEmptyPoint(types.from)]
         );
 
-        setToPoints((prev) =>
-            prev.length ? prev.map((p) => ({ ...p, type: types.to })) : [createEmptyPoint(types.to)]
+        setToPoints((prev: EditPoint[]) =>
+            prev.length
+                ? prev.map((point: EditPoint) => ({ ...point, type: types.to }))
+                : [createEmptyPoint(types.to)]
         );
     }, [kind]);
 
@@ -205,27 +172,15 @@ export function useFullEditDialog({
     }, [fetchFilters, filtersData, open]);
 
     useEffect(() => {
-        if (open) void loadCountries();
-    }, [loadCountries, open]);
-
-    useEffect(() => {
         if (open) syncFormFromInitial();
     }, [open, syncFormFromInitial]);
 
     useEffect(() => {
-        if (!open || !initial?.id || !countries.length) return;
+        if (!open || !initial?.id) return;
         if (hydratedIdRef.current === initial.id) return;
 
         hydratePointsFromInitial();
-    }, [countries.length, hydratePointsFromInitial, initial?.id, open]);
-
-    useEffect(() => {
-        if (open) void ensureDescendantsForPoints();
-    }, [ensureDescendantsForPoints, open]);
-
-    useEffect(() => {
-        if (open) reconcilePendingGeo();
-    }, [open, reconcilePendingGeo]);
+    }, [hydratePointsFromInitial, initial?.id, open]);
 
     useEffect(() => {
         syncPointTypesByKind();
@@ -235,23 +190,10 @@ export function useFullEditDialog({
         (side: "from" | "to", index: number, patch: Partial<EditPoint>) => {
             const setter = side === "from" ? setFromPoints : setToPoints;
 
-            setter((prev) =>
-                prev.map((item, i) => {
-                    if (i !== index) return item;
-
-                    const next = { ...item, ...patch };
-
-                    if ("countryId" in patch) {
-                        next.regionId = "";
-                        next.cityId = "";
-                    }
-
-                    if ("regionId" in patch) {
-                        next.cityId = "";
-                    }
-
-                    return next;
-                })
+            setter((prev: EditPoint[]) =>
+                prev.map((item: EditPoint, itemIndex: number) =>
+                    itemIndex === index ? { ...item, ...patch } : item
+                )
             );
         },
         []
@@ -261,29 +203,35 @@ export function useFullEditDialog({
         (side: "from" | "to") => {
             const type = side === "from" ? POINT_TYPES[kind].from : POINT_TYPES[kind].to;
             const setter = side === "from" ? setFromPoints : setToPoints;
-            setter((prev) => [...prev, createEmptyPoint(type)]);
+
+            setter((prev: EditPoint[]) => [...prev, createEmptyPoint(type)]);
         },
         [kind]
     );
 
     const removePoint = useCallback((side: "from" | "to", index: number) => {
         const setter = side === "from" ? setFromPoints : setToPoints;
-        setter((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)));
+
+        setter((prev: EditPoint[]) =>
+            prev.length <= 1 ? prev : prev.filter((_: EditPoint, itemIndex: number) => itemIndex !== index)
+        );
     }, []);
 
     const handleChange = useCallback(
-        (key: keyof FormState) => (e: any) => {
-            const rawValue = e?.target?.value ?? "";
+        (key: keyof FormState) => (e: FormChangeEvent) => {
+            const rawValue = e.target.value ?? "";
             const value = numericKeys.has(key)
                 ? sanitizeDigits(String(rawValue))
                 : rawValue;
 
-            setForm((prev) => {
+            setForm((prev: FormState) => {
                 if (key === "loadFrom") {
                     const next = { ...prev, loadFrom: String(value) };
+
                     if (!prev.loadTo || prev.loadTo === prev.loadFrom) {
                         next.loadTo = String(value);
                     }
+
                     return next;
                 }
 
@@ -293,23 +241,25 @@ export function useFullEditDialog({
         [numericKeys, sanitizeDigits]
     );
 
-    const handleMultiLoadTypeChange = useCallback((e: any) => {
+    const handleMultiLoadTypeChange = useCallback((e: SelectChangeEvent<string[]>) => {
         const value = e.target.value;
-        setForm((prev) => ({
+
+        setForm((prev: FormState) => ({
             ...prev,
-            loadType: typeof value === "string" ? value.split(",") : (value as string[]),
+            loadType: typeof value === "string" ? value.split(",") : value,
         }));
     }, []);
 
     const toggleBool = useCallback(
-        (key: keyof FormState) => (_e: any, checked: boolean) => {
-            setForm((prev) => ({ ...prev, [key]: checked }));
+        (key: keyof FormState) => (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+            setForm((prev: FormState) => ({ ...prev, [key]: checked }));
         },
         []
     );
 
-    const loadTypeOptions = useMemo(() => {
-        const src = lookups?.loadType;
+    const loadTypeOptions = useMemo<SelectOption[]>(() => {
+        const src = lookups?.loadType as LookupItem[] | undefined;
+
         if (!src?.length) {
             return [
                 { value: "ANY", label: t("shipments.editDialog.loadTypeAny") },
@@ -318,11 +268,13 @@ export function useFullEditDialog({
                 { value: "CONSOLIDATED", label: t("shipments.editDialog.loadTypeConsolidated") },
             ];
         }
-        return src.map((x) => ({ value: x.slug, label: getLocalizedLabel(x) }));
-    }, [getLocalizedLabel, lookups?.loadType, t]);
 
-    const cargoTypeOptions = useMemo(() => {
-        const src = lookups?.cargoTypes;
+        return src.map(toLookupOption);
+    }, [lookups?.loadType, t, toLookupOption]);
+
+    const cargoTypeOptions = useMemo<SelectOption[]>(() => {
+        const src = lookups?.cargoTypes as LookupItem[] | undefined;
+
         if (!src?.length) {
             return [
                 { value: "GENERAL", label: t("shipments.editDialog.cargoTypeGeneral") },
@@ -334,40 +286,51 @@ export function useFullEditDialog({
                 { value: "PALLETS", label: t("shipments.editDialog.cargoTypePallets") },
             ];
         }
-        return src.map((x) => ({ value: x.slug, label: getLocalizedLabel(x) }));
-    }, [getLocalizedLabel, lookups?.cargoTypes, t]);
 
-    const bargainOptions = useMemo(() => {
-        const src = lookups?.bargainOptions;
+        return src.map(toLookupOption);
+    }, [lookups?.cargoTypes, t, toLookupOption]);
+
+    const bargainOptions = useMemo<SelectOption[]>(() => {
+        const src = lookups?.bargainOptions as LookupItem[] | undefined;
+
         if (!src?.length) {
             return [
                 { value: "ALLOWED", label: t("shipments.editDialog.bargainAllowed") },
                 { value: "FORBIDDEN", label: t("shipments.editDialog.bargainForbidden") },
             ];
         }
-        return src.map((x) => ({ value: x.slug, label: getLocalizedLabel(x) }));
-    }, [getLocalizedLabel, lookups?.bargainOptions, t]);
 
-    const vehicleTypeOptions = useMemo(() => {
+        return src.map(toLookupOption);
+    }, [lookups?.bargainOptions, t, toLookupOption]);
+
+    const vehicleTypeOptions = useMemo<SelectOption[]>(() => {
         if (!filtersData?.vehicle_types?.length) {
             return [{ value: "ANY", label: "ANY" }];
         }
 
-        return filtersData.vehicle_types.map((opt) => {
-            const lookup = lookups?.vehicleType?.find((l) => l.slug === opt.value);
+        return filtersData.vehicle_types.map((opt: VehicleTypeOpt): SelectOption => {
+            const vehicleLookups = lookups?.vehicleType as LookupItem[] | undefined;
+            const lookup = vehicleLookups?.find((item: LookupItem) => item.slug === opt.value);
+
             if (lookup) {
-                return { value: opt.value, label: getLocalizedLabel(lookup) };
+                return {
+                    value: opt.value,
+                    label: getLocalizedLabel(lookup as never),
+                };
             }
-            return opt;
+
+            return {
+                value: opt.value,
+                label: opt.label,
+            };
         });
     }, [filtersData?.vehicle_types, getLocalizedLabel, lookups?.vehicleType]);
 
-    const currencyOptions = useMemo(() => {
-        if (lookups?.currency?.length) {
-            return lookups.currency.map((c) => ({
-                value: c.slug,
-                label: getLocalizedLabel(c),
-            }));
+    const currencyOptions = useMemo<SelectOption[]>(() => {
+        const src = lookups?.currency as LookupItem[] | undefined;
+
+        if (src?.length) {
+            return src.map(toLookupOption);
         }
 
         return [
@@ -377,10 +340,32 @@ export function useFullEditDialog({
             { value: "PLN", label: "PLN" },
             { value: "UAH", label: "UAH" },
         ];
-    }, [getLocalizedLabel, lookups?.currency]);
+    }, [lookups?.currency, toLookupOption]);
+
+    const buildPreparedPoints = useCallback(
+        (points: EditPoint[], type: string) =>
+            points.map((point: EditPoint, index: number) => ({
+                id: point.id,
+                type,
+                country: point.country || "",
+                region: point.region || null,
+                city: point.city || null,
+                address: point.address || null,
+                display_name: point.display_name || null,
+                latitude: point.latitude,
+                longitude: point.longitude,
+                geocode_source: point.geocode_source || null,
+                order: index,
+            })),
+        []
+    );
 
     const submit = useCallback(async () => {
+        if (submitting) return;
+
         try {
+            setSubmitting(true);
+
             const dateFrom = normalizeLoadRange(form.loadFrom, form.loadTo);
 
             if (form.loadFrom && form.loadTo && form.loadTo < form.loadFrom) {
@@ -395,27 +380,13 @@ export function useFullEditDialog({
 
             const types = POINT_TYPES[kind];
 
-            const preparedFromPoints = fromPoints.map((point, index) => ({
-                id: point.id,
-                type: types.from,
-                country: point.countryId || null,
-                region: point.regionId || null,
-                city: point.cityId || null,
-                address: point.address || null,
-                order: index,
-            }));
+            const preparedFromPoints = buildPreparedPoints(fromPoints, types.from);
+            const preparedToPoints = buildPreparedPoints(toPoints, types.to);
 
-            const preparedToPoints = toPoints.map((point, index) => ({
-                id: point.id,
-                type: types.to,
-                country: point.countryId || null,
-                region: point.regionId || null,
-                city: point.cityId || null,
-                address: point.address || null,
-                order: index,
-            }));
-
-            if (preparedFromPoints.some((p) => !p.country) || preparedToPoints.some((p) => !p.country)) {
+            if (
+                preparedFromPoints.some((point) => !point.country) ||
+                preparedToPoints.some((point) => !point.country)
+            ) {
                 toast.error(t("shipments.editDialog.errorPointsRequired"));
                 return;
             }
@@ -430,7 +401,7 @@ export function useFullEditDialog({
                 weight_t: toOptionalNumber(form.weightT),
                 volume_m3: toOptionalNumber(form.volumeM3),
 
-                has_dimensions: !!form.hasDimensions,
+                has_dimensions: form.hasDimensions,
                 length_m: form.hasDimensions ? toOptionalNumber(form.lengthM) : null,
                 width_m: form.hasDimensions ? toOptionalNumber(form.widthM) : null,
                 height_m: form.hasDimensions ? toOptionalNumber(form.heightM) : null,
@@ -445,7 +416,7 @@ export function useFullEditDialog({
             if (kind === "cargo") {
                 payload.load_type = form.loadType?.length ? form.loadType : ["ANY"];
                 payload.cargo_type = form.cargoType || "GENERAL";
-                payload.allow_partial_load = !!form.allowPartialLoad;
+                payload.allow_partial_load = form.allowPartialLoad;
                 payload.pallets_count = toOptionalNumber(form.palletsCount);
             } else {
                 payload.bargain = form.bargain || "ALLOWED";
@@ -455,13 +426,25 @@ export function useFullEditDialog({
             onClose();
         } catch (error: any) {
             const message =
-                error?.message ||
                 error?.response?.data?.message ||
+                error?.message ||
                 t("shipments.editDialog.errorUpdate");
 
             toast.error(message);
+        } finally {
+            setSubmitting(false);
         }
-    }, [form, fromPoints, kind, onClose, onSubmit, t, toPoints]);
+    }, [
+        buildPreparedPoints,
+        form,
+        fromPoints,
+        kind,
+        onClose,
+        onSubmit,
+        submitting,
+        t,
+        toPoints,
+    ]);
 
     return {
         t,
@@ -469,14 +452,11 @@ export function useFullEditDialog({
         form,
         fromPoints,
         toPoints,
-        countries,
+
         loadingFilters,
+        submitting,
         isReady: !!filtersData,
         numericInputProps,
-
-        getRegions,
-        getCities,
-        getLocalizedGeoName,
 
         loadTypeOptions,
         cargoTypeOptions,

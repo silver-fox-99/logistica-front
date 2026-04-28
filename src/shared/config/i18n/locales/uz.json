@@ -51,6 +51,12 @@
       "contacts": "Kontaktlar"
     },
     "fields": {
+      "pickupLocation": "Yuklash joyi",
+      "dropoffLocation": "Tushirish joyi",
+      "startTypingLocation": "Joylashuvni yozishni boshlang",
+      "searchLocationPlaceholder": "Shahar, manzil yoki joyni qidiring",
+      "addressDetailsPlaceholder": "Ombor, ko‘cha, bino, darvoza",
+      "noOptions": "Variantlar yo‘q",
       "pickupPoints": "Yuklash nuqtalari",
       "dropoffPoints": "Tushirish nuqtalari",
       "pickupPoint": "Yuklash nuqtasi",
@@ -562,9 +568,17 @@
       "transport": "Transport",
       "pickup": "Yuklash",
       "dropoff": "Tushirish",
+      "route": "Yo‘nalish",
+      "pickupDates": "Yuklash sanalari",
+      "dropoffDates": "Tushirish sanalari",
+      "pickupLocation": "Yuklash joyi",
+      "dropoffLocation": "Tushirish joyi",
+      "locationPlaceholder": "Joyni qidirish",
+      "showMap": "Xaritada ko‘rsatish",
+      "hideMap": "Xaritani yashirish",
       "vehicle": "Transport",
-      "country": "Mamlakat",
-      "region": "Hudud",
+      "country": "Davlat",
+      "region": "Viloyat",
       "city": "Shahar",
       "from": "Dan",
       "to": "Gacha",
@@ -576,7 +590,7 @@
       "apply": "Qo‘llash",
       "reset": "Tozalash",
       "searchLabel": "Buyurtmalarni qidirish",
-      "favorites": "Faqat sevimlilar"
+      "favorites": "Faqat tanlanganlar"
     },
     "favorites": {
       "added": "Sevimlilarga qo‘shildi",

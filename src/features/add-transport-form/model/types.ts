@@ -1,7 +1,7 @@
+import type { MapsLocationSuggestion } from "@/shared/api/types/maps";
+
 export type Place = {
-    countryId: string | null;
-    regionId: string | null;
-    cityId: string | null;
+    location: MapsLocationSuggestion | null;
     address: string;
 };
 
@@ -38,7 +38,7 @@ export type AddTransportFormValues = {
     email: string;
     extraPhoneAsMain: boolean;
     note: string;
-    
+
     images: File[];
     imageUrls: string[];
 };

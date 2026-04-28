@@ -1,14 +1,12 @@
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { useFieldArray, useWatch, type UseFormReturn } from "react-hook-form";
+import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { FiArrowDown, FiArrowUp, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import type { AddTransportFormValues, Place } from "../model/types";
 import { PlaceRowField } from "./PlaceRowField";
 
 const EMPTY_PLACE: Place = {
-    countryId: null,
-    regionId: null,
-    cityId: null,
+    location: null,
     address: "",
 };
 
@@ -17,7 +15,6 @@ type Props = {
     kind: "load" | "unload";
     name: "loadPlaces" | "unloadPlaces";
     form: UseFormReturn<AddTransportFormValues>;
-    geo: any;
     errorMessages?: Array<string | undefined>;
 };
 
@@ -26,7 +23,6 @@ export function TransportPointsFieldArray({
                                               kind,
                                               name,
                                               form,
-                                              geo,
                                               errorMessages = [],
                                           }: Props) {
     const { control, setValue } = form;
@@ -35,11 +31,6 @@ export function TransportPointsFieldArray({
         control,
         name,
     });
-
-    const points = useWatch({
-        control,
-        name,
-    }) ?? [];
 
     const title =
         kind === "load"
@@ -62,79 +53,64 @@ export function TransportPointsFieldArray({
                 {title}
             </Typography>
 
-            {fields.map((field, index) => {
-                const countryId = points[index]?.countryId ?? null;
-                const regionId = points[index]?.regionId ?? null;
+            {fields.map((field, index) => (
+                <Paper key={field.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2 }}>
+                    <Stack spacing={1.25}>
+                        <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            flexWrap="wrap"
+                            gap={1}
+                        >
+                            <Typography variant="subtitle2">
+                                {itemTitle} #{index + 1}
+                            </Typography>
 
-                return (
-                    <Paper key={field.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2 }}>
-                        <Stack spacing={1.25}>
-                            <Stack
-                                direction="row"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                flexWrap="wrap"
-                                gap={1}
-                            >
-                                <Typography variant="subtitle2">
-                                    {itemTitle} #{index + 1}
-                                </Typography>
+                            <Stack direction="row" flexWrap="wrap" gap={1}>
+                                <Button
+                                    size="small"
+                                    variant="text"
+                                    startIcon={<FiArrowUp />}
+                                    onClick={() => move(index, index - 1)}
+                                    disabled={index === 0}
+                                >
+                                    {t("addTransport.buttons.moveUp")}
+                                </Button>
 
-                                <Stack direction="row" flexWrap="wrap" gap={1}>
-                                    <Button
-                                        size="small"
-                                        variant="text"
-                                        startIcon={<FiArrowUp />}
-                                        onClick={() => move(index, index - 1)}
-                                        disabled={index === 0}
-                                    >
-                                        {t("addTransport.buttons.moveUp")}
-                                    </Button>
+                                <Button
+                                    size="small"
+                                    variant="text"
+                                    startIcon={<FiArrowDown />}
+                                    onClick={() => move(index, index + 1)}
+                                    disabled={index === fields.length - 1}
+                                >
+                                    {t("addTransport.buttons.moveDown")}
+                                </Button>
 
-                                    <Button
-                                        size="small"
-                                        variant="text"
-                                        startIcon={<FiArrowDown />}
-                                        onClick={() => move(index, index + 1)}
-                                        disabled={index === fields.length - 1}
-                                    >
-                                        {t("addTransport.buttons.moveDown")}
-                                    </Button>
-
-                                    <Button
-                                        size="small"
-                                        color="error"
-                                        variant="text"
-                                        startIcon={<FiTrash2 />}
-                                        onClick={() => remove(index)}
-                                        disabled={fields.length === 1}
-                                    >
-                                        {t("addTransport.buttons.removePoint")}
-                                    </Button>
-                                </Stack>
+                                <Button
+                                    size="small"
+                                    color="error"
+                                    variant="text"
+                                    startIcon={<FiTrash2 />}
+                                    onClick={() => remove(index)}
+                                    disabled={fields.length === 1}
+                                >
+                                    {t("addTransport.buttons.removePoint")}
+                                </Button>
                             </Stack>
-
-                            <PlaceRowField
-                                kind={kind}
-                                index={index}
-                                control={control}
-                                setValue={setValue}
-                                countries={geo.countries}
-                                regions={geo.getRegions(countryId)}
-                                cities={geo.getCities(countryId, regionId)}
-                                loadingCountries={geo.loading.countries}
-                                loadingRegions={geo.loading.regionsFor === (countryId || "")}
-                                loadingCities={geo.loading.citiesFor === `${countryId || ""}/${regionId || ""}`}
-                                errorText={errorMessages[index]}
-                                onCountryLoad={(id) => geo.ensureRegions(id)}
-                                onRegionLoad={(countryIdValue, regionIdValue) =>
-                                    geo.ensureCities(countryIdValue, regionIdValue)
-                                }
-                            />
                         </Stack>
-                    </Paper>
-                );
-            })}
+
+                        <PlaceRowField
+                            kind={kind}
+                            index={index}
+                            control={control}
+                            setValue={setValue}
+                            errorText={errorMessages[index]}
+                        />
+                    </Stack>
+                </Paper>
+            ))}
 
             <Box>
                 <Button

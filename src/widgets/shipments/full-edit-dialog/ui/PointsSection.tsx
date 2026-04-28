@@ -1,17 +1,16 @@
-import { memo } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
+    Autocomplete,
     Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
+    CircularProgress,
     Stack,
     TextField,
     Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
-import type { GeoImportItem } from "@/shared/api/geoImportApi";
+import type { MapsLocationSuggestion } from "@/entities/maps/model/types";
+import { mapsApi } from "@/shared/api/mapsApi";
 import type { EditPoint } from "../model/types";
 
 type PointRowProps = {
@@ -19,13 +18,20 @@ type PointRowProps = {
     point: EditPoint;
     index: number;
     pointsLength: number;
-    countries: GeoImportItem[];
-    regions: GeoImportItem[];
-    cities: GeoImportItem[];
     t: (key: string, options?: any) => string;
-    getLocalizedGeoName: (item: GeoImportItem) => string;
     onChange: (patch: Partial<EditPoint>) => void;
     onRemove: () => void;
+};
+
+const getLocationLabel = (option: MapsLocationSuggestion | string) => {
+    if (typeof option === "string") return option;
+
+    return (
+        (option as any)?.display_name ||
+        [(option as any)?.city, (option as any)?.region, (option as any)?.country]
+            .filter(Boolean)
+            .join(", ")
+    );
 };
 
 const PointRow = memo(function PointRow({
@@ -33,14 +39,63 @@ const PointRow = memo(function PointRow({
                                             point,
                                             index,
                                             pointsLength,
-                                            countries,
-                                            regions,
-                                            cities,
                                             t,
-                                            getLocalizedGeoName,
                                             onChange,
                                             onRemove,
                                         }: PointRowProps) {
+    const [query, setQuery] = useState("");
+    const [options, setOptions] = useState<MapsLocationSuggestion[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const normalizedQuery = useMemo(() => query.trim(), [query]);
+
+    const loadOptions = useCallback(async (search: string) => {
+        if (search.length < 2) {
+            setOptions([]);
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const data = await mapsApi.searchLocations({
+                q: search,
+                limit: 10,
+            } as any);
+
+            setOptions(data ?? []);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void loadOptions(normalizedQuery);
+        }, 350);
+
+        return () => window.clearTimeout(timer);
+    }, [loadOptions, normalizedQuery]);
+
+    const handleLocationChange = useCallback(
+        (_event: unknown, value: MapsLocationSuggestion | null) => {
+            onChange({
+                location: value,
+
+                country: (value as any)?.country ?? "",
+                region: (value as any)?.region ?? null,
+                city: (value as any)?.city ?? null,
+
+                address: (value as any)?.address ?? point.address ?? "",
+                display_name: (value as any)?.display_name ?? null,
+                latitude: (value as any)?.latitude ?? null,
+                longitude: (value as any)?.longitude ?? null,
+                geocode_source: (value as any)?.geocode_source ?? null,
+            });
+        },
+        [onChange, point.address]
+    );
+
     return (
         <>
             <Grid size={{ xs: 12 }}>
@@ -57,71 +112,43 @@ const PointRow = memo(function PointRow({
                 </Stack>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }}>
-                <FormControl fullWidth>
-                    <InputLabel>{t("shipments.editDialog.country")}</InputLabel>
-                    <Select
-                        label={t("shipments.editDialog.country")}
-                        value={point.countryId}
-                        onChange={(e) =>
-                            onChange({
-                                countryId: String(e.target.value),
-                                regionId: "",
-                                cityId: "",
-                                rawRegionName: null,
-                                rawCityName: null,
-                            })
-                        }
-                    >
-                        {countries.map((c) => (
-                            <MenuItem key={c.id} value={c.id}>
-                                {getLocalizedGeoName(c)}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </Grid>
+            <Grid size={{ xs: 12 }}>
+                <Autocomplete
+                    value={point.location}
+                    options={options}
+                    loading={loading}
+                    filterOptions={(x) => x}
+                    getOptionLabel={getLocationLabel}
+                    isOptionEqualToValue={(option, value) => {
+                        const optionName = getLocationLabel(option);
+                        const valueName = getLocationLabel(value);
 
-            <Grid size={{ xs: 12, md: 4 }}>
-                <FormControl fullWidth disabled={!point.countryId}>
-                    <InputLabel>{t("shipments.editDialog.region")}</InputLabel>
-                    <Select
-                        label={t("shipments.editDialog.region")}
-                        value={point.regionId}
-                        onChange={(e) =>
-                            onChange({
-                                regionId: String(e.target.value),
-                                cityId: "",
-                                rawCityName: null,
-                            })
-                        }
-                    >
-                        <MenuItem value="">—</MenuItem>
-                        {regions.map((r) => (
-                            <MenuItem key={r.id} value={r.id}>
-                                {getLocalizedGeoName(r)}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 4 }}>
-                <FormControl fullWidth disabled={!point.countryId || !point.regionId}>
-                    <InputLabel>{t("shipments.editDialog.city")}</InputLabel>
-                    <Select
-                        label={t("shipments.editDialog.city")}
-                        value={point.cityId}
-                        onChange={(e) => onChange({ cityId: String(e.target.value) })}
-                    >
-                        <MenuItem value="">—</MenuItem>
-                        {cities.map((c) => (
-                            <MenuItem key={c.id} value={c.id}>
-                                {getLocalizedGeoName(c)}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                        return optionName === valueName;
+                    }}
+                    onInputChange={(_, value) => setQuery(value)}
+                    onChange={handleLocationChange}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label={t("shipments.editDialog.location", {
+                                defaultValue: "Location",
+                            })}
+                            placeholder={t("shipments.editDialog.locationPlaceholder", {
+                                defaultValue: "Search city, region or address",
+                            })}
+                            fullWidth
+                            InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                    <>
+                                        {loading ? <CircularProgress size={18} /> : null}
+                                        {params.InputProps.endAdornment}
+                                    </>
+                                ),
+                            }}
+                        />
+                    )}
+                />
             </Grid>
 
             <Grid size={{ xs: 12 }}>
@@ -140,11 +167,7 @@ type PointsSectionProps = {
     side: "from" | "to";
     title: string;
     points: EditPoint[];
-    countries: GeoImportItem[];
-    getRegions: (countryId: string) => GeoImportItem[];
-    getCities: (countryId: string, regionId: string) => GeoImportItem[];
     t: (key: string, options?: any) => string;
-    getLocalizedGeoName: (item: GeoImportItem) => string;
     onAdd: (side: "from" | "to") => void;
     onUpdate: (side: "from" | "to", index: number, patch: Partial<EditPoint>) => void;
     onRemove: (side: "from" | "to", index: number) => void;
@@ -154,11 +177,7 @@ export function PointsSection({
                                   side,
                                   title,
                                   points,
-                                  countries,
-                                  getRegions,
-                                  getCities,
                                   t,
-                                  getLocalizedGeoName,
                                   onAdd,
                                   onUpdate,
                                   onRemove,
@@ -168,33 +187,25 @@ export function PointsSection({
             <Grid size={{ xs: 12 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography sx={{ fontWeight: 800 }}>{title}</Typography>
+
                     <Button size="small" onClick={() => onAdd(side)}>
                         {t("shipments.editDialog.addPoint")}
                     </Button>
                 </Stack>
             </Grid>
 
-            {points.map((point, index) => {
-                const regions = getRegions(point.countryId);
-                const cities = getCities(point.countryId, point.regionId);
-
-                return (
-                    <PointRow
-                        key={point.clientKey}
-                        title={title}
-                        point={point}
-                        index={index}
-                        pointsLength={points.length}
-                        countries={countries}
-                        regions={regions}
-                        cities={cities}
-                        t={t}
-                        getLocalizedGeoName={getLocalizedGeoName}
-                        onChange={(patch) => onUpdate(side, index, patch)}
-                        onRemove={() => onRemove(side, index)}
-                    />
-                );
-            })}
+            {points.map((point, index) => (
+                <PointRow
+                    key={point.clientKey}
+                    title={title}
+                    point={point}
+                    index={index}
+                    pointsLength={points.length}
+                    t={t}
+                    onChange={(patch) => onUpdate(side, index, patch)}
+                    onRemove={() => onRemove(side, index)}
+                />
+            ))}
         </>
     );
 }

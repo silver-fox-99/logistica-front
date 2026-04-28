@@ -1,18 +1,22 @@
 import type { GeoPoint } from "@/entities/shipment/model/type";
-import type { GeoImportItem } from "@/shared/api/geoImportApi";
 import type { EditPoint, FormState, InitialData, Kind } from "./types";
 import { POINT_TYPES } from "./types";
 
 export const createEmptyPoint = (type: string): EditPoint => ({
     clientKey: crypto.randomUUID(),
     type,
-    countryId: "",
-    regionId: "",
-    cityId: "",
+
+    location: null,
+
+    country: "",
+    region: null,
+    city: null,
+
     address: "",
-    rawCountryName: null,
-    rawRegionName: null,
-    rawCityName: null,
+    display_name: null,
+    latitude: null,
+    longitude: null,
+    geocode_source: null,
 });
 
 export const toStr = (v: unknown, fallback = ""): string =>
@@ -20,10 +24,12 @@ export const toStr = (v: unknown, fallback = ""): string =>
 
 export const toBool = (v: unknown, fallback = false): boolean => {
     if (typeof v === "boolean") return v;
+
     if (typeof v === "string") {
         if (v === "true") return true;
         if (v === "false") return false;
     }
+
     return fallback;
 };
 
@@ -46,23 +52,21 @@ export const toDateInput = (v?: string | null): string => {
     const s = String(v).trim();
     if (!s) return "";
 
-    // уже нормальная date-only строка
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-        return s;
-    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-    // dd.mm.yyyy
     const dotMatch = s.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+
     if (dotMatch) {
         return `${dotMatch[3]}-${dotMatch[2]}-${dotMatch[1]}`;
     }
 
-    // ISO datetime -> локальная дата
     const d = new Date(s);
+
     if (!Number.isNaN(d.getTime())) {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, "0");
         const day = String(d.getDate()).padStart(2, "0");
+
         return `${year}-${month}-${day}`;
     }
 
@@ -73,10 +77,12 @@ export const splitInitialLoadRange = (v?: string | string[] | null) => {
     if (Array.isArray(v)) {
         const from = toDateInput(v[0] ?? "");
         const to = toDateInput((v[1] ?? v[0]) ?? "");
+
         return { from, to: to || from };
     }
 
     const from = toDateInput(v ?? "");
+
     return { from, to: from };
 };
 
@@ -93,6 +99,7 @@ export const normalizeLoadRange = (
     const end = t || f;
 
     if (!start) return undefined;
+
     if (end && end < start) {
         throw new Error("date_from range is invalid");
     }
@@ -100,51 +107,25 @@ export const normalizeLoadRange = (
     return start === end ? [start] : [start, end];
 };
 
-export const normalizeText = (v?: string | null) =>
-    (v || "").trim().toLowerCase();
+const pickString = (...values: unknown[]): string | null => {
+    const hit = values.find(
+        (value): value is string => typeof value === "string" && value.trim().length > 0
+    );
 
-export const eqLoose = (a?: string | null, b?: string | null) => {
-    const A = normalizeText(a);
-    const B = normalizeText(b);
-
-    if (!A || !B) return false;
-
-    return A === B || A.startsWith(B) || B.startsWith(A) || A.includes(B) || B.includes(A);
+    return hit?.trim() ?? null;
 };
 
-export const collectPointNames = (
-    point?: Partial<GeoPoint> | null,
-    baseKey?: "country" | "region" | "city"
-) => {
-    if (!point || !baseKey) return [];
+const pickNumber = (...values: unknown[]): number | null => {
+    for (const value of values) {
+        if (value == null || value === "") continue;
 
-    const keys = [baseKey, `${baseKey}_ru`, `${baseKey}_uz`] as const;
+        const num = Number(value);
 
-    const values = keys
-        .map((key) => (point as any)?.[key])
-        .filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+        if (Number.isFinite(num)) return num;
+    }
 
-    return Array.from(new Set(values));
+    return null;
 };
-
-export const findGeoIdLoose = (items: GeoImportItem[], names: string[]) => {
-    if (!items.length || !names.length) return "";
-
-    const hit = items.find((item) => {
-        const candidates = [item.name, item.name_ru, item.name_uz].filter(
-            (v): v is string => typeof v === "string" && v.trim().length > 0
-        );
-
-        return names.some((needle) =>
-            candidates.some((candidate) => eqLoose(candidate, needle))
-        );
-    });
-
-    return hit?.id ?? "";
-};
-
-export const hasMeaningfulRegion = (p: EditPoint) => !!normalizeText(p.rawRegionName);
-export const hasMeaningfulCity = (p: EditPoint) => !!normalizeText(p.rawCityName);
 
 export const buildInitialForm = (initial?: InitialData): FormState => {
     const initLoad = splitInitialLoadRange(initial?.dateFrom);
@@ -184,46 +165,85 @@ export const buildInitialForm = (initial?: InitialData): FormState => {
 
 export const buildInitialPoint = (
     point: GeoPoint | undefined,
-    type: string,
-    countries: GeoImportItem[]
+    type: string
 ): EditPoint => {
-    const countryNames = collectPointNames(point, "country");
-    const regionNames = collectPointNames(point, "region");
-    const cityNames = collectPointNames(point, "city");
+    const country = pickString(
+        (point as any)?.country,
+        (point as any)?.country_ru,
+        (point as any)?.country_uz
+    );
 
-    const countryId = findGeoIdLoose(countries, countryNames);
+    const region = pickString(
+        (point as any)?.region,
+        (point as any)?.region_ru,
+        (point as any)?.region_uz
+    );
+
+    const city = pickString(
+        (point as any)?.city,
+        (point as any)?.city_ru,
+        (point as any)?.city_uz
+    );
+
+    const displayName = pickString(
+        (point as any)?.display_name,
+        [city, region, country].filter(Boolean).join(", ")
+    );
+
+    const latitude = pickNumber((point as any)?.latitude, (point as any)?.lat);
+    const longitude = pickNumber((point as any)?.longitude, (point as any)?.lng, (point as any)?.lon);
 
     return {
         clientKey: point?.id ?? crypto.randomUUID(),
         id: point?.id,
         type,
-        countryId,
-        regionId: "",
-        cityId: "",
+
+        location: displayName
+            ? ({
+                country: country ?? "",
+                region,
+                city,
+                address: point?.address ?? "",
+                display_name: displayName,
+                latitude,
+                longitude,
+                geocode_source: (point as any)?.geocode_source ?? null,
+            } as any)
+            : null,
+
+        country: country ?? "",
+        region,
+        city,
+
         address: point?.address ?? "",
-        rawCountryName: countryNames[0] ?? null,
-        rawRegionName: regionNames[0] ?? null,
-        rawCityName: cityNames[0] ?? null,
+        display_name: displayName,
+        latitude,
+        longitude,
+        geocode_source: (point as any)?.geocode_source ?? null,
+
+        order: (point as any)?.order ?? null,
     };
 };
 
 export const buildInitialPoints = (
     kind: Kind,
-    initial: InitialData | undefined,
-    countries: GeoImportItem[]
+    initial: InitialData | undefined
 ) => {
     const types = POINT_TYPES[kind];
-    const sorted = [...(initial?.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const sorted = [...(initial?.points ?? [])].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    );
 
     const rawFrom = sorted.filter((p) => p?.type === types.from);
     const rawTo = sorted.filter((p) => p?.type === types.to);
 
     return {
         fromPoints: rawFrom.length
-            ? rawFrom.map((p) => buildInitialPoint(p, types.from, countries))
+            ? rawFrom.map((p) => buildInitialPoint(p, types.from))
             : [createEmptyPoint(types.from)],
+
         toPoints: rawTo.length
-            ? rawTo.map((p) => buildInitialPoint(p, types.to, countries))
+            ? rawTo.map((p) => buildInitialPoint(p, types.to))
             : [createEmptyPoint(types.to)],
     };
 };

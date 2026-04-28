@@ -36,14 +36,10 @@ export default function FullEditDialog(props: Props) {
         form,
         fromPoints,
         toPoints,
-        countries,
+        submitting,
         loadingFilters,
         isReady,
         numericInputProps,
-
-        getRegions,
-        getCities,
-        getLocalizedGeoName,
 
         loadTypeOptions,
         cargoTypeOptions,
@@ -347,11 +343,7 @@ export default function FullEditDialog(props: Props) {
                                 side="from"
                                 title={t("shipments.editDialog.from")}
                                 points={fromPoints}
-                                countries={countries}
-                                getRegions={getRegions}
-                                getCities={getCities}
                                 t={t}
-                                getLocalizedGeoName={getLocalizedGeoName}
                                 onAdd={addPoint}
                                 onUpdate={updatePoint}
                                 onRemove={removePoint}
@@ -361,11 +353,7 @@ export default function FullEditDialog(props: Props) {
                                 side="to"
                                 title={t("shipments.editDialog.to")}
                                 points={toPoints}
-                                countries={countries}
-                                getRegions={getRegions}
-                                getCities={getCities}
                                 t={t}
-                                getLocalizedGeoName={getLocalizedGeoName}
                                 onAdd={addPoint}
                                 onUpdate={updatePoint}
                                 onRemove={removePoint}
@@ -391,8 +379,12 @@ export default function FullEditDialog(props: Props) {
                     {t("shipments.editDialog.cancel")}
                 </Button>
 
-                <Button onClick={submit} variant="contained" disabled={!isReady}>
-                    {t("shipments.editDialog.save")}
+                <Button onClick={submit} variant="contained" disabled={!isReady || submitting}>
+                    {submitting ? (
+                        <CircularProgress size={20} color="inherit" />
+                    ) : (
+                        t("shipments.editDialog.save")
+                    )}
                 </Button>
             </DialogActions>
         </Dialog>

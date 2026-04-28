@@ -1,9 +1,7 @@
-import api from "@/shared/api/axios.ts";
-import type {GeoItem, LookupOpt} from "@/shared/api/cargoApi.ts";
+import api from "@/shared/api/axios";
+import type { LookupOpt } from "@/entities/cargo/model/types";
 
-/** ----- /transport/init ----- */
 export type TransportInitData = {
-    geos: GeoItem[];
     transportPoints: Record<string, string>;
     lookups: {
         vehicleType: LookupOpt[];
@@ -27,41 +25,24 @@ export type TransportInitResponse = {
     message: string;
 };
 
-export const transportApi = {
-    async init() {
-        const { data } = await api.get<TransportInitResponse>("/transport/init");
-        return data.data;
-    },
-
-    /** ----- POST /transport ----- */
-    async create(payload: CreateTransportDto) {
-        const { data } = await api.post("/transport/create", payload);
-        return data;
-    },
-    async info(id: string) {
-        const { data } = await api.get(`/transport/${id}/info`);
-        return (data as any)?.data ?? data;
-    },
-    async viewCount(id: string) {
-        const { data } = await api.get(`/transport/${id}/view-count`);
-        return data;
-    },
-};
-
-/** ----- DTO из бек-описания ----- */
 export type TransportPointDto = {
     type: "DEPARTURE" | "ARRIVAL";
     country: string;
-    region: string;
-    city: string;
-    address: string;
+    region?: string | null;
+    city?: string | null;
+    address?: string | null;
+    display_name?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    geocode_source?: string | null;
+    order?: number | null;
 };
 
 export type CreateTransportDto = {
     images?: string[];
-    date_from: string | string[];
+    date_from: string[];
     date_to: string;
-    vehicle_type: "ANY" | "TENT" | "REFRIGERATOR" | "VAN" | "PLATFORM"; // из init.vehicleType
+    vehicle_type: string;
     cars_count: number;
     weight_t: number;
     volume_m3: number;
@@ -69,7 +50,7 @@ export type CreateTransportDto = {
     length_m?: number;
     width_m?: number;
     height_m?: number;
-    price_currency: string; // из init.currency ключ (USD/EUR/…)
+    price_currency: string;
     price_amount: number;
     payment_method: string;
     payment_term: string;
@@ -77,5 +58,27 @@ export type CreateTransportDto = {
     contact_extra_phone?: string;
     extra_phone_as_main: boolean;
     note?: string;
-    points: TransportPointDto[]; // минимум 2 (DEPARTURE, ARRIVAL)
+    points: TransportPointDto[];
+};
+
+export const transportApi = {
+    async init() {
+        const { data } = await api.get<TransportInitResponse>("/transport/init");
+        return data.data;
+    },
+
+    async create(payload: CreateTransportDto) {
+        const { data } = await api.post("/transport/create", payload);
+        return data;
+    },
+
+    async info(id: string) {
+        const { data } = await api.get(`/transport/${id}/info`);
+        return (data as any)?.data ?? data;
+    },
+
+    async viewCount(id: string) {
+        const { data } = await api.get(`/transport/${id}/view-count`);
+        return data;
+    },
 };
