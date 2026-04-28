@@ -1,5 +1,5 @@
-import { Button, Chip, CircularProgress, IconButton, Stack, Tooltip, Typography } from "@mui/material";
-import { FiChevronDown, FiChevronUp, FiEye, FiStar, FiUser } from "react-icons/fi";
+import { Button, Chip, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { FiChevronDown, FiChevronUp, FiStar, FiUser } from "react-icons/fi";
 import type { ShipmentScope } from "@/entities/shipment/model/shipment-row.types";
 
 type Props = {
@@ -41,7 +41,6 @@ export function ShipmentCardActions({
                                         labels,
                                         onToggleFavorite,
                                         onContacts,
-                                        onOrderInfo,
                                         onMore,
                                     }: Props) {
     const hasStats =
@@ -124,34 +123,6 @@ export function ShipmentCardActions({
                         {labels.contacts}
                     </Button>
                 )}
-
-                <Button
-                    variant="contained"
-                    onClick={onOrderInfo}
-                    disabled={scope === "public" && detailsLoading}
-                    startIcon={
-                        detailsLoading ? (
-                            <CircularProgress size={13} color="inherit" />
-                        ) : (
-                            <FiEye size={15} />
-                        )
-                    }
-                    sx={{
-                        textTransform: "none",
-                        fontWeight: 700,
-                        borderRadius: 1.5,
-                        minHeight: 40,
-                        height: 40,
-                        px: 1.75,
-                        boxShadow: "none",
-                        minWidth: { xs: 0, md: 150 },
-                        flex: { xs: 1.15, md: "0 0 auto" },
-                        fontSize: 13,
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    {labels.orderInfo}
-                </Button>
 
                 {scope === "my" && (
                     <Button

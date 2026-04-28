@@ -1,24 +1,40 @@
-import { Chip, Stack, Typography, Divider } from "@mui/material";
+import { Button, Chip, Stack, Typography, Divider, CircularProgress } from "@mui/material";
 import { FiClock, FiMapPin, FiPackage, FiTruck, FiUser, FiPhone, FiMail } from "react-icons/fi";
 import { FaBriefcase } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { Link as RouterLink } from "react-router-dom";
+import {Link, Link as RouterLink} from "react-router-dom";
 import type { ShipmentRowData, ShipmentsKind } from "@/entities/shipment/model/type";
 import { formatDate } from "@/shared/utils/formatDate";
 import { ShipmentDetailsSection } from "./ShipmentDetailsSection";
+import {useUserStore} from "@/entities/user/model/user.store.ts";
 
 type Props = {
     data: ShipmentRowData;
     kind: ShipmentsKind;
+    contactsRevealed?: boolean;
+    contactsLoading?: boolean;
+    onShowContacts?: () => void;
 };
 
-export function ShipmentDetailsHero({ data, kind }: Props) {
+export function ShipmentDetailsHero({
+                                        data,
+                                        kind,
+                                        contactsRevealed = false,
+                                        contactsLoading = false,
+                                        onShowContacts,
+                                    }: Props) {
     const { t } = useTranslation();
-
-    console.log(data)
 
     const loadFrom = data.loadWindow?.from ?? data.dates.from;
     const loadTo = data.loadWindow?.to ?? data.loadWindow?.from ?? data.dates.from;
+    const user = useUserStore((s) => s.user);
+
+    const hasContacts =
+        data.contact?.name ||
+        data.contact?.company ||
+        data.contact?.phone1 ||
+        data.contact?.email ||
+        data.contactExtraPhone;
 
     return (
         <ShipmentDetailsSection>
@@ -30,12 +46,7 @@ export function ShipmentDetailsHero({ data, kind }: Props) {
                     spacing={1.5}
                 >
                     <Stack spacing={1.25} sx={{ minWidth: 0, flex: 1 }}>
-                        <Stack
-                            direction="row"
-                            spacing={0.75}
-                            alignItems="center"
-                            flexWrap="wrap"
-                        >
+                        <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
                             <FiMapPin size={18} />
                             <Typography
                                 variant="h5"
@@ -45,10 +56,7 @@ export function ShipmentDetailsHero({ data, kind }: Props) {
                                 {data.routeFrom || "—"}
                             </Typography>
 
-                            <Typography
-                                color="text.secondary"
-                                sx={{ fontSize: { xs: 20, md: 22 } }}
-                            >
+                            <Typography color="text.secondary" sx={{ fontSize: { xs: 20, md: 22 } }}>
                                 →
                             </Typography>
 
@@ -140,10 +148,35 @@ export function ShipmentDetailsHero({ data, kind }: Props) {
                             {data.price || "—"}
                         </Typography>
 
-                        {(data.contact?.name ||
-                            data.contact?.company ||
-                            data.contact?.phone1 ||
-                            data.contact?.email) && (
+                        {!user && <Link to="/register" className="header__button button" >{t('header.register')}</Link>}
+
+                        {user && !contactsRevealed && onShowContacts && (
+                            <Button
+                                variant="contained"
+                                size="small"
+                                startIcon={
+                                    contactsLoading ? (
+                                        <CircularProgress size={14} color="inherit" />
+                                    ) : (
+                                        <FiPhone size={14} />
+                                    )
+                                }
+                                disabled={contactsLoading}
+                                onClick={() => void onShowContacts()}
+                                sx={{
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    borderRadius: 1.5,
+                                    minHeight: 34,
+                                }}
+                            >
+                                {contactsLoading
+                                    ? t("shipments.actions.loading", "Loading...")
+                                    : t("shipments.details.showContacts", "Show contacts")}
+                            </Button>
+                        )}
+
+                        {contactsRevealed && hasContacts && (
                             <Stack spacing={0.5} sx={{ width: "100%", alignItems: "flex-end" }}>
                                 {data.contact?.name && (
                                     <Stack direction="row" spacing={0.75} alignItems="center">
@@ -206,6 +239,13 @@ export function ShipmentDetailsHero({ data, kind }: Props) {
                                         <Typography variant="body2">{data.contact.email}</Typography>
                                     </Stack>
                                 )}
+
+                                {data.contactExtraPhone && (
+                                    <Stack direction="row" spacing={0.75} alignItems="center">
+                                        <FiPhone size={14} />
+                                        <Typography variant="body2">{data.contactExtraPhone}</Typography>
+                                    </Stack>
+                                )}
                             </Stack>
                         )}
                     </Stack>
@@ -213,12 +253,7 @@ export function ShipmentDetailsHero({ data, kind }: Props) {
 
                 <Divider />
 
-                <Stack
-                    direction="row"
-                    spacing={1.5}
-                    flexWrap="wrap"
-                    alignItems="center"
-                >
+                <Stack direction="row" spacing={1.5} flexWrap="wrap" alignItems="center">
                     {typeof data.views === "number" && data.views > 0 && (
                         <Typography variant="body2" color="text.secondary">
                             {t("shipments.shipmentCard.views", "Views")}: {data.views}

@@ -8,7 +8,7 @@ import {
 import { Add } from "@mui/icons-material";
 import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
-    FiLogOut, FiUsers, FiSearch,
+    FiLogOut, FiSearch,
     FiAward
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
@@ -42,7 +42,7 @@ function SidebarContent({
         { to: "/dashboard/search",   icon: <FiSearch />,      label: t('dashboard.menu.search') },
         { to: "/dashboard/profile",  icon: <FiUser />,        label: t('dashboard.menu.profile') },
         { to: "/dashboard/company",  icon: <FiPackage />,     label: t('dashboard.menu.company') },
-        { to: "/dashboard/staff",    icon: <FiUsers />,       label: t('dashboard.menu.staff') },
+        // { to: "/dashboard/staff",    icon: <FiUsers />,       label: t('dashboard.menu.staff') },
         { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
         { to: "/dashboard/referral", icon: <FiAward />,  label: t('dashboard.menu.referrals') },
         { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },

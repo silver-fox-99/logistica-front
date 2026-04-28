@@ -1,8 +1,7 @@
-import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { Alert, Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FiArrowLeft } from "react-icons/fi";
 
 import { useShipmentDetailsPage } from "@/entities/shipment/model/useShipmentDetailsPage";
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
@@ -12,24 +11,35 @@ import { isOrderDetailsLimitError } from "@/entities/shipment/lib/isOrderDetails
 
 export default function ShipmentDetailsPage() {
     const { kind, id } = useParams();
-    const navigate = useNavigate();
     const { t } = useTranslation();
+
 
     const resolvedKind = useMemo<ShipmentsKind | null>(() => {
         if (kind === "cargo" || kind === "transport") return kind;
         return null;
     }, [kind]);
 
-    const { data, loading, error, reload } = useShipmentDetailsPage(resolvedKind, id ?? null);
+    const {
+        data,
+        loading,
+        error,
+        contactsLoading,
+        contactsError,
+        contactsErrorCode,
+        contactsRevealed,
+        showContacts,
+    } = useShipmentDetailsPage(resolvedKind, id ?? null);
 
-    const showLimitReached = isOrderDetailsLimitError(error);
+    const showLimitReached = contactsErrorCode
+        ? isOrderDetailsLimitError(contactsErrorCode)
+        : isOrderDetailsLimitError(contactsError);
 
     if (!resolvedKind || !id) {
         return <Alert severity="error">Invalid shipment details route</Alert>;
     }
 
     return (
-        <Stack spacing={2.5} sx={{ width: "100%" }}>
+        <Stack spacing={2.5} py={3} sx={{ width: "100%" }}>
             <Stack
                 direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
@@ -48,31 +58,31 @@ export default function ShipmentDetailsPage() {
                     </Typography>
                 </Box>
 
-                <Button
-                    variant="outlined"
-                    startIcon={<FiArrowLeft size={16} />}
-                    onClick={() => navigate(-1)}
-                    sx={{
-                        textTransform: "none",
-                        fontWeight: 700,
-                        borderRadius: 1.5,
-                        minHeight: 40,
-                    }}
-                >
-                    {t("shipments.actions.back", "Back")}
-                </Button>
+
             </Stack>
 
             {loading ? (
                 <Stack alignItems="center" justifyContent="center" sx={{ py: 8 }}>
                     <CircularProgress />
                 </Stack>
-            ) : showLimitReached ? (
-                <OrderDetailsLimitReached onReload={reload} />
             ) : error ? (
                 <Alert severity="error">{error}</Alert>
             ) : data ? (
-                <ShipmentDetailsView data={data} kind={resolvedKind} />
+                <>
+                    {showLimitReached ? (
+                        <OrderDetailsLimitReached onReload={showContacts} />
+                    ) : contactsError ? (
+                        <Alert severity="error">{contactsError}</Alert>
+                    ) : null}
+
+                    <ShipmentDetailsView
+                        data={data}
+                        kind={resolvedKind}
+                        contactsRevealed={contactsRevealed}
+                        onShowContacts={showContacts}
+                        contactsLoading={contactsLoading}
+                    />
+                </>
             ) : (
                 <Alert severity="info">
                     {t("shipments.messages.orderDetailsEmpty", "No data to display")}

@@ -513,7 +513,11 @@
       "delete": "O‘chirish",
       "morePoints": "yana",
       "updated": "Yangilangan:",
-      "signInToView": "Kontaktlar va tafsilotlarni ko‘rish uchun tizimga kiring."
+      "signInToView": "Kontaktlar va tafsilotlarni ko‘rish uchun tizimga kiring.",
+      "openDetailsPage": "Tafsilotlar sahifasini ochish"
+    },
+    "details": {
+      "showContacts": "Kontaktlarni ko‘rsatish"
     },
     "editDialog": {
       "titleCargo": "Yuk buyurtmasini tahrirlash",
@@ -561,6 +565,11 @@
       "removePoint": "Nuqtani o‘chirish",
       "address": "Manzil",
       "errorPointsRequired": "Har bir nuqta uchun hech bo‘lmaganda mamlakat tanlang"
+    },
+    "orderDetailsLimit": {
+      "title": "Oylik buyurtma tafsilotlari limiti tugadi",
+      "description": "Joriy tarifingiz uchun mavjud bo‘lgan barcha buyurtma tafsilotlarini ko‘rish imkoniyatlaridan foydalandingiz. Tarifni yangilash yoki joriy limitlarni ko‘rish uchun to‘lovlar sahifasiga o‘ting.",
+      "goToPayments": "To‘lovlarga o‘tish"
     },
     "filters": {
       "title": "Filtrlar",
@@ -1387,6 +1396,17 @@
     "actions": {
       "create": "Kompaniya yaratish",
       "creating": "Yaratilmoqda..."
+    }
+  },
+  "limits": {
+    "goToPayments": "To‘lovlarga o‘tish",
+    "createCargo": {
+      "title": "Oylik yuk yaratish limiti tugadi",
+      "description": "Joriy tarifingiz uchun mavjud bo‘lgan barcha yuk yaratish imkoniyatlaridan foydalandingiz. Tarifni yangilash yoki joriy limitlarni ko‘rish uchun to‘lovlar sahifasiga o‘ting."
+    },
+    "createTransport": {
+      "title": "Oylik transport yaratish limiti tugadi",
+      "description": "Joriy tarifingiz uchun mavjud bo‘lgan barcha transport yaratish imkoniyatlaridan foydalandingiz. Tarifni yangilash yoki joriy limitlarni ko‘rish uchun to‘lovlar sahifasiga o‘ting."
     }
   }
 }

@@ -34,4 +34,9 @@ export const cargoApi = {
         const { data } = await api.get<CreateResponse>(`/cargo/${id}/view-count`);
         return data;
     },
+
+    async publicInfo(id: string) {
+        const { data } = await api.get<CreateResponse>(`/cargo/public/${id}/info`);
+        return data?.data ?? data;
+    },
 };

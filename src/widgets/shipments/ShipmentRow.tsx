@@ -13,6 +13,7 @@ import { ShipmentDetailsModal } from "@/entities/shipment/ui/shipment-details/Sh
 import {useShipmentRow} from "@/widgets/shipments/shipment-row/model/useShipmentRow.ts";
 import {buildShipmentDetailsPath} from "@/features/shipment/open-shipment-details/lib/buildShipmentDetailsPath.ts";
 import {useNavigate} from "react-router-dom";
+import {ShipmentDetailsLimitModal} from "@/entities/shipment/ui/shipment-details/ShipmentDetailsLimitModal.tsx";
 
 type Props = {
     data: ShipmentRowData;
@@ -73,10 +74,12 @@ export default function ShipmentRow({
 
     const {
         detailsOpen,
+        limitOpen,
         detailsLoading,
         detailsData,
         openDetails,
         closeDetails,
+        closeLimit,
     } = useShipmentDetails({
         id: data.id,
         kind,
@@ -193,8 +196,14 @@ export default function ShipmentRow({
                 lookups={lookups}
                 findLocalizedLabel={findLocalizedLabel}
                 t={t}
+                onOpenPage={handleOpenOrderPage}
                 formatRoute={formatRoute}
                 loading={detailsLoading}
+            />
+
+            <ShipmentDetailsLimitModal
+                open={limitOpen}
+                onClose={closeLimit}
             />
         </>
     );

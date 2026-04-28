@@ -39,5 +39,6 @@ export type ShipmentDetailsModalProps = {
     findLocalizedLabel: FindLocalizedLabel;
     t: TFunction;
     loading: boolean;
+    onOpenPage?: () => void;
     formatRoute: (point?: GeoPoint, withAddress?: boolean) => string;
 };

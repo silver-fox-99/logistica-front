@@ -427,6 +427,14 @@
       "searchTitle": "Search orders",
       "searchDescription": "Find suitable orders from other users."
     },
+    "orderDetailsLimit": {
+      "title": "Monthly order details limit reached",
+      "description": "You have used all available order detail views for your current plan. To upgrade your plan or check your current limits, go to the payments page.",
+      "goToPayments": "Go to payments"
+    },
+    "details": {
+      "showContacts": "Show contacts"
+    },
     "autoDeleteNotice": "Listings older than 2 months from the date of creation will be automatically deleted. To restore a listing, please contact support.",
     "filter": {
       "button": "Filter",
@@ -514,7 +522,8 @@
       "delete": "Delete",
       "morePoints": "more",
       "updated": "Updated:",
-      "signInToView": "Sign in to view contacts and details."
+      "signInToView": "Sign in to view contacts and details.",
+      "openDetailsPage": "Open details page"
     },
     "editDialog": {
       "titleCargo": "Edit cargo order",
@@ -1387,6 +1396,17 @@
     "actions": {
       "create": "Create company",
       "creating": "Creating..."
+    }
+  },
+  "limits": {
+    "goToPayments": "Go to payments",
+    "createCargo": {
+      "title": "Monthly cargo creation limit reached",
+      "description": "You have used all available cargo creation slots for your current plan. To upgrade your plan or check your current limits, go to the payments page."
+    },
+    "createTransport": {
+      "title": "Monthly transport creation limit reached",
+      "description": "You have used all available transport creation slots for your current plan. To upgrade your plan or check your current limits, go to the payments page."
     }
   }
 }

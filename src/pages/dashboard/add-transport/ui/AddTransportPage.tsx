@@ -5,6 +5,7 @@ import "./AddTransportPage.scss";
 import { useAddTransportForm } from "@/features/add-transport-form/model/useAddTransportForm";
 import { AddTransportDesktopForm } from "@/features/add-transport-form/ui/AddTransportDesktopForm";
 import { AddTransportMobileForm } from "@/features/add-transport-form/ui/AddTransportMobileForm";
+import {LimitReachedModal} from "@/shared/ui/limit/LimitReachedModal.tsx";
 
 export default function AddTransportPage() {
     const {
@@ -25,6 +26,9 @@ export default function AddTransportPage() {
         unloadCountryErrors,
         loading,
         imagePreviews,
+
+        createLimitOpen,
+        closeCreateLimit,
     } = useAddTransportForm();
 
     const theme = useTheme();
@@ -111,6 +115,13 @@ export default function AddTransportPage() {
                     />
                 )}
             </Paper>
+
+            <LimitReachedModal
+                open={createLimitOpen}
+                onClose={closeCreateLimit}
+                titleKey="limits.createTransport.title"
+                descriptionKey="limits.createTransport.description"
+            />
         </Box>
     );
 }

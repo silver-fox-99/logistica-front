@@ -77,12 +77,17 @@ export function useAddCargoForm() {
 
     const { getLocalizedLabel } = useLocalizedLookup();
     const [loading, setLoading] = useState(false);
+    const [createLimitOpen, setCreateLimitOpen] = useState(false);
 
     const { lookups, loadInit, loading: loadingInit } = useInitStore();
 
     useEffect(() => {
         loadInit();
     }, [loadInit]);
+
+    const closeCreateLimit = useCallback(() => {
+        setCreateLimitOpen(false);
+    }, []);
 
     const currencyOpts = useMemo(() => lookups?.currency ?? [], [lookups]);
     const vehicleOpts = useMemo(() => lookups?.vehicleType ?? [], [lookups]);
@@ -433,6 +438,13 @@ export function useAddCargoForm() {
                 toast.success(t("addCargo.successMessage"));
                 navigate("/dashboard/requests");
             } catch (error: any) {
+                const code = error?.response?.data?.code;
+
+                if (code === "MONTHLY_CREATED") {
+                    setCreateLimitOpen(true);
+                    return;
+                }
+
                 toast.error(getErrorMessage(error));
             } finally {
                 setLoading(false);
@@ -488,5 +500,8 @@ export function useAddCargoForm() {
         onSubmit,
         loading,
         imagePreviews,
+
+        createLimitOpen,
+        closeCreateLimit,
     };
 }

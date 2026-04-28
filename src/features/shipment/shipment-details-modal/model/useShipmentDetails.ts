@@ -13,8 +13,11 @@ type Params = {
     onMoreOpen?: (id: string) => void;
 };
 
+const ORDER_DETAILS_LIMIT_CODE = "MONTHLY_ORDER_DETAILS_LIMIT";
+
 export function useShipmentDetails({ id, kind, t, onMoreOpen }: Params) {
     const [detailsOpen, setDetailsOpen] = useState(false);
+    const [limitOpen, setLimitOpen] = useState(false);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [detailsData, setDetailsData] = useState<ShipmentRowData | null>(null);
 
@@ -24,9 +27,10 @@ export function useShipmentDetails({ id, kind, t, onMoreOpen }: Params) {
         setDetailsLoading(true);
 
         try {
-            const resp = kind === "cargo"
-                ? await cargoApi.info(id)
-                : await transportApi.info(id);
+            const resp =
+                kind === "cargo"
+                    ? await cargoApi.info(id)
+                    : await transportApi.info(id);
 
             const payload = (resp as any)?.data ?? resp;
 
@@ -36,14 +40,22 @@ export function useShipmentDetails({ id, kind, t, onMoreOpen }: Params) {
                 );
             }
 
-            const adapted = kind === "cargo"
-                ? adaptCargo(payload as any)
-                : adaptTransport(payload as any);
+            const adapted =
+                kind === "cargo"
+                    ? adaptCargo(payload as any)
+                    : adaptTransport(payload as any);
 
             setDetailsData(adapted);
             setDetailsOpen(true);
             onMoreOpen?.(id);
         } catch (error: any) {
+            const code = error?.response?.data?.code;
+
+            if (code === ORDER_DETAILS_LIMIT_CODE) {
+                setLimitOpen(true);
+                return;
+            }
+
             const message =
                 error?.response?.data?.message ||
                 error?.message ||
@@ -56,12 +68,15 @@ export function useShipmentDetails({ id, kind, t, onMoreOpen }: Params) {
     };
 
     const closeDetails = () => setDetailsOpen(false);
+    const closeLimit = () => setLimitOpen(false);
 
     return {
         detailsOpen,
+        limitOpen,
         detailsLoading,
         detailsData,
         openDetails,
         closeDetails,
+        closeLimit,
     };
 }

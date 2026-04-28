@@ -6,6 +6,7 @@ import "./AddCargoPage.scss";
 import { useAddCargoForm } from "@/features/add-cargo-form/model/useAddCargoForm";
 import { AddCargoMobileForm } from "@/features/add-cargo-form/ui/AddCargoMobileForm";
 import { AddCargoDesktopForm } from "@/features/add-cargo-form/ui/AddCargoDesktopForm";
+import {LimitReachedModal} from "@/shared/ui/limit/LimitReachedModal.tsx";
 
 export default function AddCargoPage() {
     const {
@@ -27,7 +28,10 @@ export default function AddCargoPage() {
         pickupCountryErrors,
         dropoffCountryErrors,
         loading,
-        imagePreviews
+        imagePreviews,
+
+        createLimitOpen,
+        closeCreateLimit,
     } = useAddCargoForm();
 
     const theme = useTheme();
@@ -113,6 +117,13 @@ export default function AddCargoPage() {
                     />
                 )}
             </Paper>
+
+            <LimitReachedModal
+                open={createLimitOpen}
+                onClose={closeCreateLimit}
+                titleKey="limits.createCargo.title"
+                descriptionKey="limits.createCargo.description"
+            />
         </Box>
     );
 }

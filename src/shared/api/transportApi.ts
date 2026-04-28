@@ -81,4 +81,9 @@ export const transportApi = {
         const { data } = await api.get(`/transport/${id}/view-count`);
         return data;
     },
+
+    async publicInfo(id: string) {
+        const { data } = await api.get(`/transport/public/${id}/info`);
+        return (data as any)?.data ?? data;
+    },
 };

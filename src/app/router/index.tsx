@@ -67,7 +67,8 @@ const router = createBrowserRouter([
             {path: "/register/:code?", element: <RegisterPage/>},
             {path: "/auth/register", element: <RegisterPage/>},
             {path: "/help", element: <HelpSupportPage />},
-            {path: "/reset-password", element: <ForgotPasswordPage />}
+            {path: "/reset-password", element: <ForgotPasswordPage />},
+            {path: "/search/:kind/:id", element: <ShipmentDetailsPage /> },
         ],
     },
 
@@ -81,7 +82,6 @@ const router = createBrowserRouter([
         children: [
             {index: true, element: <ProfilePage/>},
             {path: "search", element: <ShipmentsListPage scope="public"/>},
-            {path: "search/:kind/:id", element: <ShipmentDetailsPage /> },
             {path: "profile", element: <ProfilePage/>},
             {path: "company", element: <CompanyPage/>},
             {path: "new/company ", element: <CompanyCreatePage/>},
