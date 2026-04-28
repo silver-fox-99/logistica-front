@@ -103,7 +103,7 @@ export function ShipmentCardActions({
 
                 {scope === "public" && (
                     <Button
-                        variant="outlined"
+                        variant="contained"
                         onClick={onContacts}
                         disabled={detailsLoading}
                         startIcon={<FiUser size={15} />}
