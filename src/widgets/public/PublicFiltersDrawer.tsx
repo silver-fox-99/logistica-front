@@ -172,6 +172,14 @@ function LocationAutocomplete({
     const [options, setOptions] = useState<MapsLocationSuggestion[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const { i18n } = useTranslation();
+
+    const lang = useMemo(() => {
+        if (i18n.language.startsWith("ru")) return "ru";
+        if (i18n.language.startsWith("uz")) return "uz";
+        return "en";
+    }, [i18n.language]);
+
     const query = inputValue.trim();
 
     useEffect(() => {
@@ -190,6 +198,7 @@ function LocationAutocomplete({
             mapsApi
                 .searchLocations({
                     q: query,
+                    lang,
                     limit: 10,
                 } as any)
                 .then((data) => {

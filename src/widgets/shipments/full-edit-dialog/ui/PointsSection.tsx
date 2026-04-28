@@ -12,6 +12,7 @@ import Grid from "@mui/material/Grid";
 import type { MapsLocationSuggestion } from "@/entities/maps/model/types";
 import { mapsApi } from "@/shared/api/mapsApi";
 import type { EditPoint } from "../model/types";
+import {useTranslation} from "react-i18next";
 
 type PointRowProps = {
     title: string;
@@ -49,6 +50,14 @@ const PointRow = memo(function PointRow({
 
     const normalizedQuery = useMemo(() => query.trim(), [query]);
 
+    const { i18n } = useTranslation();
+
+    const lang = useMemo(() => {
+        if (i18n.language.startsWith("ru")) return "ru";
+        if (i18n.language.startsWith("uz")) return "uz";
+        return "en";
+    }, [i18n.language]);
+
     const loadOptions = useCallback(async (search: string) => {
         if (search.length < 2) {
             setOptions([]);
@@ -60,6 +69,7 @@ const PointRow = memo(function PointRow({
         try {
             const data = await mapsApi.searchLocations({
                 q: search,
+                lang,
                 limit: 10,
             } as any);
 

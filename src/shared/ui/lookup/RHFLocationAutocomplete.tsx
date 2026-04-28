@@ -4,6 +4,7 @@ import { Controller, type Control, type FieldValues, type Path } from "react-hoo
 
 import { mapsApi } from "@/shared/api/mapsApi";
 import type { MapsLocationSuggestion } from "@/entities/maps/model/types";
+import {useTranslation} from "react-i18next";
 
 type Props<T extends FieldValues> = {
     control: Control<T>;
@@ -48,6 +49,13 @@ export function RHFLocationAutocomplete<T extends FieldValues>({
     const [inputValue, setInputValue] = useState("");
     const [options, setOptions] = useState<MapsLocationSuggestion[]>([]);
     const [loading, setLoading] = useState(false);
+    const { i18n } = useTranslation();
+
+    const lang = useMemo(() => {
+        if (i18n.language.startsWith("ru")) return "ru";
+        if (i18n.language.startsWith("uz")) return "uz";
+        return "en";
+    }, [i18n.language]);
 
     const normalizedQuery = useMemo(() => inputValue.trim(), [inputValue]);
 
@@ -65,6 +73,7 @@ export function RHFLocationAutocomplete<T extends FieldValues>({
                     q: normalizedQuery,
                     country,
                     region,
+                    lang,
                     limit: 10,
                 } as any)
                 .then((data) => {
