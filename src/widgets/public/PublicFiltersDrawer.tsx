@@ -286,8 +286,8 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
         if (init && Object.keys(init).length > 0) {
             const result: PublicFilters = { ...init };
 
-            if (!result.pickup_date_from) result.pickup_date_from = getTodayDate();
-            if (!result.pickup_date_to) result.pickup_date_to = getDefaultDatePlus30();
+         //   if (!result.pickup_date_from) result.pickup_date_from = getTodayDate();
+         //   if (!result.pickup_date_to) result.pickup_date_to = getDefaultDatePlus30();
 
             return result;
         }
@@ -304,7 +304,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     useEffect(() => {
         if (!open) return;
 
-        setF(getInitialFilters(initial));
+       // setF(getInitialFilters(initial));
     }, [open, initial]);
 
     useEffect(() => {
@@ -350,8 +350,8 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
 
     const onReset = () => {
         setF({
-            pickup_date_from: getTodayDate(),
-            pickup_date_to: getDefaultDatePlus30(),
+          //  pickup_date_from: getTodayDate(),
+          //  pickup_date_to: getDefaultDatePlus30(),
         });
     };
 

@@ -18,23 +18,42 @@ export type PublicPoint = {
     order?: number | null
 };
 
+export type LocationFilterPlaceType =
+    | "country"
+    | "region"
+    | "city"
+    | "address"
+    | "unknown";
+
 export type PublicFilters = {
+    pickup_location_label?: string;
     pickup_country?: string;
-    pickup_region?: string[];
+    pickup_region?: string;
     pickup_city?: string;
+    pickup_lat?: number;
+    pickup_lon?: number;
+    pickup_place_type?: LocationFilterPlaceType;
+
+    dropoff_location_label?: string;
     dropoff_country?: string;
-    dropoff_region?: string[];
+    dropoff_region?: string;
     dropoff_city?: string;
+    dropoff_lat?: number;
+    dropoff_lon?: number;
+    dropoff_place_type?: LocationFilterPlaceType;
+
     pickup_date_from?: string;
     pickup_date_to?: string;
+
     dropoff_date_from?: string;
     dropoff_date_to?: string;
-    vehicle_type?: string[];
-    q?: string;
+
     weight_min?: number;
     weight_max?: number;
     volume_min?: number;
     volume_max?: number;
+
+    vehicle_type?: string[];
     favorites_only?: boolean;
 };
 

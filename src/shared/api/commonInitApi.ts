@@ -1,5 +1,6 @@
-import { cargoApi, type CargoInitData } from "./cargoApi";
+import { cargoApi } from "./cargoApi";
 import { transportApi, type TransportInitData } from "./transportApi";
+import type {CargoInitData} from "@/entities/cargo/model/types.ts";
 
 export type CommonInitData = {
     lookups: {

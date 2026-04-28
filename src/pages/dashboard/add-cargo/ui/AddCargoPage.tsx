@@ -21,8 +21,6 @@ export default function AddCargoPage() {
         payMethodOpts,
         payTermOpts,
 
-        geo,
-
         form,
         onSubmit,
 
@@ -88,7 +86,7 @@ export default function AddCargoPage() {
                         payTermOpts={payTermOpts}
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
-                        geo={geo}
+
                         pickupCountryErrors={pickupCountryErrors}
                         dropoffCountryErrors={dropoffCountryErrors}
                         imagePreviews={imagePreviews}
@@ -108,7 +106,7 @@ export default function AddCargoPage() {
                         payTermOpts={payTermOpts}
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
-                        geo={geo}
+
                         pickupCountryErrors={pickupCountryErrors}
                         dropoffCountryErrors={dropoffCountryErrors}
                         imagePreviews={imagePreviews}

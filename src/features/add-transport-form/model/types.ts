@@ -1,4 +1,5 @@
-import type { MapsLocationSuggestion } from "@/shared/api/types/maps";
+import type {MapsLocationSuggestion} from "@/entities/maps/model/types.ts";
+
 
 export type Place = {
     location: MapsLocationSuggestion | null;
