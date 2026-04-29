@@ -20,6 +20,8 @@ export function ShipmentCardHeader({
                                        pickupPointsTitle,
                                        dropoffPointsTitle,
                                    }: Props) {
+
+    console.log(routeFrom, routeTo)
     return (
         <>
             <Stack

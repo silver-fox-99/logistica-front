@@ -137,11 +137,13 @@ export function MyShipmentManageCard({
     const primaryUnloadPoint = unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
 
     const routeFrom = useMemo(() => {
+        if (data.routeFrom) return data.routeFrom;
         if (primaryLoadPoint) return formatRoute(primaryLoadPoint);
         return data.routeFrom || "—";
     }, [data.routeFrom, formatRoute, primaryLoadPoint]);
 
     const routeTo = useMemo(() => {
+        if (data.routeTo) return data.routeTo;
         if (primaryUnloadPoint) return formatRoute(primaryUnloadPoint);
         return data.routeTo || "—";
     }, [data.routeTo, formatRoute, primaryUnloadPoint]);
@@ -227,16 +229,26 @@ export function MyShipmentManageCard({
                                             direction="row"
                                             spacing={0.75}
                                             alignItems="center"
-                                            sx={{ minWidth: 0, maxWidth: "100%" }}
+                                            sx={{
+                                                minWidth: 0,
+                                                maxWidth: { xs: "100%", md: 360, lg: 440 },
+                                                flex: "1 1 auto",
+                                            }}
                                         >
                                             <FiMapPin />
 
                                             <Tooltip title={routeFrom}>
                                                 <Typography
                                                     fontWeight={700}
+                                                    noWrap
                                                     sx={{
-                                                        wordBreak: "break-word",
+                                                        minWidth: 0,
+                                                        maxWidth: "100%",
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",
+                                                        whiteSpace: "nowrap",
                                                         lineHeight: 1.25,
+                                                        display: "block",
                                                     }}
                                                 >
                                                     {routeFrom}
@@ -268,16 +280,26 @@ export function MyShipmentManageCard({
                                             direction="row"
                                             spacing={0.75}
                                             alignItems="center"
-                                            sx={{ minWidth: 0, maxWidth: "100%" }}
+                                            sx={{
+                                                minWidth: 0,
+                                                maxWidth: { xs: "100%", md: 360, lg: 440 },
+                                                flex: "1 1 auto",
+                                            }}
                                         >
                                             <FiMapPin />
 
                                             <Tooltip title={routeTo}>
                                                 <Typography
                                                     fontWeight={700}
+                                                    noWrap
                                                     sx={{
-                                                        wordBreak: "break-word",
+                                                        minWidth: 0,
+                                                        maxWidth: "100%",
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",
+                                                        whiteSpace: "nowrap",
                                                         lineHeight: 1.25,
+                                                        display: "block",
                                                     }}
                                                 >
                                                     {routeTo}

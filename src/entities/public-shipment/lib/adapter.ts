@@ -93,6 +93,7 @@ const adaptBase = (
             country_ru: point.country_ru ?? null,
             country_uz: point.country_uz ?? null,
             region: point.region ?? null,
+            display_name: point.display_name ?? null,
             region_ru: point.region_ru ?? null,
             region_uz: point.region_uz ?? null,
             city: point.city ?? null,
@@ -114,6 +115,7 @@ const adaptBase = (
 
     const toRouteLabel = (point?: PublicPoint) => {
         if (!point) return "—";
+        if (point.display_name) return point.display_name;
         const parts = [point.country, point.region, point.city].filter(Boolean);
         return parts.length ? parts.join(", ") : "—";
     };

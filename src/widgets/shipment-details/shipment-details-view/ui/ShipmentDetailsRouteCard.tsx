@@ -16,8 +16,10 @@ export function ShipmentDetailsRouteCard({ data, kind }: Props) {
     const loadPoints = sortedPoints.filter((item) => item.type === "PICKUP" || item.type === "DEPARTURE");
     const unloadPoints = sortedPoints.filter((item) => item.type === "DROPOFF" || item.type === "ARRIVAL");
 
-    const formatPoint = (point: any) =>
-        [point.country, point.region, point.city, point.address].filter(Boolean).join(", ");
+    const formatPoint = (point: any) => {
+        if (point.display_name) return point.display_name;
+       return [point.country, point.region, point.city, point.address].filter(Boolean).join(", ");
+    }
 
     const loadTitle =
         kind === "cargo"

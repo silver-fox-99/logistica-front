@@ -84,6 +84,7 @@ const getMinMaxDate = (arr: string[]): { min?: string; max?: string } => {
 
 function asRouteString(p?: GeoPoint): string {
     if (!p) return "—";
+    if (p.display_name) return p.display_name;
     return [p.country, p.region, p.city].filter(Boolean).join(", ") || "—";
 }
 

@@ -10,6 +10,7 @@ export type PublicPoint = {
     country_uz?: string | null;
     region?: string | null;
     region_ru?: string | null;
+    display_name?: string | null;
     region_uz?: string | null;
     city?: string | null;
     city_ru?: string | null;

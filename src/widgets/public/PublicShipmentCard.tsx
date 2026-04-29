@@ -1,4 +1,4 @@
-import { memo, useMemo, useCallback, useEffect } from "react";
+import React, { memo, useMemo, useCallback, useEffect } from "react";
 import {
     Box,
     Stack,
@@ -7,12 +7,22 @@ import {
     Button,
     Paper,
     Tooltip as MuiTooltip,
+    Divider,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { FiCalendar, FiMapPin, FiTag } from "react-icons/fi";
-import type { PublicShipmentBase, PublicPoint } from "@/entities/public-shipment/model/types";
+import {
+    FiCalendar,
+    FiMapPin,
+    FiTag,
+    FiLock,
+    FiPackage,
+    FiTruck,
+    FiArrowRight,
+} from "react-icons/fi";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
+import type { PublicShipmentBase, PublicPoint } from "@/entities/public-shipment/model/types";
 import { formatDate } from "@/shared/utils/formatDate";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
@@ -20,16 +30,14 @@ import { useInitStore } from "@/shared/store/initStore";
 type Props = {
     data: PublicShipmentBase;
     kind: "cargo" | "transport";
-    cta: { label: string; href: string; icon?: React.ReactNode };
-    mobileLayout?: "column" | "row";
+    cta: {
+        label: string;
+        href: string;
+        icon?: React.ReactNode;
+    };
 };
 
-export const PublicShipmentCard = memo(function PublicShipmentCard({
-                                                                       data,
-                                                                       cta,
-                                                                       kind,
-                                                                       mobileLayout = "column",
-                                                                   }: Props) {
+export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind, cta }: Props) {
     const { t, i18n } = useTranslation();
     const { lookups, loadInit } = useInitStore();
     const { findLocalizedLabel } = useLocalizedLookup();
@@ -39,16 +47,19 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({
     }, [loadInit]);
 
     const fmtPoint = useCallback(
-        (p?: PublicPoint) => {
-            if (!p) return "—";
+        (point?: PublicPoint) => {
+            if (!point) return "—";
 
-            const parts: string[] = [];
-            const lang = i18n.resolvedLanguage || i18n.language || "uz";
+            if (point.display_name) {
+                return point.display_name;
+            }
+
+            const lang = i18n.resolvedLanguage || i18n.language || "en";
 
             const getLocalized = (
                 base?: string | null,
                 ru?: string | null,
-                uz?: string | null
+                uz?: string | null,
             ) => {
                 if (!base) return null;
                 if (lang === "ru" && ru) return ru;
@@ -56,53 +67,50 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({
                 return base;
             };
 
-            const country = getLocalized(p.country, p.country_ru, p.country_uz);
-            const region = getLocalized(p.region, p.region_ru, p.region_uz);
-            const city = getLocalized(p.city, p.city_ru, p.city_uz);
+            const city = getLocalized(point.city, point.city_ru, point.city_uz);
+            const region = getLocalized(point.region, point.region_ru, point.region_uz);
+            const country = getLocalized(point.country, point.country_ru, point.country_uz);
 
-            if (country) parts.push(country);
-            if (region) parts.push(region);
-            if (city) parts.push(city);
-
-            return parts.length ? parts.join(", ") : "—";
+            return [city, region, country].filter(Boolean).join(", ") || "—";
         },
-        [i18n.resolvedLanguage, i18n.language]
+        [i18n.resolvedLanguage, i18n.language],
     );
 
-    const sortedPoints = useMemo(
-        () => [...(data.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
-        [data.points]
-    );
+    const sortedPoints = useMemo(() => {
+        return [...(data.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }, [data.points]);
 
-    const loadPoints = useMemo(
-        () =>
-            sortedPoints.filter(
-                (point) => point.type === "PICKUP" || point.type === "DEPARTURE"
-            ),
-        [sortedPoints]
-    );
+    const loadPoints = useMemo(() => {
+        return sortedPoints.filter((point) => point.type === "PICKUP" || point.type === "DEPARTURE");
+    }, [sortedPoints]);
 
-    const unloadPoints = useMemo(
-        () =>
-            sortedPoints.filter(
-                (point) => point.type === "DROPOFF" || point.type === "ARRIVAL"
-            ),
-        [sortedPoints]
-    );
+    const unloadPoints = useMemo(() => {
+        return sortedPoints.filter((point) => point.type === "DROPOFF" || point.type === "ARRIVAL");
+    }, [sortedPoints]);
 
-    const primaryLoadPoint = loadPoints[0] ?? sortedPoints[0];
-    const primaryUnloadPoint =
-        unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
+    const routeFrom = useMemo(() => {
+        return fmtPoint(loadPoints[0] ?? sortedPoints[0]);
+    }, [fmtPoint, loadPoints, sortedPoints]);
 
-    const routeFrom = useMemo(
-        () => fmtPoint(primaryLoadPoint),
-        [fmtPoint, primaryLoadPoint]
-    );
+    const routeTo = useMemo(() => {
+        return fmtPoint(unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1]);
+    }, [fmtPoint, unloadPoints, sortedPoints]);
 
-    const routeTo = useMemo(
-        () => fmtPoint(primaryUnloadPoint),
-        [fmtPoint, primaryUnloadPoint]
-    );
+    const dateLabel = useMemo(() => {
+        const loadFrom = data.loadWindow?.from ?? data.dates?.from;
+        const loadTo = data.loadWindow?.to ?? data.loadWindow?.from ?? data.dates?.from;
+        const unload = data.dates?.to;
+
+        const loadPart = data.loadWindow
+            ? `${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)} – ${formatDate(loadTo)}`
+            : `${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)}`;
+
+        const unloadPart = unload
+            ? `${t("shipments.shipmentCard.unload")}: ${formatDate(unload)}`
+            : "";
+
+        return unloadPart ? `${loadPart} / ${unloadPart}` : loadPart;
+    }, [data.loadWindow, data.dates, t]);
 
     const localizedTags = useMemo(() => {
         if (!data.tags) return [];
@@ -119,17 +127,16 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({
         };
 
         return data.tags.map((tag) => {
-            const vtLabel = findLocalizedLabel(vt, tag);
-            if (vtLabel && vtLabel !== tag) return vtLabel;
+            const vehicleTypeLabel = findLocalizedLabel(vt, tag);
+            if (vehicleTypeLabel && vehicleTypeLabel !== tag) return vehicleTypeLabel;
 
-            const ltLabel = findLocalizedLabel(lt, tag);
-            if (ltLabel && ltLabel !== tag) return ltLabel;
+            const loadTypeLabel = findLocalizedLabel(lt, tag);
+            if (loadTypeLabel && loadTypeLabel !== tag) return loadTypeLabel;
 
-            const ctLabel = findLocalizedLabel(ct, tag);
-            if (ctLabel && ctLabel !== tag) return ctLabel;
+            const cargoTypeLabel = findLocalizedLabel(ct, tag);
+            if (cargoTypeLabel && cargoTypeLabel !== tag) return cargoTypeLabel;
 
-            if (loadTypeMap[tag]) return loadTypeMap[tag];
-            return tag;
+            return loadTypeMap[tag] ?? tag;
         });
     }, [
         data.tags,
@@ -143,255 +150,278 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({
     const localizedMetrics = useMemo(() => {
         if (!data.metrics) return [];
 
-        const list: string[] = [];
+        return data.metrics.reduce<string[]>((acc, metric) => {
+            const carsMatch = metric.match(/^(\d+)\s*cars?$/i);
+            if (carsMatch) return acc;
 
-        data.metrics.forEach((m) => {
-            const carsMatch = m.match(/^(\d+)\s*cars?$/i);
-            if (carsMatch) {
-                return;
-            }
-
-            const weightMatch = m.match(/^([\d.,]+)\s*t$/i);
+            const weightMatch = metric.match(/^([\d.,]+)\s*t$/i);
             if (weightMatch) {
-                list.push(
-                    `${weightMatch[1]} ${t("shipments.shipmentCard.weightUnitShort", "т")}`
-                );
-                return;
+                acc.push(`${weightMatch[1]} ${t("shipments.shipmentCard.weightUnitShort", "т")}`);
+                return acc;
             }
 
-            const volumeMatch = m.match(/^([\d.,]+)\s*m3$/i);
+            const volumeMatch = metric.match(/^([\d.,]+)\s*m3$/i);
             if (volumeMatch) {
-                list.push(
-                    `${volumeMatch[1]} ${t("shipments.shipmentCard.volumeUnitShort", "м³")}`
-                );
-                return;
+                acc.push(`${volumeMatch[1]} ${t("shipments.shipmentCard.volumeUnitShort", "м³")}`);
+                return acc;
             }
 
-            const volumeSupMatch = m.match(/^([\d.,]+)\s*m³$/i);
+            const volumeSupMatch = metric.match(/^([\d.,]+)\s*m³$/i);
             if (volumeSupMatch) {
-                list.push(
-                    `${volumeSupMatch[1]} ${t("shipments.shipmentCard.volumeUnitShort", "м³")}`
-                );
-                return;
+                acc.push(`${volumeSupMatch[1]} ${t("shipments.shipmentCard.volumeUnitShort", "м³")}`);
+                return acc;
             }
 
-            list.push(m);
-        });
-
-        return list;
+            acc.push(metric);
+            return acc;
+        }, []);
     }, [data.metrics, t]);
 
     return (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Grid container spacing={1.5} alignItems="center">
-                <Grid size={{ xs: 12, md: 8 }}>
-                    <Stack spacing={1}>
-                        <Stack
-                            direction="row"
-                            spacing={1.5}
-                            alignItems="center"
-                            sx={{
-                                flexWrap: { xs: "wrap", md: "nowrap" },
-                            }}
-                        >
-                            <Box
-                                display="inline-flex"
-                                alignItems="center"
-                                gap={0.75}
-                                sx={{ minWidth: 0, flexShrink: 0 }}
-                            >
-                                <FiMapPin />
-                                <MuiTooltip title={routeFrom}>
-                                    <Typography
-                                        fontWeight={700}
-                                        noWrap
-                                        sx={{ maxWidth: { xs: 180, md: 300 } }}
-                                    >
-                                        {routeFrom}
-                                    </Typography>
-                                </MuiTooltip>
-
-                                {loadPoints.length > 1 && (
-                                    <MuiTooltip
-                                        title={`${t("shipments.shipmentCard.load")}: ${loadPoints.length}`}
-                                    >
-                                        <Box
-                                            sx={{
-                                                minWidth: 20,
-                                                height: 20,
-                                                px: 0.5,
-                                                borderRadius: "999px",
-                                                display: "inline-flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                bgcolor: "primary.main",
-                                                color: "primary.contrastText",
-                                                fontSize: 11,
-                                                fontWeight: 700,
-                                                lineHeight: 1,
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            {loadPoints.length > 99 ? "99+" : loadPoints.length}
-                                        </Box>
-                                    </MuiTooltip>
-                                )}
-                            </Box>
-
-                            <Typography color="text.secondary" sx={{ flexShrink: 0 }}>
-                                →
-                            </Typography>
-
-                            <Box
-                                display="inline-flex"
-                                alignItems="center"
-                                gap={0.75}
-                                sx={{ minWidth: 0, flexShrink: 0 }}
-                            >
-                                <FiMapPin />
-                                <MuiTooltip title={routeTo}>
-                                    <Typography
-                                        fontWeight={700}
-                                        noWrap
-                                        sx={{ maxWidth: { xs: 180, md: 300 } }}
-                                    >
-                                        {routeTo}
-                                    </Typography>
-                                </MuiTooltip>
-
-                                {unloadPoints.length > 1 && (
-                                    <MuiTooltip
-                                        title={`${t("shipments.shipmentCard.unload")}: ${unloadPoints.length}`}
-                                    >
-                                        <Box
-                                            sx={{
-                                                minWidth: 20,
-                                                height: 20,
-                                                px: 0.5,
-                                                borderRadius: "999px",
-                                                display: "inline-flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                bgcolor: "primary.main",
-                                                color: "primary.contrastText",
-                                                fontSize: 11,
-                                                fontWeight: 700,
-                                                lineHeight: 1,
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            {unloadPoints.length > 99 ? "99+" : unloadPoints.length}
-                                        </Box>
-                                    </MuiTooltip>
-                                )}
-                            </Box>
-
-                            <Chip
-                                size="small"
-                                icon={<FiCalendar />}
-                                variant="outlined"
-                                label={(() => {
-                                    const loadFrom = data.loadWindow?.from ?? data.dates?.from;
-                                    const loadTo =
-                                        data.loadWindow?.to ??
-                                        data.loadWindow?.from ??
-                                        data.dates?.from;
-                                    const unload = data.dates?.to;
-
-                                    const loadPart = data.loadWindow
-                                        ? `${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)} – ${formatDate(loadTo)}`
-                                        : `${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)}`;
-
-                                    const unloadPart = unload
-                                        ? `${t("shipments.shipmentCard.unload")}: ${formatDate(unload)}`
-                                        : "";
-
-                                    return unloadPart ? `${loadPart} / ${unloadPart}` : loadPart;
-                                })()}
-                                sx={{ ml: 0.5 }}
-                            />
-
+        <Paper
+            variant="outlined"
+            sx={{
+                p: { xs: 1.5, md: 2 },
+                borderRadius: 2,
+                overflow: "hidden",
+                transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                "&:hover": {
+                    borderColor: "primary.light",
+                    boxShadow: "0 8px 24px rgba(15, 23, 42, 0.06)",
+                },
+            }}
+        >
+            <Grid container spacing={2} alignItems="stretch">
+                <Grid size={{ xs: 12, md: 8.5 }}>
+                    <Stack gap={1.5} sx={{ minWidth: 0 }}>
+                        <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
                             <Chip
                                 size="small"
                                 color="primary"
-                                variant="filled"
+                                variant="outlined"
+                                icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}
                                 label={
                                     kind === "cargo"
                                         ? t("shipments.shipmentCard.cargo")
                                         : t("shipments.shipmentCard.transport")
                                 }
                             />
+
+                            <Chip
+                                size="small"
+                                variant="outlined"
+                                icon={<FiCalendar />}
+                                label={dateLabel}
+                                sx={{
+                                    maxWidth: { xs: "100%", md: 520 },
+                                    "& .MuiChip-label": {
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                    },
+                                }}
+                            />
                         </Stack>
 
-                        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-                            {localizedMetrics.map((m) => (
-                                <Chip key={m} size="small" variant="outlined" label={m} />
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1fr) auto minmax(0, 1fr)" },
+                                gap: { xs: 1, md: 1.5 },
+                                alignItems: "center",
+                                minWidth: 0,
+                            }}
+                        >
+                            <RoutePoint
+                                label={t("shipments.shipmentCard.load")}
+                                value={routeFrom}
+                                count={loadPoints.length}
+                            />
+
+                            <Box
+                                sx={{
+                                    display: { xs: "none", md: "inline-flex" },
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "text.secondary",
+                                }}
+                            >
+                                <FiArrowRight />
+                            </Box>
+
+                            <RoutePoint
+                                label={t("shipments.shipmentCard.unload")}
+                                value={routeTo}
+                                count={unloadPoints.length}
+                            />
+                        </Box>
+
+                        <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+                            {localizedMetrics.map((metric) => (
+                                <Chip key={metric} size="small" variant="outlined" label={metric} />
                             ))}
-                            {data.price && (
+
+                            {data.price ? (
                                 <Chip size="small" color="success" variant="outlined" label={data.price} />
-                            )}
+                            ) : null}
                         </Stack>
 
-                        {!!localizedTags.length && (
-                            <Stack direction="row" spacing={1} flexWrap="wrap">
-                                {localizedTags.map((tag, idx) => (
+                        {localizedTags.length ? (
+                            <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+                                {localizedTags.slice(0, 5).map((tag, index) => (
                                     <Chip
-                                        key={`${tag}-${idx}`}
+                                        key={`${tag}-${index}`}
                                         size="small"
                                         icon={<FiTag />}
                                         variant="outlined"
                                         label={tag}
+                                        sx={{
+                                            maxWidth: 180,
+                                            "& .MuiChip-label": {
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                            },
+                                        }}
                                     />
                                 ))}
-                            </Stack>
-                        )}
 
-                        {data.note && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                {localizedTags.length > 5 ? (
+                                    <Chip size="small" variant="outlined" label={`+${localizedTags.length - 5}`} />
+                                ) : null}
+                            </Stack>
+                        ) : null}
+
+                        {data.note ? (
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
+                                }}
+                            >
                                 {data.note}
                             </Typography>
-                        )}
+                        ) : null}
                     </Stack>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Stack
-                        direction={{ xs: mobileLayout === "column" ? "column" : "row", md: "row" }}
-                        spacing={1}
-                        alignItems={{
-                            xs: mobileLayout === "column" ? "flex-start" : "flex-start",
-                            md: "flex-end",
-                        }}
-                        justifyContent="space-between"
+                <Grid size={{ xs: 12, md: 3.5 }}>
+                    <Paper
+                        variant="outlined"
                         sx={{
-                            "@media (min-width: 900px)": {
-                                alignItems: "flex-end",
-                                flexDirection: "column",
-                                gap: "12px",
-                            },
+                            height: "100%",
+                            p: 1.5,
+                            borderRadius: 2,
+                            bgcolor: "action.hover",
                         }}
                     >
-                        {/*<Typography variant="caption" color="text.secondary">*/}
-                        {/*    {t("shipments.shipmentCard.updated")} {formatDate(data.createdAt) ?? ""}*/}
-                        {/*</Typography>*/}
+                        <Stack spacing={1.25} height="100%" justifyContent="space-between">
+                            <Stack spacing={1}>
+                                <Stack direction="row" spacing={0.75} alignItems="center">
+                                    <FiLock />
+                                    <Typography variant="body2" fontWeight={700}>
+                                        {t("shipments.shipmentCard.signInToView")}
+                                    </Typography>
+                                </Stack>
 
-                        <Button
-                            component={RouterLink}
-                            to={cta.href}
-                            variant="contained"
-                            size="small"
-                            sx={{ textTransform: "none" }}
-                            endIcon={cta.icon}
-                        >
-                            {cta.label}
-                        </Button>
+                                <Typography variant="caption" color="text.secondary">
+                                    Contacts are hidden and available only after viewing the full order details.
+                                </Typography>
+                            </Stack>
 
-                        <Typography variant="caption" color="text.secondary" textAlign={{ md: "right" }}>
-                            {t("shipments.shipmentCard.signInToView")}
-                        </Typography>
-                    </Stack>
+                            <Divider />
+
+                            <Button
+                                component={RouterLink}
+                                to={cta.href}
+                                variant="contained"
+                                size="small"
+                                fullWidth
+                                sx={{ textTransform: "none" }}
+                                endIcon={cta.icon}
+                            >
+                                {cta.label}
+                            </Button>
+                        </Stack>
+                    </Paper>
                 </Grid>
             </Grid>
         </Paper>
     );
 });
+
+type RoutePointProps = {
+    label: string;
+    value: string;
+    count: number;
+};
+
+function RoutePoint({ label, value, count }: RoutePointProps) {
+    return (
+        <Box
+            sx={{
+                minWidth: 0,
+                p: 1.25,
+                borderRadius: 2,
+                bgcolor: "action.hover",
+            }}
+        >
+            <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ minWidth: 0 }}>
+                <Box
+                    sx={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 1.5,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "background.paper",
+                        color: "primary.main",
+                        flexShrink: 0,
+                    }}
+                >
+                    <FiMapPin />
+                </Box>
+
+                <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+                    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+                        <Typography variant="caption" color="text.secondary">
+                            {label}
+                        </Typography>
+
+                        {count > 1 ? (
+                            <Chip
+                                size="small"
+                                label={count > 99 ? "99+" : count}
+                                sx={{
+                                    height: 18,
+                                    minWidth: 18,
+                                    "& .MuiChip-label": {
+                                        px: 0.75,
+                                        fontSize: 11,
+                                    },
+                                }}
+                            />
+                        ) : null}
+                    </Stack>
+
+                    <MuiTooltip title={value}>
+                        <Typography
+                            variant="body2"
+                            fontWeight={700}
+                            noWrap
+                            sx={{
+                                minWidth: 0,
+                                maxWidth: "100%",
+                            }}
+                        >
+                            {value}
+                        </Typography>
+                    </MuiTooltip>
+                </Stack>
+            </Stack>
+        </Box>
+    );
+}

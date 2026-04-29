@@ -50,11 +50,13 @@ export function useShipmentRow({ data, kind }: Params) {
     const primaryUnloadPoint = unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
 
     const routeFrom = useMemo(() => {
+        if (data.routeFrom) return data.routeFrom
         if (primaryLoadPoint) return formatRoute(primaryLoadPoint);
         return data.routeFrom || "—";
     }, [primaryLoadPoint, data.routeFrom, formatRoute]);
 
     const routeTo = useMemo(() => {
+        if (data.routeTo) return data.routeTo;
         if (primaryUnloadPoint) return formatRoute(primaryUnloadPoint);
         return data.routeTo || "—";
     }, [primaryUnloadPoint, data.routeTo, formatRoute]);
