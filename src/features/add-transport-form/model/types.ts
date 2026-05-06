@@ -1,8 +1,30 @@
-import type {MapsLocationSuggestion} from "@/entities/maps/model/types.ts";
+export type TransportPlaceLocation = {
+    id: string;
+    type: "COUNTRY" | "REGION" | "CITY";
 
+    country: string;
+    country_ru?: string | null;
+    country_uz?: string | null;
+
+    region?: string | null;
+    region_ru?: string | null;
+    region_uz?: string | null;
+
+    city?: string | null;
+    city_ru?: string | null;
+    city_uz?: string | null;
+
+    address?: string | null;
+    display_name: string;
+
+    latitude?: string | number | null;
+    longitude?: string | number | null;
+
+    source: "internal_geo";
+};
 
 export type Place = {
-    location: MapsLocationSuggestion | null;
+    location: TransportPlaceLocation | null;
     address: string;
 };
 

@@ -1,13 +1,24 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Autocomplete, CircularProgress, Stack, TextField, Typography } from "@mui/material";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+    Autocomplete,
+    CircularProgress,
+    Stack,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { Control, UseFormSetValue } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
-import { mapsApi } from "@/shared/api/mapsApi";
+import {
+    publicGeoApi,
+    type PublicGeoLocationItem,
+} from "@/shared/api/publicGeoApi";
 
-import type { AddTransportFormValues } from "../model/types";
-import type {MapsLocationSuggestion} from "@/entities/maps/model/types.ts";
+import type {
+    AddTransportFormValues,
+    TransportPlaceLocation,
+} from "../model/types";
 
 type Props = {
     kind: "load" | "unload";
@@ -16,6 +27,67 @@ type Props = {
     setValue: UseFormSetValue<AddTransportFormValues>;
     errorText?: string;
 };
+
+function getLocalizedName(
+    item:
+        | Pick<PublicGeoLocationItem, "name" | "name_ru" | "name_uz">
+        | null
+        | undefined,
+    lang: string,
+) {
+    if (!item) return "";
+
+    if (lang.startsWith("ru")) return item.name_ru || item.name;
+    if (lang.startsWith("uz")) return item.name_uz || item.name;
+
+    return item.name;
+}
+
+function mapGeoToTransportLocation(
+    item: PublicGeoLocationItem,
+    lang: string,
+): TransportPlaceLocation {
+    const countryName = item.country
+        ? getLocalizedName(item.country, lang)
+        : item.type === "COUNTRY"
+            ? getLocalizedName(item, lang)
+            : "";
+
+    const regionName = item.region
+        ? getLocalizedName(item.region, lang)
+        : item.type === "REGION"
+            ? getLocalizedName(item, lang)
+            : null;
+
+    const cityName = item.type === "CITY" ? getLocalizedName(item, lang) : null;
+
+    const parts = [cityName, regionName, countryName].filter(Boolean);
+
+    return {
+        id: item.id,
+        type: item.type,
+
+        country: countryName || getLocalizedName(item, lang),
+        country_ru: item.country?.name_ru ?? (item.type === "COUNTRY" ? item.name_ru : null),
+        country_uz: item.country?.name_uz ?? (item.type === "COUNTRY" ? item.name_uz : null),
+
+        region: regionName,
+        region_ru: item.region?.name_ru ?? (item.type === "REGION" ? item.name_ru : null),
+        region_uz: item.region?.name_uz ?? (item.type === "REGION" ? item.name_uz : null),
+
+        city: cityName,
+        city_ru: item.type === "CITY" ? item.name_ru : null,
+        city_uz: item.type === "CITY" ? item.name_uz : null,
+
+        address: null,
+        display_name: parts.length ? parts.join(", ") : getLocalizedName(item, lang),
+
+        latitude: item.latitude ?? null,
+        longitude: item.longitude ?? null,
+
+        source: "internal_geo",
+    };
+}
 
 export const PlaceRowField = React.memo(function PlaceRowField({
                                                                    kind,
@@ -31,14 +103,8 @@ export const PlaceRowField = React.memo(function PlaceRowField({
     const addressName = `${base}.address` as const;
 
     const [inputValue, setInputValue] = useState("");
-    const [options, setOptions] = useState<MapsLocationSuggestion[]>([]);
+    const [options, setOptions] = useState<PublicGeoLocationItem[]>([]);
     const [loading, setLoading] = useState(false);
-
-    const lang = useMemo(() => {
-        if (i18n.language.startsWith("ru")) return "ru";
-        if (i18n.language.startsWith("uz")) return "uz";
-        return "en";
-    }, [i18n.language]);
 
     const locationLabel =
         kind === "load"
@@ -50,34 +116,44 @@ export const PlaceRowField = React.memo(function PlaceRowField({
             ? t("addCargo.fields.addressLoad")
             : t("addCargo.fields.addressUnload");
 
-    useEffect(() => {
-        const q = inputValue.trim();
+    const noOptionsText = useMemo(() => {
+        return inputValue.trim().length < 2
+            ? t("addCargo.fields.startTypingLocation")
+            : t("addCargo.fields.noOptions");
+    }, [inputValue, t]);
+
+    const handleSearch = useCallback(async (value: string) => {
+        const q = value.trim();
 
         if (q.length < 2) {
             setOptions([]);
             return;
         }
 
-        const timeoutId = window.setTimeout(async () => {
-            try {
-                setLoading(true);
+        try {
+            setLoading(true);
+            const result = await publicGeoApi.search(q);
+            setOptions(result);
+        } catch {
+            setOptions([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-                const result = await mapsApi.searchLocations({
-                    q,
-                    lang,
-                    limit: 7,
-                });
+    const handleInputChange = useCallback(
+        (_: unknown, value: string, reason: string) => {
+            setInputValue(value);
 
-                setOptions(result);
-            } catch {
-                setOptions([]);
-            } finally {
-                setLoading(false);
-            }
-        }, 450);
+            if (reason !== "input") return;
 
-        return () => window.clearTimeout(timeoutId);
-    }, [inputValue, lang]);
+            window.clearTimeout((handleInputChange as any).timer);
+            (handleInputChange as any).timer = window.setTimeout(() => {
+                handleSearch(value);
+            }, 450);
+        },
+        [handleSearch],
+    );
 
     return (
         <Stack spacing={1.25}>
@@ -91,26 +167,33 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                         inputValue={inputValue}
                         loading={loading}
                         filterOptions={(items) => items}
-                        isOptionEqualToValue={(option, value) =>
-                            option.place_id === value.place_id
-                        }
-                        getOptionLabel={(option) => option.display_name || ""}
-                        onInputChange={(_, value) => {
-                            setInputValue(value);
-                        }}
-                        onChange={(_, value) => {
-                            field.onChange(value);
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        getOptionLabel={(option: any) => {
+                            if (!option) return "";
 
-                            setValue(addressName as any, value?.address ?? "", {
+                            if ("display_name" in option) {
+                                return option.display_name || "";
+                            }
+
+                            return mapGeoToTransportLocation(
+                                option,
+                                i18n.language,
+                            ).display_name;
+                        }}
+                        onInputChange={handleInputChange}
+                        onChange={(_, value) => {
+                            const location = value
+                                ? mapGeoToTransportLocation(value, i18n.language)
+                                : null;
+
+                            field.onChange(location);
+
+                            setValue(addressName as any, "", {
                                 shouldDirty: true,
                                 shouldValidate: false,
                             });
                         }}
-                        noOptionsText={
-                            inputValue.trim().length < 2
-                                ? t("addCargo.fields.startTypingLocation")
-                                : t("addCargo.fields.noOptions")
-                        }
+                        noOptionsText={noOptionsText}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -134,20 +217,25 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                                 }}
                             />
                         )}
-                        renderOption={(props, option) => (
-                            <li {...props} key={option.place_id}>
-                                <Stack spacing={0.25}>
-                                    <Typography variant="body2">
-                                        {option.display_name}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {[option.city, option.region, option.country]
-                                            .filter(Boolean)
-                                            .join(", ")}
-                                    </Typography>
-                                </Stack>
-                            </li>
-                        )}
+                        renderOption={(props, option) => {
+                            const location = mapGeoToTransportLocation(
+                                option,
+                                i18n.language,
+                            );
+
+                            return (
+                                <li {...props} key={option.id}>
+                                    <Stack spacing={0.25}>
+                                        <Typography variant="body2">
+                                            {location.display_name}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {option.type}
+                                        </Typography>
+                                    </Stack>
+                                </li>
+                            );
+                        }}
                     />
                 )}
             />

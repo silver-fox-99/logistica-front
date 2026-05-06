@@ -59,14 +59,29 @@ function toCargoPoint(
 
     return {
         type,
+
+        geo_location_id: location?.id ?? null,
+        geo_location_type: location?.type ?? null,
+
         country: location?.country || "Unknown",
+        country_ru: location?.country_ru ?? null,
+        country_uz: location?.country_uz ?? null,
+
         region: location?.region || null,
+        region_ru: location?.region_ru ?? null,
+        region_uz: location?.region_uz ?? null,
+
         city: location?.city || null,
+        city_ru: location?.city_ru ?? null,
+        city_uz: location?.city_uz ?? null,
+
         address: point.address || location?.address || null,
         display_name: location?.display_name || null,
+
         latitude: location?.latitude ? Number(location.latitude) : null,
         longitude: location?.longitude ? Number(location.longitude) : null,
-        geocode_source: location?.source || "locationiq",
+
+        geocode_source: location?.source || "internal_geo",
         order: index,
     };
 }

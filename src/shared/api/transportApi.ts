@@ -27,13 +27,28 @@ export type TransportInitResponse = {
 
 export type TransportPointDto = {
     type: "DEPARTURE" | "ARRIVAL";
+
+    geo_location_id?: string | null;
+    geo_location_type?: "COUNTRY" | "REGION" | "CITY" | null;
+
     country: string;
+    country_ru?: string | null;
+    country_uz?: string | null;
+
     region?: string | null;
+    region_ru?: string | null;
+    region_uz?: string | null;
+
     city?: string | null;
+    city_ru?: string | null;
+    city_uz?: string | null;
+
     address?: string | null;
     display_name?: string | null;
+
     latitude?: number | null;
     longitude?: number | null;
+
     geocode_source?: string | null;
     order?: number | null;
 };

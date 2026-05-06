@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import {
     Drawer,
     Box,
@@ -11,24 +11,21 @@ import {
     ToggleButton,
     ToggleButtonGroup,
     FormControlLabel,
-    Collapse,
 } from "@mui/material";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { FiMapPin, FiArrowRight, FiMap } from "react-icons/fi";
+import { FiMapPin, FiArrowRight } from "react-icons/fi";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
-import type { PublicFilters, LocationFilterPlaceType } from "@/widgets/public/PublicFiltersDrawer";
+import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
 
 import { useInitStore } from "@/shared/store/initStore";
 import { useUserStore } from "@/entities/user/model/user.store";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 
 import { RHFIdMultiAutocomplete } from "@/shared/ui/lookup/RHFIdMultiAutocomplete";
-import { RHFLocationAutocomplete } from "@/shared/ui/lookup/RHFLocationAutocomplete";
-import type { MapsLocationSuggestion } from "@/entities/maps/model/types";
+import {RHFPublicGeoAutocomplete} from "@/shared/ui/lookup/RHFPublicGeoAutocomplete.tsx";
 
-import { ShipmentFilterMapPreview } from "@/widgets/shipments/ShipmentFilterMapPreview";
 
 type FormValues = PublicFilters & {
     kind: ShipmentsKind;
@@ -64,44 +61,6 @@ function normalizeFilters(filters: PublicFilters): PublicFilters {
     return out;
 }
 
-function toNumberOrUndefined(value: unknown) {
-    const num = Number(value);
-    return Number.isFinite(num) ? num : undefined;
-}
-
-function getLocationLat(location: MapsLocationSuggestion | null) {
-    return toNumberOrUndefined((location as any)?.lat ?? (location as any)?.latitude);
-}
-
-function getLocationLon(location: MapsLocationSuggestion | null) {
-    return toNumberOrUndefined(
-        (location as any)?.lon ?? (location as any)?.lng ?? (location as any)?.longitude,
-    );
-}
-
-function getPlaceType(location: MapsLocationSuggestion | null): LocationFilterPlaceType {
-    if (!location) return "unknown";
-
-    const rawType =
-        (location as any).place_type ||
-        (location as any).type ||
-        (location as any).osm_type ||
-        "";
-
-    const value = String(rawType).toLowerCase();
-
-    if (value.includes("country")) return "country";
-    if (value.includes("region") || value.includes("state") || value.includes("province")) return "region";
-    if (value.includes("city") || value.includes("town") || value.includes("village")) return "city";
-    if (value.includes("address") || value.includes("house") || value.includes("road")) return "address";
-
-    if (location.city) return "city";
-    if (location.region) return "region";
-    if (location.country) return "country";
-
-    return "unknown";
-}
-
 export function ShipmentsFilterDrawerForm({
                                               open,
                                               initialKind,
@@ -115,16 +74,12 @@ export function ShipmentsFilterDrawerForm({
     const { lookups } = useInitStore();
     const { getLocalizedLabel } = useLocalizedLookup();
 
-    const [mapOpen, setMapOpen] = useState(false);
-
     const { control, reset, handleSubmit, setValue, getValues } = useForm<FormValues>({
         defaultValues: {
             kind: initialKind,
             ...(initialFilters as any),
         },
     });
-
-    const watched = useWatch({ control });
 
     useEffect(() => {
         if (!open) return;
@@ -133,8 +88,6 @@ export function ShipmentsFilterDrawerForm({
             kind: initialKind,
             ...(initialFilters as any),
         });
-
-        setMapOpen(false);
     }, [open, initialKind, initialFilters, reset]);
 
     const vehicleOptions = useMemo(() => {
@@ -143,61 +96,6 @@ export function ShipmentsFilterDrawerForm({
             label: getLocalizedLabel(item),
         }));
     }, [lookups?.vehicleType, getLocalizedLabel]);
-
-    const hasMapPoints = Boolean(
-        (typeof watched.pickup_lat === "number" && typeof watched.pickup_lon === "number") ||
-        (typeof watched.dropoff_lat === "number" && typeof watched.dropoff_lon === "number"),
-    );
-
-    const clearPickupStructuredLocation = () => {
-        setValue("pickup_country", undefined, { shouldDirty: true });
-        setValue("pickup_region", undefined, { shouldDirty: true });
-        setValue("pickup_city", undefined, { shouldDirty: true });
-        setValue("pickup_lat", undefined, { shouldDirty: true });
-        setValue("pickup_lon", undefined, { shouldDirty: true });
-        setValue("pickup_place_type", undefined, { shouldDirty: true });
-    };
-
-    const clearDropoffStructuredLocation = () => {
-        setValue("dropoff_country", undefined, { shouldDirty: true });
-        setValue("dropoff_region", undefined, { shouldDirty: true });
-        setValue("dropoff_city", undefined, { shouldDirty: true });
-        setValue("dropoff_lat", undefined, { shouldDirty: true });
-        setValue("dropoff_lon", undefined, { shouldDirty: true });
-        setValue("dropoff_place_type", undefined, { shouldDirty: true });
-    };
-
-    const handlePickupLocationSelect = (location: MapsLocationSuggestion | null, label: string) => {
-        setValue("pickup_location_label", label || undefined, { shouldDirty: true });
-
-        if (!location) {
-            clearPickupStructuredLocation();
-            return;
-        }
-
-        setValue("pickup_country", location.country || undefined, { shouldDirty: true });
-        setValue("pickup_region", location.region || undefined, { shouldDirty: true });
-        setValue("pickup_city", location.city || undefined, { shouldDirty: true });
-        setValue("pickup_lat", getLocationLat(location), { shouldDirty: true });
-        setValue("pickup_lon", getLocationLon(location), { shouldDirty: true });
-        setValue("pickup_place_type", getPlaceType(location), { shouldDirty: true });
-    };
-
-    const handleDropoffLocationSelect = (location: MapsLocationSuggestion | null, label: string) => {
-        setValue("dropoff_location_label", label || undefined, { shouldDirty: true });
-
-        if (!location) {
-            clearDropoffStructuredLocation();
-            return;
-        }
-
-        setValue("dropoff_country", location.country || undefined, { shouldDirty: true });
-        setValue("dropoff_region", location.region || undefined, { shouldDirty: true });
-        setValue("dropoff_city", location.city || undefined, { shouldDirty: true });
-        setValue("dropoff_lat", getLocationLat(location), { shouldDirty: true });
-        setValue("dropoff_lon", getLocationLon(location), { shouldDirty: true });
-        setValue("dropoff_place_type", getPlaceType(location), { shouldDirty: true });
-    };
 
     const submit = handleSubmit((values) => {
         const { kind, ...filters } = values;
@@ -210,8 +108,6 @@ export function ShipmentsFilterDrawerForm({
         reset({
             kind: currentKind,
         } as FormValues);
-
-        setMapOpen(false);
     };
 
     return (
@@ -300,17 +196,18 @@ export function ShipmentsFilterDrawerForm({
                                 alignItems={{ xs: "stretch", sm: "center" }}
                             >
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <RHFLocationAutocomplete
+                                    <RHFPublicGeoAutocomplete
                                         control={control}
-                                        name="pickup_location_label"
+                                        setValue={setValue}
+                                        name="pickup_geo_location_name"
+                                        typeName="pickup_geo_location_type"
                                         label={t("shipments.filters.pickupLocation", {
                                             defaultValue: "Pickup location",
                                         })}
                                         placeholder={t("shipments.filters.locationPlaceholder", {
-                                            defaultValue: "Search location",
+                                            defaultValue: "Search country, region or city",
                                         })}
                                         icon={<FiMapPin size={16} />}
-                                        onLocationSelect={handlePickupLocationSelect}
                                     />
                                 </Box>
 
@@ -325,49 +222,21 @@ export function ShipmentsFilterDrawerForm({
                                 </Box>
 
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <RHFLocationAutocomplete
+                                    <RHFPublicGeoAutocomplete
                                         control={control}
-                                        name="dropoff_location_label"
+                                        setValue={setValue}
+                                        name="dropoff_geo_location_name"
+                                        typeName="dropoff_geo_location_type"
                                         label={t("shipments.filters.dropoffLocation", {
                                             defaultValue: "Dropoff location",
                                         })}
                                         placeholder={t("shipments.filters.locationPlaceholder", {
-                                            defaultValue: "Search location",
+                                            defaultValue: "Search country, region or city",
                                         })}
                                         icon={<FiMapPin size={16} />}
-                                        onLocationSelect={handleDropoffLocationSelect}
                                     />
                                 </Box>
                             </Stack>
-
-                            {hasMapPoints ? (
-                                <Button
-                                    size="small"
-                                    variant="text"
-                                    startIcon={<FiMap />}
-                                    sx={{ mt: 1, textTransform: "none" }}
-                                    onClick={() => setMapOpen((value) => !value)}
-                                >
-                                    {mapOpen
-                                        ? t("shipments.filters.hideMap", { defaultValue: "Hide map" })
-                                        : t("shipments.filters.showMap", { defaultValue: "Show on map" })}
-                                </Button>
-                            ) : null}
-
-                            <Collapse in={mapOpen && hasMapPoints} unmountOnExit>
-                                <ShipmentFilterMapPreview
-                                    pickup={{
-                                        lat: watched.pickup_lat,
-                                        lon: watched.pickup_lon,
-                                        label: watched.pickup_location_label,
-                                    }}
-                                    dropoff={{
-                                        lat: watched.dropoff_lat,
-                                        lon: watched.dropoff_lon,
-                                        label: watched.dropoff_location_label,
-                                    }}
-                                />
-                            </Collapse>
                         </Box>
 
                         <Box>

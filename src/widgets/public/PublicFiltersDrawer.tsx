@@ -16,30 +16,18 @@ import { FiFilter, FiRefreshCw } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
-import { mapsApi } from "@/shared/api/mapsApi";
-import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+
+import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import { useUserStore } from "@/entities/user/model/user.store";
-import type { MapsLocationSuggestion } from "@/entities/maps/model/types";
-
-export type LocationFilterPlaceType = "country" | "region" | "city" | "address" | "unknown";
+import {publicGeoApi, type PublicGeoLocationItem, type PublicGeoLocationType} from "@/shared/api/publicGeoApi.ts";
 
 export type PublicFilters = {
-    pickup_location_label?: string;
-    pickup_country?: string;
-    pickup_region?: string;
-    pickup_city?: string;
-    pickup_lat?: number;
-    pickup_lon?: number;
-    pickup_place_type?: LocationFilterPlaceType;
+    pickup_geo_location_name?: string;
+    pickup_geo_location_type?: PublicGeoLocationType;
 
-    dropoff_location_label?: string;
-    dropoff_country?: string;
-    dropoff_region?: string;
-    dropoff_city?: string;
-    dropoff_lat?: number;
-    dropoff_lon?: number;
-    dropoff_place_type?: LocationFilterPlaceType;
+    dropoff_geo_location_name?: string;
+    dropoff_geo_location_type?: PublicGeoLocationType;
 
     pickup_date_from?: string;
     pickup_date_to?: string;
@@ -74,11 +62,12 @@ type Option = {
     label: string;
 };
 
-type LocationAutocompleteProps = {
+type GeoAutocompleteProps = {
     label: string;
     placeholder?: string;
     value?: string;
-    onChange: (label: string, location: MapsLocationSuggestion | null) => void;
+    type?: PublicGeoLocationType;
+    onChange: (location: PublicGeoLocationItem | null) => void;
 };
 
 const MAX_VEHICLES = 5;
@@ -108,82 +97,33 @@ const compactFilters = (filters: PublicFilters): PublicFilters => {
 
 const clampIds = (ids: string[], max: number) => ids.slice(0, max);
 
-const getLocationLabel = (location: MapsLocationSuggestion | string | null) => {
-    if (!location) return "";
-
-    if (typeof location === "string") {
-        return location;
-    }
-
-    return (
-        location.display_name ||
-        [location.city, location.region, location.country].filter(Boolean).join(", ") ||
-        location.address ||
-        ""
-    );
+const getGeoTypeLabel = (type: PublicGeoLocationType) => {
+    if (type === "COUNTRY") return "Country";
+    if (type === "REGION") return "Region";
+    return "City";
 };
 
-const toNumberOrUndefined = (value: unknown) => {
-    const num = Number(value);
+function GeoLocationAutocomplete({
+                                     label,
+                                     placeholder,
+                                     value,
+                                     onChange,
+                                 }: GeoAutocompleteProps) {
+    const { getLocalizedGeoName } = useLocalizedGeo();
 
-    return Number.isFinite(num) ? num : undefined;
-};
-
-const getLocationLat = (location: MapsLocationSuggestion | null) => {
-    return toNumberOrUndefined((location as any)?.lat ?? (location as any)?.latitude);
-};
-
-const getLocationLon = (location: MapsLocationSuggestion | null) => {
-    return toNumberOrUndefined(
-        (location as any)?.lon ?? (location as any)?.lng ?? (location as any)?.longitude,
-    );
-};
-
-const getPlaceType = (location: MapsLocationSuggestion | null): LocationFilterPlaceType => {
-    if (!location) return "unknown";
-
-    const rawType =
-        (location as any).place_type ||
-        (location as any).type ||
-        (location as any).osm_type ||
-        "";
-
-    const value = String(rawType).toLowerCase();
-
-    if (value.includes("country")) return "country";
-    if (value.includes("region") || value.includes("state") || value.includes("province")) return "region";
-    if (value.includes("city") || value.includes("town") || value.includes("village")) return "city";
-    if (value.includes("address") || value.includes("house") || value.includes("road")) return "address";
-
-    if (location.city) return "city";
-    if (location.region) return "region";
-    if (location.country) return "country";
-
-    return "unknown";
-};
-
-function LocationAutocomplete({
-                                  label,
-                                  placeholder,
-                                  value,
-                                  onChange,
-                              }: LocationAutocompleteProps) {
     const [inputValue, setInputValue] = useState(value ?? "");
-    const [options, setOptions] = useState<MapsLocationSuggestion[]>([]);
+    const [selected, setSelected] = useState<PublicGeoLocationItem | null>(null);
+    const [options, setOptions] = useState<PublicGeoLocationItem[]>([]);
     const [loading, setLoading] = useState(false);
-
-    const { i18n } = useTranslation();
-
-    const lang = useMemo(() => {
-        if (i18n.language.startsWith("ru")) return "ru";
-        if (i18n.language.startsWith("uz")) return "uz";
-        return "en";
-    }, [i18n.language]);
 
     const query = inputValue.trim();
 
     useEffect(() => {
         setInputValue(value ?? "");
+
+        if (!value) {
+            setSelected(null);
+        }
     }, [value]);
 
     useEffect(() => {
@@ -192,76 +132,91 @@ function LocationAutocomplete({
             return;
         }
 
+        let active = true;
+
         const timer = window.setTimeout(() => {
             setLoading(true);
 
-            mapsApi
-                .searchLocations({
-                    q: query,
-                    lang,
-                    limit: 10,
-                } as any)
+            publicGeoApi
+                .search(query)
                 .then((data) => {
+                    if (!active) return;
                     setOptions(Array.isArray(data) ? data : []);
                 })
                 .catch(() => {
+                    if (!active) return;
                     setOptions([]);
                 })
                 .finally(() => {
+                    if (!active) return;
                     setLoading(false);
                 });
         }, 350);
 
         return () => {
+            active = false;
             window.clearTimeout(timer);
         };
     }, [query]);
 
     return (
-        <Autocomplete<MapsLocationSuggestion, false, false, true>
-            freeSolo
+        <Autocomplete<PublicGeoLocationItem, false, false, false>
             options={options}
             loading={loading}
+            value={selected}
             inputValue={inputValue}
-            value={value ?? ""}
             filterOptions={(items) => items}
-            getOptionLabel={getLocationLabel}
-            isOptionEqualToValue={(option, currentValue) => {
-                if (typeof currentValue === "string") {
-                    return getLocationLabel(option) === currentValue;
-                }
+            isOptionEqualToValue={(option, currentValue) => option.id === currentValue.id}
+            getOptionLabel={(option) => {
+                const title = getLocalizedGeoName(option);
 
-                return getLocationLabel(option) === getLocationLabel(currentValue);
+                const meta = [
+                    option.region ? getLocalizedGeoName(option.region) : null,
+                    option.country ? getLocalizedGeoName(option.country) : null,
+                ].filter(Boolean);
+
+                return meta.length ? `${title}, ${meta.join(", ")}` : title;
             }}
             onInputChange={(_, nextValue, reason) => {
                 setInputValue(nextValue);
 
-                if (reason === "input") {
-                    onChange(nextValue, null);
+                if (reason === "input" && !nextValue.trim()) {
+                    setSelected(null);
+                    onChange(null);
                 }
+
+                if (reason === "clear") {
+                    setSelected(null);
+                    onChange(null);
+                }
+            }}
+            onChange={(_, nextValue) => {
+                setSelected(nextValue);
 
                 if (!nextValue) {
-                    onChange("", null);
-                }
-            }}
-            onChange={(_, selected) => {
-                if (!selected) {
                     setInputValue("");
-                    onChange("", null);
+                    onChange(null);
                     return;
                 }
 
-                if (typeof selected === "string") {
-                    setInputValue(selected);
-                    onChange(selected, null);
-                    return;
-                }
-
-                const nextLabel = getLocationLabel(selected);
-
-                setInputValue(nextLabel);
-                onChange(nextLabel, selected);
+                setInputValue(getLocalizedGeoName(nextValue));
+                onChange(nextValue);
             }}
+            renderOption={(props, option) => (
+                <Box component="li" {...props} key={option.id}>
+                    <Stack spacing={0.25}>
+                        <Typography variant="body2">
+                            {getLocalizedGeoName(option)}
+                        </Typography>
+
+                        <Typography variant="caption" color="text.secondary">
+                            {getGeoTypeLabel(option.type)}
+                            {option.region ? ` · ${getLocalizedGeoName(option.region)}` : ""}
+                            {option.country ? ` · ${getLocalizedGeoName(option.country)}` : ""}
+                        </Typography>
+                    </Stack>
+                </Box>
+            )}
             renderInput={(params) => (
                 <TextField
                     {...params}
@@ -293,12 +248,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
 
     const getInitialFilters = (init?: PublicFilters): PublicFilters => {
         if (init && Object.keys(init).length > 0) {
-            const result: PublicFilters = { ...init };
-
-         //   if (!result.pickup_date_from) result.pickup_date_from = getTodayDate();
-         //   if (!result.pickup_date_to) result.pickup_date_to = getDefaultDatePlus30();
-
-            return result;
+            return { ...init };
         }
 
         return {
@@ -312,8 +262,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
 
     useEffect(() => {
         if (!open) return;
-
-       // setF(getInitialFilters(initial));
+        setF(getInitialFilters(initial));
     }, [open, initial]);
 
     useEffect(() => {
@@ -358,10 +307,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     };
 
     const onReset = () => {
-        setF({
-          //  pickup_date_from: getTodayDate(),
-          //  pickup_date_to: getDefaultDatePlus30(),
-        });
+        setF({});
     };
 
     const handleVehicleTypes = (opts: Option[]) => {
@@ -376,31 +322,19 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
         }));
     };
 
-    const handlePickupLocation = (label: string, location: MapsLocationSuggestion | null) => {
+    const handlePickupLocation = (location: PublicGeoLocationItem | null) => {
         setF((v) => ({
             ...v,
-            pickup_location_label: label || undefined,
-
-            pickup_country: location?.country || undefined,
-            pickup_region: location?.region || undefined,
-            pickup_city: location?.city || undefined,
-            pickup_lat: getLocationLat(location),
-            pickup_lon: getLocationLon(location),
-            pickup_place_type: location ? getPlaceType(location) : undefined,
+            pickup_geo_location_name: location?.name || undefined,
+            pickup_geo_location_type: location?.type || undefined,
         }));
     };
 
-    const handleDropoffLocation = (label: string, location: MapsLocationSuggestion | null) => {
+    const handleDropoffLocation = (location: PublicGeoLocationItem | null) => {
         setF((v) => ({
             ...v,
-            dropoff_location_label: label || undefined,
-
-            dropoff_country: location?.country || undefined,
-            dropoff_region: location?.region || undefined,
-            dropoff_city: location?.city || undefined,
-            dropoff_lat: getLocationLat(location),
-            dropoff_lon: getLocationLon(location),
-            dropoff_place_type: location ? getPlaceType(location) : undefined,
+            dropoff_geo_location_name: location?.name || undefined,
+            dropoff_geo_location_type: location?.type || undefined,
         }));
     };
 
@@ -448,14 +382,15 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                 </Typography>
 
                 <Stack gap={1.2}>
-                    <LocationAutocomplete
+                    <GeoLocationAutocomplete
                         label={t("shipments.filters.pickupLocation", {
                             defaultValue: "Pickup location",
                         })}
                         placeholder={t("shipments.filters.locationPlaceholder", {
-                            defaultValue: "Search country, region, city or address",
+                            defaultValue: "Search country, region or city",
                         })}
-                        value={f.pickup_location_label}
+                        value={f.pickup_geo_location_name}
+                        type={f.pickup_geo_location_type}
                         onChange={handlePickupLocation}
                     />
 
@@ -505,14 +440,15 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                 </Typography>
 
                 <Stack gap={1.2}>
-                    <LocationAutocomplete
+                    <GeoLocationAutocomplete
                         label={t("shipments.filters.dropoffLocation", {
                             defaultValue: "Dropoff location",
                         })}
                         placeholder={t("shipments.filters.locationPlaceholder", {
-                            defaultValue: "Search country, region, city or address",
+                            defaultValue: "Search country, region or city",
                         })}
-                        value={f.dropoff_location_label}
+                        value={f.dropoff_geo_location_name}
+                        type={f.dropoff_geo_location_type}
                         onChange={handleDropoffLocation}
                     />
 
@@ -568,6 +504,7 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
                     value={vehicleValue}
                     onChange={(_, opts) => handleVehicleTypes(opts)}
                     isOptionEqualToValue={(o, v) => o.id === v.id}
+                    getOptionLabel={(option) => option.label}
                     getOptionDisabled={(opt) => vehicleValue.length >= MAX_VEHICLES && !vehicleIds.includes(opt.id)}
                     renderInput={(params) => (
                         <TextField

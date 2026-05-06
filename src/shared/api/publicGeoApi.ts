@@ -14,6 +14,46 @@ const toImportItem = (row: any): GeoImportItem => ({
     type: row.type ?? null,
 });
 
+
+export type PublicGeoLocationType = "COUNTRY" | "REGION" | "CITY";
+
+export type PublicGeoLocationItem = {
+    id: string;
+    type: PublicGeoLocationType;
+
+    name: string;
+    name_ru: string;
+    name_uz: string;
+
+    code: string | null;
+    iso2: string | null;
+    parent_id: string | null;
+
+    latitude?: string | number | null;
+    longitude?: string | number | null;
+
+    country?: {
+        id: string;
+        name: string;
+        name_ru: string;
+        name_uz: string;
+        iso2: string | null;
+    } | null;
+
+    region?: {
+        id: string;
+        name: string;
+        name_ru: string;
+        name_uz: string;
+    } | null;
+};
+
+export type PublicGeoSearchResponse = {
+    status: boolean;
+    data: PublicGeoLocationItem[];
+    message: string;
+};
+
 export const publicGeoApi = {
     listCountries: async (): Promise<GeoImportItem[]> => {
         const res = await api.get("/geo-location/public/list-countries");
@@ -45,5 +85,15 @@ export const publicGeoApi = {
                 type: row.type ?? "CITY",
             })
         );
+    },
+    async search(q: string) {
+        const response = await api.get<PublicGeoSearchResponse>(
+            "/geo-location/public/search",
+            {
+                params: { q },
+            },
+        );
+
+        return response.data.data;
     },
 };
