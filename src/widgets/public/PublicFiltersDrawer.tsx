@@ -16,11 +16,14 @@ import { FiFilter, FiRefreshCw } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
-
 import { useLocalizedGeo, useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import { useUserStore } from "@/entities/user/model/user.store";
-import {publicGeoApi, type PublicGeoLocationItem, type PublicGeoLocationType} from "@/shared/api/publicGeoApi.ts";
+import {
+    publicGeoApi,
+    type PublicGeoLocationItem,
+    type PublicGeoLocationType,
+} from "@/shared/api/publicGeoApi.ts";
 
 export type PublicFilters = {
     pickup_geo_location_name?: string;
@@ -74,14 +77,6 @@ const MAX_VEHICLES = 5;
 
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
 
-const getTodayDate = () => new Date().toISOString().split("T")[0];
-
-const getDefaultDatePlus30 = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 30);
-    return d.toISOString().split("T")[0];
-};
-
 const compactFilters = (filters: PublicFilters): PublicFilters => {
     const out: PublicFilters = {};
 
@@ -101,6 +96,35 @@ const getGeoTypeLabel = (type: PublicGeoLocationType) => {
     if (type === "COUNTRY") return "Country";
     if (type === "REGION") return "Region";
     return "City";
+};
+
+const getStorageKey = (kind: "cargo" | "transport") => {
+    return `shipments:public-filters:${kind}`;
+};
+
+const getStoredFilters = (kind: "cargo" | "transport"): PublicFilters | null => {
+    if (typeof window === "undefined") return null;
+
+    try {
+        const raw = window.localStorage.getItem(getStorageKey(kind));
+        if (!raw) return null;
+
+        return JSON.parse(raw) as PublicFilters;
+    } catch {
+        return null;
+    }
+};
+
+const setStoredFilters = (kind: "cargo" | "transport", filters: PublicFilters) => {
+    if (typeof window === "undefined") return;
+
+    window.localStorage.setItem(getStorageKey(kind), JSON.stringify(filters));
+};
+
+const removeStoredFilters = (kind: "cargo" | "transport") => {
+    if (typeof window === "undefined") return;
+
+    window.localStorage.removeItem(getStorageKey(kind));
 };
 
 function GeoLocationAutocomplete({
@@ -240,30 +264,40 @@ function GeoLocationAutocomplete({
     );
 }
 
-export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: Props) {
+export function PublicFiltersDrawer({
+                                        open,
+                                        initial,
+                                        onClose,
+                                        onApply,
+                                        kind,
+                                    }: Props) {
     const { t } = useTranslation();
     const { getLocalizedLabel } = useLocalizedLookup();
     const { lookups } = useInitStore();
     const user = useUserStore((s) => s.user);
 
     const getInitialFilters = (init?: PublicFilters): PublicFilters => {
+        const stored = getStoredFilters(kind);
+
+        if (stored) {
+            return stored;
+        }
+
         if (init && Object.keys(init).length > 0) {
             return { ...init };
         }
 
-        return {
-            pickup_date_from: getTodayDate(),
-            pickup_date_to: getDefaultDatePlus30(),
-        };
+        return {};
     };
 
-    const [f, setF] = useState<PublicFilters>(getInitialFilters(initial));
+    const [f, setF] = useState<PublicFilters>(() => getInitialFilters(initial));
     const [filtersData, setFiltersData] = useState<null | { vehicle_types: VehicleTypeOption[] }>(null);
 
     useEffect(() => {
         if (!open) return;
+
         setF(getInitialFilters(initial));
-    }, [open, initial]);
+    }, [open, initial, kind]);
 
     useEffect(() => {
         publicShipmentsApi
@@ -307,7 +341,9 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     };
 
     const onReset = () => {
+        removeStoredFilters(kind);
         setF({});
+        onApply({});
     };
 
     const handleVehicleTypes = (opts: Option[]) => {
@@ -339,7 +375,10 @@ export function PublicFiltersDrawer({ open, initial, onClose, onApply, kind }: P
     };
 
     const handleApply = () => {
-        onApply(compactFilters(f));
+        const nextFilters = compactFilters(f);
+
+        setStoredFilters(kind, nextFilters);
+        onApply(nextFilters);
     };
 
     return (

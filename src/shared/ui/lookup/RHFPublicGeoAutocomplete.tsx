@@ -15,9 +15,12 @@ import type {
 } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
-
 import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
-import {publicGeoApi, type PublicGeoLocationItem, type PublicGeoLocationType} from "@/shared/api/publicGeoApi.ts";
+import {
+    publicGeoApi,
+    type PublicGeoLocationItem,
+    type PublicGeoLocationType,
+} from "@/shared/api/publicGeoApi.ts";
 
 type Props<T extends FieldValues> = {
     control: Control<T>;
@@ -91,109 +94,124 @@ export function RHFPublicGeoAutocomplete<T extends FieldValues>({
         <Controller
             control={control}
             name={name}
-            render={({ field }) => (
-                <Autocomplete<PublicGeoLocationItem, false, false, false>
-                    size="small"
-                    options={options}
-                    value={selectedOption}
-                    inputValue={inputValue || field.value || ""}
-                    loading={loading}
-                    filterOptions={(items) => items}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    getOptionLabel={(option) => {
-                        const title = getLocalizedGeoName(option);
+            render={({ field }) => {
+                useEffect(() => {
+                    setInputValue(field.value ?? "");
 
-                        const meta = [
-                            option.region ? getLocalizedGeoName(option.region) : null,
-                            option.country ? getLocalizedGeoName(option.country) : null,
-                        ].filter(Boolean);
+                    if (!field.value) {
+                        setSelectedOption(null);
+                    }
+                }, [field.value]);
 
-                        return meta.length ? `${title}, ${meta.join(", ")}` : title;
-                    }}
-                    onInputChange={(_, value, reason) => {
-                        if (reason === "input") {
-                            setInputValue(value);
+                return (
+                    <Autocomplete<PublicGeoLocationItem, false, false, false>
+                        size="small"
+                        options={options}
+                        value={selectedOption}
+                        inputValue={inputValue}
+                        loading={loading}
+                        filterOptions={(items) => items}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        getOptionLabel={(option) => {
+                            const title = getLocalizedGeoName(option);
 
-                            if (!value.trim()) {
+                            const meta = [
+                                option.region ? getLocalizedGeoName(option.region) : null,
+                                option.country ? getLocalizedGeoName(option.country) : null,
+                            ].filter(Boolean);
+
+                            return meta.length ? `${title}, ${meta.join(", ")}` : title;
+                        }}
+                        onInputChange={(_, value, reason) => {
+                            if (reason === "input") {
+                                setInputValue(value);
+
+                                if (!value.trim()) {
+                                    setOptions([]);
+                                    setSelectedOption(null);
+                                    field.onChange(undefined);
+                                    setValue(typeName, undefined as any, { shouldDirty: true });
+                                }
+                            }
+
+                            if (reason === "clear") {
+                                setInputValue("");
+                                setOptions([]);
                                 setSelectedOption(null);
                                 field.onChange(undefined);
                                 setValue(typeName, undefined as any, { shouldDirty: true });
                             }
-                        }
+                        }}
+                        onChange={(_, value) => {
+                            setSelectedOption(value);
 
-                        if (reason === "clear") {
-                            setInputValue("");
-                            setSelectedOption(null);
-                            field.onChange(undefined);
-                            setValue(typeName, undefined as any, { shouldDirty: true });
-                        }
-                    }}
-                    onChange={(_, value) => {
-                        setSelectedOption(value);
+                            if (!value) {
+                                setInputValue("");
+                                setOptions([]);
+                                field.onChange(undefined);
+                                setValue(typeName, undefined as any, { shouldDirty: true });
+                                return;
+                            }
 
-                        if (!value) {
-                            setInputValue("");
-                            field.onChange(undefined);
-                            setValue(typeName, undefined as any, { shouldDirty: true });
-                            return;
-                        }
+                            const labelValue = getLocalizedGeoName(value);
 
-                        field.onChange(value.name);
-                        setInputValue(getLocalizedGeoName(value));
-                        setValue(typeName, value.type as any, { shouldDirty: true });
-                    }}
-                    renderOption={(props, option) => (
-                        <Box component="li" {...props} key={option.id}>
-                            <Stack spacing={0.25}>
-                                <Typography variant="body2">
-                                    {getLocalizedGeoName(option)}
-                                </Typography>
+                            field.onChange(value.name);
+                            setInputValue(labelValue);
+                            setValue(typeName, value.type as any, { shouldDirty: true });
+                        }}
+                        renderOption={(props, option) => (
+                            <Box component="li" {...props} key={option.id}>
+                                <Stack spacing={0.25}>
+                                    <Typography variant="body2">
+                                        {getLocalizedGeoName(option)}
+                                    </Typography>
 
-                                <Typography variant="caption" color="text.secondary">
-                                    {getGeoTypeLabel(option.type)}
-                                    {option.region ? ` · ${getLocalizedGeoName(option.region)}` : ""}
-                                    {option.country ? ` · ${getLocalizedGeoName(option.country)}` : ""}
-                                </Typography>
-                            </Stack>
-                        </Box>
-                    )}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            label={label}
-                            placeholder={placeholder}
-                            slotProps={{
-                                input: {
-                                    ...params.InputProps,
-                                    startAdornment: icon ? (
-                                        <>
-                                            <Box
-                                                component="span"
-                                                sx={{
-                                                    display: "inline-flex",
-                                                    mr: 0.75,
-                                                    color: "text.secondary",
-                                                }}
-                                            >
-                                                {icon}
-                                            </Box>
-                                            {params.InputProps.startAdornment}
-                                        </>
-                                    ) : (
-                                        params.InputProps.startAdornment
-                                    ),
-                                    endAdornment: (
-                                        <>
-                                            {loading ? <CircularProgress size={18} /> : null}
-                                            {params.InputProps.endAdornment}
-                                        </>
-                                    ),
-                                },
-                            }}
-                        />
-                    )}
-                />
-            )}
+                                    <Typography variant="caption" color="text.secondary">
+                                        {getGeoTypeLabel(option.type)}
+                                        {option.region ? ` · ${getLocalizedGeoName(option.region)}` : ""}
+                                        {option.country ? ` · ${getLocalizedGeoName(option.country)}` : ""}
+                                    </Typography>
+                                </Stack>
+                            </Box>
+                        )}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label={label}
+                                placeholder={placeholder}
+                                slotProps={{
+                                    input: {
+                                        ...params.InputProps,
+                                        startAdornment: icon ? (
+                                            <>
+                                                <Box
+                                                    component="span"
+                                                    sx={{
+                                                        display: "inline-flex",
+                                                        mr: 0.75,
+                                                        color: "text.secondary",
+                                                    }}
+                                                >
+                                                    {icon}
+                                                </Box>
+                                                {params.InputProps.startAdornment}
+                                            </>
+                                        ) : (
+                                            params.InputProps.startAdornment
+                                        ),
+                                        endAdornment: (
+                                            <>
+                                                {loading ? <CircularProgress size={18} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    },
+                                }}
+                            />
+                        )}
+                    />
+                );
+            }}
         />
     );
 }

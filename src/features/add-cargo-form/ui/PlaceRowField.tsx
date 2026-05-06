@@ -26,7 +26,7 @@ function getLocalizedName(
     return item.name;
 }
 
-function mapGeoToPlaceLocation(
+export function mapGeoToPlaceLocation(
     item: PublicGeoLocationItem,
     lang: string,
 ): PlaceLocation {
@@ -123,8 +123,8 @@ export function PlaceRowField({
                         getOptionLabel={(option: any) => {
                             if (!option) return "";
 
-                            if ("display_name" in option) {
-                                return option.display_name ?? "";
+                            if (option.source === "internal_geo") {
+                                return option.display_name || "";
                             }
 
                             const location = mapGeoToPlaceLocation(option, i18n.language);

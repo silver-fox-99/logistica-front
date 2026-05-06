@@ -19,6 +19,7 @@ import type {
     AddTransportFormValues,
     TransportPlaceLocation,
 } from "../model/types";
+import {mapGeoToPlaceLocation} from "@/features/add-cargo-form/ui/PlaceRowField.tsx";
 
 type Props = {
     kind: "load" | "unload";
@@ -171,14 +172,12 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                         getOptionLabel={(option: any) => {
                             if (!option) return "";
 
-                            if ("display_name" in option) {
+                            if (option.source === "internal_geo") {
                                 return option.display_name || "";
                             }
 
-                            return mapGeoToTransportLocation(
-                                option,
-                                i18n.language,
-                            ).display_name;
+                            const location = mapGeoToPlaceLocation(option, i18n.language);
+                            return location.display_name;
                         }}
                         onInputChange={handleInputChange}
                         onChange={(_, value) => {

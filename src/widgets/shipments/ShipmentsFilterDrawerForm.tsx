@@ -24,8 +24,7 @@ import { useUserStore } from "@/entities/user/model/user.store";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 
 import { RHFIdMultiAutocomplete } from "@/shared/ui/lookup/RHFIdMultiAutocomplete";
-import {RHFPublicGeoAutocomplete} from "@/shared/ui/lookup/RHFPublicGeoAutocomplete.tsx";
-
+import { RHFPublicGeoAutocomplete } from "@/shared/ui/lookup/RHFPublicGeoAutocomplete.tsx";
 
 type FormValues = PublicFilters & {
     kind: ShipmentsKind;
@@ -40,6 +39,7 @@ type Props = {
 };
 
 const MAX_VEHICLES = 5;
+const STORAGE_KEY = "shipments:filters:drawer-form";
 
 const digitsOnly = (value: string) => value.replace(/\D/g, "");
 
@@ -61,6 +61,44 @@ function normalizeFilters(filters: PublicFilters): PublicFilters {
     return out;
 }
 
+function getStoredFormValues(): FormValues | null {
+    if (typeof window === "undefined") return null;
+
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+
+        return JSON.parse(raw) as FormValues;
+    } catch {
+        return null;
+    }
+}
+
+function setStoredFormValues(values: FormValues) {
+    if (typeof window === "undefined") return;
+
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+}
+
+function removeStoredFormValues() {
+    if (typeof window === "undefined") return;
+
+    window.localStorage.removeItem(STORAGE_KEY);
+}
+
+function getInitialFormValues(initialKind: ShipmentsKind, initialFilters: PublicFilters): FormValues {
+    const stored = getStoredFormValues();
+
+    if (stored) {
+        return stored;
+    }
+
+    return {
+        kind: initialKind,
+        ...(initialFilters as any),
+    };
+}
+
 export function ShipmentsFilterDrawerForm({
                                               open,
                                               initialKind,
@@ -75,19 +113,13 @@ export function ShipmentsFilterDrawerForm({
     const { getLocalizedLabel } = useLocalizedLookup();
 
     const { control, reset, handleSubmit, setValue, getValues } = useForm<FormValues>({
-        defaultValues: {
-            kind: initialKind,
-            ...(initialFilters as any),
-        },
+        defaultValues: getInitialFormValues(initialKind, initialFilters),
     });
 
     useEffect(() => {
         if (!open) return;
 
-        reset({
-            kind: initialKind,
-            ...(initialFilters as any),
-        });
+        reset(getInitialFormValues(initialKind, initialFilters));
     }, [open, initialKind, initialFilters, reset]);
 
     const vehicleOptions = useMemo(() => {
@@ -99,20 +131,52 @@ export function ShipmentsFilterDrawerForm({
 
     const submit = handleSubmit((values) => {
         const { kind, ...filters } = values;
-        onApply(kind, normalizeFilters(filters));
+        const normalizedFilters = normalizeFilters(filters);
+
+        setStoredFormValues({
+            kind,
+            ...(normalizedFilters as any),
+        });
+
+        onApply(kind, normalizedFilters);
     });
 
     const handleReset = () => {
         const currentKind = getValues("kind");
 
+        removeStoredFormValues();
+
         reset({
             kind: currentKind,
+            pickup_geo_location_name: undefined,
+            pickup_geo_location_type: undefined,
+            dropoff_geo_location_name: undefined,
+            dropoff_geo_location_type: undefined,
+            pickup_date_from: undefined,
+            pickup_date_to: undefined,
+            dropoff_date_from: undefined,
+            dropoff_date_to: undefined,
+            weight_min: undefined,
+            weight_max: undefined,
+            volume_min: undefined,
+            volume_max: undefined,
+            vehicle_type: undefined,
+            favorites_only: undefined,
         } as FormValues);
+
+        onApply(currentKind, {});
     };
 
     return (
         <Drawer anchor="right" open={open} onClose={onClose} ModalProps={{ keepMounted: true }}>
-            <Box sx={{ width: { xs: "100vw", sm: 520 }, display: "flex", flexDirection: "column", height: "100%" }}>
+            <Box
+                sx={{
+                    width: { xs: "100vw", sm: 520 },
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                }}
+            >
                 <Box sx={{ p: 2 }}>
                     <Stack spacing={1.5}>
                         <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2}>
@@ -150,6 +214,7 @@ export function ShipmentsFilterDrawerForm({
                                         <ToggleButton value="cargo">
                                             {t("shipments.filters.cargo", { defaultValue: "Cargo" })}
                                         </ToggleButton>
+
                                         <ToggleButton value="transport">
                                             {t("shipments.filters.transport", { defaultValue: "Transport" })}
                                         </ToggleButton>
