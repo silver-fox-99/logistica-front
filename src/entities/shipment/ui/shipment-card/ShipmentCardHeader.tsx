@@ -21,7 +21,7 @@ export function ShipmentCardHeader({
                                        dropoffPointsTitle,
                                    }: Props) {
 
-    console.log(routeFrom, routeTo)
+
     return (
         <>
             <Stack

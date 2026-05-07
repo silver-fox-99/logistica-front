@@ -50,16 +50,14 @@ export function useShipmentRow({ data, kind }: Params) {
     const primaryUnloadPoint = unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
 
     const routeFrom = useMemo(() => {
-        if (data.routeFrom) return data.routeFrom
         if (primaryLoadPoint) return formatRoute(primaryLoadPoint);
-        return data.routeFrom || "—";
-    }, [primaryLoadPoint, data.routeFrom, formatRoute]);
+        return "—";
+    }, [primaryLoadPoint, formatRoute]);
 
     const routeTo = useMemo(() => {
-        if (data.routeTo) return data.routeTo;
         if (primaryUnloadPoint) return formatRoute(primaryUnloadPoint);
-        return data.routeTo || "—";
-    }, [primaryUnloadPoint, data.routeTo, formatRoute]);
+        return "—";
+    }, [primaryUnloadPoint, formatRoute]);
 
     const shipmentTypeLabel = useMemo(() => getShipmentTypeLabel(kind, t), [kind, t]);
 

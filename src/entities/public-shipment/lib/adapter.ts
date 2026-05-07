@@ -93,7 +93,7 @@ const adaptBase = (
             country_ru: point.country_ru ?? null,
             country_uz: point.country_uz ?? null,
             region: point.region ?? null,
-            display_name: point.display_name ?? null,
+          //  display_name: point.display_name ?? null,
             region_ru: point.region_ru ?? null,
             region_uz: point.region_uz ?? null,
             city: point.city ?? null,
@@ -103,22 +103,22 @@ const adaptBase = (
         }))
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-    const fromPoints = points.filter(
-        (point) => point.type === "PICKUP" || point.type === "DEPARTURE"
-    );
-    const toPoints = points.filter(
-        (point) => point.type === "DROPOFF" || point.type === "ARRIVAL"
-    );
+  //  const fromPoints = points.filter(
+  //      (point) => point.type === "PICKUP" || point.type === "DEPARTURE"
+  //  );
+  //  const toPoints = points.filter(
+  //      (point) => point.type === "DROPOFF" || point.type === "ARRIVAL"
+  //  );
 
-    const primaryFrom = fromPoints[0] ?? points[0];
-    const primaryTo = toPoints[0] ?? points[points.length - 1];
-
-    const toRouteLabel = (point?: PublicPoint) => {
-        if (!point) return "—";
-        if (point.display_name) return point.display_name;
-        const parts = [point.country, point.region, point.city].filter(Boolean);
-        return parts.length ? parts.join(", ") : "—";
-    };
+  //  const primaryFrom = fromPoints[0] ?? points[0];
+  //  const primaryTo = toPoints[0] ?? points[points.length - 1];
+//
+  //  const toRouteLabel = (point?: PublicPoint) => {
+  //      if (!point) return "—";
+  //    //  if (point.display_name) return point.display_name;
+  //      const parts = [point.country, point.region, point.city].filter(Boolean);
+  //      return parts.length ? parts.join(", ") : "—";
+  //  };
 
     return {
         id: a.id,
@@ -127,8 +127,8 @@ const adaptBase = (
             to: datesTo,
         },
         loadWindow,
-        routeFrom: toRouteLabel(primaryFrom),
-        routeTo: toRouteLabel(primaryTo),
+     //   routeFrom: toRouteLabel(primaryFrom),
+     //   routeTo: toRouteLabel(primaryTo),
         points,
         metrics,
         tags,

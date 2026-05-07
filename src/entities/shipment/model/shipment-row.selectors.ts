@@ -6,21 +6,21 @@ import type { CommonInitData } from "@/shared/api/commonInitApi";
 
 type Lookups = CommonInitData["lookups"] | null;
 
-export function getSortedPoints(data: ShipmentRowData) {
+export const getLoadPoints = (data: ShipmentRowData) => {
+    return (data.points ?? [])
+        .filter((point) => point.type === "PICKUP" || point.type === "DEPARTURE")
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+};
+
+export const getUnloadPoints = (data: ShipmentRowData) => {
+    return (data.points ?? [])
+        .filter((point) => point.type === "DROPOFF" || point.type === "ARRIVAL")
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+};
+
+export const getSortedPoints = (data: ShipmentRowData) => {
     return [...(data.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-}
-
-export function getLoadPoints(data: ShipmentRowData) {
-    return getSortedPoints(data).filter(
-        (item) => item.type === "PICKUP" || item.type === "DEPARTURE",
-    );
-}
-
-export function getUnloadPoints(data: ShipmentRowData) {
-    return getSortedPoints(data).filter(
-        (item) => item.type === "DROPOFF" || item.type === "ARRIVAL",
-    );
-}
+};
 
 export function getShipmentTypeLabel(kind: "cargo" | "transport", t: TFunction) {
     return kind === "cargo"

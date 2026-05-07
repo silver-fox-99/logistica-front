@@ -37,7 +37,6 @@ export default function LanguageSwitcher() {
 
     const changeLang = async (lng: string) => {
         await i18n.changeLanguage(lng);
-        console.log(lng);
         localStorage.setItem("i18nextLng", lng);
         setFlagError(false);
         handleClose();

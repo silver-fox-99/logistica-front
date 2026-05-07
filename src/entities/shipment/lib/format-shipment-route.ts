@@ -4,8 +4,9 @@ type Lang = string | undefined;
 
 export function formatShipmentRoute(point?: GeoPoint, lang?: Lang, withAddress = false) {
     if (!point) return "—";
+    console.log(lang)
 
-    if (point.display_name) return point.display_name;
+   // if (point.display_name) return point.display_name;
 
     const normalizeLang = lang || "uz";
 

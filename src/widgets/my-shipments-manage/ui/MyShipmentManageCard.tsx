@@ -32,6 +32,7 @@ import type { GeoPoint, ShipmentRowData, ShipmentsKind } from "@/entities/shipme
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
 import { formatDate } from "@/shared/utils/formatDate";
+import {formatShipmentRoute} from "@/entities/shipment/lib/format-shipment-route.ts";
 
 type Props = {
     data: ShipmentRowData;
@@ -87,35 +88,13 @@ export function MyShipmentManageCard({
     }, [loadInit]);
 
     const formatRoute = useCallback(
-        (point?: GeoPoint, withAddress = false) => {
-            if (!point) return "—";
-
-            const parts: string[] = [];
-            const lang = i18n.resolvedLanguage || i18n.language || "uz";
-
-            const getLocalized = (
-                base?: string | null,
-                ru?: string | null,
-                uz?: string | null
-            ) => {
-                if (!base) return null;
-                if (lang === "ru" && ru) return ru;
-                if (lang === "uz" && uz) return uz;
-                return base;
-            };
-
-            const country = getLocalized(point.country, point.country_ru, point.country_uz);
-            const region = getLocalized(point.region, point.region_ru, point.region_uz);
-            const city = getLocalized(point.city, point.city_ru, point.city_uz);
-
-            if (country) parts.push(country);
-            if (region) parts.push(region);
-            if (city) parts.push(city);
-            if (withAddress && point.address) parts.push(point.address);
-
-            return parts.length > 0 ? parts.join(", ") : "—";
-        },
-        [i18n.language, i18n.resolvedLanguage]
+        (point?: GeoPoint, withAddress = false) =>
+            formatShipmentRoute(
+                point,
+                i18n.resolvedLanguage || i18n.language || "uz",
+                withAddress,
+            ),
+        [i18n.language, i18n.resolvedLanguage],
     );
 
     const sortedPoints = useMemo(
@@ -137,16 +116,14 @@ export function MyShipmentManageCard({
     const primaryUnloadPoint = unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
 
     const routeFrom = useMemo(() => {
-        if (data.routeFrom) return data.routeFrom;
         if (primaryLoadPoint) return formatRoute(primaryLoadPoint);
-        return data.routeFrom || "—";
-    }, [data.routeFrom, formatRoute, primaryLoadPoint]);
+        return "—";
+    }, [formatRoute, primaryLoadPoint]);
 
     const routeTo = useMemo(() => {
-        if (data.routeTo) return data.routeTo;
         if (primaryUnloadPoint) return formatRoute(primaryUnloadPoint);
-        return data.routeTo || "—";
-    }, [data.routeTo, formatRoute, primaryUnloadPoint]);
+        return "—";
+    }, [formatRoute, primaryUnloadPoint]);
 
     const updatedAt = getUpdatedValue(data);
     const views = getViewsValue(data);
