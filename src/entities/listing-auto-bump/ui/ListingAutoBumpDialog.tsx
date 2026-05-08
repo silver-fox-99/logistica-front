@@ -35,6 +35,18 @@ type Props = {
 const DEFAULT_INTERVAL = 15;
 const DEFAULT_DURATION = 1;
 
+const toDateTimeLocalValue = (value?: string | null) => {
+    if (!value) return "";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+    const localDate = new Date(date.getTime() - offsetMs);
+
+    return localDate.toISOString().slice(0, 16);
+};
+
 export function ListingAutoBumpDialog({
                                           open,
                                           targetType,
@@ -93,7 +105,7 @@ export function ListingAutoBumpDialog({
             setEnabled(entity.is_enabled);
             setIntervalMinutes(entity.interval_minutes);
             setDurationDays(entity.duration_days);
-            setStartsAt(entity.starts_at ? entity.starts_at.slice(0, 16) : "");
+            setStartsAt(toDateTimeLocalValue(entity.starts_at));
             setLastError(entity.last_error);
         } catch (error: any) {
             toast.error(

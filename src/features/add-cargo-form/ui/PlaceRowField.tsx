@@ -158,7 +158,7 @@ export function PlaceRowField({
                                         ? t("addCargo.fields.pickupLocation")
                                         : t("addCargo.fields.dropoffLocation")
                                 }
-                                placeholder={t("addCargo.fields.locationSearchPlaceholder")}
+                                placeholder={t("addCargo.fields.startTypingLocation")}
                                 error={!!errorText}
                                 helperText={errorText}
                             />
@@ -173,8 +173,8 @@ export function PlaceRowField({
                 render={({ field }) => (
                     <TextField
                         {...field}
-                        label={t("addCargo.fields.address")}
-                        placeholder={t("addCargo.fields.addressPlaceholder")}
+                        label={t("addCargo.fields.addressLoad")}
+                        placeholder={t("addCargo.fields.addressLoad")}
                         fullWidth
                     />
                 )}

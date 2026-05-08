@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AuthTop from "@/shared/ui/auth/auth-top";
 import StepPhone from "@/features/login/register/ui/StepPhone";
-import StepCode from "@/features/login/register/ui/StepCode";
+//import StepCode from "@/features/login/register/ui/StepCode";
 import StepProfile from "@/features/login/register/ui/StepProfile";
 import {authApi} from "@/shared/api/authApi.ts";
 
@@ -12,7 +12,7 @@ export default function RegisterPage() {
     const { t } = useTranslation();
     const [activeStep, setActiveStep] = useState(0);
     const [e164, setE164] = useState<string>("");
-    const steps = useMemo(() => ["", "", ""], []);
+    const steps = useMemo(() => ["", ""], []);
 
     const next = () => setActiveStep((s) => Math.min(s + 1, 2));
     const back = () => setActiveStep((s) => Math.max(s - 1, 0));
@@ -20,8 +20,8 @@ export default function RegisterPage() {
     const header = useMemo(() => {
         switch (activeStep) {
             case 0: return { title: t("register.step1Title"), subtitle: t("register.step1Subtitle") };
-            case 1: return { title: t("register.step2Title"), subtitle: t("register.step2Subtitle", { phone: e164 || "your phone" }) };
-            case 2: return { title: t("register.step3Title"), subtitle: t("register.step3Subtitle") };
+         //   case 1: return { title: t("register.step2Title"), subtitle: t("register.step2Subtitle", { phone: e164 || "your phone" }) };
+            case 1: return { title: t("register.step3Title"), subtitle: t("register.step3Subtitle") };
             default: return { title: "", subtitle: "" };
         }
     }, [activeStep, e164, t]);
@@ -30,14 +30,14 @@ export default function RegisterPage() {
         switch (activeStep) {
             case 0:
                 return <StepPhone onNext={(phoneE164) => { setE164(phoneE164); next(); }} />;
+            // case 1:
+            //     return (
+            //         <StepCode
+            //             length={6}
+            //             onSubmit={next}
+            //         />
+            //     );
             case 1:
-                return (
-                    <StepCode
-                        length={6}
-                        onSubmit={next}
-                    />
-                );
-            case 2:
                 return <StepProfile />;
             default:
                 return null;

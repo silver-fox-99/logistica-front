@@ -198,7 +198,7 @@ export const PlaceRowField = React.memo(function PlaceRowField({
                                 {...params}
                                 fullWidth
                                 label={locationLabel}
-                                placeholder={t("addCargo.fields.searchLocationPlaceholder")}
+                                placeholder={t("addCargo.fields.startTypingLocation")}
                                 error={!!fieldState.error || !!errorText}
                                 helperText={
                                     (fieldState.error?.message as string | undefined) ||
