@@ -32,7 +32,7 @@ type Props = {
     onSaved?: () => void;
 };
 
-const DEFAULT_INTERVAL = 15;
+const DEFAULT_INTERVAL = 30;
 const DEFAULT_DURATION = 1;
 
 const toDateTimeLocalValue = (value?: string | null) => {
@@ -72,7 +72,7 @@ export function ListingAutoBumpDialog({
         return (
             !!targetId &&
             Number.isFinite(intervalMinutes) &&
-            intervalMinutes >= 5 &&
+            intervalMinutes >= 30 &&
             Number.isFinite(durationDays) &&
             durationDays >= 1 &&
             durationDays <= 3
@@ -259,7 +259,7 @@ export function ListingAutoBumpDialog({
                         type="number"
                         value={intervalMinutes}
                         onChange={(event) => setIntervalMinutes(Number(event.target.value))}
-                        inputProps={{ min: 5, step: 5 }}
+                        inputProps={{ min: 30, step: 5 }}
                         disabled={loading || submitting}
                         fullWidth
                     />
