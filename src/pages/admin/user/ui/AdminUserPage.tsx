@@ -75,6 +75,20 @@ export default function AdminUserPage() {
                               color={user.status === "ACTIVE" ? "success" : "default"}
                               variant={user.status === "ACTIVE" ? "filled" : "outlined"} />
                         {user.type && <Chip size="small" label={user.type} />}
+                        {user.phone_verified_at ? (
+                            <Chip
+                                size="small"
+                                color="success"
+                                label="Телефон подтвержден"
+                            />
+                        ) : (
+                            <Chip
+                                size="small"
+                                color="warning"
+                                variant="outlined"
+                                label="Телефон не подтвержден"
+                            />
+                        )}
                     </Stack>
                     <Stack direction="row" spacing={1}>
                         <Button
