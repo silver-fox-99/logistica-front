@@ -84,7 +84,7 @@ const router = createBrowserRouter([
             {path: "search", element: <ShipmentsListPage scope="public"/>},
             {path: "profile", element: <ProfilePage/>},
             {path: "company", element: <CompanyPage/>},
-            {path: "new/company ", element: <CompanyCreatePage/>},
+            {path: "new/company", element: <CompanyCreatePage/>},
             {path: "invitations/:token", element: <CompanyInvitationAcceptPage /> },
             {
                 path: "company/:id",
