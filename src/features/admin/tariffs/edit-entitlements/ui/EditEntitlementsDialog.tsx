@@ -35,6 +35,8 @@ const entitlementApiKeyMap: Record<EntitlementKey, ApiEntitlementKey> = {
     can_create_companies: "CAN_CREATE_COMPANIES",
     company_limit: "COMPANY_LIMIT",
     members_per_company_limit: "MEMBERS_PER_COMPANY_LIMIT",
+    active_tenders: "ACTIVE_TENDERS",
+    can_view_tenders: "CAN_VIEW_TENDERS"
 };
 
 type Props = {

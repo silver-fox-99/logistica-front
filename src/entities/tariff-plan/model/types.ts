@@ -189,7 +189,9 @@ export type ApiEntitlementKey =
     | "ORDER_DETAILS_VIEWS_PER_DAY_LIMIT"
     | "CAN_CREATE_COMPANIES"
     | "COMPANY_LIMIT"
-    | "MEMBERS_PER_COMPANY_LIMIT";
+    | "MEMBERS_PER_COMPANY_LIMIT"
+    | "CAN_VIEW_TENDERS"
+    | "ACTIVE_TENDERS";
 
 export type SubscriptionEntitlementInput = {
     key: ApiEntitlementKey;
