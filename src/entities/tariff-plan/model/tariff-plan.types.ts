@@ -10,6 +10,8 @@ export type TariffPlanFormValues = {
     price_text: string;
     currency: string;
     billing_period: BillingPeriod | "";
+    can_view_tenders: boolean;
+    active_tenders: number | null;
 
     cargo_limit: number | null;
     vehicle_limit: number | null;

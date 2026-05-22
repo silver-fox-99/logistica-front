@@ -22,6 +22,8 @@ export const createEmptyTariffPlanForm = (
 
     cargo_limit: null,
     vehicle_limit: null,
+    can_view_tenders: false,
+    active_tenders: null,
     can_view_order_details: false,
     order_details_views_per_day_limit: null,
     can_auto_bump: false,
@@ -71,6 +73,11 @@ export const mapPlanToFormValues = (plan: TariffPlan): TariffPlanFormValues => {
         can_create_companies: toBoolean(
             plan.can_create_companies ?? ent.can_create_companies,
         ),
+        can_view_tenders:
+                typeof plan.can_view_tenders === "boolean"
+                    ? plan.can_view_tenders
+                    : toBoolean(ent.can_view_tenders),
+        active_tenders: toNullableNumber(plan.active_tenders ?? ent.active_tenders),
         company_limit: toNullableNumber(plan.company_limit ?? ent.company_limit),
         members_per_company_limit: toNullableNumber(
             plan.members_per_company_limit ?? ent.members_per_company_limit,
@@ -124,8 +131,11 @@ export const buildTariffPlanPayload = (
         currency: values.currency.trim() ? values.currency.trim().toUpperCase() : null,
         billing_period: values.billing_period || null,
 
+
         cargo_limit: values.cargo_limit,
         vehicle_limit: values.vehicle_limit,
+        can_view_tenders: values.can_view_tenders,
+        active_tenders: values.active_tenders,
         can_view_order_details: values.can_view_order_details,
         order_details_views_per_day_limit: values.order_details_views_per_day_limit,
         can_auto_bump: values.can_auto_bump,

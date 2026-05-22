@@ -17,9 +17,12 @@ export const ENTITLEMENTS: EntitlementMeta[] = [
     { key: "can_create_companies", label: "Возможность созданий компаний", type: "boolean" },
     { key: "company_limit", label: "Лимит компаний", type: "number" },
     { key: "members_per_company_limit", label: "Количество участников на компанию", type: "number" },
+    { key: "can_view_tenders", label: "Доступ к тендерам", type: "boolean" },
+    { key: "active_tenders", label: "Количество активных тендеров", type: "number" },
 ];
 
 export const formatEntitlementValue = (key: EntitlementKey, value: unknown) => {
+
     const meta = ENTITLEMENTS.find((m) => m.key === key);
     if (meta?.type === "boolean") {
         return value ? "Enabled" : "Disabled";

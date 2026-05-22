@@ -24,11 +24,14 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
 
     const features = useMemo(
         () => [
-            { label: t("paymentsNew.cargoLimit", "Cargo limit / month"), value: formatEntitlementValue("cargo_limit", plan.entitlements?.cargo_limit) },
-            { label: t("paymentsNew.vehicleLimit", "Vehicle limit / month"), value: formatEntitlementValue("vehicle_limit", plan.entitlements?.vehicle_limit) },
             { label: t("paymentsNew.orderDetails", "Order details access"), value: formatEntitlementValue("can_view_order_details", plan.entitlements?.can_view_order_details) },
             { label: t("paymentsNew.autoBump", "Can auto bump orders"), value: formatEntitlementValue("can_auto_bump", plan.entitlements?.can_auto_bump) },
             { label: t("paymentsNew.companies", "Company creation"), value: formatEntitlementValue("can_create_companies", plan.entitlements?.can_create_companies) },
+            { label: t("paymentsNew.tenders", "Tender access"), value: formatEntitlementValue("can_view_tenders", plan?.entitlements?.can_view_tenders) },
+            { label: t("paymentsNew.companies", "Company creation"), value: formatEntitlementValue("can_create_companies", plan.entitlements?.can_create_companies) },
+            { label: t("paymentsNew.cargoLimit", "Cargo limit / month"), value: formatEntitlementValue("cargo_limit", plan.entitlements?.cargo_limit) },
+            { label: t("paymentsNew.vehicleLimit", "Vehicle limit / month"), value: formatEntitlementValue("vehicle_limit", plan.entitlements?.vehicle_limit) },
+            { label: t("paymentsNew.activeTenders", "Active tenders"), value: formatEntitlementValue("active_tenders", plan.entitlements?.active_tenders) },
         ],
         [plan, t]
     );

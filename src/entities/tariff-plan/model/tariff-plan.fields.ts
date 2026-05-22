@@ -1,14 +1,16 @@
 export type TariffBooleanFieldKey =
     | "can_view_order_details"
     | "can_auto_bump"
-    | "can_create_companies";
+    | "can_create_companies"
+    | "can_view_tenders";
 
 export type TariffNumberFieldKey =
     | "cargo_limit"
     | "vehicle_limit"
     | "order_details_views_per_day_limit"
     | "company_limit"
-    | "members_per_company_limit";
+    | "members_per_company_limit"
+    | "active_tenders";
 
 export type TariffFeatureFieldMeta = {
     key: TariffBooleanFieldKey;
@@ -35,6 +37,10 @@ export const TARIFF_FEATURE_FIELDS: TariffFeatureFieldMeta[] = [
         key: "can_create_companies",
         label: "Создание компаний",
     },
+    {
+        key: "can_view_tenders",
+        label: "Участие в тендерах"
+    }
 ];
 
 export const TARIFF_LIMIT_FIELDS: TariffLimitFieldMeta[] = [
@@ -54,6 +60,11 @@ export const TARIFF_LIMIT_FIELDS: TariffLimitFieldMeta[] = [
         hint: "Сколько раз в месяц можно открывать детали заказов",
     },
     {
+        key: "active_tenders",
+        label: "Количество активных тендеров",
+        hint: "Количество активных тендеров одновременно"
+    },
+    {
         key: "company_limit",
         label: "Лимит компаний",
         hint: "Максимальное количество компаний для этого тарифа",
@@ -62,5 +73,5 @@ export const TARIFF_LIMIT_FIELDS: TariffLimitFieldMeta[] = [
         key: "members_per_company_limit",
         label: "Лимит сотрудников в компании",
         hint: "Сколько пользователей можно добавить в одну компанию",
-    },
+    }
 ];

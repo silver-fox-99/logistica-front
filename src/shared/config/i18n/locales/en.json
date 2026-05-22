@@ -43,7 +43,6 @@
     "validationWarning": "Fill in all required fields",
     "step": "Step",
     "of": "of",
-
     "steps": {
       "datesRoutes": "Dates and Routes",
       "cargoInfo": "Cargo Information",
@@ -257,7 +256,10 @@
       "adminPanel": "Admin Panel",
       "logout": "Log Out",
       "openMenu": "Open menu",
-      "referrals": "Referrals"
+      "referrals": "Referrals",
+      "tenders": "Tenders",
+      "tenderSearch": "Tender search",
+      "myTenders": "My tenders"
     }
   },
   "profile": {
@@ -1407,6 +1409,251 @@
     "createTransport": {
       "title": "Monthly transport creation limit reached",
       "description": "You have used all available transport creation slots for your current plan. To upgrade your plan or check your current limits, go to the payments page."
+    }
+  },
+  "tenders": {
+    "common": {
+      "empty": "-",
+      "find": "Find",
+      "total": "Total: {{count}}",
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "back": "Back",
+      "save": "Save",
+      "add": "Add",
+      "status": "Status: {{value}}",
+      "owner": "Owner",
+      "participant": "Participant",
+      "winner": "Winner"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "WAITING_CONFIRMATION": "Waiting confirmation",
+      "CONFIRMED": "Confirmed",
+      "CANCELLED": "Cancelled",
+      "EXPIRED": "Expired",
+      "FINISHED": "Finished"
+    },
+    "auctionType": {
+      "DECREASING": "Reverse auction",
+      "INCREASING": "Forward auction"
+    },
+    "list": {
+      "myTitle": "My tenders",
+      "searchTitle": "Tender search",
+      "mySubtitle": "Active tenders, archive, wins, and your bid history.",
+      "searchSubtitle": "Open tender registry with reverse auctions.",
+      "create": "Create tender",
+      "searchPlaceholder": "Search by title, route, cargo",
+      "allAuctionTypes": "All auction types",
+      "decreasing": "Reverse auction",
+      "increasing": "Forward auction",
+      "tabs": {
+        "active": "Active",
+        "archive": "Completed",
+        "wins": "Won",
+        "bids": "My bids"
+      },
+      "empty": {
+        "search": "No tenders found",
+        "active": "No active tenders yet",
+        "archive": "No completed tenders yet",
+        "wins": "No won tenders yet",
+        "bids": "You have not bid in tenders yet"
+      },
+      "archivePending": "The archive endpoint is not ready yet. Completed tenders will appear here after backend update.",
+      "loadError": "Failed to load tenders",
+      "card": {
+        "buyout": "Buyout available",
+        "startPrice": "Start price",
+        "endsAt": "Ends",
+        "vehicleType": "Vehicle type",
+        "cargo": "Cargo",
+        "bids": "Bids",
+        "hasBids": "Yes",
+        "noBids": "No"
+      }
+    },
+    "workspace": {
+      "sidebar": {
+        "backToMy": "My tenders",
+        "overview": "Overview",
+        "bids": "Auction and bids",
+        "settings": "Management",
+        "confirmation": "Confirmation"
+      },
+      "header": {
+        "startPrice": "Start price",
+        "buyoutPrice": "Buyout price",
+        "endsAt": "Until",
+        "ownerCode": "Winner code",
+        "waitingConfirmation": "Waiting for winner confirmation"
+      }
+    },
+    "overview": {
+      "participants": "Participants",
+      "averageBid": "Average bid",
+      "economy": "Savings",
+      "route": "Route",
+      "pickup": "Pickup",
+      "dropoff": "Dropoff",
+      "terms": "Tender terms",
+      "cargo": "Cargo",
+      "weightVolume": "Weight / volume",
+      "transport": "Transport",
+      "loadingType": "Loading type",
+      "startsAt": "Start",
+      "endsAt": "End",
+      "startPrice": "Start price",
+      "buyoutPrice": "Buyout price",
+      "phone": "phone"
+    },
+    "bids": {
+      "yourBid": "Your bid",
+      "description": "In an open tender, participants see current offers. Repeated bid changes are limited by the server.",
+      "amount": "Amount ({{currency}})",
+      "transportDetails": "Transport / comment",
+      "submit": "Submit bid",
+      "currentOffers": "Current offers",
+      "rule": "The lowest bid wins; if equal, the earlier bid wins.",
+      "leader": "Leader: {{amount}} {{currency}}",
+      "empty": "There are no bids yet.",
+      "currentLeader": "Current leader",
+      "transportEmpty": "Transport is not specified",
+      "createdAt": "Created: {{value}}",
+      "changedAt": "changed: {{value}}",
+      "selectWinner": "Select winner",
+      "selecting": "Selecting...",
+      "validationAmount": "Enter bid amount",
+      "saved": "Bid saved",
+      "saveError": "Failed to save bid",
+      "winnerSelected": "Winner selected",
+      "winnerError": "Failed to select winner",
+      "ownerOnlySelect": "Only the tender owner can select a winner.",
+      "codePanelTitle": "Confirm win",
+      "codePanelDescription": "Enter the code from the tender owner to complete the tender.",
+      "codeNotAvailable": "The confirmation code field will appear after the owner selects a winner.",
+      "winnerCodeTitle": "Code for winner",
+      "winnerCodeDescription": "Give this code to the selected winner. It is shown only once after selecting the winner.",
+      "code": "Code",
+      "confirmCode": "Confirm code"
+    },
+    "settings": {
+      "title": "Tender management",
+      "editTerms": "Edit terms",
+      "cancelTender": "Cancel tender",
+      "hasBidsWarning": "This tender already has bids.",
+      "dealConfirmation": "Deal confirmation",
+      "dealDescription": "After selecting the winner, the owner passes the code and the winner enters it within 30 minutes.",
+      "confirmationCode": "Confirmation code",
+      "confirm": "Confirm",
+      "blacklist": "Blacklist",
+      "blacklistDescription": "Users with these phone numbers will not see your tenders or submit bids.",
+      "phone": "Phone",
+      "cancelDialogTitle": "Cancel tender",
+      "cancelDialogText": "Are you sure you want to cancel tender \"{{title}}\"?",
+      "cancelling": "Cancelling...",
+      "editDialogTitle": "Edit tender",
+      "editInfo": "Editing is available only before the first bid.",
+      "validation": {
+        "title": "Enter tender title",
+        "startPrice": "Enter start price",
+        "dates": "Enter tender dates",
+        "dateOrder": "End date must be later than start date",
+        "code": "Enter confirmation code",
+        "phone": "Enter phone"
+      },
+      "toast": {
+        "canceled": "Tender cancelled",
+        "cancelError": "Failed to cancel tender",
+        "codeConfirmed": "Code confirmed",
+        "codeError": "Failed to confirm code",
+        "phoneAdded": "Phone added to blacklist",
+        "phoneError": "Failed to add phone",
+        "updated": "Tender updated",
+        "updateError": "Failed to update tender"
+      },
+      "participantReadOnly": "Tender management is available only to the owner.",
+      "ownerCodeMissing": "Select a winner in bids to generate the confirmation code."
+    },
+    "fields": {
+      "title": "Title",
+      "pickupDate": "Pickup date",
+      "dropoffDate": "Dropoff date",
+      "pickupTime": "Pickup time",
+      "dropoffTime": "Dropoff time",
+      "cargoType": "Cargo type",
+      "vehicleType": "Vehicle type",
+      "loadingType": "Loading type",
+      "weightTons": "Weight (t)",
+      "volumeM3": "Volume (m3)",
+      "placesCount": "Places count",
+      "vehicleCapacityTons": "Capacity (t)",
+      "vehicleBodyLengthM": "Body length (m)",
+      "startPrice": "Start price",
+      "buyoutPrice": "Buyout price",
+      "minBidStep": "Minimum step",
+      "startsAt": "Tender start",
+      "endsAt": "Tender end",
+      "cargoDescription": "Cargo description"
+    },
+    "admin": {
+      "title": "Tenders",
+      "subtitle": "Client open tender registry. Admin actions will be added after backend endpoints are ready.",
+      "searchPlaceholder": "Search by title or route",
+      "loadError": "Failed to load tenders",
+      "table": {
+        "tender": "Tender",
+        "route": "Route",
+        "auction": "Auction",
+        "status": "Status",
+        "bids": "Bids",
+        "owner": "Owner",
+        "endsAt": "Ends",
+        "price": "Price",
+        "createdAt": "Created"
+      },
+      "empty": "No tenders found"
+    },
+    "create": {
+      "pageTitle": "Create tender",
+      "pageSubtitle": "Specify route, cargo parameters and auction terms.",
+      "pickupPoint": "Pickup point",
+      "dropoffPoint": "Dropoff point",
+      "pickupPoints": "Pickup points",
+      "dropoffPoints": "Dropoff points",
+      "locationPlaceholder": "Start typing city, country or region",
+      "pickupAddress": "Pickup address",
+      "dropoffAddress": "Dropoff address",
+      "addressPlaceholder": "Warehouse, street, gate",
+      "addPickupPoint": "Add pickup point",
+      "addDropoffPoint": "Add dropoff point",
+      "moveUp": "Up",
+      "moveDown": "Down",
+      "remove": "Remove",
+      "titleField": "Tender title",
+      "selectCargoType": "Select cargo type",
+      "selectVehicleType": "Select vehicle type",
+      "selectLoadingType": "Select loading type",
+      "adr": "ADR",
+      "hydraulicTailLiftRequired": "Hydraulic tail lift required",
+      "auctionType": "Auction type",
+      "selectAuctionType": "Select auction type",
+      "currency": "Currency",
+      "selectCurrency": "Select currency",
+      "paymentMethod": "Payment method",
+      "selectPaymentMethod": "Select payment method",
+      "paymentTerm": "Payment term",
+      "selectPaymentTerm": "Select payment term",
+      "createButton": "Create tender",
+      "validationRequired": "Fill required fields",
+      "selectPickup": "Select pickup point",
+      "selectDropoff": "Select dropoff point",
+      "startRequired": "Enter tender start",
+      "endRequired": "Enter tender end",
+      "created": "Tender created",
+      "createError": "Tender creation failed"
     }
   }
 }

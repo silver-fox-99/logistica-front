@@ -33,7 +33,7 @@ import {
     FiChevronRight,
     FiAward,
     FiLink2, FiTruck,
-    FiBriefcase, FiSend,
+    FiBriefcase, FiSend, FiFileText,
 } from "react-icons/fi";
 import {BsGeoAlt} from "react-icons/bs";
 import {MdOutlineAdminPanelSettings, MdOutlineRateReview} from "react-icons/md";
@@ -65,6 +65,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/companies", icon: <FiBriefcase />, label: "Компании", requiredAny: [viewCode("COMPANIES" as any)] },
     { to: "/admin/cargo", icon: <FiPackage />, label: "Грузы", requiredAny: [viewCode("CARGO" as any)] },
     { to: "/admin/transport", icon: <FiTruck />, label: "Транспорт", requiredAny: [viewCode("TRANSPORT" as any)] },
+    { to: "/admin/tenders", icon: <FiFileText />, label: "Тендеры" },
     { to: "/admin/geo", icon: <BsGeoAlt />, label: "Геолокации", requiredAny: [viewCode("GEO_LOCATIONS" as any)] },
     { to: "/admin/reviews", icon: <MdOutlineRateReview />, label: "Отзывы", requiredAny: [viewCode("REVIEWS" as any)] },
     { to: "/admin/documents", icon: <HiOutlineDocumentText />, label: "Документы", requiredAny: [viewCode("DOCUMENTS" as any)] },

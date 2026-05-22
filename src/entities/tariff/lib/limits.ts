@@ -6,7 +6,7 @@ import {
     FiPackage,
     FiTruck,
     FiUsers,
-    FiArrowUpCircle,
+    FiArrowUpCircle, FiClipboard, FiUserCheck,
 } from "react-icons/fi";
 
 import type {
@@ -33,6 +33,8 @@ export const usageKeyMap: Record<
     can_create_companies: null,
     company_limit: null,
     can_auto_bump: "can_auto_bump",
+    can_view_tenders: "can_view_tenders",
+    active_tenders: null,
     members_per_company_limit: null,
 };
 
@@ -93,6 +95,14 @@ export const buildLimitItemsConfig = (t: TFunction): LimitItem[] => [
         type: "numeric",
     },
     {
+        key: "active_tenders",
+        label: t("paymentsNew.activeTenders", {
+            defaultValue: "Активные тендеры"
+        }),
+        icon: FiClipboard,
+        type: "numeric",
+    },
+    {
         key: "can_view_order_details",
         label: t("paymentsNew.orderDetails", {
             defaultValue: "Доступ к подробностям заказа",
@@ -116,4 +126,12 @@ export const buildLimitItemsConfig = (t: TFunction): LimitItem[] => [
         icon: FiArrowUpCircle,
         type: "boolean",
     },
+    {
+        key: "can_view_tenders",
+        label: t('paymentsNew.tenders', {
+            defaultValue: "Участие в тендерах"
+        }),
+        icon: FiUserCheck,
+        type: "boolean",
+    }
 ];

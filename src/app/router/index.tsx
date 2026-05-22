@@ -55,6 +55,13 @@ import PublicCompanyPage from "@/pages/public/company";
 import CompanyInvitationAcceptPage from "@/pages/dashboard/company/invitation-accept";
 import ShipmentDetailsPage from "@/pages/dashboard/shipments-details";
 import AdminTelegramNotificationsPage from "@/pages/admin/telegram-notifications";
+import TendersPage from "@/pages/dashboard/tenders/ui/TendersPage.tsx";
+import TenderCreatePage from "@/pages/dashboard/tender-create/ui/TenderCreatePage.tsx";
+import TenderWorkspaceLayout from "@/pages/dashboard/tender-workspace/ui/TenderWorkspaceLayout.tsx";
+import TenderOverviewPage from "@/pages/dashboard/tender-overview/ui/TenderOverviewPage.tsx";
+import TenderBidsPage from "@/pages/dashboard/tender-bids/ui/TenderBidsPage.tsx";
+import TenderSettingsPage from "@/pages/dashboard/tender-settings/ui/TenderSettingsPage.tsx";
+import AdminTendersPage from "@/pages/admin/tenders";
 
 
 const router = createBrowserRouter([
@@ -112,6 +119,20 @@ const router = createBrowserRouter([
             {path: "create-transport", element: <AddTransportPage/>},
             {path: "companies/:id", element: <PublicCompanyPage /> },
 
+            { path: "tenders", element: <TendersPage scope="search" /> },
+            { path: "tenders/my", element: <TendersPage scope="my" /> },
+            { path: "tenders/create", element: <TenderCreatePage /> },
+            {
+                path: "tenders/:id",
+                element: <TenderWorkspaceLayout />,
+                children: [
+                    { index: true, element: <Navigate to="overview" replace /> },
+                    { path: "overview", element: <TenderOverviewPage /> },
+                    { path: "bids", element: <TenderBidsPage /> },
+                    { path: "settings", element: <TenderSettingsPage /> },
+                ],
+            },
+
         ],
     },
     {
@@ -129,6 +150,7 @@ const router = createBrowserRouter([
             { path: "companies/:id", element: <AdminCompanyPage /> },
             { path: "cargo", element: <AdminCargoPage /> },
             { path: "transport", element: <AdminTransportPage />},
+            { path: "tenders", element: <AdminTendersPage />},
             { path: "geo", element: <AdminGeoLocationsPage />},
             { path: "black-list", element: <AdminBlackListPage />},
             { path: "activity-logs", element: <AdminActivityLogsPage />},

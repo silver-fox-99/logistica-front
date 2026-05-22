@@ -104,6 +104,7 @@ export default function AdminTariffPlansPage() {
     };
 
     const handleSave = async (values: TariffPlanFormValues) => {
+
         const validationError = validateTariffPlanForm(values, plans, editing?.id);
 
         if (validationError) {

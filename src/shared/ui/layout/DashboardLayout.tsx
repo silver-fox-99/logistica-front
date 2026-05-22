@@ -3,16 +3,17 @@ import React, { useState, Fragment } from "react";
 import {
     Box, Container, Paper, Stack, Button, Divider, List, ListItemButton,
     ListItemIcon, ListItemText, Drawer,  useMediaQuery,
-    CircularProgress
+    CircularProgress, Collapse
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
     FiLogOut, FiSearch,
-    FiAward
+    FiAward, FiFileText, FiChevronDown, FiChevronRight, FiList
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
@@ -22,10 +23,12 @@ import BookmarkPromptDialog from "@/features/bookmarkPrompt/ui/BookmarkPromptDia
 import { CompanyWorkspaceSidebar } from "@/widgets/company/company-workspace-sidebar/ui/CompanyWorkspaceSidebar";
 import { useIsCompanyWorkspace } from "@/pages/dashboard/company/workspace/model/useIsCompanyWorkspace";
 import { useCompanySidebarCompany } from "@/pages/dashboard/company/workspace/model/useCompanySidebarCompany";
+import { TenderWorkspaceSidebar } from "@/widgets/tender/tender-workspace-sidebar/ui/TenderWorkspaceSidebar";
+import { useTenderWorkspaceAccessStore } from "@/entities/tender/model/tenderWorkspaceAccess.store";
 
-function NavItem({ to, icon, label, onClick }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void }) {
+function NavItem({ to, icon, label, onClick, end }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void; end?: boolean }) {
     return (
-        <ListItemButton component={NavLink} to={to} className="dashboard-buttons" onClick={onClick}>
+        <ListItemButton component={NavLink} to={to} end={end} className="dashboard-buttons" onClick={onClick}>
             <ListItemIcon>{icon}</ListItemIcon>
             <ListItemText primary={label} primaryTypographyProps={{ fontSize: 16 }} />
         </ListItemButton>
@@ -37,12 +40,13 @@ function SidebarContent({
                         }: { onItemClick?: () => void }) {
     const user = useUserStore(state => state.user);
     const { t } = useTranslation();
+    const location = useLocation();
+    const [tendersOpen, setTendersOpen] = useState(() => location.pathname.startsWith("/dashboard/tenders"));
 
     const mainNav = [
         { to: "/dashboard/search",   icon: <FiSearch />,      label: t('dashboard.menu.search') },
         { to: "/dashboard/profile",  icon: <FiUser />,        label: t('dashboard.menu.profile') },
         { to: "/dashboard/company",  icon: <FiPackage />,     label: t('dashboard.menu.company') },
-        // { to: "/dashboard/staff",    icon: <FiUsers />,       label: t('dashboard.menu.staff') },
         { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
         { to: "/dashboard/referral", icon: <FiAward />,  label: t('dashboard.menu.referrals') },
         { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },
@@ -66,6 +70,22 @@ function SidebarContent({
                 {mainNav.map((i) => (
                     <NavItem key={i.to} {...i} onClick={onItemClick} />
                 ))}
+
+                <ListItemButton
+                    className={`dashboard-buttons ${location.pathname.startsWith("/dashboard/tenders") ? "active" : ""}`}
+                    onClick={() => setTendersOpen((value) => !value)}
+                >
+                    <ListItemIcon><FiFileText /></ListItemIcon>
+                    <ListItemText primary={t("dashboard.menu.tenders")} primaryTypographyProps={{ fontSize: 16 }} />
+                    {tendersOpen ? <FiChevronDown /> : <FiChevronRight />}
+                </ListItemButton>
+
+                <Collapse in={tendersOpen} timeout="auto" unmountOnExit>
+                    <List disablePadding sx={{ mt: 0.5 }}>
+                        <NavItem to="/dashboard/tenders" end icon={<FiSearch />} label={t("dashboard.menu.tenderSearch")} onClick={onItemClick} />
+                        <NavItem to="/dashboard/tenders/my" icon={<FiList />} label={t("dashboard.menu.myTenders")} onClick={onItemClick} />
+                    </List>
+                </Collapse>
             </List>
 
             <Stack mt={1.5} spacing={1}>
@@ -127,14 +147,21 @@ function SidebarContent({
 export default function DashboardLayout() {
     const isMobile = useMediaQuery("(max-width:860px)");
     const [open, setOpen] = useState(false);
+    const location = useLocation();
+    const tenderAccess = useTenderWorkspaceAccessStore((state) => state);
 
     const isCompanyWorkspace = useIsCompanyWorkspace();
     const { company, isLoading: isCompanyLoading } = useCompanySidebarCompany();
+    const tenderWorkspaceMatch = location.pathname.match(/^\/dashboard\/tenders\/([^/]+)\/(overview|bids|settings)/);
+    const tenderId = tenderWorkspaceMatch?.[1] ?? "";
+    const tenderSidebarCanManage = Boolean(tenderId && tenderAccess.tenderId === tenderId && tenderAccess.canManage);
 
     const toggle = (state?: boolean) => setOpen(prev => (typeof state === "boolean" ? state : !prev));
     const closeOnItem = () => { if (isMobile) toggle(false); };
 
-    const sidebarContent = isCompanyWorkspace ? (
+    const sidebarContent = tenderId ? (
+        <TenderWorkspaceSidebar tenderId={tenderId} canManage={tenderSidebarCanManage} onItemClick={closeOnItem} />
+    ) : isCompanyWorkspace ? (
         isCompanyLoading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                 <CircularProgress size={28} />

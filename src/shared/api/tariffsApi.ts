@@ -80,6 +80,10 @@ const extractEntitlements = (raw: any): Entitlements => {
             raw?.can_create_companies ?? nested?.can_create_companies,
             false,
         ),
+        active_tenders: raw?.active_tenders ?? nested?.active_tenders,
+        can_view_tenders: toBoolean(
+            raw?.can_view_tenders ?? nested?.can_view_tenders,
+        ),
         company_limit: raw?.company_limit ?? nested?.company_limit ?? null,
         members_per_company_limit:
             raw?.members_per_company_limit ?? nested?.members_per_company_limit ?? null,
@@ -88,7 +92,7 @@ const extractEntitlements = (raw: any): Entitlements => {
 
 const normalizePlan = (raw: any): TariffPlan => {
     const entitlements = extractEntitlements(raw);
-
+    console.log(entitlements)
     return {
         id: raw?.id ?? "",
         code: raw?.code ?? "",
@@ -97,6 +101,8 @@ const normalizePlan = (raw: any): TariffPlan => {
         is_active: toBoolean(raw?.is_active ?? raw?.isActive, false),
         is_default: toBoolean(raw?.is_default ?? raw?.isDefault, false),
         can_auto_bump: toBoolean(raw?.can_auto_bump ?? entitlements.can_auto_bump, false),
+        can_view_tenders: toBoolean(raw?.can_view_tenders ?? entitlements.can_view_tenders, false),
+        active_tenders: toNullableNumber(entitlements.active_tenders),
         priority: toNullableNumber(raw?.priority),
         price:
             raw?.price === null || raw?.price === undefined || raw?.price === ""
@@ -184,37 +190,6 @@ const normalizeInvoice = (raw: any): TariffInvoice => {
     };
 };
 
-const normalizePlanPayload = (
-    payload: UpsertTariffPlanPayload,
-): UpsertTariffPlanPayload => {
-    return {
-        code: payload.code.trim(),
-        name: payload.name.trim(),
-        description: payload.description?.trim() || null,
-        is_active: payload.is_active,
-        is_default: payload.is_default,
-        can_auto_bump: payload.can_auto_bump,
-        priority: payload.priority ?? null,
-        price:
-            payload.price === null || payload.price === undefined || payload.price === ""
-                ? null
-                : String(payload.price).trim(),
-        currency: payload.currency?.trim()?.toUpperCase() || null,
-        billing_period: payload.billing_period || null,
-
-        cargo_limit: payload.cargo_limit ?? null,
-        vehicle_limit: payload.vehicle_limit ?? null,
-        can_view_order_details: payload.can_view_order_details ?? false,
-        order_details_views_per_day_limit:
-            payload.order_details_views_per_day_limit ?? null,
-        can_create_companies: payload.can_create_companies ?? false,
-        company_limit: payload.company_limit ?? null,
-        members_per_company_limit: payload.members_per_company_limit ?? null,
-
-        meta: payload.meta,
-    };
-};
-
 const normalizeMeResponse = (data: any): TariffMeResponse => {
     const payload = getPayload<any>(data);
     const activeRaw = payload?.active_subscription ?? null;
@@ -250,7 +225,7 @@ export const tariffsApi = {
     adminCreatePlan: async (payload: UpsertTariffPlanPayload) => {
         const { data } = await api.post(
             "/admin/tariffs/plans",
-            normalizePlanPayload(payload),
+            payload,
         );
         return normalizePlan(getPayload(data));
     },
@@ -258,7 +233,7 @@ export const tariffsApi = {
     adminUpdatePlan: async (id: string, payload: UpsertTariffPlanPayload) => {
         const { data } = await api.patch(
             `/admin/tariffs/plans/${id}`,
-            normalizePlanPayload(payload),
+            payload,
         );
         return normalizePlan(getPayload(data));
     },

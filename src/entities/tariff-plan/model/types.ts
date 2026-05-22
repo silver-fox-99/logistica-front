@@ -5,12 +5,14 @@ export type TariffLimitKey =
     | "vehicle_limit"
     | "order_details_views_per_day_limit"
     | "company_limit"
-    | "members_per_company_limit";
+    | "members_per_company_limit"
+    | "active_tenders";
 
 export type TariffBooleanKey =
     | "can_view_order_details"
     | "can_auto_bump"
-    | "can_create_companies";
+    | "can_create_companies"
+    | "can_view_tenders";
 
 export type EntitlementKey = TariffLimitKey | TariffBooleanKey;
 
@@ -22,6 +24,8 @@ export type Entitlements = {
     can_auto_bump?: boolean;
     can_create_companies?: boolean;
     company_limit?: number | null;
+    can_view_tenders?: boolean;
+    active_tenders?: number | null;
     members_per_company_limit?: number | null;
 };
 
@@ -38,6 +42,8 @@ export type TariffPlan = {
     currency: string | null;
     billing_period: BillingPeriod | null;
 
+    can_view_tenders: boolean;
+    active_tenders?: number | null;
     cargo_limit?: number | null;
     vehicle_limit?: number | null;
     can_view_order_details?: boolean;
@@ -75,6 +81,8 @@ export type UpsertTariffPlanPayload = {
     can_view_order_details?: boolean;
     order_details_views_per_day_limit?: number | null;
     can_create_companies?: boolean;
+    can_view_tenders?: boolean;
+    active_tenders?: number | null;
     company_limit?: number | null;
     members_per_company_limit?: number | null;
 
@@ -160,6 +168,8 @@ export type TariffMeResponse = {
         vehicle_creates_used?: number | string;
         can_auto_bump?: boolean;
         order_details_views_used?: number | string;
+        can_view_tenders?: boolean;
+        active_tenders?: number | null;
     } | null;
     raw?: any;
 };
