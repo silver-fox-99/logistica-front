@@ -104,5 +104,31 @@ export const tendersApi = {
     getCode: async (tenderId: string) => {
         const {data} = await api.get(`/tenders/${tenderId}/get-code`);
         return data.data;
-    }
+    },
+
+    adminList: async (params?: TenderListParams) => {
+        const { data } = await api.get<TenderListResponse>("/admin/tenders/list", { params });
+        return data;
+    },
+
+    adminGetById: async (id: string) => {
+        const { data } = await api.get<{ status: boolean; data: Tender; message: string }>(
+            `/admin/tenders/${id}/info`,
+        );
+        return data.data;
+    },
+
+    adminDelete: async (id: string) => {
+        const { data } = await api.delete<{ status: boolean; data: { deleted: boolean }; message: string }>(
+            `/admin/tenders/${id}`,
+        );
+        return data.data;
+    },
+
+    adminDeleteBid: async (tenderId: string, bidId: string) => {
+        const { data } = await api.delete<{ status: boolean; data: { deleted: boolean }; message: string }>(
+            `/admin/tenders/${tenderId}/bids/${bidId}`,
+        );
+        return data.data;
+    },
 };
