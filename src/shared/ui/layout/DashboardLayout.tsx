@@ -81,7 +81,7 @@ function SidebarContent({
                 </ListItemButton>
 
                 <Collapse in={tendersOpen} timeout="auto" unmountOnExit>
-                    <List disablePadding sx={{ mt: 0.5 }}>
+                    <List disablePadding sx={{ mt: 0.5, pl: 1 }}>
                         <NavItem to="/dashboard/tenders" end icon={<FiSearch />} label={t("dashboard.menu.tenderSearch")} onClick={onItemClick} />
                         <NavItem to="/dashboard/tenders/my" icon={<FiList />} label={t("dashboard.menu.myTenders")} onClick={onItemClick} />
                     </List>

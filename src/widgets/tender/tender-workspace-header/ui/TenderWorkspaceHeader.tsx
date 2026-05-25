@@ -35,7 +35,7 @@ export function TenderWorkspaceHeader({
         <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
             <Stack spacing={1}>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    <Chip label="TENDER" size="small" color="primary" />
+                    <Chip label={t("tenders.workspace.header.type")} size="small" color="primary" />
 
                     <Chip
                         label={statusMeta.label}

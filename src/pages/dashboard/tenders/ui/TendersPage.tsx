@@ -111,7 +111,9 @@ function TenderCard({ tender }: { tender: Tender }) {
                     </Grid>
                     <Grid size={{ xs: 6, md: 3 }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.list.card.vehicleType")}</Typography>
-                        <Typography variant="body2">{tender.vehicle_type || "ANY"}</Typography>
+                        <Typography variant="body2">
+                            {tender.vehicle_type || t("tenders.list.card.anyVehicle")}
+                        </Typography>
                     </Grid>
                     <Grid size={{ xs: 6, md: 3 }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.list.card.cargo")}</Typography>
