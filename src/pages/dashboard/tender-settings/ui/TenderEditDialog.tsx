@@ -60,12 +60,13 @@ export function TenderEditDialog({
         { name: "volumeM3", label: t("tenders.fields.volumeM3"), size: { xs: 12, md: 4 } },
         { name: "placesCount", label: t("tenders.fields.placesCount"), size: { xs: 12, md: 4 } },
 
-        { name: "vehicleCapacityTons", label: t("tenders.fields.vehicleCapacityTons"), size: { xs: 12, md: 6 } },
+       // { name: "vehicleCapacityTons", label: t("tenders.fields.vehicleCapacityTons"), size: { xs: 12, md: 6 } },
         { name: "vehicleBodyLengthM", label: t("tenders.fields.vehicleBodyLengthM"), size: { xs: 12, md: 6 } },
 
         { name: "startPrice", label: t("tenders.fields.startPrice"), size: { xs: 12, md: 4 } },
         { name: "buyoutPrice", label: t("tenders.fields.buyoutPrice"), size: { xs: 12, md: 4 } },
         { name: "minBidStep", label: t("tenders.fields.minBidStep"), size: { xs: 12, md: 4 } },
+        { name: "payment_deferment_days", label: t("tenders.fields.paymentDefermentDays"), size: { xs: 12, md: 6 } },
 
         { name: "phone", label: t("forgotPassword.phoneLabel"), size: { xs: 12, md: 6 } },
         { name: "startsAt", label: t("tenders.fields.startsAt"), type: "datetime-local", size: { xs: 12, md: 6 } },

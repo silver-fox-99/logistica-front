@@ -43,7 +43,7 @@ export const getTenderEditInitialValues = (tender: any): TenderEditValues => ({
     weightTons: tender.weight_t ?? "",
     volumeM3: tender.volume_m3 ?? "",
     placesCount: tender.places_count == null ? "" : String(tender.places_count),
-    vehicleCapacityTons: tender.vehicle_capacity_t ?? "",
+  //  vehicleCapacityTons: tender.vehicle_capacity_t ?? "",
     vehicleBodyLengthM: tender.vehicle_body_length_m ?? "",
     startPrice: tender.start_price ?? "",
     buyoutPrice: tender.buyout_price ?? "",
@@ -51,6 +51,7 @@ export const getTenderEditInitialValues = (tender: any): TenderEditValues => ({
     startsAt: toDateTimeInput(tender.starts_at),
     endsAt: toDateTimeInput(tender.ends_at),
     phone: tender.phone ?? "",
+    payment_deferment_days: tender.payment_deferment_days ?? "",
 });
 
 export const buildTenderUpdatePayload = (values: TenderEditValues): UpdateTenderPayload => ({
@@ -66,12 +67,13 @@ export const buildTenderUpdatePayload = (values: TenderEditValues): UpdateTender
     weight_t: toNullableNumberString(values.weightTons),
     volume_m3: toNullableNumberString(values.volumeM3),
     places_count: toNullableInteger(values.placesCount),
-    vehicle_capacity_t: toNullableNumberString(values.vehicleCapacityTons),
+ //   vehicle_capacity_t: toNullableNumberString(values.vehicleCapacityTons),
     vehicle_body_length_m: toNullableNumberString(values.vehicleBodyLengthM),
     start_price: toNullableNumberString(values.startPrice) || "0",
     buyout_price: toNullableNumberString(values.buyoutPrice),
     min_bid_step: toNullableNumberString(values.minBidStep) || "0",
     starts_at: new Date(values.startsAt).toISOString(),
     ends_at: new Date(values.endsAt).toISOString(),
+    payment_deferment_days: toNullableNumberString(values.payment_deferment_days),
     phone: values.phone,
 });

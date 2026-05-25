@@ -13,7 +13,7 @@ export type TenderEditValues = {
     weightTons: string;
     volumeM3: string;
     placesCount: string;
-    vehicleCapacityTons: string;
+ //   vehicleCapacityTons: string;
     vehicleBodyLengthM: string;
     startPrice: string;
     buyoutPrice: string;
@@ -21,6 +21,7 @@ export type TenderEditValues = {
     startsAt: string;
     endsAt: string;
     phone: string;
+    payment_deferment_days: string
 };
 
 export type BlacklistItem = TenderBlacklistPhone;
