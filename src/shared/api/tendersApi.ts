@@ -4,7 +4,7 @@ import type {
     ConfirmTenderCodePayload,
     CreateTenderBidPayload,
     CreateTenderPayload,
-    Tender,
+    Tender, TenderBlacklistPhone,
     TenderListParams,
     TenderListResponse,
     UpdateTenderPayload
@@ -94,6 +94,16 @@ export const tendersApi = {
     addBlacklistPhone: async (payload: AddTenderBlacklistPhonePayload) => {
         const { data } = await api.post("/tenders/blacklist/phones", payload);
         return data.data;
+    },
+
+    async getBlacklistPhones() {
+        const res = await api.get<{
+            status: boolean;
+            data: TenderBlacklistPhone[];
+            total: number;
+        }>("/tenders/blacklist/phones");
+
+        return res.data;
     },
 
     removeBlacklistPhone: async (id: string) => {

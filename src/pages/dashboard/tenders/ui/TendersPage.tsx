@@ -7,27 +7,28 @@ import {
     CircularProgress,
     Divider,
     Grid,
-    InputAdornment,
-    MenuItem,
     Pagination,
     Paper,
-    Select,
     Stack,
     Tab,
     Tabs,
-    TextField,
     Typography,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { Add } from "@mui/icons-material";
-import { FiMapPin, FiSearch } from "react-icons/fi";
+import { FiMapPin } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
-import { TenderAuctionType, TenderStatus, type Tender, type TenderListParams } from "@/entities/tender/model/types";
+import { TenderStatus, type Tender, type TenderListParams } from "@/entities/tender/model/types";
 import { tendersApi } from "@/shared/api/tendersApi.ts";
 import { forgetPendingOwnerTender, getPendingOwnerTenderIds } from "@/entities/tender/model/pendingOwnerTenders";
 import { useUserStore } from "@/entities/user/model/user.store";
 import {getTenderStatusMeta} from "@/entities/tender/lib/getTenderStatusMeta.ts";
+import {useInitStore} from "@/shared/store/initStore.ts";
+import {useLocalizedLookup} from "@/shared/utils/lookupUtils.ts";
+import type {TenderFiltersValue} from "@/features/tender-search/model/types.ts";
+import {TenderSearchBar} from "@/features/tender-search/ui/TenderSearchBar.tsx";
+import {TenderFiltersDrawer} from "@/features/tender-search/ui/TenderFiltersDrawer.tsx";
 
 type Props = {
     scope?: "search" | "my";
@@ -139,9 +140,14 @@ export default function TendersPage({ scope = "search" }: Props) {
     const [archivePending, setArchivePending] = useState(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const [search, setSearch] = useState("");
-    const [auctionType, setAuctionType] = useState<"all" | TenderAuctionType>("all");
     const [myTab, setMyTab] = useState<MyTenderTab>("active");
+
+    const { lookups, loadInit } = useInitStore();
+    const { getLocalizedLabel } = useLocalizedLookup();
+
+    const [filtersOpen, setFiltersOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const [filters, setFilters] = useState<TenderFiltersValue>({});
 
     const limit = 12;
     const pages = Math.max(1, Math.ceil(total / limit));
@@ -154,8 +160,8 @@ export default function TendersPage({ scope = "search" }: Props) {
         const params: TenderListParams = {
             page,
             limit,
+            ...mapTenderFiltersToParams(filters),
             search: search.trim() || undefined,
-            auction_type: auctionType === "all" ? undefined : auctionType,
         };
 
         try {
@@ -223,15 +229,42 @@ export default function TendersPage({ scope = "search" }: Props) {
         } finally {
             setIsLoading(false);
         }
-    }, [auctionType, currentUserId, myTab, page, scope, search, t]);
+    }, [currentUserId, filters, limit, myTab, page, scope, search, t]);
 
     useEffect(() => {
         void load();
     }, [load]);
 
     useEffect(() => {
+        loadInit();
+    }, [loadInit]);
+
+    useEffect(() => {
         setPage(1);
-    }, [auctionType, myTab, scope]);
+    }, [filters, myTab, scope]);
+
+    const cargoOpts = useMemo(() => lookups?.cargoTypes ?? [], [lookups]);
+    const vehicleOpts = useMemo(() => lookups?.vehicleType ?? [], [lookups]);
+    const loadingTypeOpts = useMemo(() => lookups?.loadType ?? [], [lookups]);
+
+    const activeFiltersCount = useMemo(() => {
+        return Object.entries(filters).filter(([, value]) => {
+            if (typeof value === "boolean") return value;
+            return value !== undefined && value !== null && String(value).trim() !== "";
+        }).length;
+    }, [filters]);
+
+    function mapTenderFiltersToParams(filters: TenderFiltersValue): TenderListParams {
+        const pickup = filters.pickup_location;
+        const dropoff = filters.dropoff_location;
+
+        return {
+            ...filters,
+
+            pickup_location: pickup?.display_name || pickup?.city || pickup?.region || pickup?.country || undefined,
+            dropoff_location: dropoff?.display_name || dropoff?.city || dropoff?.region || dropoff?.country || undefined,
+        } as TenderListParams;
+    }
 
     const title = scope === "my" ? t("tenders.list.myTitle") : t("tenders.list.searchTitle");
     const subtitle = scope === "my" ? t("tenders.list.mySubtitle") : t("tenders.list.searchSubtitle");
@@ -283,44 +316,36 @@ export default function TendersPage({ scope = "search" }: Props) {
                 )}
 
                 <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
-                    <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-                        <TextField
-                            size="small"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                    setPage(1);
-                                    void load();
-                                }
-                            }}
-                            placeholder={t("tenders.list.searchPlaceholder")}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <FiSearch />
-                                    </InputAdornment>
-                                ),
-                            }}
-                            fullWidth
-                        />
-
-                        <Select
-                            size="small"
-                            value={auctionType}
-                            onChange={(event) => setAuctionType(event.target.value as "all" | TenderAuctionType)}
-                            sx={{ minWidth: 220 }}
-                        >
-                            <MenuItem value="all">{t("tenders.list.allAuctionTypes")}</MenuItem>
-                            <MenuItem value={TenderAuctionType.DECREASING}>{t("tenders.list.decreasing")}</MenuItem>
-                            <MenuItem value={TenderAuctionType.INCREASING}>{t("tenders.list.increasing")}</MenuItem>
-                        </Select>
-
-                        <Button variant="outlined" onClick={() => { setPage(1); void load(); }}>
-                            {t("tenders.common.find")}
-                        </Button>
-                    </Stack>
+                    <TenderSearchBar
+                        value={search}
+                        activeFiltersCount={activeFiltersCount}
+                        onChange={setSearch}
+                        onSearch={() => {
+                            setPage(1);
+                            void load();
+                        }}
+                        onOpenFilters={() => setFiltersOpen(true)}
+                    />
                 </Paper>
+
+                <TenderFiltersDrawer
+                    open={filtersOpen}
+                    value={filters}
+                    cargoOpts={cargoOpts}
+                    vehicleOpts={vehicleOpts}
+                    loadingTypeOpts={loadingTypeOpts}
+                    getLocalizedLabel={getLocalizedLabel}
+                    onClose={() => setFiltersOpen(false)}
+                    onApply={(nextFilters) => {
+                        setFilters(nextFilters);
+                        setPage(1);
+                    }}
+                    onReset={() => {
+                        setFilters({});
+                        setPage(1);
+                        setFiltersOpen(false);
+                    }}
+                />
 
                 {isLoading && (
                     <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>

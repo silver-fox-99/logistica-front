@@ -45,7 +45,6 @@ type TenderCreateFormValues = {
     weightTons: string;
     volumeM3: string;
     placesCount: string;
-    vehicleCapacityTons: string;
     vehicleBodyLengthM: string;
     adrRequired: boolean;
     hydraulicTailLiftRequired: boolean;
@@ -59,6 +58,7 @@ type TenderCreateFormValues = {
     startsAt: string;
     endsAt: string;
     phone: string;
+    payment_deferment_days: string;
 };
 
 const EMPTY_PLACE: Place = {
@@ -334,7 +334,6 @@ export default function TenderCreatePage() {
             weightTons: "",
             volumeM3: "",
             placesCount: "",
-            vehicleCapacityTons: "",
             vehicleBodyLengthM: "",
             adrRequired: false,
             hydraulicTailLiftRequired: false,
@@ -348,6 +347,7 @@ export default function TenderCreatePage() {
             phone: "",
             startsAt: "",
             endsAt: "",
+            payment_deferment_days: ""
         },
     });
 
@@ -403,7 +403,7 @@ export default function TenderCreatePage() {
             pickup_time: values.pickupTime || null,
             dropoff_time: values.dropoffTime || null,
             vehicle_type: values.vehicleType || "ANY",
-            vehicle_capacity_t: toNullableNumberString(values.vehicleCapacityTons),
+            payment_deferment_days: values.payment_deferment_days || null,
             vehicle_body_length_m: toNullableNumberString(values.vehicleBodyLengthM),
             loading_type: values.loadingType || null,
             adr_required: values.adrRequired,
@@ -569,9 +569,9 @@ export default function TenderCreatePage() {
                         <Grid size={{ xs: 12, md: 6 }}>
                             <TextField label={t("tenders.fields.volumeM3")} fullWidth {...register("volumeM3")} />
                         </Grid>
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <TextField label={t("tenders.fields.vehicleCapacityTons")} fullWidth {...register("vehicleCapacityTons")} />
-                        </Grid>
+                        {/*<Grid size={{ xs: 12, md: 6 }}>*/}
+                        {/*    <TextField label={t("tenders.fields.vehicleCapacityTons")} fullWidth {...register("vehicleCapacityTons")} />*/}
+                        {/*</Grid>*/}
                         <Grid size={{ xs: 12, md: 6 }}>
                             <TextField label={t("tenders.fields.vehicleBodyLengthM")} fullWidth {...register("vehicleBodyLengthM")} />
                         </Grid>
@@ -652,6 +652,9 @@ export default function TenderCreatePage() {
                                 options={payTermOpts}
                                 getOptionLabel={getLocalizedLabel}
                             />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TextField label={t("tenders.fields.paymentDefermentDays")} fullWidth {...register("payment_deferment_days")} />
                         </Grid>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <TextField

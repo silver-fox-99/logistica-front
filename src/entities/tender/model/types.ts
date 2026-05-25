@@ -99,6 +99,7 @@ export type Tender = {
 
     payment_method: string | null;
     payment_term: string | null;
+    payment_deferment_days: string | null;
     vat_type: string | null;
 
     starts_at: string;
@@ -165,7 +166,6 @@ export type CreateTenderPayload = {
     carrier_documents?: string | null;
 
     vehicle_type?: string;
-    vehicle_capacity_t?: string | null;
     vehicle_body_length_m?: string | null;
     loading_type?: string | null;
     adr_required?: boolean;
@@ -187,6 +187,7 @@ export type CreateTenderPayload = {
     phone: string;
 
     points: TenderPoint[];
+    payment_deferment_days: string | null
 };
 
 export type UpdateTenderPayload = Partial<CreateTenderPayload>;
@@ -203,4 +204,13 @@ export type ConfirmTenderCodePayload = {
 export type AddTenderBlacklistPhonePayload = {
     phone: string;
     reason?: string | null;
+};
+
+export type TenderBlacklistPhone = {
+    id: string;
+    owner_id: string;
+    phone: string;
+    reason: string | null;
+    created_at?: string;
+    updated_at?: string;
 };
