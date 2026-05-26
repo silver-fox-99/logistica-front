@@ -78,7 +78,7 @@ export default function Header({
         }
         setLoadingOptions(true);
         try {
-            const res = await adminUsersApi.list({ search: q, limit: 5, page: 1 });
+            const res = await adminUsersApi.list({ search: q, limit: 5, page: 1 }, true);
             const filtered = (res.items || []).filter((o) => o.id !== currentUserId);
             setOptions(filtered);
         } catch {

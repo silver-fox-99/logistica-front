@@ -46,10 +46,12 @@ export type AdminUsersResponse = {
 };
 
 export const adminUsersApi = {
-    list: async (params: AdminUsersQuery) => {
-        const { data } = await api.get<AdminUsersResponse>("/users", { params });
+    list: async (params: AdminUsersQuery, publicMode = false) => {
+        const { data } = await api.get<AdminUsersResponse>(publicMode ? "/users/search" : "/users", { params });
         return data.data;
     },
+
+
 
     impersonate: async (id: string, reason?: string): Promise<{ accessToken: string; refreshToken: string }> => {
         const { data } = await api.post(`/users/${id}/impersonate`, { reason });
