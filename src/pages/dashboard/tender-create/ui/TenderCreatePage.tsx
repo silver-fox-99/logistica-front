@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    Alert,
+    AlertTitle,
     Autocomplete,
     Box,
     Button,
@@ -595,6 +597,17 @@ export default function TenderCreatePage() {
                             <Divider sx={{ my: 2 }} />
                         </Grid>
 
+                        <Grid size={{ xs: 12 }}>
+                            <Alert severity="info" sx={{ borderRadius: 2 }}>
+                                <AlertTitle sx={{ fontWeight: 800 }}>
+                                    {t("tenders.create.howItWorksTitle")}
+                                </AlertTitle>
+                                <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+                                    {t("tenders.create.howItWorksText")}
+                                </Typography>
+                            </Alert>
+                        </Grid>
+
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Controller
                                 control={control}
@@ -605,7 +618,7 @@ export default function TenderCreatePage() {
                                         placeholder={t("tenders.create.selectAuctionType")}
                                         options={[
                                             { slug: TenderAuctionType.DECREASING, label: t("tenders.list.decreasing") } as LookupOpt,
-                                            { slug: TenderAuctionType.INCREASING, label: t("tenders.list.increasing") } as LookupOpt,
+                                            //   { slug: TenderAuctionType.INCREASING, label: t("tenders.list.increasing") } as LookupOpt,
                                         ]}
                                         valueSlug={field.value}
                                         onChangeSlug={(slug) => field.onChange(slug)}
@@ -625,13 +638,32 @@ export default function TenderCreatePage() {
                             />
                         </Grid>
                         <Grid size={{ xs: 12, md: 4 }}>
-                            <TextField label={t("tenders.fields.startPrice")} fullWidth {...register("startPrice")} error={!!formState.errors.startPrice} helperText={formState.errors.startPrice?.message} />
+                            <TextField
+                                label={t("tenders.fields.startPrice")}
+                                placeholder={t("tenders.create.startPricePlaceholder")}
+                                helperText={formState.errors.startPrice?.message || t("tenders.create.startPriceHint")}
+                                fullWidth
+                                {...register("startPrice")}
+                                error={!!formState.errors.startPrice}
+                            />
                         </Grid>
                         <Grid size={{ xs: 12, md: 4 }}>
-                            <TextField label={t("tenders.fields.buyoutPrice")} fullWidth {...register("buyoutPrice")} />
+                            <TextField
+                                label={t("tenders.fields.buyoutPrice")}
+                                placeholder={t("tenders.create.buyoutPricePlaceholder")}
+                                helperText={t("tenders.create.buyoutPriceHint")}
+                                fullWidth
+                                {...register("buyoutPrice")}
+                            />
                         </Grid>
                         <Grid size={{ xs: 12, md: 4 }}>
-                            <TextField label={t("tenders.fields.minBidStep")} fullWidth {...register("minBidStep")} />
+                            <TextField
+                                label={t("tenders.fields.minBidStep")}
+                                placeholder={t("tenders.create.minBidStepPlaceholder")}
+                                helperText={t("tenders.create.minBidStepHint")}
+                                fullWidth
+                                {...register("minBidStep")}
+                            />
                         </Grid>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <RHFLookupAutocomplete<TenderCreateFormValues>

@@ -1546,7 +1546,10 @@
       "winnerCodeTitle": "Code for winner",
       "winnerCodeDescription": "Give this code to the selected winner. It is shown only once after selecting the winner.",
       "code": "Code",
-      "confirmCode": "Confirm code"
+      "confirmCode": "Confirm code",
+      "endsIn": "Ends in",
+      "ended": "Ended",
+      "suggestedBid": "Suggested Bid"
     },
     "settings": {
       "title": "Tender management",
@@ -1605,9 +1608,9 @@
       "placesCount": "Places count",
       "vehicleCapacityTons": "Capacity (t)",
       "vehicleBodyLengthM": "Body length (m)",
-      "startPrice": "Start price",
-      "buyoutPrice": "Buyout price",
-      "minBidStep": "Minimum step",
+      "startPrice": "Maximum price (starting price)",
+      "buyoutPrice": "Instant buyout price",
+      "minBidStep": "Minimum bid step (decrease)",
       "startsAt": "Tender start",
       "endsAt": "Tender end",
       "cargoDescription": "Cargo description",
@@ -1699,7 +1702,15 @@
       "startRequired": "Enter tender start",
       "endRequired": "Enter tender end",
       "created": "Tender created",
-      "createError": "Tender creation failed"
+      "createError": "Tender creation failed",
+      "howItWorksTitle": "How does a reverse auction work?",
+      "howItWorksText": "You set the maximum price — this is the ceiling no carrier can bid above.\nCarriers compete by offering lower and lower prices.\nThe carrier with the lowest bid at the end of the tender wins.\nIf two carriers bid the same price, the earlier bid wins.",
+      "startPricePlaceholder": "e.g. 1500",
+      "startPriceHint": "The maximum amount you are willing to pay",
+      "buyoutPricePlaceholder": "Optional",
+      "buyoutPriceHint": "If someone bids this amount, the tender closes immediately",
+      "minBidStepPlaceholder": "e.g. 10",
+      "minBidStepHint": "Minimum amount each new bid must be lower than the previous"
     }
   }
 }

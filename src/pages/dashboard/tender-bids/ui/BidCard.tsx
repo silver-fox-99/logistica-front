@@ -13,25 +13,29 @@ type Props = {
     isOwner: boolean;
     selectingId: string;
     formatTime: (value?: string | null) => string;
+    formatPrice: (value: number | string | null | undefined) => string | undefined;
     onSelectWinner: (bidId: string) => void;
 };
 
 export function BidCard({
-                            bid,
-                            index,
-                            currency,
-                            isLeader,
-                            isOwner,
-                            selectingId,
-                            formatTime,
-                            onSelectWinner,
-                        }: Props) {
+    bid,
+    index,
+    currency,
+    isLeader,
+    isOwner,
+    selectingId,
+    formatTime,
+    formatPrice,
+    onSelectWinner,
+}: Props) {
     const { t } = useTranslation();
 
     const bidderName = getBidderName(
         bid,
         t("tenders.bids.unknownBidder", "Unknown bidder"),
     );
+
+    const formattedAmount = formatPrice(bid.amount) ?? bid.amount;
 
     return (
         <Paper
@@ -67,7 +71,7 @@ export function BidCard({
                             {isLeader && <FiAward size={20} color="#2e7d32" />}
 
                             <Typography variant="h6" fontWeight={800}>
-                                {bid.amount} {currency}
+                                {formattedAmount} {currency}
                             </Typography>
 
                             {isLeader && (
@@ -94,29 +98,29 @@ export function BidCard({
                             )}
                         </Stack>
 
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                            sx={{
-                                width: "fit-content",
-                                px: 1.25,
-                                py: 0.75,
-                                borderRadius: 1,
-                                bgcolor: "grey.100",
-                            }}
-                        >
-                            <FiTruck size={16} />
-
-                            <Typography variant="body2" color="text.secondary">
-                                {bid.transport_details || t("tenders.bids.transportEmpty")}
-                            </Typography>
-                        </Stack>
+                        {bid.transport_details && (
+                            <Stack
+                                direction="row"
+                                spacing={1}
+                                alignItems="center"
+                                sx={{
+                                    width: "fit-content",
+                                    px: 1.25,
+                                    py: 0.75,
+                                    borderRadius: 1,
+                                    bgcolor: "grey.100",
+                                }}
+                            >
+                                <FiTruck size={16} />
+                                <Typography variant="body2" color="text.secondary">
+                                    {bid.transport_details}
+                                </Typography>
+                            </Stack>
+                        )}
 
                         <Stack direction="row" spacing={1.25} flexWrap="wrap" color="text.secondary">
                             <Stack direction="row" spacing={0.5} alignItems="center">
                                 <FiCalendar size={14} />
-
                                 <Typography variant="caption">
                                     {t("tenders.bids.createdAt", {
                                         value: formatTime(bid.created_at),
@@ -127,7 +131,6 @@ export function BidCard({
                             {bid.last_changed_at && (
                                 <Stack direction="row" spacing={0.5} alignItems="center">
                                     <FiEdit3 size={14} />
-
                                     <Typography variant="caption">
                                         {t("tenders.bids.changedAt", {
                                             value: formatTime(bid.last_changed_at),

@@ -11,19 +11,23 @@ type Props = {
     isOwner: boolean;
     selectingId: string;
     formatTime: (value?: string | null) => string;
+    formatPrice: (value: number | string | null | undefined) => string | undefined;
     onSelectWinner: (bidId: string) => void;
 };
 
 export function BidsListCard({
-                                 bids,
-                                 leader,
-                                 currency,
-                                 isOwner,
-                                 selectingId,
-                                 formatTime,
-                                 onSelectWinner,
-                             }: Props) {
+    bids,
+    leader,
+    currency,
+    isOwner,
+    selectingId,
+    formatTime,
+    formatPrice,
+    onSelectWinner,
+}: Props) {
     const { t } = useTranslation();
+
+    const leaderFormatted = leader ? (formatPrice(leader.amount) ?? leader.amount) : null;
 
     return (
         <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
@@ -39,11 +43,11 @@ export function BidsListCard({
                         </Typography>
                     </Box>
 
-                    {leader && (
+                    {leader && leaderFormatted && (
                         <Chip
                             color="success"
                             label={t("tenders.bids.leader", {
-                                amount: leader.amount,
+                                amount: leaderFormatted,
                                 currency,
                             })}
                         />
@@ -66,6 +70,7 @@ export function BidsListCard({
                         isOwner={isOwner}
                         selectingId={selectingId}
                         formatTime={formatTime}
+                        formatPrice={formatPrice}
                         onSelectWinner={onSelectWinner}
                     />
                 ))}

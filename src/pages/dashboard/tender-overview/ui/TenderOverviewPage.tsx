@@ -7,6 +7,7 @@ import type { Tender, TenderPoint } from "@/entities/tender/model/types";
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 import {FiPhoneCall} from "react-icons/fi";
 import {useInitStore} from "@/shared/store/initStore.ts";
+import {formatPrice} from "@/shared/utils/formatPrice.ts";
 
 function pointLabel(point: TenderPoint, empty: string) {
     return [point.city, point.region, point.country].filter(Boolean).join(", ") || point.display_name || empty;
@@ -18,7 +19,8 @@ function averageBid(tender: Tender) {
         .filter((amount) => Number.isFinite(amount));
 
     if (!amounts.length) return null;
-    return amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
+    const sum = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
+    return formatPrice(sum)
 }
 
 export default function TenderOverviewPage() {
@@ -164,15 +166,15 @@ export default function TenderOverviewPage() {
         },
         {
             label: t("tenders.overview.startPrice", "Start price"),
-            value: fmtMoney(tender.start_price),
+            value: fmtMoney(formatPrice(tender.start_price)),
         },
         {
             label: t("tenders.overview.buyoutPrice", "Buyout price"),
-            value: fmtMoney(tender.buyout_price),
+            value: fmtMoney(formatPrice(tender.buyout_price)),
         },
         {
             label: t("tenders.fields.minBidStep", "Min bid step"),
-            value: fmtMoney(tender.min_bid_step),
+            value: fmtMoney(formatPrice(tender.min_bid_step)),
         },
         {
             label: t("tenders.fields.paymentMethod", "Payment method"),
@@ -232,7 +234,7 @@ export default function TenderOverviewPage() {
                     <Paper elevation={0} sx={{ p: 2, borderRadius: 2, height: "100%" }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.overview.averageBid")}</Typography>
                         <Typography variant="h5" fontWeight={800}>
-                            {avg == null ? empty : `${avg.toFixed(2)} ${tender.currency}`}
+                            {avg == null ? empty : `${avg} ${tender.currency}`}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -240,7 +242,7 @@ export default function TenderOverviewPage() {
                     <Paper elevation={0} sx={{ p: 2, borderRadius: 2, height: "100%" }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.overview.economy")}</Typography>
                         <Typography variant="h5" fontWeight={800}>
-                            {economy == null ? empty : `${economy.toFixed(2)} ${tender.currency}`}
+                            {economy == null ? empty : `${formatPrice(economy)} ${tender.currency}`}
                         </Typography>
 
                     </Paper>

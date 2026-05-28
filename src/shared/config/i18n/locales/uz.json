@@ -1547,7 +1547,10 @@
       "winnerCodeTitle": "G'olib uchun kod",
       "winnerCodeDescription": "Bu kodni tanlangan g'olibga bering. Kod faqat g'olib tanlangandan keyin bir marta ko'rsatiladi.",
       "code": "Kod",
-      "confirmCode": "Kodni tasdiqlash"
+      "confirmCode": "Kodni tasdiqlash",
+      "endsIn": "In tugaydi",
+      "ended": "Tugadi",
+      "suggestedBid": "taklif qilingan taklif"
     },
     "settings": {
       "title": "Tenderni boshqarish",
@@ -1606,9 +1609,9 @@
       "placesCount": "Joylar soni",
       "vehicleCapacityTons": "Yuk ko'tarish (t)",
       "vehicleBodyLengthM": "Kuzov uzunligi (m)",
-      "startPrice": "Boshlang'ich narx",
-      "buyoutPrice": "Sotib olish narxi",
-      "minBidStep": "Minimal qadam",
+      "startPrice": "Maksimal narx (boshlang'ich)",
+      "buyoutPrice": "Darhol sotib olish narxi",
+      "minBidStep": "Minimal kamaytirish qadami",
       "startsAt": "Tender boshlanishi",
       "endsAt": "Tender tugashi",
       "cargoDescription": "Yuk tavsifi",
@@ -1700,7 +1703,15 @@
       "startRequired": "Tender boshlanishini kiriting",
       "endRequired": "Tender tugashini kiriting",
       "created": "Tender yaratildi",
-      "createError": "Tender yaratishda xatolik"
+      "createError": "Tender yaratishda xatolik",
+      "howItWorksTitle": "Pasayuvchi tender qanday ishlaydi?",
+      "howItWorksText": "Siz maksimal narxni belgilaysiz — bu tashuvchilar oshib keta olmaydigan yuqori chegara.\nTashuvchilar tobora past narx taklif qilib raqobatlashadi.\nTender oxirida eng past narxni taklif qilgan g'olib bo'ladi.\nIkki ishtirokchi bir xil narx taklif qilsa — oldinroq taklif qilgan yutadi.",
+      "startPricePlaceholder": "Masalan: 1500",
+      "startPriceHint": "To'lashga tayyor bo'lgan maksimal summa",
+      "buyoutPricePlaceholder": "Ixtiyoriy",
+      "buyoutPriceHint": "Bu narxda taklif berilsa, tender darhol tugaydi",
+      "minBidStepPlaceholder": "Masalan: 10",
+      "minBidStepHint": "Har yangi taklif oldingi taklifdan kamida shu miqdorga past bo'lishi kerak"
     }
   }
 }
