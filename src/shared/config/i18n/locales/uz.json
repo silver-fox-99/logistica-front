@@ -1550,7 +1550,15 @@
       "confirmCode": "Kodni tasdiqlash",
       "endsIn": "In tugaydi",
       "ended": "Tugadi",
-      "suggestedBid": "taklif qilingan taklif"
+      "suggestedBid": "taklif qilingan taklif",
+      "params": {
+        "startPrice": "Boshlang'ich (maks.) narx",
+        "startPriceHint": "Bu summadan yuqori takliflar qabul qilinmaydi",
+        "buyoutPrice": "Sotib olish narxi",
+        "buyoutPriceHint": "Bu narxdagi taklif tenderni darhol yakunlaydi",
+        "minBidStep": "Kamaytirish qadami",
+        "minBidStepHint": "Har yangi taklif oldingi taklifdan kamida shu miqdorga past bo'lishi kerak"
+      }
     },
     "settings": {
       "title": "Tenderni boshqarish",

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import {  Box, Chip, Stack, Typography } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
@@ -81,16 +81,6 @@ export default function TenderBidsPage() {
     // Countdown
     const remaining = useCountdown(tender.ends_at);
     const isExpired = remaining === 0;
-
-    // Compute suggested min bid for DECREASING auction
-   // const minBidAmount = useMemo(() => {
-   //     const step = tender.min_bid_step ? Number(tender.min_bid_step) : 0;
-   //     if (leader?.amount != null) {
-   //         const min = Number(leader.amount) - step;
-   //         return min > 0 ? String(min) : String(leader.amount);
-   //     }
-   //     return tender.start_price ? String(tender.start_price) : "";
-   // }, [leader, tender.min_bid_step, tender.start_price]);
 
     const formatTime = (value?: string | null) =>
         value
@@ -252,6 +242,9 @@ export default function TenderBidsPage() {
                 currency={tender.currency}
                 isOwner={isOwner}
                 selectingId={selectingId}
+                startPrice={tender.start_price}
+                buyoutPrice={tender.buyout_price}
+                minBidStep={tender.min_bid_step}
                 formatTime={formatTime}
                 formatPrice={formatPriceLocal}
                 onSelectWinner={selectWinner}

@@ -1549,7 +1549,15 @@
       "confirmCode": "Confirm code",
       "endsIn": "Ends in",
       "ended": "Ended",
-      "suggestedBid": "Suggested Bid"
+      "suggestedBid": "Suggested Bid",
+      "params": {
+        "startPrice": "Starting (max) price",
+        "startPriceHint": "Bids above this amount are not accepted",
+        "buyoutPrice": "Buyout price",
+        "buyoutPriceHint": "A bid at this price closes the tender immediately",
+        "minBidStep": "Bid step",
+        "minBidStepHint": "Each new bid must be lower than the previous one by at least this amount"
+      }
     },
     "settings": {
       "title": "Tender management",
