@@ -332,6 +332,22 @@
       "checkingStatus": "Checking...",
       "successToast": "Telegram connected successfully!",
       "waitingToast": "Waiting for bot authorization... Please complete the process in Telegram."
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "subtitle": "Personalize the notifications of your logistics platform",
+      "warningTitle": "Telegram is not linked",
+      "warningDesc": "To receive these notifications, you must first link your Telegram account in the block above.",
+      "newTenders": "New Tenders",
+      "newTendersDesc": "Notifications about the creation of new tenders on the platform",
+      "myTenderBids": "Bids in My Tenders",
+      "myTenderBidsDesc": "Notifications when someone bids on your tender",
+      "tenderWin": "Tender Victory",
+      "tenderWinDesc": "Notifications when you win a tender",
+      "tenderFinished": "Tender Completion",
+      "tenderFinishedDesc": "Notifications when tenders you participated in are completed",
+      "loadError": "Failed to load notification settings",
+      "saveError": "Failed to save changes"
     }
   },
   "userReviews": {

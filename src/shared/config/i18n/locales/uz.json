@@ -332,6 +332,22 @@
       "checkingStatus": "Tekshirilmoqda...",
       "successToast": "Telegram muvaffaqiyatli bog'landi!",
       "waitingToast": "Botda ro'yxatdan o'tish kutilmoqda... Iltimos, Telegram-da jarayonni yakunlang."
+    },
+    "notifications": {
+      "title": "Bildirishnoma sozlamalari",
+      "subtitle": "Logistika platformangizning bildirishnomalarini shaxsiylashtiring",
+      "warningTitle": "Telegram bog'lanmagan",
+      "warningDesc": "Ushbu bildirishnomalarni olish uchun avval yuqoridagi blokda Telegram akkauntingizni bog'lashingiz kerak.",
+      "newTenders": "Yangi tenderlar",
+      "newTendersDesc": "Platformada yangi tenderlar yaratilishi haqidagi bildirishnomalar",
+      "myTenderBids": "Mening tenderlarimdagi takliflar",
+      "myTenderBidsDesc": "Kimdir sizning tenderingizga taklif kiritgandagi bildirishnomalar",
+      "tenderWin": "Tenderdagi g'alaba",
+      "tenderWinDesc": "Tenderda g'olib bo'lganingiz haqidagi bildirishnomalar",
+      "tenderFinished": "Tenderlarning yakunlanishi",
+      "tenderFinishedDesc": "Siz ishtirok etgan tenderlarning yakunlanishi haqidagi bildirishnomalar",
+      "loadError": "Bildirishnoma sozlamalarini yuklab bo'lmadi",
+      "saveError": "O'zgarishlarni saqlab bo'lmadi"
     }
   },
   "userReviews": {
