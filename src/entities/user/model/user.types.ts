@@ -1,5 +1,3 @@
-import type {Entitlements, TariffSubscription} from "@/entities/tariff-plan/model/types.ts";
-
 export type RegistrationStage =
     | "PENDING"
     | "PHONE_VERIFIED"
@@ -13,11 +11,6 @@ export interface User {
 
 
     is_admin: boolean;
-
-    tariff?: {
-        active_subscription?: TariffSubscription | null;
-        effective_entitlements?: Entitlements | null;
-    };
 
 
     phone: string;

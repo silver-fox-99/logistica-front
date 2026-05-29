@@ -1,7 +1,6 @@
 import { Box, Container, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { useUserStore } from "@/entities/user/model/user.store";
 import { useRefreshMe } from "@/entities/user/model/useRefreshMe";
 
 import { useTariffMe } from "@/entities/tariff/model/useTariffMe";
@@ -19,14 +18,12 @@ export default function PaymentsPage() {
     const { t } = useTranslation();
 
     useRefreshMe();
-    const user = useUserStore((s) => s.user);
+    const { activeSubscription, effectiveEntitlements, usage } = useTariffMe();
 
-    const currentSubscription = user?.tariff?.active_subscription ?? null;
+    const currentSubscription = activeSubscription ?? null;
     const currentPlanId = currentSubscription?.plan_id ?? null;
 
-    const { effectiveEntitlements: effectiveFromApi, usage: usageFromApi } = useTariffMe();
-    const effectiveEntitlements = effectiveFromApi ?? user?.tariff?.effective_entitlements ?? null;
-    const usageData = usageFromApi ?? (user as any)?.usage ?? null;
+    const usageData = usage ?? null;
 
     const { plans, loading: plansLoading } = useTariffPlans(t);
     const { history, loading: historyLoading, error: historyError } = useTariffHistory(t);

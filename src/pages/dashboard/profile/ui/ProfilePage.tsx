@@ -7,6 +7,7 @@ import NotificationSettingsCard from "@/features/profile/ui/NotificationSettings
 import ContactInfoCard, { type ContactInfo } from "@/features/profile/ui/ContactInfoCard.tsx";
 import ProfileMembershipHistoryCard from "@/features/profile/ui/ProfileMembershipHistoryCard.tsx";
 import { useUserStore } from "@/entities/user/model/user.store.ts";
+import { useTariffStore } from "@/entities/tariff/model/tariff.store";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { profileApi } from "@/shared/api/profileApi.ts";
 import { userReviewsApi } from "@/shared/api/userReviewsApi.ts";
@@ -18,6 +19,7 @@ import type {CompanyMembershipHistoryItem} from "@/entities/company/model/types.
 export default function ProfilePage() {
     const user = useUserStore((s) => s.user);
     const setUser = useUserStore((s) => s.setUser);
+    const activeSubscription = useTariffStore((s) => s.activeSubscription);
     const { t } = useTranslation();
 
     const [selfReviews, setSelfReviews] = useState<UserReview[]>([]);
@@ -110,9 +112,9 @@ export default function ProfilePage() {
     }, [avgRating, user]);
 
     const planLabel =
-        user?.tariff?.active_subscription?.plan?.name ??
-        user?.tariff?.active_subscription?.plan?.code ??
-        (user?.tariff?.active_subscription
+        activeSubscription?.plan?.name ??
+        activeSubscription?.plan?.code ??
+        (activeSubscription
             ? t("profile.overview.activePlan")
             : t("profile.overview.freePlan"));
 

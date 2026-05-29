@@ -1,27 +1,18 @@
-import { useEffect, useState } from "react";
-import { tariffsApi } from "@/shared/api/tariffsApi";
-import type {Entitlements, TariffMeResponse} from "@/entities/tariff-plan/model/types.ts";
+import { useEffect } from "react";
+import { useTariffStore } from "./tariff.store";
 
 export const useTariffMe = () => {
-    const [effectiveEntitlements, setEffectiveEntitlements] = useState<Entitlements | null>(null);
-    const [usage, setUsage] = useState<TariffMeResponse["usage"]>(null);
-    const [loading, setLoading] = useState(false);
+    const { activeSubscription, effectiveEntitlements, usage, loading, loadTariff } = useTariffStore();
 
     useEffect(() => {
-        const run = async () => {
-            setLoading(true);
-            try {
-                const res = await tariffsApi.getMyTariff();
-                setEffectiveEntitlements(res.effective_entitlements ?? null);
-                setUsage(res.usage ?? null);
-            } catch (e) {
-                console.error("Failed to load tariff details", e);
-            } finally {
-                setLoading(false);
-            }
-        };
-        void run();
-    }, []);
+        void loadTariff();
+    }, [loadTariff]);
 
-    return { effectiveEntitlements, usage, loading };
+    return {
+        activeSubscription,
+        effectiveEntitlements,
+        usage,
+        loading,
+        refetch: () => loadTariff(true),
+    };
 };
