@@ -315,6 +315,23 @@
       "empty": "No reviews yet",
       "noComment": "No comment",
       "defaultAuthor": "Review"
+    },
+    "telegramBinding": {
+      "title": "Telegram Notifications",
+      "description": "Link your Telegram account to instantly receive important notifications about order statuses, auth codes, and bidding directly in your chat.",
+      "connected": "Connected",
+      "connectedDesc": "Your account has been successfully linked with the Telegram bot. You will receive system notifications in the chat.",
+      "notConnected": "Not connected",
+      "connect": "Connect Telegram",
+      "connecting": "Connecting...",
+      "instructionsTitle": "How to connect:",
+      "step1": "Click the \"Connect Telegram\" button",
+      "step2": "In the opened Telegram chat, click \"Start\" or \"Launch\"",
+      "step3": "Share your contact in the chat to complete verification",
+      "checkStatus": "Check Connection Status",
+      "checkingStatus": "Checking...",
+      "successToast": "Telegram connected successfully!",
+      "waitingToast": "Waiting for bot authorization... Please complete the process in Telegram."
     }
   },
   "userReviews": {

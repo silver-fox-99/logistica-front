@@ -37,6 +37,7 @@ export interface User {
 
 
     meta: any;
+    telegram_chat_id?: string;
     last_login_at: string | null;
     created_at: string;
     updated_at: string;

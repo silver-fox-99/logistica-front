@@ -315,6 +315,23 @@
       "empty": "Hozircha sharhlar yo'q",
       "noComment": "Izoh yo‘q",
       "defaultAuthor": "Sharh"
+    },
+    "telegramBinding": {
+      "title": "Telegram-bildirishnomalar",
+      "description": "Buyurtmalar holati, kirish kodlari va yangi takliflar haqidagi muhim bildirishnomalarni to‘g‘ridan-to‘g‘ri chatda olish uchun Telegram akkauntingizni bog‘lang.",
+      "connected": "Bog'langan",
+      "connectedDesc": "Akkauntingiz Telegram-bot bilan muvaffaqiyatli bog'landi. Tizim bildirishnomalarini chatda olasiz.",
+      "notConnected": "Bog'lanmagan",
+      "connect": "Telegramni bog‘lash",
+      "connecting": "Bog‘lanmoqda...",
+      "instructionsTitle": "Qanday bog'lash kerak:",
+      "step1": "«Telegramni bog‘lash» tugmasini bosing",
+      "step2": "Ochilgan Telegram chatida «Start» yoki «Ishga tushirish» tugmasini bosing",
+      "step3": "Avtorizatsiyani yakunlash uchun bot chatida kontaktni yuboring",
+      "checkStatus": "Bog'lanish holatini tekshirish",
+      "checkingStatus": "Tekshirilmoqda...",
+      "successToast": "Telegram muvaffaqiyatli bog'landi!",
+      "waitingToast": "Botda ro'yxatdan o'tish kutilmoqda... Iltimos, Telegram-da jarayonni yakunlang."
     }
   },
   "userReviews": {
