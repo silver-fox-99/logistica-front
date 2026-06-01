@@ -10,7 +10,7 @@ import TopRoutesTable from "@/widgets/dashboard/TopRoutesTable";
 import TopCountriesTabs from "@/widgets/dashboard/TopCountriesTabs";
 import PowerUsersTable from "@/widgets/dashboard/PowerUsersTable";
 import RecentActivity from "@/widgets/dashboard/RecentActivity";
-import { FiTrendingUp, FiUsers, FiPackage, FiTruck } from "react-icons/fi";
+import { FiActivity, FiUsers, FiPackage, FiTruck } from "react-icons/fi";
 import TopInfoViewersTable from "@/widgets/dashboard/TopInfoViewersTable.tsx";
 import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
 import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
@@ -32,9 +32,6 @@ export default function AdminOverviewPage() {
     };
 
     useEffect(() => { load(range); }, [range]);
-
-    const avgCargo = useMemo(() => data?.kpi.avgPrice7d.cargo ?? 0, [data]);
-    const avgTransport = useMemo(() => data?.kpi.avgPrice7d.transport ?? 0, [data]);
 
     const onRangeChange = (e: SelectChangeEvent) => setRange(e.target.value as Range);
 
@@ -80,9 +77,9 @@ export default function AdminOverviewPage() {
                         </Grid>
                         <Grid size={{ xs: 12, md: 3 }}>
                             <KpiCard
-                                title="Средняя цена (7д)"
-                                value={`Cargo: ${avgCargo.toFixed(0)} | Transport: ${avgTransport.toFixed(0)}`}
-                                icon={<FiTrendingUp size={24} />}
+                                title="Уникальные посетители"
+                                value={data?.kpi.activeUsers ?? 0}
+                                icon={<FiActivity size={24} />}
                             />
                         </Grid>
 

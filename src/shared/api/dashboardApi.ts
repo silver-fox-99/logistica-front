@@ -54,7 +54,7 @@ export type DashboardResponse = {
             newUsers: number;
             newCargos: number;
             newTransports: number;
-            avgPrice7d: { cargo: number; transport: number };
+            activeUsers: number;
         };
         series: { priceTrend: PriceTrendPoint[] };
         top: {
