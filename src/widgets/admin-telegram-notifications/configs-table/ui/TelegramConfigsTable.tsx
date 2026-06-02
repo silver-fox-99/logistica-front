@@ -26,6 +26,20 @@ type Props = {
     onDelete: (item: TelegramNotificationConfig) => void;
 };
 
+// Russian pluralization helper for channels
+const getChannelsLabel = (count: number) => {
+    const remainder10 = count % 10;
+    const remainder100 = count % 100;
+
+    if (remainder10 === 1 && remainder100 !== 11) {
+        return `${count} канал`;
+    }
+    if (remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20)) {
+        return `${count} канала`;
+    }
+    return `${count} каналов`;
+};
+
 export function TelegramConfigsTable(props: Props) {
     const { items, loading, onEdit, onToggle, onDelete } = props;
 
@@ -35,12 +49,12 @@ export function TelegramConfigsTable(props: Props) {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Channels</TableCell>
-                            <TableCell>Cargo</TableCell>
-                            <TableCell>Transport</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell align="right">Actions</TableCell>
+                            <TableCell>Название</TableCell>
+                            <TableCell>Каналы</TableCell>
+                            <TableCell>Грузы</TableCell>
+                            <TableCell>Транспорт</TableCell>
+                            <TableCell>Статус</TableCell>
+                            <TableCell align="right">Действия</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -57,7 +71,7 @@ export function TelegramConfigsTable(props: Props) {
                                     >
                                         <CircularProgress size={20} />
                                         <Typography variant="body2" color="text.secondary">
-                                            Loading...
+                                            Загрузка...
                                         </Typography>
                                     </Stack>
                                 </TableCell>
@@ -66,7 +80,7 @@ export function TelegramConfigsTable(props: Props) {
                             <TableRow>
                                 <TableCell colSpan={6}>
                                     <Typography sx={{ py: 4 }} align="center" color="text.secondary">
-                                        No telegram configs found
+                                        Конфигурации ботов не найдены
                                     </Typography>
                                 </TableCell>
                             </TableRow>
@@ -77,20 +91,20 @@ export function TelegramConfigsTable(props: Props) {
                                         <Stack spacing={0.5}>
                                             <Typography fontWeight={600}>{item.name}</Typography>
                                             <Typography variant="caption" color="text.secondary">
-                                                Updated: {new Date(item.updated_at).toLocaleString()}
+                                                Обновлено: {new Date(item.updated_at).toLocaleString("ru-RU")}
                                             </Typography>
                                         </Stack>
                                     </TableCell>
 
                                     <TableCell>
                                         <Tooltip title={item.chat_ids.join(", ")}>
-                                            <Chip label={`${item.chat_ids.length} channels`} size="small" />
+                                            <Chip label={getChannelsLabel(item.chat_ids.length)} size="small" />
                                         </Tooltip>
                                     </TableCell>
 
                                     <TableCell>
                                         <Chip
-                                            label={item.send_cargo ? "Enabled" : "Disabled"}
+                                            label={item.send_cargo ? "Включено" : "Выключено"}
                                             size="small"
                                             color={item.send_cargo ? "success" : "default"}
                                             variant={item.send_cargo ? "filled" : "outlined"}
@@ -99,7 +113,7 @@ export function TelegramConfigsTable(props: Props) {
 
                                     <TableCell>
                                         <Chip
-                                            label={item.send_transport ? "Enabled" : "Disabled"}
+                                            label={item.send_transport ? "Включено" : "Выключено"}
                                             size="small"
                                             color={item.send_transport ? "success" : "default"}
                                             variant={item.send_transport ? "filled" : "outlined"}

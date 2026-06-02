@@ -74,29 +74,29 @@ export function TelegramConfigDialog(props: Props) {
 
     return (
         <Dialog open={open} onClose={submitting ? undefined : onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{isEdit ? "Edit Telegram config" : "Create Telegram config"}</DialogTitle>
+            <DialogTitle>{isEdit ? "Редактирование конфигурации Telegram" : "Создание конфигурации Telegram"}</DialogTitle>
 
             <DialogContent dividers>
                 <Stack spacing={2} sx={{ pt: 0.5 }}>
                     <TextField
-                        label="Name"
-                        placeholder="Main bot"
+                        label="Название"
+                        placeholder="Например, Основной бот"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Bot token"
-                        placeholder="Enter bot token"
+                        label="Токен бота"
+                        placeholder="Введите токен бота (от BotFather)"
                         value={botToken}
                         onChange={(e) => setBotToken(e.target.value)}
                         fullWidth
                     />
 
                     <TextField
-                        label="Chat IDs"
-                        placeholder={"One chat ID per line\n-1001234567890\n-1009876543210"}
+                        label="ID чатов / каналов"
+                        placeholder={"По одному ID на строку, например:\n-1001234567890\n-1009876543210"}
                         value={chatIdsText}
                         onChange={(e) => setChatIdsText(e.target.value)}
                         fullWidth
@@ -111,7 +111,7 @@ export function TelegramConfigDialog(props: Props) {
                                 onChange={(e) => setSendCargo(e.target.checked)}
                             />
                         }
-                        label="Send cargo messages"
+                        label="Отправлять сообщения о грузах"
                     />
 
                     <FormControlLabel
@@ -121,7 +121,7 @@ export function TelegramConfigDialog(props: Props) {
                                 onChange={(e) => setSendTransport(e.target.checked)}
                             />
                         }
-                        label="Send transport messages"
+                        label="Отправлять сообщения о транспорте"
                     />
 
                     <FormControlLabel
@@ -131,11 +131,11 @@ export function TelegramConfigDialog(props: Props) {
                                 onChange={(e) => setIsActive(e.target.checked)}
                             />
                         }
-                        label="Active"
+                        label="Активен"
                     />
 
                     <TextField
-                        label="Detected channels count"
+                        label="Количество распознанных каналов"
                         value={chatIdsPreview.length}
                         fullWidth
                         InputProps={{ readOnly: true }}
@@ -145,7 +145,7 @@ export function TelegramConfigDialog(props: Props) {
 
             <DialogActions sx={{ px: 3, py: 2 }}>
                 <Button onClick={onClose} disabled={submitting}>
-                    Cancel
+                    Отмена
                 </Button>
                 <Button
                     variant="contained"
@@ -157,7 +157,7 @@ export function TelegramConfigDialog(props: Props) {
                         normalizeChatIds(chatIdsText).length === 0
                     }
                 >
-                    {isEdit ? "Save changes" : "Create"}
+                    {isEdit ? "Сохранить" : "Создать"}
                 </Button>
             </DialogActions>
         </Dialog>

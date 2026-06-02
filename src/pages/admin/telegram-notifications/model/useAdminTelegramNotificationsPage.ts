@@ -44,7 +44,7 @@ export function useAdminTelegramNotificationsPage() {
             setTotal(data.total);
             setPages(data.pages);
         } catch (err: any) {
-            setError(err?.response?.data?.message || "Failed to load telegram configs");
+            setError(err?.response?.data?.message || "Не удалось загрузить конфигурации Telegram");
         } finally {
             setLoading(false);
         }
@@ -74,11 +74,11 @@ export function useAdminTelegramNotificationsPage() {
             try {
                 setSubmitting(true);
                 await telegramNotificationsApi.create(payload);
-                toast.success("Telegram config created");
+                toast.success("Конфигурация Telegram успешно создана");
                 await load();
                 return true;
             } catch (err: any) {
-                toast.error(err?.response?.data?.message || "Failed to create telegram config");
+                toast.error(err?.response?.data?.message || "Не удалось создать конфигурацию Telegram");
                 return false;
             } finally {
                 setSubmitting(false);
@@ -87,16 +87,33 @@ export function useAdminTelegramNotificationsPage() {
         [load],
     );
 
+    const sendAds = useCallback(
+        async (payload: { bot_ids: string[]; html_text: string }) => {
+            try {
+                setSubmitting(true);
+                await telegramNotificationsApi.sendAds(payload);
+                toast.success("Реклама успешно отправлена");
+                return true;
+            } catch (err: any) {
+                toast.error(err?.response?.data?.message || "Ошибка отправки рекламы");
+                return false;
+            } finally {
+                setSubmitting(false);
+            }
+        },
+        [],
+    );
+
     const updateConfig = useCallback(
         async (id: string, payload: UpdateTelegramNotificationConfigPayload) => {
             try {
                 setSubmitting(true);
                 await telegramNotificationsApi.update(id, payload);
-                toast.success("Telegram config updated");
+                toast.success("Конфигурация Telegram успешно обновлена");
                 await load();
                 return true;
             } catch (err: any) {
-                toast.error(err?.response?.data?.message || "Failed to update telegram config");
+                toast.error(err?.response?.data?.message || "Не удалось обновить конфигурацию Telegram");
                 return false;
             } finally {
                 setSubmitting(false);
@@ -109,10 +126,10 @@ export function useAdminTelegramNotificationsPage() {
         async (id: string) => {
             try {
                 await telegramNotificationsApi.toggle(id);
-                toast.success("Telegram config status updated");
+                toast.success("Статус конфигурации обновлен");
                 await load();
             } catch (err: any) {
-                toast.error(err?.response?.data?.message || "Failed to toggle telegram config");
+                toast.error(err?.response?.data?.message || "Не удалось изменить статус конфигурации");
             }
         },
         [load],
@@ -122,10 +139,10 @@ export function useAdminTelegramNotificationsPage() {
         async (id: string) => {
             try {
                 await telegramNotificationsApi.remove(id);
-                toast.success("Telegram config deleted");
+                toast.success("Конфигурация Telegram успешно удалена");
                 await load();
             } catch (err: any) {
-                toast.error(err?.response?.data?.message || "Failed to delete telegram config");
+                toast.error(err?.response?.data?.message || "Не удалось удалить конфигурацию Telegram");
             }
         },
         [load],
@@ -146,5 +163,6 @@ export function useAdminTelegramNotificationsPage() {
         updateConfig,
         toggleConfig,
         removeConfig,
+        sendAds
     };
 }

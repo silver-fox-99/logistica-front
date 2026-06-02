@@ -60,4 +60,8 @@ export const telegramNotificationsApi = {
         }>(`/admin/telegram-notifications/${id}`);
         return data.data;
     },
+
+    sendAds: async( payload: {bot_ids: string[], html_text: string }) => {
+        await api.post('/admin/telegram-notifications/ads', payload)
+    }
 };

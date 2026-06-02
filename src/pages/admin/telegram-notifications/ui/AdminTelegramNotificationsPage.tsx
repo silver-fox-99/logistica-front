@@ -12,8 +12,10 @@ import { FiPlus } from "react-icons/fi";
 
 import type { TelegramNotificationConfig } from "@/entities/telegram-notification/model/types";
 import { TelegramConfigDialog } from "@/features/admin-telegram-notifications/create-edit-config/ui/TelegramConfigDialog";
+import { TelegramSendAdsDialog } from "@/features/admin-telegram-notifications/send-ads/ui/TelegramSendAdsDialog";
 import { TelegramConfigsTable } from "@/widgets/admin-telegram-notifications/configs-table/ui/TelegramConfigsTable";
 import { useAdminTelegramNotificationsPage } from "../model/useAdminTelegramNotificationsPage";
+import { FaRegNewspaper } from "react-icons/fa";
 
 export default function AdminTelegramNotificationsPage() {
     const {
@@ -30,9 +32,11 @@ export default function AdminTelegramNotificationsPage() {
         updateConfig,
         toggleConfig,
         removeConfig,
+        sendAds
     } = useAdminTelegramNotificationsPage();
 
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [sendAdsDialogOpen, setSendAdsDialogOpen] = useState(false);
     const [selected, setSelected] = useState<TelegramNotificationConfig | null>(null);
 
     const openCreate = () => {
@@ -46,7 +50,7 @@ export default function AdminTelegramNotificationsPage() {
     };
 
     const handleDelete = async (item: TelegramNotificationConfig) => {
-        const ok = window.confirm(`Delete telegram config "${item.name}"?`);
+        const ok = window.confirm(`Вы действительно хотите удалить конфигурацию ботов "${item.name}"?`);
         if (!ok) return;
         await removeConfig(item.id);
     };
@@ -61,20 +65,33 @@ export default function AdminTelegramNotificationsPage() {
             >
                 <Box>
                     <Typography variant="h4" fontWeight={800}>
-                        Telegram notifications
+                        Telegram-уведомления
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Manage bots, channels and delivery settings for cargo and transport messages.
+                        Управление ботами, каналами и параметрами доставки сообщений о грузах и транспорте.
                     </Typography>
                 </Box>
 
-                <Button
-                    variant="contained"
-                    startIcon={<FiPlus />}
-                    onClick={openCreate}
-                >
-                    Add config
-                </Button>
+                <Stack direction="row" spacing={2} sx={{ alignSelf: { xs: "stretch", md: "center" } }}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<FaRegNewspaper />}
+                        onClick={() => setSendAdsDialogOpen(true)}
+                        sx={{ flex: 1 }}
+                    >
+                        Разослать рекламу
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        startIcon={<FiPlus />}
+                        onClick={openCreate}
+                        sx={{ flex: 1 }}
+                    >
+                        Добавить бота
+                    </Button>
+                </Stack>
             </Stack>
 
             <Stack
@@ -83,15 +100,15 @@ export default function AdminTelegramNotificationsPage() {
                 alignItems={{ xs: "stretch", md: "center" }}
             >
                 <TextField
-                    label="Search"
-                    placeholder="Search by name"
+                    label="Поиск"
+                    placeholder="Поиск по названию"
                     value={filters.search}
                     onChange={(e) => setSearch(e.target.value)}
                     sx={{ minWidth: { md: 320 } }}
                 />
 
                 <Typography variant="body2" color="text.secondary">
-                    Total: {total}
+                    Всего конфигураций: {total}
                 </Typography>
             </Stack>
 
@@ -127,6 +144,14 @@ export default function AdminTelegramNotificationsPage() {
                     }
                     return createConfig(payload);
                 }}
+            />
+
+            <TelegramSendAdsDialog
+                open={sendAdsDialogOpen}
+                configs={items}
+                submitting={submitting}
+                onClose={() => setSendAdsDialogOpen(false)}
+                onSubmit={sendAds}
             />
         </Stack>
     );
