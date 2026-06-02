@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, TextField,
-    MenuItem, Select, InputLabel, FormControl, FormHelperText, Autocomplete
+    MenuItem, Select, InputLabel, FormControl, FormHelperText, Autocomplete, Box, Typography
 } from "@mui/material";
 import type { GeoLocation, LocationType, CreateLocationDto, UpdateLocationDto } from "@/shared/api/adminGeoApi";
 import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
+import { GEO_TYPE_RU } from "./GeoTreeFlow";
 
 const TYPES: LocationType[] = ["COUNTRY", "REGION", "CITY", "DISTRICT", "OTHER"];
 
@@ -75,12 +76,12 @@ export default function GeoLocationDialog({
 
     const validate = () => {
         const e: Record<string, string | undefined> = {};
-        if (!name.trim()) e.name = "Name is required";
-        if (!type) e.type = "Type is required";
-        if (type === "COUNTRY" && iso2 && !/^[A-Za-z]{2}$/.test(iso2)) e.iso2 = "ISO2 must be 2 letters";
-        if (type === "COUNTRY" && parent) e.type = "Country can't have a parent";
-        if (code && code.length > 32) e.code = "Max length is 32";
-        if (slug && slug.length > 200) e.slug = "Max length is 200";
+        if (!name.trim()) e.name = "Название (английский / базовое) обязательно для заполнения";
+        if (!type) e.type = "Тип обязателен для заполнения";
+        if (type === "COUNTRY" && iso2 && !/^[A-Za-z]{2}$/.test(iso2)) e.iso2 = "ISO2 код должен состоять из 2 латинских букв";
+        if (type === "COUNTRY" && parent) e.type = "Страна не может иметь родительский элемент";
+        if (code && code.length > 32) e.code = "Максимальная длина — 32 символа";
+        if (slug && slug.length > 200) e.slug = "Максимальная длина — 200 символов";
         setErrors(e);
         return Object.values(e).every(v => !v);
     };
@@ -118,64 +119,83 @@ export default function GeoLocationDialog({
     };
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{title}</DialogTitle>
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
+            <DialogTitle sx={{ fontWeight: 700, fontSize: 20 }}>{title}</DialogTitle>
             <DialogContent dividers>
-                <Stack spacing={2} sx={{ mt: 1 }}>
-                    <FormControl size="small" error={!!errors.type}>
-                        <InputLabel>Тип</InputLabel>
-                        <Select label="Type" value={type} onChange={(e) => setType(e.target.value as LocationType)}>
-                            {TYPES.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                <Stack spacing={2.5} sx={{ mt: 1 }}>
+                    <FormControl size="small" error={!!errors.type} fullWidth>
+                        <InputLabel>Тип локации</InputLabel>
+                        <Select label="Тип локации" value={type} onChange={(e) => setType(e.target.value as LocationType)}>
+                            {TYPES.map(t => <MenuItem key={t} value={t}>{GEO_TYPE_RU[t] || t}</MenuItem>)}
                         </Select>
                         {!!errors.type && <FormHelperText>{errors.type}</FormHelperText>}
                     </FormControl>
 
-                    <TextField
-                        size="small" label="Название (английский)" value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        error={!!errors.name} helperText={errors.name}
-                    />
+                    <Box sx={{ p: 2, border: "1px solid #e2e8f0", borderRadius: 2, bgcolor: "#f8fafc" }}>
+                        <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: "block", mb: 1.5, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                            Названия на разных языках
+                        </Typography>
+                        <Stack spacing={2}>
+                            <TextField
+                                size="small" label="Название (английский / базовое)" value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                error={!!errors.name} helperText={errors.name}
+                                required
+                                fullWidth
+                            />
 
-                    <TextField
-                        size="small" label="Название (русский)" value={nameRu}
-                        onChange={(e) => setNameRu(e.target.value)}
-                    />
+                            <TextField
+                                size="small" label="Название (русский)" value={nameRu}
+                                onChange={(e) => setNameRu(e.target.value)}
+                                fullWidth
+                            />
 
-                    <TextField
-                        size="small" label="Название (узбекский)" value={nameUz}
-                        onChange={(e) => setNameUz(e.target.value)}
-                    />
+                            <TextField
+                                size="small" label="Название (узбекский)" value={nameUz}
+                                onChange={(e) => setNameUz(e.target.value)}
+                                fullWidth
+                            />
+                        </Stack>
+                    </Box>
 
                     <Autocomplete
                         options={parentOptions}
-                        getOptionLabel={(o) => `${getLocalizedGeoName(o)} (${o.type})`}
+                        getOptionLabel={(o) => `${getLocalizedGeoName(o)} (${GEO_TYPE_RU[o.type] || o.type})`}
                         value={parent}
                         onChange={(_, v) => setParent(v)}
-                        renderInput={(p) => <TextField {...p} size="small" label="Локация (опционально)" />}
+                        renderInput={(p) => <TextField {...p} size="small" label="Родительская локация (опционально)" />}
                         disabled={type === "COUNTRY"}
+                        fullWidth
                     />
 
-                    <TextField
-                        size="small" label="Код (опционально)" value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        error={!!errors.code} helperText={errors.code}
-                    />
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                        <TextField
+                            size="small" label="Код (опционально)" value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            error={!!errors.code} helperText={errors.code}
+                            fullWidth
+                        />
 
-                    <TextField
-                        size="small" label="ISO2 (только для стран)" value={iso2}
-                        onChange={(e) => setIso2(e.target.value)}
-                        error={!!errors.iso2} helperText={errors.iso2}
-                        placeholder="US, UA, PL…"
-                    />
+                        {type === "COUNTRY" && (
+                            <TextField
+                                size="small" label="ISO2 код страны" value={iso2}
+                                onChange={(e) => setIso2(e.target.value)}
+                                error={!!errors.iso2} helperText={errors.iso2}
+                                placeholder="UZ, RU, KZ, US..."
+                                fullWidth
+                            />
+                        )}
 
-                    <TextField
-                        size="small" label="Слаг (опционально)" value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
-                        error={!!errors.slug} helperText={errors.slug}
-                    />
+                        <TextField
+                            size="small" label="Слаг (опционально)" value={slug}
+                            onChange={(e) => setSlug(e.target.value)}
+                            error={!!errors.slug} helperText={errors.slug}
+                            fullWidth
+                        />
+                    </Stack>
 
                     {mode === "edit" && (
-                        <>
+                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                             <TextField
                                 size="small"
                                 label="Порядок сортировки"
@@ -187,25 +207,26 @@ export default function GeoLocationDialog({
                                     setOrder(val === "" ? "" : parseInt(val, 10));
                                 }}
                                 helperText="Меньшее значение = выше в списке (например, 0 для Узбекистана)"
+                                fullWidth
                             />
-                            <FormControl size="small">
-                                <InputLabel shrink>Активен</InputLabel>
+                            <FormControl size="small" fullWidth>
+                                <InputLabel shrink>Статус активности</InputLabel>
                                 <Select
                                     notched
                                     value={String(isActive)}
                                     onChange={(e) => setIsActive(e.target.value === "true")}
-                                    label="Активен"
+                                    label="Статус активности"
                                 >
                                     <MenuItem value="true">Активен</MenuItem>
-                                    <MenuItem value="false">Неактивен</MenuItem>
+                                    <MenuItem value="false">Неактивен (скрыт)</MenuItem>
                                 </Select>
                             </FormControl>
-                        </>
+                        </Stack>
                     )}
                 </Stack>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Отмена</Button>
+            <DialogActions sx={{ px: 3, py: 2 }}>
+                <Button onClick={onClose} color="inherit">Отмена</Button>
                 <Button variant="contained" onClick={handleSave} disabled={submitting}>
                     {submitting ? "Сохранение…" : "Сохранить"}
                 </Button>

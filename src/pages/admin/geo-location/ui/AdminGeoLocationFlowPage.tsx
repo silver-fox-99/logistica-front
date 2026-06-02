@@ -18,6 +18,10 @@ import {
     TextField,
     Tooltip,
     Typography,
+    Grid,
+    Breadcrumbs,
+    Link,
+    Alert,
 } from "@mui/material";
 import {
     FiMapPin,
@@ -26,24 +30,28 @@ import {
     FiSearch,
     FiTrash2,
     FiEdit3,
-    FiDownload, FiArrowLeft,
+    FiDownload,
+    FiHome,
+    FiChevronRight,
+    FiFolder,
 } from "react-icons/fi";
 import type { GeoLocation, LocationType } from "@/shared/api/adminGeoApi";
 import { useGeoLocations } from "@/features/admin/geo-locations/model/useGeoLocations";
 import GeoLocationDialog from "@/features/admin/geo-locations/ui/GeoLocationDialog";
-import GeoTreeFlow from "@/features/admin/geo-locations/ui/GeoTreeFlow";
+import GeoTreeFlow, { GEO_TYPE_RU, LocationIcon, nodeColor } from "@/features/admin/geo-locations/ui/GeoTreeFlow";
 import GeoImportDialog from "@/features/admin/geo-locations/ui/GeoDatasetPanel.tsx";
-import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
-import {viewCode} from "@/shared/ui/layout/AdminLayout.tsx";
+import { useAdminAccessStore } from "@/entities/adminAccess/model/adminAccess.store.ts";
+import { viewCode } from "@/shared/ui/layout/AdminLayout.tsx";
 import NoAccess from "@/shared/ui/no-access/NoAccess.tsx";
+import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
 
-const TYPES: (LocationType | "")[] = [
-    "",
-    "COUNTRY",
-    "REGION",
-    "CITY",
-    "DISTRICT",
-    "OTHER",
+const TYPES: { value: LocationType | ""; label: string }[] = [
+    { value: "", label: "Все типы" },
+    { value: "COUNTRY", label: "Страны" },
+    { value: "REGION", label: "Регионы" },
+    { value: "CITY", label: "Города" },
+    { value: "DISTRICT", label: "Районы" },
+    { value: "OTHER", label: "Другие" },
 ];
 
 // максимально допустимое количество нод в дереве
@@ -74,6 +82,8 @@ export default function AdminGeoLocationFlowPage() {
         reload,
     } = useGeoLocations();
 
+    const { getLocalizedGeoName } = useLocalizedGeo();
+
     const canViewGeoLocation = useAdminAccessStore((s) => s.hasPermission(viewCode('GET_LOCATIONS' as any)));
 
     const [dlgOpen, setDlgOpen] = useState(false);
@@ -88,12 +98,22 @@ export default function AdminGeoLocationFlowPage() {
         return childrenOf(selectedId);
     }, [selectedId, childrenOf, treeRoots]);
 
-       const parentLocation = useMemo(() => {
-               if (!selectedId) return null;
-               const current = byId.get(selectedId);
-               if (!current?.parent_id) return null;
-               return byId.get(current.parent_id) ?? null;
-           }, [selectedId, byId]);
+    const selectedLocation = useMemo(() => {
+        if (!selectedId) return null;
+        return byId.get(selectedId) ?? null;
+    }, [selectedId, byId]);
+
+    // Хлебные крошки для навигации
+    const breadcrumbs = useMemo(() => {
+        if (!selectedId) return [];
+        const path: GeoLocation[] = [];
+        let curr = byId.get(selectedId);
+        while (curr) {
+            path.unshift(curr);
+            curr = curr.parent_id ? byId.get(curr.parent_id) : undefined;
+        }
+        return path;
+    }, [selectedId, byId]);
 
     // --- поддерево для выбранной локации (для дерева Flow) ---
     const { items: flowItems, totalInSubtree }: FlowInfo = useMemo(() => {
@@ -194,7 +214,7 @@ export default function AdminGeoLocationFlowPage() {
     };
 
     const handleDelete = async (row: GeoLocation) => {
-        if (!confirm(`Delete "${row.name}"?`)) return;
+        if (!confirm(`Вы действительно хотите удалить локацию "${row.name}"?`)) return;
         const wasSelected = selectedId === row.id;
         await remove(row.id);
         if (wasSelected) setSelectedId(null);
@@ -203,30 +223,36 @@ export default function AdminGeoLocationFlowPage() {
     if (!canViewGeoLocation) return <NoAccess />;
 
     return (
-        <Stack spacing={2}>
+        <Stack spacing={3}>
             {/* Header */}
             <Stack
                 direction={{ xs: "column", sm: "row" }}
-                spacing={1.5}
+                spacing={2}
                 alignItems={{ sm: "center" }}
                 justifyContent="space-between"
             >
                 <Stack spacing={0.5}>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <FiMapPin />
-                        <Typography variant="h5" fontWeight={700}>
-                            Гео-локации
-                        </Typography>
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Box sx={{ color: "primary.main", display: "flex", p: 1, borderRadius: 2, bgcolor: "primary.light", opacity: 0.8 }}>
+                            <FiMapPin size={24} />
+                        </Box>
+                        <Box>
+                            <Typography variant="h5" fontWeight={800}>
+                                Гео-локации
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Управление странами, регионами, городами и районами в системе
+                            </Typography>
+                        </Box>
                     </Stack>
-                    <Typography variant="body2" color="text.secondary">
-                        {items.length.toLocaleString()} всего
-                    </Typography>
                 </Stack>
-                <Stack direction="row" spacing={1}>
+                
+                <Stack direction="row" spacing={1.5}>
                     <Button
                         startIcon={<FiPlus />}
                         variant="contained"
                         onClick={openCreateGeneral}
+                        sx={{ borderRadius: 2, px: 2.5 }}
                     >
                         Добавить локацию
                     </Button>
@@ -234,251 +260,416 @@ export default function AdminGeoLocationFlowPage() {
                         startIcon={<FiDownload />}
                         variant="outlined"
                         onClick={() => setImportOpen(true)}
+                        sx={{ borderRadius: 2, px: 2.5 }}
                     >
                         Догрузить данные
                     </Button>
-                    <Tooltip title="Обновить">
-            <span>
-              <IconButton onClick={reload}>
-                <FiRefreshCw />
-              </IconButton>
-            </span>
+                    <Tooltip title="Обновить список">
+                        <IconButton onClick={reload} sx={{ border: "1px solid #e2e8f0", borderRadius: 2, p: 1 }}>
+                            <FiRefreshCw />
+                        </IconButton>
                     </Tooltip>
                 </Stack>
             </Stack>
 
-            {/* Filters */}
-            <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2 }}>
-                <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={1.5}
-                    alignItems={{ md: "center" }}
-                    justifyContent="space-between"
-                >
-                    <Stack direction="row" spacing={1.5} flexWrap="wrap">
-                        <TextField
-                            size="small"
-                            placeholder="Search by name/code/ISO2…"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <FiSearch />
-                                    </InputAdornment>
-                                ),
-                            }}
-                            sx={{ minWidth: 280 }}
-                        />
-                        <Select
-                            size="small"
-                            value={typeFilter}
-                            onChange={(e) =>
-                                setTypeFilter(e.target.value as LocationType | "")
-                            }
-                            sx={{ minWidth: 180 }}
-                            displayEmpty
-                        >
-                            {TYPES.map((t) => (
-                                <MenuItem key={t || "ALL"} value={t}>
-                                    {t || "All types"}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </Stack>
-                    <Typography variant="caption" color="text.secondary">
-                        Hint: double click on Country/Region to add City, double click on
-                        City to edit.
-                    </Typography>
-                </Stack>
-            </Paper>
-
-            {/* Flow + подсказки */}
-            <Stack spacing={0.5}>
-                <Typography variant="subtitle2">Иерархия (дерево)</Typography>
-                {selectedId && (
-                    <Stack direction="row" spacing={1}>
-                        {parentLocation && (
-                            <Button
-                                size="small"
-                                variant="text"
-                                onClick={() => setSelectedId(parentLocation.id)}
+            {/* Split Master-Detail Layout */}
+            <Grid container spacing={3}>
+                {/* Left Pane (Master: Search, Breadcrumbs, Table) */}
+                <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+                    <Stack spacing={2.5}>
+                        {/* Search & Filters */}
+                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                            <Stack
+                                direction={{ xs: "column", sm: "row" }}
+                                spacing={2}
+                                alignItems="center"
+                                width="100%"
                             >
-                                To parent: {parentLocation.name || parentLocation.code || parentLocation.type}
-                            </Button>
-                        )}
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            startIcon={<FiArrowLeft />}
-                            onClick={() => setSelectedId(null)}
-                        >
-                            All locations
-                        </Button>
-                    </Stack>
-                )}
-                {!selectedId ? (
-                    <Paper
-                        variant="outlined"
-                        sx={{ p: 2, borderRadius: 2, textAlign: "center" }}
-                    >
-                        <Typography variant="body2" color="text.secondary">
-                            Select a location in the table below to display its hierarchy
-                            tree.
-                        </Typography>
-                    </Paper>
-                ) : flowItems.length === 0 ? (
-                    <Paper
-                        variant="outlined"
-                        sx={{ p: 2, borderRadius: 2, textAlign: "center" }}
-                    >
-                        <Typography variant="body2" color="text.secondary">
-                            This location has no children to build a tree.
-                        </Typography>
-                    </Paper>
-                ) : (
-                    <>
-                        {flowTooLarge && (
-                            <Typography variant="caption" color="text.secondary">
-                                Subtree contains {totalInSubtree.toLocaleString()} nodes. Only
-                                first {MAX_FLOW_NODES} are shown in the diagram.
-                            </Typography>
-                        )}
-                        <GeoTreeFlow
-                            items={flowItems}
-                            selectedId={selectedId}
-                            onSelect={(id) => setSelectedId(id)}
-                            onAddCity={openCreateCity}
-                            onEditCity={openEditCity}
-                        />
-                    </>
-                )}
-            </Stack>
-
-            {/* Children table */}
-            <Paper variant="outlined" sx={{ borderRadius: 2 }}>
-                <Box sx={{ overflowX: "auto" }}>
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        sx={{ px: 2, py: 1 }}
-                    >
-                        <Typography variant="subtitle2">Список элементов</Typography>
-                        <Button size="small" startIcon={<FiPlus />} onClick={openCreateGeneral}>
-                            Добавить
-                        </Button>
-                    </Stack>
-                    <Divider />
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Название</TableCell>
-                                <TableCell>Тип</TableCell>
-                                <TableCell>Родитель</TableCell>
-                                <TableCell>Код</TableCell>
-                                <TableCell>ISO2</TableCell>
-                                <TableCell>Слаг</TableCell>
-                                <TableCell>Активен</TableCell>
-                                <TableCell align="right">Действия</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    hover
-                                    selected={row.id === selectedId}
-                                    onClick={() => setSelectedId(row.id)}
-                                    sx={{ cursor: "pointer" }}
+                                <TextField
+                                    size="small"
+                                    placeholder="Поиск по названию, коду, ISO2 или слагу…"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <FiSearch color="#94a3b8" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    fullWidth
+                                />
+                                <Select
+                                    size="small"
+                                    value={typeFilter}
+                                    onChange={(e) =>
+                                        setTypeFilter(e.target.value as LocationType | "")
+                                    }
+                                    sx={{ minWidth: 160, width: { xs: "100%", sm: "auto" } }}
+                                    displayEmpty
                                 >
-                                    <TableCell>{row.name || "Без названия"}</TableCell>
-                                    <TableCell>
-                                        <Chip size="small" label={row.type} />
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.parent_id
-                                            ? byId.get(row.parent_id)?.name ?? row.parent_id
-                                            : "—"}
-                                    </TableCell>
-                                    <TableCell>{row.code || "—"}</TableCell>
-                                    <TableCell>{row.iso2 || "—"}</TableCell>
-                                    <TableCell>{row.slug || "—"}</TableCell>
-                                    <TableCell>
-                                        {row.is_active === false ? "Нет" : "Да"}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                            <Tooltip title="Редактировать">
-                        <span>
-                          <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                  e.stopPropagation();
-                                  openEditCity(row.id);
-                              }}
-                          >
-                            <FiEdit3 />
-                          </IconButton>
-                        </span>
-                                            </Tooltip>
-                                            <Tooltip title="Удалить">
-                        <span>
-                          <IconButton
-                              size="small"
-                              color="error"
-                              onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(row);
-                              }}
-                          >
-                            <FiTrash2 />
-                          </IconButton>
-                        </span>
-                                            </Tooltip>
-                                        </Stack>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {!loading && rows.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={8}>
-                                        <Typography
-                                            align="center"
-                                            color="text.secondary"
-                                            sx={{ py: 4 }}
+                                    {TYPES.map((t) => (
+                                        <MenuItem key={t.value || "ALL"} value={t.value}>
+                                            {t.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </Stack>
+                        </Paper>
+
+                        {/* Breadcrumbs Navigation */}
+                        <Paper variant="outlined" sx={{ px: 2.5, py: 1.5, borderRadius: 3, bgcolor: "#f8fafc" }}>
+                            <Breadcrumbs separator={<FiChevronRight size={14} color="#94a3b8" />} aria-label="breadcrumb">
+                                <Link
+                                    underline="hover"
+                                    color={!selectedId ? "text.primary" : "inherit"}
+                                    onClick={() => setSelectedId(null)}
+                                    sx={{ cursor: "pointer", display: 'flex', alignItems: 'center', gap: 0.75, fontWeight: !selectedId ? 700 : 500 }}
+                                >
+                                    <FiHome size={15} />
+                                    Все локации
+                                </Link>
+                                {breadcrumbs.map((node, index) => {
+                                    const isLast = index === breadcrumbs.length - 1;
+                                    const name = getLocalizedGeoName(node);
+                                    return (
+                                        <Link
+                                            key={node.id}
+                                            underline={isLast ? "none" : "hover"}
+                                            color={isLast ? "text.primary" : "inherit"}
+                                            onClick={() => !isLast && setSelectedId(node.id)}
+                                            sx={{
+                                                cursor: isLast ? "default" : "pointer",
+                                                fontWeight: isLast ? 700 : 500,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5
+                                            }}
                                         >
-                                            Локации не найдены
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                            {loading && (
-                                <TableRow>
-                                    <TableCell colSpan={8}>
-                                        <Typography
-                                            align="center"
-                                            color="text.secondary"
-                                            sx={{ py: 4 }}
+                                            <FiFolder size={14} />
+                                            {name || node.code || node.type}
+                                        </Link>
+                                    );
+                                })}
+                            </Breadcrumbs>
+                        </Paper>
+
+                        {/* Interactive Hint */}
+                        <Alert severity="info" variant="outlined" sx={{ borderRadius: 3, py: 0.5, borderStyle: "dashed", bgcolor: "#f0fdfa", borderColor: "#ccfbf1", "& .MuiAlert-icon": { color: "#0d9488" } }}>
+                            <Typography variant="caption" color="text.secondary" display="block">
+                                💡 <b>Подсказка:</b> дважды кликните на элемент в диаграмме дерева справа, чтобы быстро перейти вглубь или открыть форму редактирования.
+                            </Typography>
+                        </Alert>
+
+                        {/* Children List Table */}
+                        <Paper variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
+                            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: "#fafafa" }}>
+                                <Typography variant="subtitle2" fontWeight={700}>
+                                    {selectedId ? `Дочерние локации для "${getLocalizedGeoName(selectedLocation!)}"` : "Список корневых локаций"}
+                                </Typography>
+                                <Chip size="small" label={`Всего: ${rows.length}`} color="primary" variant="outlined" sx={{ fontWeight: 700 }} />
+                            </Box>
+                            <Divider />
+                            <Box sx={{ overflowX: "auto" }}>
+                                <Table size="medium">
+                                    <TableHead sx={{ bgcolor: "#f8fafc" }}>
+                                        <TableRow>
+                                            <TableCell sx={{ fontWeight: 700 }}>Название</TableCell>
+                                            <TableCell sx={{ fontWeight: 700 }}>Тип</TableCell>
+                                            <TableCell sx={{ fontWeight: 700 }}>Код</TableCell>
+                                            <TableCell sx={{ fontWeight: 700 }}>ISO2</TableCell>
+                                            <TableCell sx={{ fontWeight: 700 }}>Слаг</TableCell>
+                                            <TableCell sx={{ fontWeight: 700 }}>Активен</TableCell>
+                                            <TableCell align="right" sx={{ fontWeight: 700 }}>Действия</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {rows.map((row) => (
+                                            <TableRow
+                                                key={row.id}
+                                                hover
+                                                selected={row.id === selectedId}
+                                                onClick={() => setSelectedId(row.id)}
+                                                sx={{ cursor: "pointer", transition: "background-color 0.2s" }}
+                                            >
+                                                <TableCell sx={{ fontWeight: 600, color: "text.primary" }}>
+                                                    {getLocalizedGeoName(row) || "Без названия"}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        label={GEO_TYPE_RU[row.type] || row.type}
+                                                        sx={{
+                                                            bgcolor: `${nodeColor(row.type)}15`,
+                                                            color: nodeColor(row.type),
+                                                            fontWeight: 700,
+                                                            border: `1px solid ${nodeColor(row.type)}30`,
+                                                            borderRadius: 1.5,
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>{row.code || "—"}</TableCell>
+                                                <TableCell>{row.iso2 || "—"}</TableCell>
+                                                <TableCell sx={{ fontFamily: "monospace", fontSize: 12 }}>{row.slug || "—"}</TableCell>
+                                                <TableCell>
+                                                    {row.is_active === false ? (
+                                                        <Chip size="small" label="Неактивен" color="default" variant="outlined" sx={{ borderRadius: 1.5 }} />
+                                                    ) : (
+                                                        <Chip size="small" label="Активен" color="success" variant="outlined" sx={{ borderRadius: 1.5, fontWeight: 600 }} />
+                                                    )}
+                                                </TableCell>
+                                                <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+                                                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                                                        <Tooltip title="Редактировать">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => openEditCity(row.id)}
+                                                                sx={{ color: "primary.main", hover: { bgcolor: "primary.light" } }}
+                                                            >
+                                                                <FiEdit3 size={16} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Удалить">
+                                                            <IconButton
+                                                                size="small"
+                                                                color="error"
+                                                                onClick={() => handleDelete(row)}
+                                                            >
+                                                                <FiTrash2 size={16} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Stack>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {!loading && rows.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={7}>
+                                                    <Typography
+                                                        align="center"
+                                                        color="text.secondary"
+                                                        sx={{ py: 6 }}
+                                                    >
+                                                        Локации не найдены
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                        {loading && (
+                                            <TableRow>
+                                                <TableCell colSpan={7}>
+                                                    <Typography
+                                                        align="center"
+                                                        color="text.secondary"
+                                                        sx={{ py: 6 }}
+                                                    >
+                                                        Загрузка…
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                        {error && (
+                                            <TableRow>
+                                                <TableCell colSpan={7}>
+                                                    <Typography align="center" color="error" sx={{ py: 6 }}>
+                                                        {error}
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Paper>
+                    </Stack>
+                </Grid>
+
+                {/* Right Pane (Detail Pane: Details Card, Hierarchy Tree) */}
+                <Grid size={{ xs: 12, md: 5, lg: 4 }}>
+                    <Stack spacing={3} sx={{ position: { md: "sticky" }, top: 24 }}>
+                        {/* Details Card */}
+                        {selectedLocation ? (
+                            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, position: "relative", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.02)" }}>
+                                <Box sx={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, bgcolor: nodeColor(selectedLocation.type) }} />
+                                
+                                <Stack spacing={2}>
+                                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                                        <Box sx={{ p: 1, borderRadius: 2, bgcolor: `${nodeColor(selectedLocation.type)}12`, color: nodeColor(selectedLocation.type), display: 'flex' }}>
+                                            <LocationIcon type={selectedLocation.type} size={22} />
+                                        </Box>
+                                        <Box sx={{ overflow: "hidden" }}>
+                                            <Typography variant="subtitle1" fontWeight={800} noWrap>
+                                                {getLocalizedGeoName(selectedLocation) || "Без названия"}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: "monospace" }}>
+                                                ID: {selectedLocation.id}
+                                            </Typography>
+                                        </Box>
+                                    </Stack>
+
+                                    <Divider />
+
+                                    <Stack spacing={1.5}>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography variant="body2" color="text.secondary">Тип локации:</Typography>
+                                            <Chip
+                                                size="small"
+                                                label={GEO_TYPE_RU[selectedLocation.type] || selectedLocation.type}
+                                                sx={{
+                                                    bgcolor: `${nodeColor(selectedLocation.type)}12`,
+                                                    color: nodeColor(selectedLocation.type),
+                                                    fontWeight: 800,
+                                                    border: `1px solid ${nodeColor(selectedLocation.type)}30`,
+                                                }}
+                                            />
+                                        </Box>
+
+                                        {selectedLocation.parent_id && (
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Typography variant="body2" color="text.secondary">Родительская локация:</Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    fontWeight={600}
+                                                    sx={{ cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
+                                                    onClick={() => setSelectedId(selectedLocation.parent_id!)}
+                                                >
+                                                    {byId.get(selectedLocation.parent_id)?.name ?? "Перейти к родителю"}
+                                                </Typography>
+                                            </Box>
+                                        )}
+
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography variant="body2" color="text.secondary">Код локации:</Typography>
+                                            <Typography variant="body2" fontWeight={600}>{selectedLocation.code || "—"}</Typography>
+                                        </Box>
+
+                                        {selectedLocation.type === "COUNTRY" && (
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Typography variant="body2" color="text.secondary">Код ISO2:</Typography>
+                                                <Typography variant="body2" fontWeight={600} sx={{ fontFamily: "monospace" }}>{selectedLocation.iso2 || "—"}</Typography>
+                                            </Box>
+                                        )}
+
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography variant="body2" color="text.secondary">Слаг в URL:</Typography>
+                                            <Typography variant="body2" fontWeight={600} sx={{ wordBreak: 'break-all', textAlign: 'right', fontFamily: "monospace", fontSize: 12 }}>{selectedLocation.slug || "—"}</Typography>
+                                        </Box>
+
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography variant="body2" color="text.secondary">Статус:</Typography>
+                                            {selectedLocation.is_active === false ? (
+                                                <Chip size="small" label="Неактивен" color="default" variant="outlined" sx={{ borderRadius: 1.5 }} />
+                                            ) : (
+                                                <Chip size="small" label="Активен" color="success" variant="outlined" sx={{ borderRadius: 1.5, fontWeight: 700 }} />
+                                            )}
+                                        </Box>
+
+                                        {selectedLocation.order !== undefined && (
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Typography variant="body2" color="text.secondary">Сортировка (order):</Typography>
+                                                <Typography variant="body2" fontWeight={600}>{selectedLocation.order}</Typography>
+                                            </Box>
+                                        )}
+                                        
+                                        <Box display="flex" flexDirection="column" gap={0.75} sx={{ p: 1.5, bgcolor: "#f8fafc", borderRadius: 3, border: "1px solid #f1f5f9" }}>
+                                            <Typography variant="caption" color="text.secondary" fontWeight={800} sx={{ letterSpacing: 0.5 }}>ЛОКАЛИЗАЦИЯ ИМЕНИ:</Typography>
+                                            <Typography variant="caption" sx={{ color: "text.primary" }}>🇬🇧 Английский: <b>{selectedLocation.name}</b></Typography>
+                                            <Typography variant="caption" sx={{ color: "text.primary" }}>🇷🇺 Русский: <b>{selectedLocation.name_ru || "—"}</b></Typography>
+                                            <Typography variant="caption" sx={{ color: "text.primary" }}>🇺🇿 Узбекский: <b>{selectedLocation.name_uz || "—"}</b></Typography>
+                                        </Box>
+                                    </Stack>
+
+                                    <Divider />
+
+                                    {/* Actions */}
+                                    <Stack direction="row" spacing={1}>
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            startIcon={<FiEdit3 />}
+                                            onClick={() => openEditCity(selectedLocation.id)}
+                                            fullWidth
+                                            sx={{ borderRadius: 2 }}
                                         >
-                                            Загрузка…
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
+                                            Изменить
+                                        </Button>
+                                        {(selectedLocation.type === "COUNTRY" || selectedLocation.type === "REGION") && (
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                color="secondary"
+                                                startIcon={<FiPlus />}
+                                                onClick={() => openCreateCity(selectedLocation.id)}
+                                                fullWidth
+                                                sx={{ borderRadius: 2 }}
+                                            >
+                                                Добавить
+                                            </Button>
+                                        )}
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            color="error"
+                                            startIcon={<FiTrash2 />}
+                                            onClick={() => handleDelete(selectedLocation)}
+                                            fullWidth
+                                            sx={{ borderRadius: 2 }}
+                                        >
+                                            Удалить
+                                        </Button>
+                                    </Stack>
+                                </Stack>
+                            </Paper>
+                        ) : (
+                            <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, textAlign: "center", bgcolor: "#f8fafc", borderStyle: "dashed" }}>
+                                <Typography variant="subtitle2" fontWeight={700} color="text.secondary" gutterBottom>
+                                    Локация не выбрана
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" display="block">
+                                    Выберите любую локацию из списка в таблице слева, чтобы посмотреть её детальную информацию, переводы и получить быстрый доступ к действиям.
+                                </Typography>
+                            </Paper>
+                        )}
+
+                        {/* Visual Hierarchy Tree Diagram */}
+                        <Stack spacing={1}>
+                            <Typography variant="subtitle2" fontWeight={800} sx={{ pl: 0.5 }}>
+                                Дерево подчиненности локаций
+                            </Typography>
+                            {!selectedId ? (
+                                <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, textAlign: "center", bgcolor: "#f8fafc", borderStyle: "dashed" }}>
+                                    <Typography variant="caption" color="text.secondary">
+                                        Выберите локацию в таблице слева, чтобы сгенерировать интерактивную схему подчинения элементов (поддерево).
+                                    </Typography>
+                                </Paper>
+                            ) : flowItems.length === 0 ? (
+                                <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, textAlign: "center", bgcolor: "#f8fafc", borderStyle: "dashed" }}>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                        Локация не имеет дочерних элементов (например, городов или районов) для отрисовки дерева.
+                                    </Typography>
+                                </Paper>
+                            ) : (
+                                <Stack spacing={1}>
+                                    {flowTooLarge && (
+                                        <Alert severity="warning" variant="outlined" sx={{ py: 0.5, borderRadius: 3 }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Вложено {totalInSubtree} узлов. На схеме показаны первые {MAX_FLOW_NODES}.
+                                            </Typography>
+                                        </Alert>
+                                    )}
+                                    <GeoTreeFlow
+                                        items={flowItems}
+                                        selectedId={selectedId}
+                                        onSelect={(id) => setSelectedId(id)}
+                                        onAddCity={openCreateCity}
+                                        onEditCity={openEditCity}
+                                    />
+                                </Stack>
                             )}
-                            {error && (
-                                <TableRow>
-                                    <TableCell colSpan={8}>
-                                        <Typography align="center" color="error" sx={{ py: 4 }}>
-                                            {error}
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </Box>
-            </Paper>
+                        </Stack>
+                    </Stack>
+                </Grid>
+            </Grid>
 
             {/* Dialog создать/редактировать */}
             <GeoLocationDialog

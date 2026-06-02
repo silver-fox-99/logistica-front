@@ -15,9 +15,17 @@ import {
 import "@xyflow/react/dist/style.css";
 import dagre from "dagre";
 import { Box, Chip, Stack, Typography } from "@mui/material";
-import { FiMapPin } from "react-icons/fi";
+import { FiGlobe, FiMap, FiNavigation, FiCompass, FiHelpCircle } from "react-icons/fi";
 import type { GeoLocation, LocationType } from "@/shared/api/adminGeoApi";
 import { useLocalizedGeo } from "@/shared/utils/lookupUtils";
+
+export const GEO_TYPE_RU: Record<LocationType, string> = {
+    COUNTRY: "Страна",
+    REGION: "Регион",
+    CITY: "Город",
+    DISTRICT: "Район",
+    OTHER: "Другое",
+};
 
 type Props = {
     items: GeoLocation[];
@@ -35,21 +43,36 @@ type NodeData = {
 // наш кастомный тип ноды для ReactFlow
 type GeoNode = Node<NodeData, "geo">;
 
-const WIDTH = 200;
-const HEIGHT = 56;
+const WIDTH = 220;
+const HEIGHT = 58;
 
-function nodeColor(t: LocationType) {
+export function nodeColor(t: LocationType) {
     switch (t) {
         case "COUNTRY":
-            return "#1976d2";
+            return "#6366f1"; // Indigo
         case "REGION":
-            return "#9c27b0";
+            return "#a855f7"; // Purple
         case "CITY":
-            return "#2e7d32";
+            return "#14b8a6"; // Teal
         case "DISTRICT":
-            return "#ff6f00";
+            return "#f97316"; // Orange
         default:
-            return "#607d8b";
+            return "#64748b"; // Slate
+    }
+}
+
+export function LocationIcon({ type, size = 16, color }: { type: LocationType; size?: number; color?: string }) {
+    switch (type) {
+        case "COUNTRY":
+            return <FiGlobe size={size} color={color} />;
+        case "REGION":
+            return <FiMap size={size} color={color} />;
+        case "CITY":
+            return <FiNavigation size={size} color={color} style={{ transform: "rotate(45deg)" }} />;
+        case "DISTRICT":
+            return <FiCompass size={size} color={color} />;
+        default:
+            return <FiHelpCircle size={size} color={color} />;
     }
 }
 
@@ -136,43 +159,50 @@ const DefaultNode = ({ data, selected }: NodeProps<GeoNode>) => {
         <Stack
             direction="row"
             alignItems="center"
-            spacing={1}
+            spacing={1.25}
             sx={{
                 width: "100%",
                 height: "100%",
                 overflow: "hidden",
                 position: "relative",
-                borderRadius: 1.25,
-                border: `1px solid ${color}`,
-                bgcolor: selected ? "#f0f7ff" : "#fff",
+                borderRadius: 2,
+                border: `2px solid ${selected ? color : `${color}40`}`,
+                bgcolor: selected ? `${color}08` : "#fff",
                 boxShadow: selected
-                    ? "0 0 0 2px rgba(25,118,210,.35)"
-                    : "0 1px 2px rgba(0,0,0,.04)",
+                    ? `0 0 0 3px ${color}25, 0 4px 12px ${color}10`
+                    : "0 2px 4px rgba(0,0,0,.03)",
+                transition: "all 0.2s ease",
                 cursor: "pointer",
-                px: 1.25,
+                px: 1.5,
+                "&:hover": {
+                    borderColor: color,
+                    boxShadow: `0 4px 12px ${color}15`,
+                }
             }}
         >
             {/* невидимые, но рабочие Handle'ы */}
             <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
             <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
 
-            <FiMapPin size={16} />
+            <LocationIcon type={data.type} color={color} size={18} />
             <Typography
                 noWrap
                 title={data.label}
-                sx={{ fontSize: 13, fontWeight: 600 }}
+                sx={{ fontSize: 13, fontWeight: 600, color: "text.primary" }}
             >
                 {data.label}
             </Typography>
             <Chip
                 size="small"
-                label={data.type}
+                label={GEO_TYPE_RU[data.type] || data.type}
                 sx={{
                     ml: "auto",
                     fontSize: 10,
+                    fontWeight: 700,
                     height: 20,
-                    bgcolor: `${color}20`,
-                    border: `1px solid ${color}`,
+                    bgcolor: `${color}12`,
+                    color: color,
+                    border: `1px solid ${color}30`,
                 }}
             />
         </Stack>

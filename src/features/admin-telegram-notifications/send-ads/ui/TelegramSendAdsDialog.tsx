@@ -6,7 +6,6 @@ import {
     DialogContent,
     DialogTitle,
     Stack,
-    TextField,
     Typography,
     Box,
     Checkbox,
@@ -26,7 +25,6 @@ import {
     FaCode,
     FaLink,
     FaTelegramPlane,
-    FaEye,
     FaEyeSlash,
 } from "react-icons/fa";
 
@@ -115,7 +113,6 @@ export function TelegramSendAdsDialog(props: Props) {
 
     const [selectedBotIds, setSelectedBotIds] = useState<string[]>([]);
     const [htmlText, setHtmlText] = useState("");
-    const [previewRevealed, setPreviewRevealed] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Initialize list of active bots when dialog opens
@@ -125,7 +122,6 @@ export function TelegramSendAdsDialog(props: Props) {
             const activeIds = configs.filter(c => c.is_active).map(c => c.id);
             setSelectedBotIds(activeIds);
             setHtmlText("");
-            setPreviewRevealed(false);
         }
     }, [open, configs]);
 
@@ -159,7 +155,6 @@ export function TelegramSendAdsDialog(props: Props) {
     const handleAddLink = () => {
         const url = window.prompt("Введите URL ссылки:", "https://");
         if (url === null) return;
-        const text = url.trim() || "ссылка";
         const tag = `<a href="${url}">`;
         const endTag = "</a>";
         const textarea = textareaRef.current;
