@@ -141,7 +141,7 @@ export default function ShipmentsListPage({ scope }: Props) {
                 onApply={(kind, filters) => {
                     setDrawerOpen(false);
                     setAppliedKind(kind);
-                    setAppliedFilters(filters);
+                    setAppliedFilters(Object.keys(filters).length === 0 ? {} : filters);
                     setReloadKey((k) => k + 1);
                 }}
             />

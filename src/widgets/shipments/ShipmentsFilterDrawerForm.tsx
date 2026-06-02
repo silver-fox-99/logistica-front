@@ -41,6 +41,23 @@ type Props = {
 const MAX_VEHICLES = 5;
 const STORAGE_KEY = "shipments:filters:drawer-form";
 
+const EMPTY_FILTERS: Record<keyof PublicFilters, any> = {
+    pickup_geo_location_name: null,
+    pickup_geo_location_type: null,
+    dropoff_geo_location_name: null,
+    dropoff_geo_location_type: null,
+    pickup_date_from: null,
+    pickup_date_to: null,
+    dropoff_date_from: null,
+    dropoff_date_to: null,
+    weight_min: null,
+    weight_max: null,
+    volume_min: null,
+    volume_max: null,
+    vehicle_type: [],
+    favorites_only: false,
+};
+
 const digitsOnly = (value: string) => value.replace(/\D/g, "");
 
 function normalizeNumber(value: string) {
@@ -90,13 +107,17 @@ function getInitialFormValues(initialKind: ShipmentsKind, initialFilters: Public
     const stored = getStoredFormValues();
 
     if (stored) {
-        return stored;
+        return {
+            ...EMPTY_FILTERS,
+            ...stored,
+        } as FormValues;
     }
 
     return {
         kind: initialKind,
+        ...EMPTY_FILTERS,
         ...(initialFilters as any),
-    };
+    } as FormValues;
 }
 
 export function ShipmentsFilterDrawerForm({
@@ -146,24 +167,12 @@ export function ShipmentsFilterDrawerForm({
 
         removeStoredFormValues();
 
-        reset({
+        const resetValues = {
             kind: currentKind,
-            pickup_geo_location_name: undefined,
-            pickup_geo_location_type: undefined,
-            dropoff_geo_location_name: undefined,
-            dropoff_geo_location_type: undefined,
-            pickup_date_from: undefined,
-            pickup_date_to: undefined,
-            dropoff_date_from: undefined,
-            dropoff_date_to: undefined,
-            weight_min: undefined,
-            weight_max: undefined,
-            volume_min: undefined,
-            volume_max: undefined,
-            vehicle_type: undefined,
-            favorites_only: undefined,
-        } as FormValues);
+            ...EMPTY_FILTERS,
+        } as FormValues;
 
+        reset(resetValues);
         onApply(currentKind, {});
     };
 
