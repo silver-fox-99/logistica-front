@@ -41,6 +41,7 @@ export type AdminUserPatch = Partial<{
     meta: Record<string, any>;
     deleted_at: string | null;
     type: string | null;
+    telegram_chat_id?: string | null;
 }>;
 
 export const adminUserApi = {

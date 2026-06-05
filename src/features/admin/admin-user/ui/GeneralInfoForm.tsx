@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
-import { Card, CardContent, Stack, TextField, InputAdornment, Button } from "@mui/material";
-import { FiUser, FiPhone, FiMail, FiSave, FiLoader, FiBriefcase } from "react-icons/fi";
+import { Card, CardContent, Stack, TextField, InputAdornment, Button, Chip } from "@mui/material";
+import { FiUser, FiPhone, FiMail, FiSave, FiLoader, FiBriefcase, FiSend, FiCheck, FiX } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { adminUserApi } from "@/shared/api/adminUserApi";
@@ -17,6 +17,7 @@ type FormValues = {
     email?: string | null;
     avatar?: string | null;
     type?: string | null;
+    telegram_chat_id?: string | null;
 };
 
 export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: AdminUser) => void; }) {
@@ -28,6 +29,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             email:      user.email ?? "",
             avatar:     user.avatar ?? "",
             type:       user.type ?? "",
+            telegram_chat_id: user.telegram_chat_id ?? "",
         },
     });
 
@@ -43,6 +45,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                 email:      values.email?.trim()      ? values.email.trim()      : null,
                 avatar:     values.avatar?.trim()     ? values.avatar.trim()     : null,
                 type:       values.type?.trim()       ? values.type.trim()       : null,
+                telegram_chat_id: values.telegram_chat_id?.trim() ? values.telegram_chat_id.trim() : null,
             };
 
             const payload = diffPayload<FormValues>(
@@ -53,6 +56,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                     email:      user.email ?? null,
                     avatar:     user.avatar ?? null,
                     type:       user.type ?? null,
+                    telegram_chat_id: user.telegram_chat_id ?? null,
                 },
                 normalized
             );
@@ -86,9 +90,106 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                 email:      res.data.user.email ?? "",
                 avatar:     res.data.user.avatar ?? "",
                 type:       res.data.user.type ?? "",
+                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
             });
         } catch (error: any) {
             const message = error?.response?.data?.message || 'Ошибка при обновлении пользователя';
+            toast.error(message);
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const handleVerifyPhone = async () => {
+        setBusy(true);
+        try {
+            await adminUserApi.patch(user.id, { phone_verified_at: new Date().toISOString() });
+            const res = await adminUserApi.get(user.id);
+            onUpdated(res.data.user);
+            toast.success("Номер телефона успешно подтвержден");
+            reset({
+                first_name: res.data.user.first_name ?? "",
+                last_name:  res.data.user.last_name ?? "",
+                phone:      res.data.user.phone ?? "",
+                email:      res.data.user.email ?? "",
+                avatar:     res.data.user.avatar ?? "",
+                type:       res.data.user.type ?? "",
+                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
+            });
+        } catch (error: any) {
+            const message = error?.response?.data?.message || "Ошибка при верификации телефона";
+            toast.error(message);
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const handleUnverifyPhone = async () => {
+        setBusy(true);
+        try {
+            await adminUserApi.patch(user.id, { phone_verified_at: null });
+            const res = await adminUserApi.get(user.id);
+            onUpdated(res.data.user);
+            toast.success("Верификация телефона сброшена");
+            reset({
+                first_name: res.data.user.first_name ?? "",
+                last_name:  res.data.user.last_name ?? "",
+                phone:      res.data.user.phone ?? "",
+                email:      res.data.user.email ?? "",
+                avatar:     res.data.user.avatar ?? "",
+                type:       res.data.user.type ?? "",
+                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
+            });
+        } catch (error: any) {
+            const message = error?.response?.data?.message || "Ошибка при сбросе верификации телефона";
+            toast.error(message);
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const handleVerifyEmail = async () => {
+        setBusy(true);
+        try {
+            await adminUserApi.patch(user.id, { email_verified_at: new Date().toISOString() });
+            const res = await adminUserApi.get(user.id);
+            onUpdated(res.data.user);
+            toast.success("Email адрес успешно подтвержден");
+            reset({
+                first_name: res.data.user.first_name ?? "",
+                last_name:  res.data.user.last_name ?? "",
+                phone:      res.data.user.phone ?? "",
+                email:      res.data.user.email ?? "",
+                avatar:     res.data.user.avatar ?? "",
+                type:       res.data.user.type ?? "",
+                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
+            });
+        } catch (error: any) {
+            const message = error?.response?.data?.message || "Ошибка при верификации email";
+            toast.error(message);
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const handleUnverifyEmail = async () => {
+        setBusy(true);
+        try {
+            await adminUserApi.patch(user.id, { email_verified_at: null });
+            const res = await adminUserApi.get(user.id);
+            onUpdated(res.data.user);
+            toast.success("Верификация email сброшена");
+            reset({
+                first_name: res.data.user.first_name ?? "",
+                last_name:  res.data.user.last_name ?? "",
+                phone:      res.data.user.phone ?? "",
+                email:      res.data.user.email ?? "",
+                avatar:     res.data.user.avatar ?? "",
+                type:       res.data.user.type ?? "",
+                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
+            });
+        } catch (error: any) {
+            const message = error?.response?.data?.message || "Ошибка при сбросе верификации email";
             toast.error(message);
         } finally {
             setBusy(false);
@@ -99,11 +200,12 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
         <Card variant="outlined" sx={{ borderRadius: 2 }}>
             <CardContent>
                 <form onSubmit={handleSubmit(submit)}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={3}>
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <Stack spacing={2}>
+                            <Stack spacing={2.5}>
                                 <TextField
                                     label="Имя"
+                                    fullWidth
                                     {...register("first_name", {
                                         setValueAs: (v) => (typeof v === "string" ? v : ""),
                                         maxLength: { value: 120, message: "Максимум 120 символов" },
@@ -114,6 +216,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                                 />
                                 <TextField
                                     label="Фамилия"
+                                    fullWidth
                                     {...register("last_name", {
                                         setValueAs: (v) => (typeof v === "string" ? v : ""),
                                         maxLength: { value: 120, message: "Максимум 120 символов" },
@@ -122,41 +225,88 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                                     helperText={errors.last_name?.message}
                                     InputProps={{ startAdornment: <InputAdornment position="start"><FiUser/></InputAdornment> }}
                                 />
-                                <TextField
-                                    label="Телефон (E.164)"
-                                    {...register("phone", {
-                                        setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
-                                        validate: (v) => !v || (phoneRegex.test(v) && v.length >= 10 && v.length <= 20) || "Телефон должен быть в формате E.164 и содержать 10-20 символов",
-                                    })}
-                                    error={!!errors.phone}
-                                    helperText={errors.phone?.message}
-                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiPhone/></InputAdornment> }}
-                                />
+
+                                <Stack spacing={1}>
+                                    <TextField
+                                        label="Телефон (E.164)"
+                                        fullWidth
+                                        {...register("phone", {
+                                            setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                            validate: (v) => !v || (phoneRegex.test(v) && v.length >= 10 && v.length <= 20) || "Телефон должен быть в формате E.164 и содержать 10-20 символов",
+                                        })}
+                                        error={!!errors.phone}
+                                        helperText={errors.phone?.message}
+                                        InputProps={{ startAdornment: <InputAdornment position="start"><FiPhone/></InputAdornment> }}
+                                    />
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        {user.phone_verified_at ? (
+                                            <>
+                                                <Chip size="small" color="success" icon={<FiCheck />} label="Подтвержден" variant="outlined" />
+                                                <Button size="small" variant="text" color="warning" onClick={handleUnverifyPhone} disabled={busy} sx={{ fontSize: '0.75rem' }}>
+                                                    Снять подтверждение
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Chip size="small" color="warning" icon={<FiX />} label="Не подтвержден" variant="outlined" />
+                                                <Button size="small" variant="text" color="success" onClick={handleVerifyPhone} disabled={busy} sx={{ fontSize: '0.75rem' }}>
+                                                    Подтвердить телефон
+                                                </Button>
+                                            </>
+                                        )}
+                                    </Stack>
+                                </Stack>
                             </Stack>
                         </Grid>
+
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <Stack spacing={2}>
+                            <Stack spacing={2.5}>
+                                <Stack spacing={1}>
+                                    <TextField
+                                        label="Email адрес"
+                                        fullWidth
+                                        {...register("email", {
+                                            setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                            validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Email неверный",
+                                        })}
+                                        error={!!errors.email}
+                                        helperText={errors.email?.message}
+                                        InputProps={{ startAdornment: <InputAdornment position="start"><FiMail/></InputAdornment> }}
+                                    />
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        {user.email_verified_at ? (
+                                            <>
+                                                <Chip size="small" color="success" icon={<FiCheck />} label="Подтвержден" variant="outlined" />
+                                                <Button size="small" variant="text" color="warning" onClick={handleUnverifyEmail} disabled={busy} sx={{ fontSize: '0.75rem' }}>
+                                                    Снять подтверждение
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Chip size="small" color="warning" icon={<FiX />} label="Не подтвержден" variant="outlined" />
+                                                <Button size="small" variant="text" color="success" onClick={handleVerifyEmail} disabled={busy} sx={{ fontSize: '0.75rem' }}>
+                                                    Подтвердить email
+                                                </Button>
+                                            </>
+                                        )}
+                                    </Stack>
+                                </Stack>
+
                                 <TextField
-                                    label="Email адрес"
-                                    {...register("email", {
+                                    label="Telegram Chat ID"
+                                    fullWidth
+                                    {...register("telegram_chat_id", {
                                         setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
-                                        validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Email неверный",
+                                        maxLength: { value: 100, message: "Максимум 100 символов" },
                                     })}
-                                    error={!!errors.email}
-                                    helperText={errors.email?.message}
-                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiMail/></InputAdornment> }}
+                                    error={!!errors.telegram_chat_id}
+                                    helperText={errors.telegram_chat_id?.message}
+                                    InputProps={{ startAdornment: <InputAdornment position="start"><FiSend/></InputAdornment> }}
                                 />
-                                <TextField
-                                    label="Аватар URL"
-                                    {...register("avatar", {
-                                        setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
-                                        validate: (v) => !v || /^https?:\/\//i.test(v) || "Должен быть валидным URL",
-                                    })}
-                                    error={!!errors.avatar}
-                                    helperText={errors.avatar?.message}
-                                />
+
                                 <TextField
                                     label="Тип пользователя"
+                                    fullWidth
                                     {...register("type", {
                                         setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
                                         maxLength: { value: 120, message: "Максимум 120 символов" },
@@ -167,6 +317,20 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                                 />
                             </Stack>
                         </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <TextField
+                                label="Аватар URL"
+                                fullWidth
+                                {...register("avatar", {
+                                    setValueAs: (v) => (typeof v === "string" ? v.trim() : ""),
+                                    validate: (v) => !v || /^https?:\/\//i.test(v) || "Должен быть валидным URL",
+                                })}
+                                error={!!errors.avatar}
+                                helperText={errors.avatar?.message}
+                            />
+                        </Grid>
+
                         <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end">
                             <Button type="submit" variant="contained" startIcon={busy ? <FiLoader/> : <FiSave/>} disabled={busy || !isDirty}>
                                 {busy ? "Сохранение…" : "Сохранить информацию"}

@@ -290,7 +290,7 @@ export default function AdminLayout() {
                 }}
             >
                 <Toolbar />
-                <Box sx={{ py: 3, px: { xs: 2, md: 3 }, width: "100%" }}>
+                <Box sx={{ pt: 3, pb: 12, px: { xs: 2, md: 3 }, width: "100%" }}>
                     <Outlet />
                 </Box>
             </Box>

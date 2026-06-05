@@ -29,6 +29,7 @@ export type AdminUser = {
     deleted_at: string | null;
     binotel_id: string | null;
     type?: string | null;
+    telegram_chat_id?: string | null;
 };
 
 export type AdminUsersResponse = {
