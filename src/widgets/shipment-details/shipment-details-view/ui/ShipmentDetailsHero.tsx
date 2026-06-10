@@ -226,7 +226,7 @@ export function ShipmentDetailsHero({
                                     </Stack>
                                 )}
 
-                                {data.contact?.phone1 && (
+                                {data.contact?.phone1 && !data.extraPhoneAsMain && (
                                     <Stack direction="row" spacing={0.75} alignItems="center">
                                         <FiPhone size={14} />
                                         <Typography variant="body2">{data.contact.phone1}</Typography>
