@@ -124,6 +124,23 @@ export default function ProfilePage() {
 
     const fullNameWithPlan = `${baseName} (${planLabel})`;
 
+    const subscriptionExpiresAt = useMemo(() => {
+        if (!activeSubscription) return null;
+        if (activeSubscription.lifetime) {
+            return t("profile.overview.lifetime", "бессрочно");
+        }
+        if (!activeSubscription.ends_at) return null;
+
+        const dt = new Date(activeSubscription.ends_at);
+        return dt.toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }, [activeSubscription, t]);
+
     const updateUser = async (
         values: ContactInfo & { phoneMainE164?: string; phoneAltE164?: string }
     ) => {
@@ -156,6 +173,7 @@ export default function ProfilePage() {
                 fullName={fullNameWithPlan}
                 location={user?.meta?.geo || t("profile.overview.unknown")}
                 registeredAt={userDate || t("profile.overview.unknown")}
+                subscriptionExpiresAt={subscriptionExpiresAt}
                 ratings={overviewRatings}
             />
 

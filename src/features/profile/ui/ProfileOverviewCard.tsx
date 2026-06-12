@@ -8,6 +8,7 @@ type ProfileOverviewCardProps = {
     fullName: string;
     location?: string;
     registeredAt?: string;
+    subscriptionExpiresAt?: string | null;
     ratings?: { label: string; value: number | null | undefined; color?: "default"|"primary"|"success"|"warning" }[];
 };
 
@@ -15,6 +16,7 @@ export default function ProfileOverviewCard({
                                                 fullName,
                                                 location = "—",
                                                 registeredAt = "—",
+                                                subscriptionExpiresAt = null,
                                                 ratings = [],
                                             }: ProfileOverviewCardProps) {
     const { t } = useTranslation();
@@ -66,9 +68,14 @@ export default function ProfileOverviewCard({
                             </Stack>
                         )}
 
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ color: "text.secondary", mt: 0.5 }}>
+                        <Stack direction={{ xs: "column", sm: "row" }} gap={1} sx={{ color: "text.secondary", mt: 0.5 }} flexWrap="wrap">
                             <Typography variant="body2"><b>{t('profile.overview.location')}</b> {location}</Typography>
                             <Typography variant="body2"><b>{t('profile.overview.registeredAt')}</b> {registeredAt}</Typography>
+                            {subscriptionExpiresAt && (
+                                <Typography variant="body2">
+                                    <b>{t('profile.overview.subscriptionExpiresAt', 'Активен до:')}</b> {subscriptionExpiresAt}
+                                </Typography>
+                            )}
                         </Stack>
                     </Stack>
                 </Stack>

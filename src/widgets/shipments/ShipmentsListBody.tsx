@@ -37,6 +37,7 @@ type Props = {
     filters: Partial<PublicFilters>;
     onRequestReload?: () => void;
     onTotalChange?: (count: number) => void;
+    reloadKey?: number;
 };
 
 export const ShipmentsListBody = React.memo(function ShipmentsListBody({
@@ -45,6 +46,7 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
                                                                            filters,
                                                                            onRequestReload,
                                                                            onTotalChange,
+                                                                           reloadKey,
                                                                        }: Props) {
     const { t } = useTranslation();
 
@@ -57,7 +59,7 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
 
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
-    const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters);
+    const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters, reloadKey);
 
     useEffect(() => {
         onTotalChange?.(total || 0);

@@ -54,8 +54,8 @@ export default function MyShipmentsManagePage() {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     const listKey = useMemo(() => {
-        return `${appliedKind}-${JSON.stringify(appliedFilters)}-${reloadKey}`;
-    }, [appliedKind, appliedFilters, reloadKey]);
+        return `${appliedKind}-${JSON.stringify(appliedFilters)}`;
+    }, [appliedKind, appliedFilters]);
 
     const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
     const selectedCount = selectedIds.length;
@@ -281,6 +281,7 @@ export default function MyShipmentsManagePage() {
                     onRequestReload={requestReload}
                     onTotalChange={setTotalCount}
                     onPageIdsChange={setPageIds}
+                    reloadKey={reloadKey}
                 />
             </div>
 

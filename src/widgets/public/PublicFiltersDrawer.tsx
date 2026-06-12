@@ -264,6 +264,14 @@ function GeoLocationAutocomplete({
     );
 }
 
+const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 export function PublicFiltersDrawer({
                                         open,
                                         initial,
@@ -278,16 +286,19 @@ export function PublicFiltersDrawer({
 
     const getInitialFilters = (init?: PublicFilters): PublicFilters => {
         const stored = getStoredFilters(kind);
+        const defaultFilters = {
+            pickup_date_from: getTodayDateString(),
+        };
 
         if (stored) {
-            return stored;
+            return { ...defaultFilters, ...stored };
         }
 
         if (init && Object.keys(init).length > 0) {
-            return { ...init };
+            return { ...defaultFilters, ...init };
         }
 
-        return {};
+        return defaultFilters;
     };
 
     const [f, setF] = useState<PublicFilters>(() => getInitialFilters(initial));
@@ -342,8 +353,9 @@ export function PublicFiltersDrawer({
 
     const onReset = () => {
         removeStoredFilters(kind);
-        setF({});
-        onApply({});
+        const defaults = { pickup_date_from: getTodayDateString() };
+        setF(defaults);
+        onApply(defaults);
     };
 
     const handleVehicleTypes = (opts: Option[]) => {

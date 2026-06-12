@@ -9,7 +9,8 @@ import { Add } from "@mui/icons-material";
 import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
     FiLogOut, FiSearch,
-    FiAward, FiFileText, FiChevronDown, FiChevronRight, FiList
+    FiAward, FiFileText, FiChevronDown, FiChevronRight, FiList,
+    FiMessageSquare
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
@@ -53,6 +54,7 @@ function SidebarContent({
     ];
 
     const bottomNav = [
+        { to: "/reviews",            icon: <FiMessageSquare />, label: t('dashboard.menu.siteReviews', 'Отзывы о сайте') },
         { to: "/dashboard/security", icon: <FiShield />,      label: t('dashboard.menu.security') },
         { to: "/dashboard/help",     icon: <FiHelpCircle />,  label: t('dashboard.menu.helpSupport') },
     ];

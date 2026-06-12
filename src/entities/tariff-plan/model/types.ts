@@ -41,6 +41,7 @@ export type TariffPlan = {
     price: string | null;
     currency: string | null;
     billing_period: BillingPeriod | null;
+    days: number;
 
     can_view_tenders: boolean;
     active_tenders?: number | null;
@@ -75,6 +76,7 @@ export type UpsertTariffPlanPayload = {
     price?: string | null;
     currency?: string | null;
     billing_period?: BillingPeriod | null;
+    days?: number;
 
     cargo_limit?: number | null;
     vehicle_limit?: number | null;

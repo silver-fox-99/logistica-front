@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import {
     Alert,
     Box,
+    Button,
     CircularProgress,
     Paper,
     Stack,
@@ -20,7 +21,7 @@ import {
     IconButton,
     Tooltip,
 } from "@mui/material";
-import { FiRefreshCw } from "react-icons/fi";
+import { FiRefreshCw, FiCheck, FiCheckSquare } from "react-icons/fi";
 
 import { useNotifications } from "@/features/notifications/list/model/useNotifications";
 import { NotificationType, type Notification } from "@/entities/notification/model/types";
@@ -32,9 +33,11 @@ const TABS: Array<{ label: string; type?: NotificationType }> = [
     { label: "Все", type: undefined },
     { label: "Регистрация", type: NotificationType.REGISTRATION },
     { label: "Отзывы", type: NotificationType.REVIEW },
-    { label: "Смена тарифа", type: NotificationType.PLAN_CHANGE },
+    { label: "Оплата тарифа", type: NotificationType.PLAN_CHANGE },
     { label: "Создан груз", type: NotificationType.CARGO_CREATED },
     { label: "Создан транспорт", type: NotificationType.TRANSPORT_CREATED },
+    { label: "Создана компания", type: NotificationType.COMPANY_CREATED },
+    { label: "Создан тендер", type: NotificationType.TENDER_CREATED },
 ];
 
 function typeLabel(t: NotificationType) {
@@ -44,11 +47,15 @@ function typeLabel(t: NotificationType) {
         case NotificationType.REVIEW:
             return "Отзыв";
         case NotificationType.PLAN_CHANGE:
-            return "Смена тарифа";
+            return "Оплата тарифа";
         case NotificationType.CARGO_CREATED:
             return "Создан груз";
         case NotificationType.TRANSPORT_CREATED:
             return "Создан транспорт";
+        case NotificationType.COMPANY_CREATED:
+            return "Создана компания";
+        case NotificationType.TENDER_CREATED:
+            return "Создан тендер";
         default:
             return t;
     }
@@ -80,6 +87,8 @@ export default function NotificationsPage() {
         loading,
         error,
         reload,
+        markAsRead,
+        markAllAsRead,
     } = useNotifications();
 
     const tabIndex = useMemo(() => {
@@ -91,7 +100,6 @@ export default function NotificationsPage() {
     const total = data?.total ?? 0;
 
     const canViewNotifications = useAdminAccessStore((s) => s.hasPermission(viewCode('NOTIFICATIONS' as any)));
-
 
     if (!canViewNotifications) return <NoAccess/>
 
@@ -107,13 +115,23 @@ export default function NotificationsPage() {
                     </Typography>
                 </Stack>
 
-                <Tooltip title="Обновить">
-                    <span>
-                        <IconButton onClick={() => void reload()} disabled={loading}>
-                            {loading ? <CircularProgress size={18} /> : <FiRefreshCw />}
-                        </IconButton>
-                    </span>
-                </Tooltip>
+                <Stack direction="row" alignItems="center" gap={1}>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={markAllAsRead}
+                        startIcon={<FiCheckSquare />}
+                    >
+                        Прочитать все
+                    </Button>
+                    <Tooltip title="Обновить">
+                        <span>
+                            <IconButton onClick={() => void reload()} disabled={loading}>
+                                {loading ? <CircularProgress size={18} /> : <FiRefreshCw />}
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                </Stack>
             </Stack>
 
             {error && (
@@ -152,13 +170,24 @@ export default function NotificationsPage() {
                                     <TableCell width={280}>Пользователь</TableCell>
                                     <TableCell width={170}>Телефон</TableCell>
                                     <TableCell>Сообщение</TableCell>
+                                    <TableCell width={100} align="right">Действия</TableCell>
                                 </TableRow>
                             </TableHead>
 
                             <TableBody>
                                 {items.map((n: Notification) => (
-                                    <TableRow key={n.id} hover>
-                                        <TableCell sx={{ fontFamily: "monospace", fontSize: 12 }}>
+                                    <TableRow
+                                        key={n.id}
+                                        hover
+                                        sx={{
+                                            bgcolor: n.is_read ? "transparent" : "rgba(25, 118, 210, 0.04)",
+                                            fontWeight: n.is_read ? "normal" : "bold",
+                                            "&:hover": {
+                                                bgcolor: n.is_read ? "action.hover" : "rgba(25, 118, 210, 0.08) !important",
+                                            },
+                                        }}
+                                    >
+                                        <TableCell sx={{ fontFamily: "monospace", fontSize: 12, fontWeight: "inherit" }}>
                                             {formatTime(n.created_at)}
                                         </TableCell>
 
@@ -166,21 +195,31 @@ export default function NotificationsPage() {
                                             <Chip size="small" label={typeLabel(n.type)} />
                                         </TableCell>
 
-                                        <TableCell sx={{ fontFamily: "monospace", fontSize: 12 }}>
+                                        <TableCell sx={{ fontFamily: "monospace", fontSize: 12, fontWeight: "inherit" }}>
                                             {n.user_id ?? "—"}
                                         </TableCell>
 
-                                        <TableCell sx={{ fontFamily: "monospace", fontSize: 12 }}>
+                                        <TableCell sx={{ fontFamily: "monospace", fontSize: 12, fontWeight: "inherit" }}>
                                             {n.phone ?? "—"}
                                         </TableCell>
 
-                                        <TableCell>{n.message}</TableCell>
+                                        <TableCell sx={{ fontWeight: "inherit" }}>{n.message}</TableCell>
+
+                                        <TableCell align="right">
+                                            {!n.is_read && (
+                                                <Tooltip title="Прочитано">
+                                                    <IconButton size="small" onClick={() => void markAsRead(n.id)}>
+                                                        <FiCheck style={{ color: "#2e7d32" }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
 
                                 {!loading && items.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={5}>
+                                        <TableCell colSpan={6}>
                                             <Typography variant="body2" color="text.secondary">
                                                 Уведомления не найдены.
                                             </Typography>
@@ -190,7 +229,7 @@ export default function NotificationsPage() {
 
                                 {loading && (
                                     <TableRow>
-                                        <TableCell colSpan={5}>
+                                        <TableCell colSpan={6}>
                                             <Stack direction="row" alignItems="center" gap={1.5}>
                                                 <CircularProgress size={18} />
                                                 <Typography variant="body2">Загрузка...</Typography>

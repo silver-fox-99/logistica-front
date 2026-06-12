@@ -5,6 +5,7 @@ export const FALLBACK_BILLING_PERIODS: { value: BillingPeriod; label: string }[]
     { value: "MONTHLY", label: "Monthly" },
     { value: "YEARLY", label: "Yearly" },
     { value: "ONE_TIME", label: "One-time" },
+    { value: "CUSTOM", label: "Custom" },
 ];
 
 export const createEmptyTariffPlanForm = (
@@ -19,6 +20,7 @@ export const createEmptyTariffPlanForm = (
     price_text: "",
     currency: "",
     billing_period: defaultPeriod ?? "",
+    days: null,
 
     cargo_limit: null,
     vehicle_limit: null,
@@ -56,6 +58,7 @@ export const mapPlanToFormValues = (plan: TariffPlan): TariffPlanFormValues => {
                 : String(plan.price),
         currency: plan.currency ?? "",
         billing_period: plan.billing_period ?? "",
+        days: plan.days !== undefined && plan.days !== null ? plan.days : null,
 
         cargo_limit: toNullableNumber(plan.cargo_limit ?? ent.cargo_limit),
         vehicle_limit: toNullableNumber(plan.vehicle_limit ?? ent.vehicle_limit),
@@ -114,6 +117,15 @@ export const validateTariffPlanForm = (
         return "Currency must contain 3 characters.";
     }
 
+    if (values.billing_period === "CUSTOM") {
+        if (values.days === null || values.days === undefined || isNaN(values.days)) {
+            return "Количество дней обязательно для кастомного периода.";
+        }
+        if (values.days < 1) {
+            return "Длительность кастомного тарифа должна быть не менее 1 дня.";
+        }
+    }
+
     return null;
 };
 
@@ -130,7 +142,7 @@ export const buildTariffPlanPayload = (
         price: values.price_text.trim() ? values.price_text.trim() : null,
         currency: values.currency.trim() ? values.currency.trim().toUpperCase() : null,
         billing_period: values.billing_period || null,
-
+        days: values.billing_period === "CUSTOM" ? (values.days ?? 0) : 0,
 
         cargo_limit: values.cargo_limit,
         vehicle_limit: values.vehicle_limit,
@@ -148,6 +160,18 @@ export const buildTariffPlanPayload = (
 export const formatTariffPrice = (plan: TariffPlan) => {
     if (plan.price === undefined || plan.price === null || plan.price === "") return "—";
     if (!plan.currency || !plan.billing_period) return "—";
+
+    if (plan.billing_period === "CUSTOM") {
+        const daysCount = plan.days ?? 0;
+        const mod10 = daysCount % 10;
+        const mod100 = daysCount % 100;
+        let suffix = "дней";
+        if (mod100 < 11 || mod100 > 19) {
+            if (mod10 === 1) suffix = "день";
+            else if (mod10 >= 2 && mod10 <= 4) suffix = "дня";
+        }
+        return `${plan.price} ${plan.currency} / ${daysCount} ${suffix}`;
+    }
 
     return `${plan.price} ${plan.currency} / ${plan.billing_period}`;
 };

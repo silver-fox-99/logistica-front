@@ -20,7 +20,7 @@ export default function Footer() {
         terms: "/docs/user-agreement.pdf",
         billing: "/payments-billing.pdf",
     };
-    const phoneNumbers = ["+998 94 986 68 86", "+998781136755"];
+    const phoneNumbers = ["+998 94 986 68 86", "+998 78 113 67 55"];
     const email = "info@yologistic.uz";
     const user = useUserStore((s) => s.user);
     const isAuthenticated = !!user;
@@ -66,6 +66,7 @@ export default function Footer() {
                    <button type="button" className="footer__link-button" onClick={handleContactClick}>
                        {t('footer.contacts')}
                    </button>
+                   <Link to="/reviews">{t('footer.siteReviews', 'Отзывы о сайте')}</Link>
                    {isAuthenticated ? (
                        <Link to="/dashboard/help">{t('footer.askAndAnswer')}</Link>
                    ) : (
@@ -100,7 +101,7 @@ export default function Footer() {
                         <a href={`mailto:${email}`}>{email}</a>
                     </div>
                     <button type="button" className="footer__modal-close" onClick={() => setContactOpen(false)}>
-                        Закрыть
+                        {t('header.close', 'Закрыть')}
                     </button>
                 </div>
             </div>

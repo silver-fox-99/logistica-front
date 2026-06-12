@@ -51,6 +51,7 @@ export function useShipments(
     page = 1,
     limit = 10,
     filters: Partial<ListParams> = {},
+    reloadTrigger?: number,
 ) {
     const [items, setItems] = useState<ShipmentRowData[]>([]);
     const [total, setTotal] = useState(0);
@@ -102,7 +103,7 @@ export function useShipments(
         return () => {
             aborted = true;
         };
-    }, [kind, scope, page, limit, JSON.stringify(requestFilters)]);
+    }, [kind, scope, page, limit, JSON.stringify(requestFilters), reloadTrigger]);
 
     return { items, total, pages, loading, error };
 }

@@ -120,7 +120,10 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
                                 {priceLabel(plan)}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                                {t("paymentsNew.billingPeriod", "Billing period")}: {plan.billing_period || "—"}
+                                {t("paymentsNew.billingPeriod", "Billing period")}:{" "}
+                                {plan.billing_period === "CUSTOM"
+                                    ? `${plan.days} ${t("paymentsNew.days", "days")}`
+                                    : (plan.billing_period || "—")}
                             </Typography>
                         </Stack>
                     )}

@@ -37,9 +37,10 @@ type Props = {
     filters: Partial<PublicFilters>;
     selectedIds: Set<string>;
     onToggleSelect: (id: string) => void;
-    onRequestReload?: () => void;
+    onRequestReload?: (page?: number) => void;
     onTotalChange?: (count: number) => void;
     onPageIdsChange?: (ids: string[]) => void;
+    reloadKey?: number;
 };
 
 export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
@@ -50,13 +51,14 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
                                                                                    onRequestReload,
                                                                                    onTotalChange,
                                                                                    onPageIdsChange,
+                                                                                   reloadKey,
                                                                                }: Props) {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
 
-    const { items, pages, total, loading } = useShipments(kind, "my", page, limit, filters);
+    const { items, pages, total, loading } = useShipments(kind, "my", page, limit, filters, reloadKey);
 
     useEffect(() => {
         setPage(1);

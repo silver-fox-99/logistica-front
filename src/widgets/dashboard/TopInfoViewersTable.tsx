@@ -1,13 +1,14 @@
 import { useMemo } from "react";
 import {
-    Paper,
+    Card,
+    CardHeader,
+    CardContent,
     Typography,
     Table,
     TableHead,
     TableRow,
     TableCell,
     TableBody,
-    Stack,
     Chip,
 } from "@mui/material";
 import type { InfoViewer } from "@/shared/api/dashboardApi";
@@ -31,7 +32,7 @@ function formatDate(iso?: string | null) {
 }
 
 export default function TopInfoViewersTable({
-                                                title = "Топ просмотров деталей",
+                                                title = "Топ просмотров контактов",
                                                 rows,
                                             }: {
     title?: string;
@@ -40,65 +41,87 @@ export default function TopInfoViewersTable({
     const sorted = useMemo(() => rows ?? [], [rows]);
 
     return (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-                <Typography variant="h6" fontWeight={700}>
-                    {title}
-                </Typography>
-                <Chip size="small" label={`Top ${sorted.length}`} />
-            </Stack>
-
-            <Table size="small">
-                <TableHead>
-                    <TableRow>
-                        <TableCell sx={{ width: 64 }}>#</TableCell>
-                        <TableCell>Пользователь</TableCell>
-                        <TableCell>Контакт</TableCell>
-                        <TableCell align="right">Cargo</TableCell>
-                        <TableCell align="right">Transport</TableCell>
-                        <TableCell align="right">Всего</TableCell>
-                        <TableCell>Последний просмотр</TableCell>
-                    </TableRow>
-                </TableHead>
-
-                <TableBody>
-                    {sorted.length === 0 ? (
-                        <TableRow>
-                            <TableCell colSpan={7} sx={{ color: "text.secondary" }}>
-                                Нет данных за выбранный период
-                            </TableCell>
+        <Card
+            variant="outlined"
+            sx={{
+                borderRadius: 4,
+                transition: "all 0.3s ease",
+                "&:hover": {
+                    boxShadow: "0 10px 20px rgba(0, 0, 0, 0.03)",
+                },
+            }}
+        >
+            <CardHeader
+                title={title}
+                subheader="Пользователи, наиболее часто просматривавшие детальную информацию"
+                titleTypographyProps={{ fontWeight: 800, fontSize: "1.1rem" }}
+                subheaderTypographyProps={{ fontSize: "0.85rem", color: "text.secondary" }}
+                action={
+                    <Chip size="small" label={`Top ${sorted.length}`} color="primary" sx={{ fontWeight: 600, mt: 1, mr: 1 }} />
+                }
+            />
+            <CardContent sx={{ pt: 0, overflowX: "auto" }}>
+                <Table size="medium">
+                    <TableHead>
+                        <TableRow sx={{ "& th": { fontWeight: 700, color: "text.secondary", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" } }}>
+                            <TableCell sx={{ width: 64 }}>#</TableCell>
+                            <TableCell>Пользователь</TableCell>
+                            <TableCell>Контактные данные</TableCell>
+                            <TableCell align="right">Грузы</TableCell>
+                            <TableCell align="right">Транспорт</TableCell>
+                            <TableCell align="right">Всего просмотров</TableCell>
+                            <TableCell>Последний просмотр</TableCell>
                         </TableRow>
-                    ) : (
-                        sorted.map((r, idx) => (
-                            <TableRow key={`${r.user_id ?? r.phone ?? r.email ?? idx}`}>
-                                <TableCell>{idx + 1}</TableCell>
-                                <TableCell>
-                                    <Typography variant="body2" fontWeight={600}>
-                                        {formatName(r)}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {r.user_id ? `id: ${r.user_id}` : "id: —"}
-                                    </Typography>
+                    </TableHead>
+
+                    <TableBody>
+                        {sorted.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center" sx={{ py: 3, color: "text.secondary" }}>
+                                    Нет данных за выбранный период
                                 </TableCell>
-                                <TableCell>
-                                    <Typography variant="body2">{formatIdentity(r)}</Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {r.email ?? ""}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="right">{r.cargo_views ?? 0}</TableCell>
-                                <TableCell align="right">{r.transport_views ?? 0}</TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="body2" fontWeight={700}>
-                                        {r.total_views ?? 0}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>{formatDate(r.last_view_at)}</TableCell>
                             </TableRow>
-                        ))
-                    )}
-                </TableBody>
-            </Table>
-        </Paper>
+                        ) : (
+                            sorted.map((r, idx) => (
+                                <TableRow
+                                    key={`${r.user_id ?? r.phone ?? r.email ?? idx}`}
+                                    sx={{ "&:hover": { bgcolor: "action.hover" } }}
+                                >
+                                    <TableCell sx={{ py: 1.5, fontWeight: 700, color: "text.secondary" }}>{idx + 1}</TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2" fontWeight={600}>
+                                            {formatName(r)}
+                                        </Typography>
+                                        {r.user_id && (
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: "monospace" }}>
+                                                ID: {r.user_id.slice(0, 8)}…
+                                            </Typography>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{formatIdentity(r)}</Typography>
+                                        {r.email && (
+                                            <Typography variant="caption" color="text.secondary">
+                                                {r.email}
+                                            </Typography>
+                                        )}
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 500 }}>{r.cargo_views ?? 0}</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 500 }}>{r.transport_views ?? 0}</TableCell>
+                                    <TableCell align="right">
+                                        <Chip
+                                            size="small"
+                                            label={r.total_views ?? 0}
+                                            sx={{ fontWeight: 700, bgcolor: "action.selected", color: "text.primary" }}
+                                        />
+                                    </TableCell>
+                                    <TableCell sx={{ fontSize: "13px" }}>{formatDate(r.last_view_at)}</TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
     );
 }

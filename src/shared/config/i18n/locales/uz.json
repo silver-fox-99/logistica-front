@@ -1,7 +1,10 @@
 {
   "header": {
     "login": "Kirish",
-    "register": "Ro‘yxatdan o‘tish"
+    "register": "Ro‘yxatdan o‘tish",
+    "searchUser": "Foydalanuvchini qidirish",
+    "searchPlaceholder": "Email, telefon yoki ism",
+    "close": "Yopish"
   },
   "footer": {
     "companyName": "Kompaniya nomi",
@@ -16,7 +19,8 @@
     "privacyAndPolicy": "Shartlar va siyosat",
     "termsCookie": "Cookie siyosati",
     "terms": "Foydalanish shartlari",
-    "privacy": "Maxfiylik siyosati"
+    "privacy": "Maxfiylik siyosati",
+    "siteReviews": "Sayt sharhlari"
   },
   "loginPage": {
     "title": "Kirish",
@@ -259,7 +263,8 @@
       "referrals": "Referallar",
       "tenders": "Tenderlar",
       "tenderSearch": "Tenderlarni qidirish",
-      "myTenders": "Mening tenderlarim"
+      "myTenders": "Mening tenderlarim",
+      "siteReviews": "Sayt sharhlari"
     }
   },
   "profile": {
@@ -1030,7 +1035,8 @@
     "loading": "Yuklanmoqda...",
     "close": "Yopish",
     "copy": "Nusxa olish",
-    "dash": "—"
+    "dash": "—",
+    "reset": "Tozalash"
   },
   "bookmarkPrompt": {
     "title": {
@@ -1754,5 +1760,28 @@
       "minBidStepPlaceholder": "Masalan: 10",
       "minBidStepHint": "Har yangi taklif oldingi taklifdan kamida shu miqdorga past bo'lishi kerak"
     }
+  },
+  "reviews": {
+    "title": "Sayt sharhlari",
+    "subtitle": "Logistica logistika xizmati sifati haqida foydalanuvchilarimizning fikrlari. Biz har bir fikr-mulohazani qadrlaymiz va platformamizni doimiy ravishda takomillashtiramiz.",
+    "listTitle": "Foydalanuvchilar fikrlari",
+    "noReviews": "Hozircha sayt haqida hech qanday sharh yo'q. Birinchi bo'ling!",
+    "formTitle": "Sharh qoldirish",
+    "ratingLabel": "Sizning bahoingiz",
+    "commentLabel": "Fikr-mulohaza (ixtiyoriy)",
+    "commentPlaceholder": "Saytda nima sizga yoqdi yoki nimani yaxshilash mumkin?",
+    "submitBtn": "Sharhni yuborish",
+    "moderationNotice": "Sharh moderator tekshiruvidan so'ng e'lon qilinadi.",
+    "guestTitle": "Fikringizni baham ko'ring",
+    "guestSubtitle": "Platforma haqida sharhlarni faqat tizimga kirgan foydalanuvchilar qoldirishlari mumkin.",
+    "anonymousUser": "Foydalanuvchi",
+    "errorLoad": "Sayt sharhlarini yuklab bo'lmadi",
+    "errorRatingRequired": "Iltimos, bahoni tanlang",
+    "successSubmit": "Sharh muvaffaqiyatli moderatorga yuborildi!",
+    "errorSubmit": "Sharhni yuborib bo'lmadi",
+    "basedOn": "Asosida",
+    "countLabel": "ta sharh",
+    "starsUnit": "yulduzli",
+    "filteringBy": "Faqat quyidagi bahoga ega sharhlar ko'rsatilmoqda:"
   }
 }

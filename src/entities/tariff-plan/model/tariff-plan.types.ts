@@ -10,6 +10,7 @@ export type TariffPlanFormValues = {
     price_text: string;
     currency: string;
     billing_period: BillingPeriod | "";
+    days: number | null;
     can_view_tenders: boolean;
     active_tenders: number | null;
 

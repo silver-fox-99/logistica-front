@@ -1,11 +1,9 @@
 import api from "@/shared/api/axios";
 
-export type PriceTrendPoint = {
+export type CreationTrendPoint = {
     day: string;
-    cargo_avg: number;
-    cargo_median: number;
-    transport_avg: number;
-    transport_median: number;
+    cargo_cnt: number;
+    transport_cnt: number;
 };
 
 export type TopRoute = {
@@ -22,17 +20,7 @@ export type PowerUser = {
     first_name: string | null;
     last_name: string | null;
     ads: number;
-    updates: number;
-};
-
-export type ApiEndpointStat = {
-    endpoint: string;
-    method: string;
-    hits: number;
-    avg_ms: number;
-    p95_ms: number;
-    ok: number;
-    errors: number;
+    updates?: number;
 };
 
 export type InfoViewer = {
@@ -56,7 +44,7 @@ export type DashboardResponse = {
             newTransports: number;
             activeUsers: number;
         };
-        series: { priceTrend: PriceTrendPoint[] };
+        series: { creationTrend: CreationTrendPoint[] };
         top: {
             routes: { cargo: TopRoute[]; transport: TopRoute[] };
             countries: {
@@ -66,7 +54,6 @@ export type DashboardResponse = {
             powerUsers: PowerUser[];
             infoViewers: InfoViewer[];
         };
-        api: { endpoints: ApiEndpointStat[] };
     };
 };
 

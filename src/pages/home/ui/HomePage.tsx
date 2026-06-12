@@ -23,6 +23,14 @@ import { useUserStore } from "@/entities/user/model/user.store";
 
 type TabKind = "cargo" | "transport";
 
+const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 export default function HomePage() {
     const { t } = useTranslation();
     const { loadInit } = useInitStore();
@@ -33,7 +41,14 @@ export default function HomePage() {
     const [tab, setTab] = useState<TabKind>("cargo");
     const [page, setPage] = useState(1);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [filters, setFilters] = useState<PublicFilters>({});
+    const [filters, setFilters] = useState<PublicFilters>(() => {
+        const storedKey = `shipments:public-filters:cargo`;
+        try {
+            const raw = localStorage.getItem(storedKey);
+            if (raw) return JSON.parse(raw);
+        } catch {}
+        return { pickup_date_from: getTodayDateString() };
+    });
 
     const limit = 10;
 
@@ -108,6 +123,15 @@ export default function HomePage() {
                         onChange={(_, value: TabKind) => {
                             setTab(value);
                             setPage(1);
+                            const storedKey = `shipments:public-filters:${value}`;
+                            try {
+                                const raw = localStorage.getItem(storedKey);
+                                if (raw) {
+                                    setFilters(JSON.parse(raw));
+                                    return;
+                                }
+                            } catch {}
+                            setFilters({ pickup_date_from: getTodayDateString() });
                         }}
                         variant="scrollable"
                         scrollButtons="auto"

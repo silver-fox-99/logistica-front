@@ -14,8 +14,38 @@ import "./MyShipmentsPage.scss";
 
 type Props = { scope: "public" | "my" };
 
-const DEFAULT_KIND: ShipmentsKind = "cargo";
-const DEFAULT_FILTERS: PublicFilters = {};
+const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const getStoredFilters = (): PublicFilters => {
+    if (typeof window === "undefined") return { pickup_date_from: getTodayDateString() };
+    try {
+        const raw = localStorage.getItem("shipments:filters:drawer-form");
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            const { kind, ...filters } = parsed;
+            return filters;
+        }
+    } catch {}
+    return { pickup_date_from: getTodayDateString() };
+};
+
+const getStoredKind = (): ShipmentsKind => {
+    if (typeof window === "undefined") return "cargo";
+    try {
+        const raw = localStorage.getItem("shipments:filters:drawer-form");
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.kind) return parsed.kind;
+        }
+    } catch {}
+    return "cargo";
+};
 
 export default function ShipmentsListPage({ scope }: Props) {
     const { t } = useTranslation();
@@ -23,15 +53,15 @@ export default function ShipmentsListPage({ scope }: Props) {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
 
-    const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(DEFAULT_KIND);
-    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(DEFAULT_FILTERS);
+    const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(() => getStoredKind());
+    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(() => getStoredFilters());
 
     const [reloadKey, setReloadKey] = useState(0);
     const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
 
     const listKey = useMemo(() => {
-        return `${appliedKind}-${JSON.stringify(appliedFilters)}-${reloadKey}`;
-    }, [appliedKind, appliedFilters, reloadKey]);
+        return `${appliedKind}-${JSON.stringify(appliedFilters)}`;
+    }, [appliedKind, appliedFilters]);
 
     return (
         <>
@@ -130,6 +160,7 @@ export default function ShipmentsListPage({ scope }: Props) {
                     filters={appliedFilters}
                     onRequestReload={requestReload}
                     onTotalChange={setTotalCount}
+                    reloadKey={reloadKey}
                 />
             </div>
 

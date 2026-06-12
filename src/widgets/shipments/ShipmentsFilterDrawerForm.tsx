@@ -103,19 +103,33 @@ function removeStoredFormValues() {
     window.localStorage.removeItem(STORAGE_KEY);
 }
 
+const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 function getInitialFormValues(initialKind: ShipmentsKind, initialFilters: PublicFilters): FormValues {
     const stored = getStoredFormValues();
+    const today = getTodayDateString();
+
+    const defaults = {
+        ...EMPTY_FILTERS,
+        pickup_date_from: today,
+    };
 
     if (stored) {
         return {
-            ...EMPTY_FILTERS,
+            ...defaults,
             ...stored,
         } as FormValues;
     }
 
     return {
         kind: initialKind,
-        ...EMPTY_FILTERS,
+        ...defaults,
         ...(initialFilters as any),
     } as FormValues;
 }
@@ -170,10 +184,11 @@ export function ShipmentsFilterDrawerForm({
         const resetValues = {
             kind: currentKind,
             ...EMPTY_FILTERS,
+            pickup_date_from: getTodayDateString(),
         } as FormValues;
 
         reset(resetValues);
-        onApply(currentKind, {});
+        onApply(currentKind, { pickup_date_from: getTodayDateString() });
     };
 
     return (

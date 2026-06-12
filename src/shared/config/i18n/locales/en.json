@@ -1,7 +1,10 @@
 {
   "header": {
     "login": "Login",
-    "register": "Sign up"
+    "register": "Sign up",
+    "searchUser": "Search User",
+    "searchPlaceholder": "Email, phone or name",
+    "close": "Close"
   },
   "footer": {
     "companyName": "Company Name",
@@ -16,7 +19,8 @@
     "privacyAndPolicy": "Terms & Policies",
     "termsCookie": "Cookie Policy",
     "terms": "Terms of Use",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "siteReviews": "Site Reviews"
   },
   "loginPage": {
     "title": "Login",
@@ -259,7 +263,8 @@
       "referrals": "Referrals",
       "tenders": "Tenders",
       "tenderSearch": "Tender search",
-      "myTenders": "My tenders"
+      "myTenders": "My tenders",
+      "siteReviews": "Site Reviews"
     }
   },
   "profile": {
@@ -1029,7 +1034,8 @@
     "loading": "Loading...",
     "close": "Close",
     "copy": "Copy",
-    "dash": "—"
+    "dash": "—",
+    "reset": "Reset"
   },
   "bookmarkPrompt": {
     "title": {
@@ -1753,5 +1759,28 @@
       "minBidStepPlaceholder": "e.g. 10",
       "minBidStepHint": "Minimum amount each new bid must be lower than the previous"
     }
+  },
+  "reviews": {
+    "title": "Website Reviews",
+    "subtitle": "Opinions of our users about the quality of the Logistica logistics service. We value every feedback and continuously improve our platform.",
+    "listTitle": "User Reviews",
+    "noReviews": "No website reviews yet. Be the first!",
+    "formTitle": "Leave a Review",
+    "ratingLabel": "Your Rating",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "What did you like or what can be improved on the site?",
+    "submitBtn": "Submit Review",
+    "moderationNotice": "The review will be published after moderator check.",
+    "guestTitle": "Share your opinion",
+    "guestSubtitle": "Only registered users can leave reviews about the platform.",
+    "anonymousUser": "User",
+    "errorLoad": "Failed to load website reviews",
+    "errorRatingRequired": "Please select a rating",
+    "successSubmit": "Review submitted for moderation successfully!",
+    "errorSubmit": "Failed to submit review",
+    "basedOn": "Based on",
+    "countLabel": "reviews",
+    "starsUnit": "stars",
+    "filteringBy": "Showing only reviews with rating"
   }
 }

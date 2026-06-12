@@ -52,6 +52,7 @@ import CompanyTeamPage from "@/pages/dashboard/company/team/ui/CompanyTeamPage.t
 import CompanyVerificationPage from "@/pages/dashboard/company/verification/ui/CompanyVerificationPage.tsx";
 import CompanySettingsPage from "@/pages/dashboard/company/settings/ui/CompanySettingsPage.tsx";
 import PublicCompanyPage from "@/pages/public/company";
+import ReviewsPage from "@/pages/public/reviews";
 import CompanyInvitationAcceptPage from "@/pages/dashboard/company/invitation-accept";
 import ShipmentDetailsPage from "@/pages/dashboard/shipments-details";
 import AdminTelegramNotificationsPage from "@/pages/admin/telegram-notifications";
@@ -76,6 +77,7 @@ const router = createBrowserRouter([
             {path: "/help", element: <HelpSupportPage />},
             {path: "/reset-password", element: <ForgotPasswordPage />},
             {path: "/search/:kind/:id", element: <ShipmentDetailsPage /> },
+            {path: "/reviews", element: <ReviewsPage /> },
         ],
     },
 

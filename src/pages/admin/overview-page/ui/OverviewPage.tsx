@@ -9,7 +9,6 @@ import PriceTrendChart from "@/widgets/dashboard/PriceTrendChart";
 import TopRoutesTable from "@/widgets/dashboard/TopRoutesTable";
 import TopCountriesTabs from "@/widgets/dashboard/TopCountriesTabs";
 import PowerUsersTable from "@/widgets/dashboard/PowerUsersTable";
-import RecentActivity from "@/widgets/dashboard/RecentActivity";
 import { FiActivity, FiUsers, FiPackage, FiTruck } from "react-icons/fi";
 import TopInfoViewersTable from "@/widgets/dashboard/TopInfoViewersTable.tsx";
 import {useAdminAccessStore} from "@/entities/adminAccess/model/adminAccess.store.ts";
@@ -41,17 +40,17 @@ export default function AdminOverviewPage() {
 
     return (
         <Box>
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, mb: 2 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Stack>
-                        <Typography variant="h6" fontWeight={700}>Обзор</Typography>
+            <Paper variant="outlined" sx={{ p: 3, borderRadius: 4, mb: 3, bgcolor: "background.paper" }}>
+                <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} spacing={2}>
+                    <Stack spacing={0.5}>
+                        <Typography variant="h5" fontWeight={800} sx={{ letterSpacing: "-0.5px" }}>Обзор</Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Метрики платформы, тренды и популярные списки
+                            Метрики платформы, тренды и популярные списки активности пользователей
                         </Typography>
                     </Stack>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                        <Typography variant="body2" color="text.secondary">Период:</Typography>
-                        <Select size="small" value={range} onChange={onRangeChange} sx={{ minWidth: 120 }}>
+                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                        <Typography variant="body2" fontWeight={600} color="text.secondary">Период:</Typography>
+                        <Select size="small" value={range} onChange={onRangeChange} sx={{ minWidth: 160, borderRadius: 2 }}>
                             <MenuItem value="1d">Последний 1 день</MenuItem>
                             <MenuItem value="7d">Последние 7 дней</MenuItem>
                             <MenuItem value="30d">Последние 30 дней</MenuItem>
@@ -62,47 +61,63 @@ export default function AdminOverviewPage() {
             </Paper>
 
             {loading ? (
-                <Stack alignItems="center" sx={{ py: 8 }}><CircularProgress /></Stack>
+                <Stack alignItems="center" justifyContent="center" sx={{ py: 12 }}><CircularProgress /></Stack>
             ) : (
-                <>
-                    <Grid container spacing={1.5}>
-                        <Grid size={{ xs: 12, md: 3 }}>
-                            <KpiCard title="Новые пользователи" value={data?.kpi.newUsers ?? 0} icon={<FiUsers size={24} />} />
+                <Stack spacing={3}>
+                    {/* Top KPI Cards Block */}
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                            <KpiCard
+                                title="Новые пользователи"
+                                value={data?.kpi.newUsers ?? 0}
+                                icon={<FiUsers />}
+                                color="primary"
+                            />
                         </Grid>
-                        <Grid size={{ xs: 12, md: 3 }}>
-                            <KpiCard title="Новые грузы" value={data?.kpi.newCargos ?? 0} icon={<FiPackage size={24} />} />
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                            <KpiCard
+                                title="Новые грузы"
+                                value={data?.kpi.newCargos ?? 0}
+                                icon={<FiPackage />}
+                                color="success"
+                            />
                         </Grid>
-                        <Grid size={{ xs: 12, md: 3 }}>
-                            <KpiCard title="Новые транспортировки" value={data?.kpi.newTransports ?? 0} icon={<FiTruck size={24} />} />
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                            <KpiCard
+                                title="Новые транспортировки"
+                                value={data?.kpi.newTransports ?? 0}
+                                icon={<FiTruck />}
+                                color="secondary"
+                            />
                         </Grid>
-                        <Grid size={{ xs: 12, md: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <KpiCard
                                 title="Уникальные посетители"
                                 value={data?.kpi.activeUsers ?? 0}
-                                icon={<FiActivity size={24} />}
+                                icon={<FiActivity />}
+                                color="warning"
                             />
                         </Grid>
+                    </Grid>
 
+                    <Grid container spacing={3}>
+                        {/* 1. Просмотр контактов (деталей) */}
                         <Grid size={{ xs: 12 }}>
                             <TopInfoViewersTable rows={data?.top.infoViewers ?? []} />
                         </Grid>
 
+                        {/* 2. Динамика создания объявлений */}
                         <Grid size={{ xs: 12 }}>
+                            <PriceTrendChart data={data?.series.creationTrend ?? []} />
+                        </Grid>
+
+                        {/* 3. Активные пользователи */}
+                        <Grid size={{ xs: 12, lg: 6 }}>
                             <PowerUsersTable rows={data?.top.powerUsers ?? []} />
                         </Grid>
 
-                        <Grid size={{ xs: 12 }}>
-                            <PriceTrendChart data={data?.series.priceTrend ?? []} />
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
-                            <TopRoutesTable title="Популярные маршруты — Груз" rows={data?.top.routes.cargo ?? []} />
-                        </Grid>
-                        <Grid size={{ xs: 12 }}>
-                            <TopRoutesTable title="Популярные маршруты — Транспорт" rows={data?.top.routes.transport ?? []} />
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
+                        {/* 4. Популярные страны */}
+                        <Grid size={{ xs: 12, lg: 6 }}>
                             <TopCountriesTabs
                                 cargoPickup={data?.top.countries.cargo.pickup ?? []}
                                 cargoDrop={data?.top.countries.cargo.dropoff ?? []}
@@ -111,11 +126,15 @@ export default function AdminOverviewPage() {
                             />
                         </Grid>
 
-                        <Grid size={{ xs: 12 }}>
-                            <RecentActivity />
+                        {/* 5. Популярные маршруты */}
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TopRoutesTable title="Популярные маршруты — Груз" rows={data?.top.routes.cargo ?? []} />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <TopRoutesTable title="Популярные маршруты — Транспорт" rows={data?.top.routes.transport ?? []} />
                         </Grid>
                     </Grid>
-                </>
+                </Stack>
             )}
         </Box>
     );

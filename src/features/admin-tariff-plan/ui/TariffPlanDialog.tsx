@@ -200,6 +200,24 @@ export function TariffPlanDialog({
                                 </MenuItem>
                             ))}
                         </TextField>
+
+                        {form.billing_period === "CUSTOM" && (
+                            <TextField
+                                label="Количество дней"
+                                type="text"
+                                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                                value={form.days ?? ""}
+                                onChange={(e) =>
+                                    updateField(
+                                        "days",
+                                        e.target.value === "" ? null : Number(sanitizeDigits(e.target.value)),
+                                    )
+                                }
+                                sx={{ minWidth: 160 }}
+                                required
+                                helperText="Длительность действия тарифа (мин. 1)"
+                            />
+                        )}
                     </Stack>
                 </Box>
 

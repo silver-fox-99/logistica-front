@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ListNotificationsResponse, NotificationType } from "@/entities/notification/model/types";
 import { notificationsApi } from "@/shared/api/notifications.api";
 import {useDebouncedValue} from "@/shared/lib/hooks/useDebouncedValue.ts";
+import { toast } from "react-toastify";
+import { useUnreadNotificationsStore } from "@/entities/notification/model/unreadNotifications.store";
 
 export function useNotifications() {
     const [type, setType] = useState<NotificationType | undefined>(undefined);
@@ -49,10 +51,78 @@ export function useNotifications() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [load]);
 
-
     useEffect(() => {
         setPage(0);
     }, [type, debouncedQ]);
+
+    // WebSocket real-time update listener
+    useEffect(() => {
+        const handleNewNotification = (e: Event) => {
+            const customEvent = e as CustomEvent<any>;
+            const newNotif = customEvent.detail;
+
+            // Check if matches the current type filter
+            if (type && newNotif.type !== type) return;
+
+            // Check if matches the current search query
+            if (debouncedQ) {
+                const query = debouncedQ.toLowerCase();
+                const matchesUser = newNotif.user_id?.toLowerCase().includes(query);
+                const matchesPhone = newNotif.phone?.toLowerCase().includes(query);
+                if (!matchesUser && !matchesPhone) return;
+            }
+
+            setData((prev) => {
+                if (!prev) return null;
+                // Avoid duplicates
+                if (prev.items.some((item) => item.id === newNotif.id)) return prev;
+                return {
+                    ...prev,
+                    items: [newNotif, ...prev.items].slice(0, rowsPerPage),
+                    total: prev.total + 1,
+                };
+            });
+        };
+
+        window.addEventListener("admin_notification_received", handleNewNotification);
+        return () => {
+            window.removeEventListener("admin_notification_received", handleNewNotification);
+        };
+    }, [type, debouncedQ, rowsPerPage]);
+
+    const markAsRead = useCallback(async (id: string) => {
+        try {
+            await notificationsApi.markAsRead(id);
+            setData((prev) => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    items: prev.items.map((item) =>
+                        item.id === id ? { ...item, is_read: true } : item
+                    ),
+                };
+            });
+            useUnreadNotificationsStore.getState().decrement();
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || "Failed to mark notification as read");
+        }
+    }, []);
+
+    const markAllAsRead = useCallback(async () => {
+        try {
+            await notificationsApi.markAllAsRead();
+            setData((prev) => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    items: prev.items.map((item) => ({ ...item, is_read: true })),
+                };
+            });
+            useUnreadNotificationsStore.getState().setCount(0);
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || "Failed to mark all as read");
+        }
+    }, []);
 
     return {
         type,
@@ -67,5 +137,7 @@ export function useNotifications() {
         loading,
         error,
         reload: load,
+        markAsRead,
+        markAllAsRead,
     };
 }

@@ -4,6 +4,8 @@ export enum NotificationType {
     PLAN_CHANGE = "PLAN_CHANGE",
     CARGO_CREATED = "CARGO_CREATED",
     TRANSPORT_CREATED = "TRANSPORT_CREATED",
+    COMPANY_CREATED = "COMPANY_CREATED",
+    TENDER_CREATED = "TENDER_CREATED",
 }
 
 export type Notification = {
@@ -13,11 +15,13 @@ export type Notification = {
     phone: string | null;
     message: string;
     created_at: string; // ISO
+    is_read: boolean;
 };
 
 export type ListNotificationsParams = {
     type?: NotificationType;
     q?: string;
+    is_read?: boolean;
     offset?: number;
     limit?: number;
 };

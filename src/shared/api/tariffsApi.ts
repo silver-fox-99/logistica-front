@@ -110,6 +110,7 @@ const normalizePlan = (raw: any): TariffPlan => {
                 : String(raw.price),
         currency: raw?.currency ?? null,
         billing_period: (raw?.billing_period ?? raw?.billingPeriod ?? null) as BillingPeriod | null,
+        days: toNullableNumber(raw?.days) ?? 0,
 
         cargo_limit: entitlements.cargo_limit ?? null,
         vehicle_limit: entitlements.vehicle_limit ?? null,

@@ -147,7 +147,7 @@ export default function Header({
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    placeholder="Email, телефон или имя"
+                                    placeholder={t('header.searchPlaceholder')}
                                     InputProps={{
                                         ...params.InputProps,
                                         endAdornment: (
@@ -164,7 +164,7 @@ export default function Header({
                         />
                     ) : (
                         <IconButton
-                            aria-label="Поиск пользователя"
+                            aria-label={t('header.searchUser')}
                             onClick={() => setSearchOpen(true)}
                             size="large"
                             sx={{ color: "#fff" }}
@@ -273,7 +273,7 @@ export default function Header({
                 >
                     <Stack spacing={2}>
                         <Typography variant="subtitle1" fontWeight={700}>
-                            Поиск пользователя
+                            {t('header.searchUser')}
                         </Typography>
                         <Autocomplete<AdminUser | string, false, false, true>
                             fullWidth
@@ -318,7 +318,7 @@ export default function Header({
                                 <TextField
                                     {...params}
                                     autoFocus
-                                    placeholder="Email, телефон или имя"
+                                    placeholder={t('header.searchPlaceholder')}
                                     InputProps={{
                                         ...params.InputProps,
                                         endAdornment: (
@@ -334,7 +334,7 @@ export default function Header({
                             PaperComponent={(props) => <Paper elevation={3} {...props} />}
                         />
                         <Button variant="outlined" onClick={() => setSearchOpen(false)} sx={{ alignSelf: "flex-start" }}>
-                            Закрыть
+                            {t('header.close')}
                         </Button>
                     </Stack>
                 </Drawer>
