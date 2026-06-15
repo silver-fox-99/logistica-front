@@ -44,6 +44,12 @@ export function mapIntegrationItemToForm(item: IntegrationTokenItem): Integratio
         scopes: Array.isArray(item.scopes) ? item.scopes : [],
         usage_limit: item.usage_limit != null ? String(item.usage_limit) : "",
         expires_at: item.expires_at ? toLocalDatetimeInputValue(item.expires_at) : "",
+        discount_percent: item.meta?.default_referred_user_discount_percent != null
+            ? String(item.meta.default_referred_user_discount_percent)
+            : "",
+        discount_expires_days: item.meta?.default_referred_user_discount_days != null
+            ? String(item.meta.default_referred_user_discount_days)
+            : "",
     };
 }
 
@@ -57,6 +63,16 @@ export function buildCreateIntegrationPayload(
         scopes: form.scopes,
         usage_limit: form.usage_limit.trim() ? Number(form.usage_limit) : null,
         expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
+        meta: form.scopes.includes("user:create")
+            ? {
+                  default_referred_user_discount_percent: form.discount_percent?.trim()
+                      ? Number(form.discount_percent)
+                      : null,
+                  default_referred_user_discount_days: form.discount_expires_days?.trim()
+                      ? Number(form.discount_expires_days)
+                      : null,
+              }
+            : null,
     };
 }
 
@@ -70,5 +86,15 @@ export function buildUpdateIntegrationPayload(
         scopes: form.scopes,
         usage_limit: form.usage_limit.trim() ? Number(form.usage_limit) : null,
         expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
+        meta: form.scopes.includes("user:create")
+            ? {
+                  default_referred_user_discount_percent: form.discount_percent?.trim()
+                      ? Number(form.discount_percent)
+                      : null,
+                  default_referred_user_discount_days: form.discount_expires_days?.trim()
+                      ? Number(form.discount_expires_days)
+                      : null,
+              }
+            : null,
     };
 }

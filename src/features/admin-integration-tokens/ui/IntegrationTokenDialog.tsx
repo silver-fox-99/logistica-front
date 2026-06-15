@@ -172,6 +172,38 @@ export const IntegrationTokenDialog = React.memo(function IntegrationTokenDialog
                                 Scopes определяют, к каким разделам API будет доступ у токена. Выдавайте только необходимые права.
                             </Typography>
                         </Grid>
+
+                        {form.scopes.includes("user:create") && (
+                            <>
+                                <Grid size={{ xs: 12 }}>
+                                    <Typography variant="subtitle2" sx={{ mt: 1, color: "primary.main" }}>
+                                        Настройки скидки для новых пользователей (Необязательно)
+                                    </Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Скидка (%)"
+                                        type="number"
+                                        value={form.discount_percent ?? ""}
+                                        onChange={(e) => onFormChange("discount_percent", e.target.value)}
+                                        placeholder="Например, 10"
+                                        helperText="Процент скидки на тарифные планы для пользователей, зарегистрированных через данный токен."
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Срок действия скидки (дней)"
+                                        type="number"
+                                        value={form.discount_expires_days ?? ""}
+                                        onChange={(e) => onFormChange("discount_expires_days", e.target.value)}
+                                        placeholder="Например, 30"
+                                        helperText="Количество дней, в течение которых действует скидка с момента регистрации пользователя."
+                                    />
+                                </Grid>
+                            </>
+                        )}
                     </Grid>
                 </Stack>
             </DialogContent>

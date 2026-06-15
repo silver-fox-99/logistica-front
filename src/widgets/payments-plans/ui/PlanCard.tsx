@@ -5,6 +5,7 @@ import { priceLabel, normalizeValueDisplay } from "@/entities/tariff/lib/plan";
 import { formatEntitlementValue } from "@/shared/config/entitlements";
 import { useTranslation } from "react-i18next";
 import type {TariffPlan} from "@/entities/tariff-plan/model/types.ts";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 const pleasantGreen = "#2e7d32";
 const pleasantRed = "#d32f2f";
@@ -18,6 +19,44 @@ type Props = {
 
 export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, onCheckout }) => {
     const { t } = useTranslation();
+    const user = useUserStore((s: any) => s.user);
+
+    const discountInfo = useMemo(() => {
+        if (!user || !user.discount_percent) return null;
+        const percent = Number(user.discount_percent);
+        if (isNaN(percent) || percent <= 0) return null;
+
+        const hasExpired = user.discount_expires_at && new Date(user.discount_expires_at).getTime() <= Date.now();
+        if (hasExpired) return null;
+
+        const originalPrice = Number(plan.price);
+        if (isNaN(originalPrice) || originalPrice <= 0) return null;
+
+        const discountAmount = (originalPrice * percent) / 100;
+        const discountedPrice = Math.max(0, originalPrice - discountAmount);
+
+        // Format suffix like / Month or / day
+        let suffix = "";
+        if (plan.billing_period === "CUSTOM") {
+            const daysCount = plan.days ?? 0;
+            const mod10 = daysCount % 10;
+            const mod100 = daysCount % 100;
+            let daySuffix = "дней";
+            if (mod100 < 11 || mod100 > 19) {
+                if (mod10 === 1) daySuffix = "день";
+                else if (mod10 >= 2 && mod10 <= 4) daySuffix = "дня";
+            }
+            suffix = `/ ${daysCount} ${daySuffix}`;
+        } else {
+            suffix = `/ ${plan.billing_period}`;
+        }
+
+        return {
+            percent,
+            originalPriceLabel: `${plan.price} ${plan.currency} ${suffix}`,
+            discountedPriceLabel: `${discountedPrice.toFixed(0)} ${plan.currency} ${suffix}`,
+        };
+    }, [user, plan]);
 
     const enabledLabel = t("paymentsNew.enabled", "Enabled");
     const disabledLabel = t("paymentsNew.disabled", "Disabled");
@@ -116,9 +155,32 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
                 <Stack direction="row" spacing={1} alignItems="center" justifyContent={hasPriceInfo ? "space-between" : "flex-end"} mt="auto">
                     {hasPriceInfo && (
                         <Stack spacing={0.25}>
-                            <Typography variant="subtitle2" fontWeight={800}>
-                                {priceLabel(plan)}
-                            </Typography>
+                            {discountInfo ? (
+                                <Stack spacing={0.5}>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{ textDecoration: "line-through" }}
+                                        >
+                                            {priceLabel(plan)}
+                                        </Typography>
+                                        <Chip
+                                            size="small"
+                                            color="error"
+                                            label={`-${discountInfo.percent}%`}
+                                            sx={{ height: 18, fontSize: "0.7rem", fontWeight: 700 }}
+                                        />
+                                    </Stack>
+                                    <Typography variant="subtitle2" fontWeight={800} color="success.main">
+                                        {discountInfo.discountedPriceLabel}
+                                    </Typography>
+                                </Stack>
+                            ) : (
+                                <Typography variant="subtitle2" fontWeight={800}>
+                                    {priceLabel(plan)}
+                                </Typography>
+                            )}
                             <Typography variant="caption" color="text.secondary">
                                 {t("paymentsNew.billingPeriod", "Billing period")}:{" "}
                                 {plan.billing_period === "CUSTOM"

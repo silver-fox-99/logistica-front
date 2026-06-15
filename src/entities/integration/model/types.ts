@@ -4,7 +4,8 @@ export type IntegrationScope =
     | "transport:create"
     | "transport:read"
     | "lookups:read"
-    | "geo:read";
+    | "geo:read"
+    | "user:create";
 
 export type IntegrationStatus = "ACTIVE" | "REVOKED";
 
@@ -37,6 +38,10 @@ export type IntegrationTokenItem = {
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;
+    meta?: {
+        default_referred_user_discount_percent?: number | null;
+        default_referred_user_discount_days?: number | null;
+    } | null;
 };
 
 export type CreateIntegrationTokenPayload = {
@@ -46,6 +51,7 @@ export type CreateIntegrationTokenPayload = {
     scopes: IntegrationScope[];
     usage_limit: number | null;
     expires_at: string | null;
+    meta?: Record<string, any> | null;
 };
 
 export type UpdateIntegrationTokenPayload = {
@@ -55,4 +61,5 @@ export type UpdateIntegrationTokenPayload = {
     scopes: IntegrationScope[];
     usage_limit: number | null;
     expires_at: string | null;
+    meta?: Record<string, any> | null;
 };

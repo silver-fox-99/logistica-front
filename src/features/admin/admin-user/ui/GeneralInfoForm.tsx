@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
-import { Card, CardContent, Stack, TextField, InputAdornment, Button, Chip } from "@mui/material";
+import { Card, CardContent, Stack, TextField, InputAdornment, Button, Chip, Typography } from "@mui/material";
 import { FiUser, FiPhone, FiMail, FiSave, FiLoader, FiBriefcase, FiSend, FiCheck, FiX } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -18,19 +18,27 @@ type FormValues = {
     avatar?: string | null;
     type?: string | null;
     telegram_chat_id?: string | null;
+    discount_percent?: string | null;
+    discount_expires_at?: string | null;
+    discount_reason?: string | null;
 };
+
+const buildDefaultValues = (u: AdminUser): FormValues => ({
+    first_name: u.first_name ?? "",
+    last_name:  u.last_name ?? "",
+    phone:      u.phone ?? "",
+    email:      u.email ?? "",
+    avatar:     u.avatar ?? "",
+    type:       u.type ?? "",
+    telegram_chat_id: u.telegram_chat_id ?? "",
+    discount_percent: u.discount_percent !== null && u.discount_percent !== undefined ? String(u.discount_percent) : "",
+    discount_expires_at: u.discount_expires_at ? u.discount_expires_at.slice(0, 10) : "",
+    discount_reason: u.discount_reason ?? "",
+});
 
 export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdated: (u: AdminUser) => void; }) {
     const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm<FormValues>({
-        defaultValues: {
-            first_name: user.first_name ?? "",
-            last_name:  user.last_name ?? "",
-            phone:      user.phone ?? "",
-            email:      user.email ?? "",
-            avatar:     user.avatar ?? "",
-            type:       user.type ?? "",
-            telegram_chat_id: user.telegram_chat_id ?? "",
-        },
+        defaultValues: buildDefaultValues(user),
     });
 
     const [busy, setBusy] = useState(false);
@@ -46,6 +54,9 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                 avatar:     values.avatar?.trim()     ? values.avatar.trim()     : null,
                 type:       values.type?.trim()       ? values.type.trim()       : null,
                 telegram_chat_id: values.telegram_chat_id?.trim() ? values.telegram_chat_id.trim() : null,
+                discount_percent: values.discount_percent?.trim() ? String(Number(values.discount_percent)) : null,
+                discount_expires_at: values.discount_expires_at?.trim() ? new Date(values.discount_expires_at).toISOString() : null,
+                discount_reason: values.discount_reason?.trim() ? values.discount_reason.trim() : null,
             };
 
             const payload = diffPayload<FormValues>(
@@ -57,6 +68,9 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                     avatar:     user.avatar ?? null,
                     type:       user.type ?? null,
                     telegram_chat_id: user.telegram_chat_id ?? null,
+                    discount_percent: user.discount_percent !== null && user.discount_percent !== undefined ? String(user.discount_percent) : null,
+                    discount_expires_at: user.discount_expires_at ?? null,
+                    discount_reason: user.discount_reason ?? null,
                 },
                 normalized
             );
@@ -83,15 +97,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
             toast.success('Информация о пользователе обновлена');
-            reset({
-                first_name: res.data.user.first_name ?? "",
-                last_name:  res.data.user.last_name ?? "",
-                phone:      res.data.user.phone ?? "",
-                email:      res.data.user.email ?? "",
-                avatar:     res.data.user.avatar ?? "",
-                type:       res.data.user.type ?? "",
-                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
-            });
+            reset(buildDefaultValues(res.data.user));
         } catch (error: any) {
             const message = error?.response?.data?.message || 'Ошибка при обновлении пользователя';
             toast.error(message);
@@ -107,15 +113,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
             toast.success("Номер телефона успешно подтвержден");
-            reset({
-                first_name: res.data.user.first_name ?? "",
-                last_name:  res.data.user.last_name ?? "",
-                phone:      res.data.user.phone ?? "",
-                email:      res.data.user.email ?? "",
-                avatar:     res.data.user.avatar ?? "",
-                type:       res.data.user.type ?? "",
-                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
-            });
+            reset(buildDefaultValues(res.data.user));
         } catch (error: any) {
             const message = error?.response?.data?.message || "Ошибка при верификации телефона";
             toast.error(message);
@@ -131,15 +129,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
             toast.success("Верификация телефона сброшена");
-            reset({
-                first_name: res.data.user.first_name ?? "",
-                last_name:  res.data.user.last_name ?? "",
-                phone:      res.data.user.phone ?? "",
-                email:      res.data.user.email ?? "",
-                avatar:     res.data.user.avatar ?? "",
-                type:       res.data.user.type ?? "",
-                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
-            });
+            reset(buildDefaultValues(res.data.user));
         } catch (error: any) {
             const message = error?.response?.data?.message || "Ошибка при сбросе верификации телефона";
             toast.error(message);
@@ -155,15 +145,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
             toast.success("Email адрес успешно подтвержден");
-            reset({
-                first_name: res.data.user.first_name ?? "",
-                last_name:  res.data.user.last_name ?? "",
-                phone:      res.data.user.phone ?? "",
-                email:      res.data.user.email ?? "",
-                avatar:     res.data.user.avatar ?? "",
-                type:       res.data.user.type ?? "",
-                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
-            });
+            reset(buildDefaultValues(res.data.user));
         } catch (error: any) {
             const message = error?.response?.data?.message || "Ошибка при верификации email";
             toast.error(message);
@@ -179,15 +161,7 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
             const res = await adminUserApi.get(user.id);
             onUpdated(res.data.user);
             toast.success("Верификация email сброшена");
-            reset({
-                first_name: res.data.user.first_name ?? "",
-                last_name:  res.data.user.last_name ?? "",
-                phone:      res.data.user.phone ?? "",
-                email:      res.data.user.email ?? "",
-                avatar:     res.data.user.avatar ?? "",
-                type:       res.data.user.type ?? "",
-                telegram_chat_id: res.data.user.telegram_chat_id ?? "",
-            });
+            reset(buildDefaultValues(res.data.user));
         } catch (error: any) {
             const message = error?.response?.data?.message || "Ошибка при сбросе верификации email";
             toast.error(message);
@@ -329,6 +303,48 @@ export function GeneralInfoForm({ user, onUpdated }: { user: AdminUser; onUpdate
                                 error={!!errors.avatar}
                                 helperText={errors.avatar?.message}
                             />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <Typography variant="subtitle2" fontWeight={700} sx={{ mt: 1, mb: 1 }}>
+                                Персональная скидка
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <TextField
+                                        label="Скидка (%)"
+                                        fullWidth
+                                        type="number"
+                                        {...register("discount_percent", {
+                                            validate: (v) => !v || (Number(v) >= 0 && Number(v) <= 100) || "Скидка должна быть от 0% до 100%",
+                                        })}
+                                        error={!!errors.discount_percent}
+                                        helperText={errors.discount_percent?.message}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <TextField
+                                        label="Дата истечения"
+                                        fullWidth
+                                        type="date"
+                                        InputLabelProps={{ shrink: true }}
+                                        {...register("discount_expires_at")}
+                                        error={!!errors.discount_expires_at}
+                                        helperText={errors.discount_expires_at?.message}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <TextField
+                                        label="Причина скидки"
+                                        fullWidth
+                                        {...register("discount_reason", {
+                                            maxLength: { value: 255, message: "Максимум 255 символов" },
+                                        })}
+                                        error={!!errors.discount_reason}
+                                        helperText={errors.discount_reason?.message}
+                                    />
+                                </Grid>
+                            </Grid>
                         </Grid>
 
                         <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end">

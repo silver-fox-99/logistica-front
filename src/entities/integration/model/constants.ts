@@ -7,4 +7,5 @@ export const AVAILABLE_INTEGRATION_SCOPES: IntegrationScope[] = [
     "transport:read",
     "lookups:read",
     "geo:read",
+    "user:create",
 ];

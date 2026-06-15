@@ -30,6 +30,9 @@ export type AdminUser = {
     binotel_id: string | null;
     type?: string | null;
     telegram_chat_id?: string | null;
+    discount_percent?: number | string | null;
+    discount_expires_at?: string | null;
+    discount_reason?: string | null;
 };
 
 export type AdminUsersResponse = {

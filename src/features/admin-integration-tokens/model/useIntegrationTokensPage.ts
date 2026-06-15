@@ -166,6 +166,24 @@ export function useIntegrationTokensPage() {
             }
         }
 
+        if (form.scopes.includes("user:create")) {
+            if (form.discount_percent?.trim()) {
+                const percent = Number(form.discount_percent);
+                if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+                    setError("Discount percent must be between 0 and 100");
+                    return false;
+                }
+            }
+
+            if (form.discount_expires_days?.trim()) {
+                const days = Number(form.discount_expires_days);
+                if (!Number.isFinite(days) || days <= 0 || !Number.isInteger(days)) {
+                    setError("Discount duration must be a positive integer number of days");
+                    return false;
+                }
+            }
+        }
+
         return true;
     }, [form]);
 

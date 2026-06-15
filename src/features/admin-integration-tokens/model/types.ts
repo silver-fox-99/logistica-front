@@ -19,6 +19,8 @@ export type IntegrationTokenFormState = {
     scopes: IntegrationScope[];
     usage_limit: string;
     expires_at: string;
+    discount_percent?: string;
+    discount_expires_days?: string;
 };
 
 export const INITIAL_INTEGRATION_FILTERS: IntegrationFiltersState = {
@@ -36,4 +38,6 @@ export const INITIAL_INTEGRATION_FORM: IntegrationTokenFormState = {
     scopes: [],
     usage_limit: "",
     expires_at: "",
+    discount_percent: "",
+    discount_expires_days: "",
 };

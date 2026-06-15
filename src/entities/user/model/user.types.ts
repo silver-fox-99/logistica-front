@@ -31,6 +31,9 @@ export interface User {
 
     meta: any;
     telegram_chat_id?: string;
+    discount_percent?: number | string | null;
+    discount_expires_at?: string | null;
+    discount_reason?: string | null;
     last_login_at: string | null;
     created_at: string;
     updated_at: string;
