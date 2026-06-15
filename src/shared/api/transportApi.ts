@@ -58,6 +58,7 @@ export type CreateTransportDto = {
     date_from: string[];
     date_to: string;
     vehicle_type: string;
+    load_type?: string[];
     cars_count: number;
     weight_t: number;
     volume_m3: number;

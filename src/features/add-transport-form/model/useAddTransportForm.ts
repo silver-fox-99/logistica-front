@@ -81,6 +81,7 @@ export function useAddTransportForm() {
     }, [loadInit]);
 
     const vehicleOpts = useMemo(() => lookups?.vehicleType ?? [], [lookups]);
+    const loadOpts = useMemo(() => lookups?.loadType ?? [], [lookups]);
     const payMethodOpts = useMemo(() => lookups?.paymentMethods ?? [], [lookups]);
     const payTermOpts = useMemo(() => lookups?.paymentTerms ?? [], [lookups]);
     const currencyOpts = useMemo(() => lookups?.currency ?? [], [lookups]);
@@ -97,6 +98,7 @@ export function useAddTransportForm() {
             unloadPlaces: [EMPTY_PLACE],
 
             vehicleType: "",
+            loadType: [],
             vehiclesCount: "1",
 
             capacityTons: "",
@@ -279,6 +281,7 @@ export function useAddTransportForm() {
             date_to: v.dateTo || "",
 
             vehicle_type: v.vehicleType || "ANY",
+            load_type: v.loadType?.length ? v.loadType : ["ANY"],
 
             cars_count: Math.max(1, toIntOrZero(v.vehiclesCount)),
             weight_t: toIntOrZero(v.capacityTons),
@@ -392,6 +395,7 @@ export function useAddTransportForm() {
 
         currencyOpts,
         vehicleOpts,
+        loadOpts,
         payMethodOpts,
         payTermOpts,
 

@@ -43,6 +43,7 @@ export type AddTransportFormValues = {
     unloadPlaces: Place[];
 
     vehicleType: string;
+    loadType: string[];
     vehiclesCount: string;
 
     capacityTons: string;

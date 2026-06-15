@@ -4,6 +4,7 @@ import { Controller, type UseFormReturn } from "react-hook-form";
 
 import type { LookupOpt } from "@/shared/utils/lookupUtils";
 import { RHFLookupAutocomplete } from "@/shared/ui/lookup/RHFLookupAutocomplete";
+import { RHFLookupMultiAutocomplete } from "@/shared/ui/lookup/RHFLookupMultiAutocomplete";
 import { LookupAutocomplete } from "@/shared/ui/lookup/LookupAutocomplete";
 import { ImageUploadField } from "@/shared/ui/image-upload/ImageUploadField";
 import { onDigitsOnlyKeyDown, onDigitsOnlyPaste } from "@/shared/lib/numericInput";
@@ -23,6 +24,7 @@ type Props = {
     loadingInit: boolean;
 
     vehicleOpts: LookupOpt[];
+    loadOpts: LookupOpt[];
     payMethodOpts: LookupOpt[];
     payTermOpts: LookupOpt[];
     currencyOpts: LookupOpt[];
@@ -43,6 +45,7 @@ export function AddTransportDesktopForm({
                                             onSubmit,
                                             loadingInit,
                                             vehicleOpts,
+                                            loadOpts,
                                             payMethodOpts,
                                             payTermOpts,
                                             currencyOpts,
@@ -129,6 +132,18 @@ export function AddTransportDesktopForm({
                         label={t("addTransport.fields.vehicleType")}
                         placeholder={t("addTransport.fields.selectVehicleType")}
                         options={vehicleOpts}
+                        getOptionLabel={getLocalizedLabel}
+                    />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
+                    <RHFLookupMultiAutocomplete<AddTransportFormValues>
+                        key={`loadType-transport-desktop-${i18nLang}`}
+                        control={control}
+                        name="loadType"
+                        label={t("addCargo.fields.loadType")}
+                        placeholder={t("addCargo.fields.selectLoadType")}
+                        options={loadOpts}
                         getOptionLabel={getLocalizedLabel}
                     />
                 </Grid>

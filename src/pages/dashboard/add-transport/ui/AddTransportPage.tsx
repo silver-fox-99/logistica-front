@@ -18,6 +18,7 @@ export default function AddTransportPage() {
         vehicleOpts,
         payMethodOpts,
         payTermOpts,
+        loadOpts,
 
         form,
         onSubmit,
@@ -87,6 +88,7 @@ export default function AddTransportPage() {
                         vehicleOpts={vehicleOpts}
                         payMethodOpts={payMethodOpts}
                         payTermOpts={payTermOpts}
+                        loadOpts={loadOpts}
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
 
@@ -105,6 +107,7 @@ export default function AddTransportPage() {
                         vehicleOpts={vehicleOpts}
                         payMethodOpts={payMethodOpts}
                         payTermOpts={payTermOpts}
+                        loadOpts={loadOpts}
                         currencyOpts={currencyOpts}
                         getLocalizedLabel={getLocalizedLabel}
 

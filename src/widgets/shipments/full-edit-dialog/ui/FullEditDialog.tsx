@@ -142,39 +142,41 @@ export default function FullEditDialog(props: Props) {
                                 />
                             </Grid>
 
+                            {(kind === "cargo" || kind === "transport") && (
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <FormControl fullWidth>
+                                        <InputLabel>{t("shipments.editDialog.loadType")}</InputLabel>
+                                        <Select
+                                            label={t("shipments.editDialog.loadType")}
+                                            multiple
+                                            value={form.loadType}
+                                            onChange={handleMultiLoadTypeChange}
+                                            renderValue={(selected) => {
+                                                const arr = Array.isArray(selected) ? selected : [selected];
+                                                if (!arr.length) {
+                                                    return (
+                                                        <em style={{ color: "#999" }}>
+                                                            {t("shipments.editDialog.selectLoadType")}
+                                                        </em>
+                                                    );
+                                                }
+
+                                                const map = new Map(loadTypeOptions.map((x) => [x.value, x.label]));
+                                                return arr.map((v) => map.get(v) ?? v).join(", ");
+                                            }}
+                                        >
+                                            {loadTypeOptions.map((opt) => (
+                                                <MenuItem key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            )}
+
                             {kind === "cargo" && (
                                 <>
-                                    <Grid size={{ xs: 12, md: 6 }}>
-                                        <FormControl fullWidth>
-                                            <InputLabel>{t("shipments.editDialog.loadType")}</InputLabel>
-                                            <Select
-                                                label={t("shipments.editDialog.loadType")}
-                                                multiple
-                                                value={form.loadType}
-                                                onChange={handleMultiLoadTypeChange}
-                                                renderValue={(selected) => {
-                                                    const arr = Array.isArray(selected) ? selected : [selected];
-                                                    if (!arr.length) {
-                                                        return (
-                                                            <em style={{ color: "#999" }}>
-                                                                {t("shipments.editDialog.selectLoadType")}
-                                                            </em>
-                                                        );
-                                                    }
-
-                                                    const map = new Map(loadTypeOptions.map((x) => [x.value, x.label]));
-                                                    return arr.map((v) => map.get(v) ?? v).join(", ");
-                                                }}
-                                            >
-                                                {loadTypeOptions.map((opt) => (
-                                                    <MenuItem key={opt.value} value={opt.value}>
-                                                        {opt.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <FormControl fullWidth>
                                             <InputLabel>{t("shipments.editDialog.cargoType")}</InputLabel>

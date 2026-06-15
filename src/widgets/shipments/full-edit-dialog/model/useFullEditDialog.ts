@@ -413,8 +413,9 @@ export function useFullEditDialog({
                 points: [...preparedFromPoints, ...preparedToPoints],
             };
 
+            payload.load_type = form.loadType?.length ? form.loadType : ["ANY"];
+
             if (kind === "cargo") {
-                payload.load_type = form.loadType?.length ? form.loadType : ["ANY"];
                 payload.cargo_type = form.cargoType || "GENERAL";
                 payload.allow_partial_load = form.allowPartialLoad;
                 payload.pallets_count = toOptionalNumber(form.palletsCount);
