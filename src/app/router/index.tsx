@@ -56,6 +56,7 @@ import ReviewsPage from "@/pages/public/reviews";
 import CompanyInvitationAcceptPage from "@/pages/dashboard/company/invitation-accept";
 import ShipmentDetailsPage from "@/pages/dashboard/shipments-details";
 import AdminTelegramNotificationsPage from "@/pages/admin/telegram-notifications";
+import AdminSystemSettingsPage from "@/pages/admin/system-settings/ui/AdminSystemSettingsPage.tsx";
 import TendersPage from "@/pages/dashboard/tenders/ui/TendersPage.tsx";
 import TenderCreatePage from "@/pages/dashboard/tender-create/ui/TenderCreatePage.tsx";
 import TenderWorkspaceLayout from "@/pages/dashboard/tender-workspace/ui/TenderWorkspaceLayout.tsx";
@@ -167,6 +168,7 @@ const router = createBrowserRouter([
             { path: "ads", element: <AdsPage />},
             { path: "ads/:id", element: <AdsDetailsPage />},
             { path: "telegram-notifications", element: <AdminTelegramNotificationsPage /> },
+            { path: "system-settings", element: <AdminSystemSettingsPage /> },
         ],
     },
     {

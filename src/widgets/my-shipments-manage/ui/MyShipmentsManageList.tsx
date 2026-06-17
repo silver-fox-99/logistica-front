@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useShipments } from "@/entities/shipment/model/useShipments";
 import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
-import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
+import type { PublicFilters } from "@/widgets/shipments/ShipmentsFilterDrawer";
 
 import { MyShipmentManageCard } from "@/widgets/my-shipments-manage/ui/MyShipmentManageCard";
 import ConfirmDialog from "@/widgets/common/ConfirmDialog";

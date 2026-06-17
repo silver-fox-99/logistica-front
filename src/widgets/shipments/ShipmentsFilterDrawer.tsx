@@ -17,11 +17,35 @@ import { useTranslation } from "react-i18next";
 import { FiMapPin, FiArrowRight } from "react-icons/fi";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
-import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
+import type { PublicGeoLocationType } from "@/shared/api/publicGeoApi";
+
+export type PublicFilters = {
+    pickup_geo_location_name?: string;
+    pickup_geo_location_type?: PublicGeoLocationType;
+
+    dropoff_geo_location_name?: string;
+    dropoff_geo_location_type?: PublicGeoLocationType;
+
+    pickup_date_from?: string;
+    pickup_date_to?: string;
+
+    dropoff_date_from?: string;
+    dropoff_date_to?: string;
+
+    weight_min?: number;
+    weight_max?: number;
+    volume_min?: number;
+    volume_max?: number;
+
+    vehicle_type?: string[];
+    favorites_only?: boolean;
+};
 
 import { useInitStore } from "@/shared/store/initStore";
 import { useUserStore } from "@/entities/user/model/user.store";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { useFilterSettingsStore } from "@/shared/store/filterSettingsStore";
+import { resolveFilters } from "@/shared/utils/filterSettings";
 
 import { RHFIdMultiAutocomplete } from "@/shared/ui/lookup/RHFIdMultiAutocomplete";
 import { RHFPublicGeoAutocomplete } from "@/shared/ui/lookup/RHFPublicGeoAutocomplete.tsx";
@@ -32,14 +56,15 @@ type FormValues = PublicFilters & {
 
 type Props = {
     open: boolean;
+    pageKey: "search" | "my" | "home";
     initialKind: ShipmentsKind;
     initialFilters: PublicFilters;
     onClose: () => void;
     onApply: (kind: ShipmentsKind, filters: PublicFilters) => void;
+    showKindSelect?: boolean;
 };
 
 const MAX_VEHICLES = 5;
-const STORAGE_KEY = "shipments:filters:drawer-form";
 
 const EMPTY_FILTERS: Record<keyof PublicFilters, any> = {
     pickup_geo_location_name: null,
@@ -78,69 +103,38 @@ function normalizeFilters(filters: PublicFilters): PublicFilters {
     return out;
 }
 
-function getStoredFormValues(): FormValues | null {
-    if (typeof window === "undefined") return null;
-
-    try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-
-        return JSON.parse(raw) as FormValues;
-    } catch {
-        return null;
+const getStorageKey = (pageKey: "search" | "my" | "home", kind: ShipmentsKind) => {
+    if (pageKey === "home") {
+        return `shipments:public-filters:${kind}`;
     }
-}
-
-function setStoredFormValues(values: FormValues) {
-    if (typeof window === "undefined") return;
-
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
-}
-
-function removeStoredFormValues() {
-    if (typeof window === "undefined") return;
-
-    window.localStorage.removeItem(STORAGE_KEY);
-}
-
-const getTodayDateString = () => {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return "shipments:filters:drawer-form";
 };
 
-function getInitialFormValues(initialKind: ShipmentsKind, initialFilters: PublicFilters): FormValues {
-    const stored = getStoredFormValues();
-    const today = getTodayDateString();
-
-    const defaults = {
-        ...EMPTY_FILTERS,
-        pickup_date_from: today,
-    };
-
-    if (stored) {
-        return {
-            ...defaults,
-            ...stored,
-        } as FormValues;
+const saveStoredValues = (pageKey: "search" | "my" | "home", kind: ShipmentsKind, filters: PublicFilters) => {
+    if (typeof window === "undefined") return;
+    const key = getStorageKey(pageKey, kind);
+    if (pageKey === "home") {
+        window.localStorage.setItem(key, JSON.stringify(filters));
+    } else {
+        window.localStorage.setItem(key, JSON.stringify({ kind, ...filters }));
     }
+};
 
-    return {
-        kind: initialKind,
-        ...defaults,
-        ...(initialFilters as any),
-    } as FormValues;
-}
+const clearStoredValues = (pageKey: "search" | "my" | "home", kind: ShipmentsKind) => {
+    if (typeof window === "undefined") return;
+    const key = getStorageKey(pageKey, kind);
+    window.localStorage.removeItem(key);
+};
 
-export function ShipmentsFilterDrawerForm({
-                                              open,
-                                              initialKind,
-                                              initialFilters,
-                                              onClose,
-                                              onApply,
-                                          }: Props) {
+export function ShipmentsFilterDrawer({
+                                           open,
+                                           pageKey,
+                                           initialKind,
+                                           initialFilters,
+                                           onClose,
+                                           onApply,
+                                           showKindSelect = true,
+                                       }: Props) {
     const { t } = useTranslation();
     const user = useUserStore((s) => s.user);
 
@@ -148,13 +142,21 @@ export function ShipmentsFilterDrawerForm({
     const { getLocalizedLabel } = useLocalizedLookup();
 
     const { control, reset, handleSubmit, setValue, getValues } = useForm<FormValues>({
-        defaultValues: getInitialFormValues(initialKind, initialFilters),
+        defaultValues: {
+            kind: initialKind,
+            ...EMPTY_FILTERS,
+            ...(initialFilters as any),
+        },
     });
 
     useEffect(() => {
         if (!open) return;
 
-        reset(getInitialFormValues(initialKind, initialFilters));
+        reset({
+            kind: initialKind,
+            ...EMPTY_FILTERS,
+            ...(initialFilters as any),
+        });
     }, [open, initialKind, initialFilters, reset]);
 
     const vehicleOptions = useMemo(() => {
@@ -168,27 +170,30 @@ export function ShipmentsFilterDrawerForm({
         const { kind, ...filters } = values;
         const normalizedFilters = normalizeFilters(filters);
 
-        setStoredFormValues({
-            kind,
-            ...(normalizedFilters as any),
-        });
-
+        saveStoredValues(pageKey, kind, normalizedFilters);
         onApply(kind, normalizedFilters);
     });
 
     const handleReset = () => {
         const currentKind = getValues("kind");
 
-        removeStoredFormValues();
+        clearStoredValues(pageKey, currentKind);
+
+        // Получаем настройки сброса для данной страницы из стора
+        const pageSettings = useFilterSettingsStore.getState().settings?.[pageKey];
+        const resetConfig = pageSettings?.reset || {};
+        
+        // Разрешаем динамические даты
+        const resolvedResetFilters = resolveFilters(resetConfig);
 
         const resetValues = {
             kind: currentKind,
             ...EMPTY_FILTERS,
-            pickup_date_from: getTodayDateString(),
+            ...resolvedResetFilters,
         } as FormValues;
 
         reset(resetValues);
-        onApply(currentKind, { pickup_date_from: getTodayDateString() });
+        onApply(currentKind, resolvedResetFilters);
     };
 
     return (
@@ -216,35 +221,43 @@ export function ShipmentsFilterDrawerForm({
                                 </Typography>
                             </Box>
 
-                            <Controller
-                                control={control}
-                                name="kind"
-                                render={({ field }) => (
-                                    <ToggleButtonGroup
-                                        exclusive
-                                        size="small"
-                                        value={field.value}
-                                        onChange={(_, value: ShipmentsKind | null) => {
-                                            if (value) field.onChange(value);
-                                        }}
-                                        sx={{
-                                            flexShrink: 0,
-                                            "& .MuiToggleButton-root": {
-                                                px: 1.5,
-                                                textTransform: "none",
-                                            },
-                                        }}
-                                    >
-                                        <ToggleButton value="cargo">
-                                            {t("shipments.filters.cargo", { defaultValue: "Cargo" })}
-                                        </ToggleButton>
+                            {showKindSelect ? (
+                                <Controller
+                                    control={control}
+                                    name="kind"
+                                    render={({ field }) => (
+                                        <ToggleButtonGroup
+                                            exclusive
+                                            size="small"
+                                            value={field.value}
+                                            onChange={(_, value: ShipmentsKind | null) => {
+                                                if (value) field.onChange(value);
+                                            }}
+                                            sx={{
+                                                flexShrink: 0,
+                                                "& .MuiToggleButton-root": {
+                                                    px: 1.5,
+                                                    textTransform: "none",
+                                                },
+                                            }}
+                                        >
+                                            <ToggleButton value="cargo">
+                                                {t("shipments.filters.cargo", { defaultValue: "Cargo" })}
+                                            </ToggleButton>
 
-                                        <ToggleButton value="transport">
-                                            {t("shipments.filters.transport", { defaultValue: "Transport" })}
-                                        </ToggleButton>
-                                    </ToggleButtonGroup>
-                                )}
-                            />
+                                            <ToggleButton value="transport">
+                                                {t("shipments.filters.transport", { defaultValue: "Transport" })}
+                                            </ToggleButton>
+                                        </ToggleButtonGroup>
+                                    )}
+                                />
+                            ) : (
+                                <Typography variant="body2" color="text.secondary" sx={{ textTransform: "capitalize", fontWeight: 600 }}>
+                                    {initialKind === "cargo"
+                                        ? t("shipments.filters.cargo", { defaultValue: "Cargo" })
+                                        : t("shipments.filters.transport", { defaultValue: "Transport" })}
+                                </Typography>
+                            )}
                         </Stack>
 
                         {user && (

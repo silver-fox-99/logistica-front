@@ -1,6 +1,6 @@
 import api from "@/shared/api/axios.ts";
 import type {CargoApiItem, ListResponse, ShipmentsKind, TransportApiItem} from "@/entities/shipment/model/type.ts";
-import type {PublicFilters} from "@/widgets/public/PublicFiltersDrawer.tsx";
+import type {PublicFilters} from "@/widgets/shipments/ShipmentsFilterDrawer";
 
 
 type Scope = "public" | "my";

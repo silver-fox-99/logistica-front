@@ -4,11 +4,12 @@ import { FiSliders } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
-import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
-
+import { ShipmentsFilterDrawer, type PublicFilters } from "@/widgets/shipments/ShipmentsFilterDrawer.tsx";
 import { ShipmentsListBody } from "@/widgets/shipments/ShipmentsListBody";
-import { ShipmentsFilterDrawerForm } from "@/widgets/shipments/ShipmentsFilterDrawerForm.tsx";
 import { PublicPlacementBanner } from "@/widgets/public-ads/ui/PublicPlacementBanner";
+import { useFilterSettingsStore } from "@/shared/store/filterSettingsStore";
+import { resolveFilters } from "@/shared/utils/filterSettings";
+import { useEffect } from "react";
 
 import "./MyShipmentsPage.scss";
 
@@ -54,7 +55,26 @@ export default function ShipmentsListPage({ scope }: Props) {
     const [totalCount, setTotalCount] = useState(0);
 
     const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(() => getStoredKind());
-    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(() => getStoredFilters());
+    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(() => {
+        const stored = getStoredFilters();
+        if (!localStorage.getItem("shipments:filters:drawer-form")) {
+            const settings = useFilterSettingsStore.getState().settings;
+            const defaults = settings?.search.default || { pickup_date_from: "today" };
+            return resolveFilters(defaults);
+        }
+        return stored;
+    });
+
+    useEffect(() => {
+        const syncSettings = async () => {
+            const settings = await useFilterSettingsStore.getState().loadSettings();
+            if (!localStorage.getItem("shipments:filters:drawer-form")) {
+                const defaults = settings.search.default;
+                setAppliedFilters(resolveFilters(defaults));
+            }
+        };
+        syncSettings();
+    }, []);
 
     const [reloadKey, setReloadKey] = useState(0);
     const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
@@ -164,8 +184,9 @@ export default function ShipmentsListPage({ scope }: Props) {
                 />
             </div>
 
-            <ShipmentsFilterDrawerForm
+            <ShipmentsFilterDrawer
                 open={drawerOpen}
+                pageKey="search"
                 initialKind={appliedKind}
                 initialFilters={appliedFilters}
                 onClose={() => setDrawerOpen(false)}

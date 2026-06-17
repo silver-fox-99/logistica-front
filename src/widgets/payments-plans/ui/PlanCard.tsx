@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Box, Button, Card, CardContent, Chip, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { FiArrowUpRight, FiCheckCircle, FiShield, FiX } from "react-icons/fi";
-import { priceLabel, normalizeValueDisplay } from "@/entities/tariff/lib/plan";
+import { normalizeValueDisplay } from "@/entities/tariff/lib/plan";
 import { formatEntitlementValue } from "@/shared/config/entitlements";
 import { useTranslation } from "react-i18next";
 import type {TariffPlan} from "@/entities/tariff-plan/model/types.ts";
@@ -21,6 +21,20 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
     const { t } = useTranslation();
     const user = useUserStore((s: any) => s.user);
 
+    const renderBillingPeriod = React.useCallback((plan: TariffPlan) => {
+        const period = plan.billing_period?.toLowerCase();
+        if (plan.days > 0) {
+            if (plan.days === 1) return t("homePage.tariffsPeriodDay", "день");
+            if (plan.days === 30) return t("homePage.tariffsPeriodMonth", "мес.");
+            if (plan.days === 365) return t("homePage.tariffsPeriodYear", "год");
+            return t("homePage.tariffsPeriodCustomDays", { count: plan.days, defaultValue: `${plan.days} дн.` });
+        }
+        if (period === "yearly" || period === "year") return t("homePage.tariffsPeriodYear", "год");
+        if (period === "monthly" || period === "month") return t("homePage.tariffsPeriodMonth", "мес.");
+        if (period === "daily" || period === "day") return t("homePage.tariffsPeriodDay", "день");
+        return plan.billing_period || "";
+    }, [t]);
+
     const discountInfo = useMemo(() => {
         if (!user || !user.discount_percent) return null;
         const percent = Number(user.discount_percent);
@@ -35,28 +49,14 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
         const discountAmount = (originalPrice * percent) / 100;
         const discountedPrice = Math.max(0, originalPrice - discountAmount);
 
-        // Format suffix like / Month or / day
-        let suffix = "";
-        if (plan.billing_period === "CUSTOM") {
-            const daysCount = plan.days ?? 0;
-            const mod10 = daysCount % 10;
-            const mod100 = daysCount % 100;
-            let daySuffix = "дней";
-            if (mod100 < 11 || mod100 > 19) {
-                if (mod10 === 1) daySuffix = "день";
-                else if (mod10 >= 2 && mod10 <= 4) daySuffix = "дня";
-            }
-            suffix = `/ ${daysCount} ${daySuffix}`;
-        } else {
-            suffix = `/ ${plan.billing_period}`;
-        }
+        const suffix = `/ ${renderBillingPeriod(plan)}`;
 
         return {
             percent,
             originalPriceLabel: `${plan.price} ${plan.currency} ${suffix}`,
             discountedPriceLabel: `${discountedPrice.toFixed(0)} ${plan.currency} ${suffix}`,
         };
-    }, [user, plan]);
+    }, [user, plan, renderBillingPeriod]);
 
     const enabledLabel = t("paymentsNew.enabled", "Enabled");
     const disabledLabel = t("paymentsNew.disabled", "Disabled");
@@ -163,7 +163,7 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
                                             color="text.secondary"
                                             sx={{ textDecoration: "line-through" }}
                                         >
-                                            {priceLabel(plan)}
+                                            {plan.price} {plan.currency} / {renderBillingPeriod(plan)}
                                         </Typography>
                                         <Chip
                                             size="small"
@@ -178,14 +178,12 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
                                 </Stack>
                             ) : (
                                 <Typography variant="subtitle2" fontWeight={800}>
-                                    {priceLabel(plan)}
+                                    {plan.price} {plan.currency} / {renderBillingPeriod(plan)}
                                 </Typography>
                             )}
                             <Typography variant="caption" color="text.secondary">
                                 {t("paymentsNew.billingPeriod", "Billing period")}:{" "}
-                                {plan.billing_period === "CUSTOM"
-                                    ? `${plan.days} ${t("paymentsNew.days", "days")}`
-                                    : (plan.billing_period || "—")}
+                                {renderBillingPeriod(plan)}
                             </Typography>
                         </Stack>
                     )}

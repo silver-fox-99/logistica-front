@@ -5,12 +5,13 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
-import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
-
-import { ShipmentsFilterDrawerForm } from "@/widgets/shipments/ShipmentsFilterDrawerForm.tsx";
+import { ShipmentsFilterDrawer, type PublicFilters } from "@/widgets/shipments/ShipmentsFilterDrawer.tsx";
 import { MyShipmentsManageToolbar } from "@/widgets/my-shipments-manage/ui/MyShipmentsManageToolbar";
 import { MyShipmentsManageList } from "@/widgets/my-shipments-manage/ui/MyShipmentsManageList";
 import { MyShipmentsBulkActionsDrawer } from "@/widgets/my-shipments-bulk-actions-drawer/ui/MyShipmentsBulkActionsDrawer";
+import { useFilterSettingsStore } from "@/shared/store/filterSettingsStore";
+import { resolveFilters } from "@/shared/utils/filterSettings";
+import { useEffect } from "react";
 
 import {
     cargoBulkAction,
@@ -34,7 +35,6 @@ type BulkActionPayload =
 };
 
 const DEFAULT_KIND: ShipmentsKind = "cargo";
-const DEFAULT_FILTERS: PublicFilters = {};
 
 export default function MyShipmentsManagePage() {
     const { t } = useTranslation();
@@ -46,7 +46,20 @@ export default function MyShipmentsManagePage() {
     const [pageIds, setPageIds] = useState<string[]>([]);
 
     const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(DEFAULT_KIND);
-    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(DEFAULT_FILTERS);
+    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(() => {
+        const settings = useFilterSettingsStore.getState().settings;
+        const defaults = settings?.my.default || {};
+        return resolveFilters(defaults);
+    });
+
+    useEffect(() => {
+        const syncSettings = async () => {
+            const settings = await useFilterSettingsStore.getState().loadSettings();
+            const defaults = settings.my.default;
+            setAppliedFilters(resolveFilters(defaults));
+        };
+        syncSettings();
+    }, []);
 
     const [reloadKey, setReloadKey] = useState(0);
     const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
@@ -285,8 +298,9 @@ export default function MyShipmentsManagePage() {
                 />
             </div>
 
-            <ShipmentsFilterDrawerForm
+            <ShipmentsFilterDrawer
                 open={filterDrawerOpen}
+                pageKey="my"
                 initialKind={appliedKind}
                 initialFilters={appliedFilters}
                 onClose={() => setFilterDrawerOpen(false)}

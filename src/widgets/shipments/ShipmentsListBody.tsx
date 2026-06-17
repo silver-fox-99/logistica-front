@@ -22,7 +22,7 @@ import {
     shipmentCopy,
 } from "@/shared/api/shipmentsActions";
 
-import type { PublicFilters } from "@/widgets/public/PublicFiltersDrawer";
+import type { PublicFilters } from "@/widgets/shipments/ShipmentsFilterDrawer";
 
 function parsePriceAmount(price?: string | null): number | null {
     if (!price) return null;

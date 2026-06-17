@@ -80,6 +80,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/integrations", icon: <FiLink2 />, label: "Интеграции", requiredAny: [viewCode("INTEGRATIONS" as any)] },
     { to: "/admin/telegram-notifications", icon: <FiSend />, label: "Telegram", requiredAny: [viewCode("TELEGRAM_NOTIFICATIONS" as any)] },
     { to: "/admin/ads", icon: <LuNewspaper />, label: "Реклама", requiredAny: [viewCode("ADS" as any)] },
+    { to: "/admin/system-settings", icon: <FiSettings />, label: "Настройки фильтров", requiredAny: [viewCode("SYSTEM_SETTINGS" as any)] },
     { to: "/admin/activity-logs", icon: <FiSettings />, label: "Журнал активности", requiredAny: [viewCode("ACTIVITY_LOGS" as any)] },
     {
         to: "/admin/groups-roles",
@@ -165,6 +166,7 @@ export default function AdminLayout() {
                         "/admin/integrations",
                         "/admin/telegram-notifications",
                         "/admin/ads",
+                        "/admin/system-settings",
                         "/admin/activity-logs",
                         "/admin/notifications",
                     ].includes(i.to)

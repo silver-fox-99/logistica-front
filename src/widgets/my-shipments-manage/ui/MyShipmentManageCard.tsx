@@ -481,9 +481,18 @@ export function MyShipmentManageCard({
                                     {data.loadType && data.loadType.length > 0 && (
                                         <Typography variant="body2">
                                             <strong>{t("shipments.shipmentCard.loadType")}</strong>{" "}
-                                            {Array.isArray(data.loadType)
-                                                ? data.loadType.join(", ")
-                                                : String(data.loadType)}
+                                            {(Array.isArray(data.loadType) ? data.loadType : [data.loadType])
+                                                .map((lt) => {
+                                                    const lookupLabel = findLocalizedLabel(lookups?.loadType ?? [], lt);
+                                                    const loadTypeMap: Record<string, string> = {
+                                                        ANY: t("shipments.editDialog.loadTypeAny", "Any"),
+                                                        FULL: t("shipments.editDialog.loadTypeFull", "Full"),
+                                                        PARTIAL: t("shipments.editDialog.loadTypePartial", "Partial"),
+                                                        CONSOLIDATED: t("shipments.editDialog.loadTypeConsolidated", "Consolidated"),
+                                                    };
+                                                    return lookupLabel !== lt ? lookupLabel : (loadTypeMap[lt] || lt);
+                                                })
+                                                .join(", ")}
                                         </Typography>
                                     )}
 
