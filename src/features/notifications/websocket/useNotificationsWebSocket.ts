@@ -18,6 +18,7 @@ export function useNotificationsWebSocket() {
             auth: {
                 token: refreshToken,
             },
+            transports: ["websocket"],
         });
 
         socketRef.current = socket;
