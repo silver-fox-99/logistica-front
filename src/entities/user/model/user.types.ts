@@ -1,6 +1,7 @@
 export type RegistrationStage =
     | "PENDING"
     | "PHONE_VERIFIED"
+    | "EMAIL_VERIFIED"
     | "PROFILE"
     | "COMPLETED";
 

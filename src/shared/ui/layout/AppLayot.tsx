@@ -17,6 +17,10 @@ export default function AppLayout() {
             if (user) {
                 return;
             }
+            if (!localStorage.getItem("accessToken") && !localStorage.getItem("refreshToken")) {
+                setUser(null);
+                return;
+            }
             const res = await authApi.getMe();
             setUser(res.data);
         } catch {

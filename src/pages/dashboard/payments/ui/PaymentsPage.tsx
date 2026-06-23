@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Typography } from "@mui/material";
+import {Alert, Box, Container, Stack, Typography} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { useRefreshMe } from "@/entities/user/model/useRefreshMe";
@@ -45,6 +45,21 @@ export default function PaymentsPage() {
                             </Typography>
                         </Stack>
                     </Stack>
+
+                    <Alert
+                        severity="info"
+                        variant="outlined"
+                        sx={{
+                            borderRadius: 2,
+                            borderColor: "info.light",
+                            backgroundColor: "rgba(2, 136, 209, 0.02)",
+                            fontSize: "0.9rem"
+                        }}
+                    >
+                        {t("paymentsNew.cardBindingTip", {
+                            defaultValue: "💡 Хотите оплатить без привязки карты? В окне платежной системы выберите любой альтернативный метод оплаты вместо сохранения карты."
+                        })}
+                    </Alert>
 
                     <PlansSection
                         plans={plans}

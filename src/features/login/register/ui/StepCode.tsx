@@ -6,9 +6,9 @@ import OtpInput from "@/shared/ui/inputs/OtpInput";
 
 import { authApi } from "@/shared/api/authApi";
 
-type StepCodeProps = { length?: number; onSubmit?: () => void; };
+type StepCodeProps = { length?: number; type?: "phone" | "email"; onSubmit?: () => void; };
 
-export default function StepCode({ length = 6, onSubmit }: StepCodeProps) {
+export default function StepCode({ length = 6, type = "phone", onSubmit }: StepCodeProps) {
     const { t } = useTranslation();
     const [code, setCode] = useState("");
     const [busy, setBusy] = useState(false);
@@ -18,7 +18,11 @@ export default function StepCode({ length = 6, onSubmit }: StepCodeProps) {
         if (code.length !== length) return;
         setBusy(true);
         try {
-            await authApi.verifyPhoneCode(code);
+            if (type === "phone") {
+                await authApi.verifyPhoneCode(code);
+            } else {
+                await authApi.verifyEmailCode(code);
+            }
             toast.success(t("register.codeVerified"));
             onSubmit?.();
         } catch (error: any) {
@@ -31,7 +35,11 @@ export default function StepCode({ length = 6, onSubmit }: StepCodeProps) {
 
     const handleResend = async () => {
         try {
-            await authApi.sendAgainPhoneCode();
+            if (type === "phone") {
+                await authApi.sendAgainPhoneCode();
+            } else {
+                await authApi.sendAgainEmailCode();
+            }
             setTimer(60);
             toast.success(t("register.codeSent"));
         } catch (error: any) {

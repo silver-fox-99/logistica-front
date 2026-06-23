@@ -72,9 +72,45 @@ export const authApi = {
         return data;
     },
 
-    login: async (payload: { phone: string; password: string; }) => {
+    login: async (payload: { identify: string; password: string; }) => {
         const { data } = await api.post("/auth/login", payload);
         return data;
+    },
+
+    sendEmailCode: async (email: string) => {
+        const res = await api.post("/auth/email/send-code", { email });
+
+        const bodyAccess  = res.data?.data?.accessToken;
+        const bodyRefresh = res.data?.data?.refreshToken;
+
+        if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
+        if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
+    },
+
+    verifyEmailCode: async (code: string) => {
+        const res = await api.post("/auth/email/verify-code", { code });
+
+        const bodyAccess  = res.data?.data?.accessToken;
+        const bodyRefresh = res.data?.data?.refreshToken;
+
+        if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
+        if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
+    },
+
+    sendAgainEmailCode: async () => {
+        const res = await api.get("/auth/email/send-code");
+
+        const bodyAccess  = res.data?.data?.accessToken;
+        const bodyRefresh = res.data?.data?.refreshToken;
+
+        if (bodyAccess)  localStorage.setItem("accessToken", bodyAccess);
+        if (bodyRefresh) localStorage.setItem("refreshToken", bodyRefresh);
+
+        return res.data;
     },
 
     resetPassword: async (password: string) => {

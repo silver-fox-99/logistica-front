@@ -24,16 +24,16 @@
   },
   "loginPage": {
     "title": "Login",
-    "subtitle": "Use the phone number you provided during registration. The number must start with “+” and the country code.",
+    "subtitle": "Use the phone number or E-mail you provided during registration.",
     "needToRegister": "Not registered yet?",
     "register": "Sign up"
   },
   "loginForm": {
-    "phone": "Phone number",
+    "phone": "Phone number or E-mail",
     "password": "Password",
     "login": "Log in",
     "forgotPassword": "Forgot password?",
-    "error": "Invalid phone number or password",
+    "error": "Invalid phone number/E-mail or password",
     "success": "Login successful!"
   },
   "addCargo": {
@@ -303,7 +303,18 @@
       "geoPlaceholder": "Uzbekistan",
       "edit": "Edit",
       "cancel": "Cancel",
-      "save": "Save"
+      "save": "Save",
+      "phoneVerified": "Verified",
+      "phoneUnverified": "Unverified",
+      "verifyPhone": "Verify",
+      "changePhone": "Change",
+      "verifyPhoneTitle": "Phone Verification",
+      "enterVerificationCode": "Enter verification code from SMS",
+      "sendSmsCode": "Send SMS code",
+      "resendSmsCode": "Resend SMS code",
+      "verifyPhoneSuccess": "Phone successfully verified!",
+      "verifyPhoneError": "Phone verification error",
+      "enterPhone": "Enter phone number"
     },
     "messages": {
       "updateSuccess": "Profile information successfully updated",
@@ -734,6 +745,7 @@
     "loading": "Loading…",
     "autoBump": "Automatically move orders to the top",
     "current": "Current plan",
+    "cardBindingTip": "💡 Want to pay without linking your card? In the payment gateway window, simply choose any alternative payment method instead of saving your card.",
     "perks": "Included perks",
     "cargoLimit": "Cargo limit/month:",
     "vehicleLimit": "Vehicle limit/month:",
@@ -799,6 +811,14 @@
     "phoneRequired": "Enter phone number",
     "phoneInvalid": "Enter a valid phone number",
     "phoneExists": "This phone number is already registered",
+    "phoneTab": "By phone",
+    "emailTab": "By email",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "email@example.com",
+    "emailRequired": "Enter E-mail",
+    "emailInvalid": "Enter a valid email address",
+    "emailCodeSent": "Verification code sent to your email",
+    "step2SubtitleEmail": "We sent a verification code to email {{email}}. Enter the code below.",
     "sendCodeButton": "Send code",
     "codeSent": "Code sent to your phone number",
     "codeSendError": "Failed to send code",

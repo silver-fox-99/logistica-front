@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState, useRef} from "react";
 import { Box, Container, Paper, Step, StepLabel, Stepper, Stack, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -9,9 +9,10 @@ import {authApi} from "@/shared/api/authApi.ts";
 import StepCode from "@/features/login/register/ui/StepCode.tsx";
 
 export default function RegisterPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [activeStep, setActiveStep] = useState(0);
-    const [e164, setE164] = useState<string>("");
+    const [registrationType, setRegistrationType] = useState<"phone" | "email">("phone");
+    const [contactVal, setContactVal] = useState<string>("");
     const steps = useMemo(() => ["", "", ""], []);
 
     const next = () => setActiveStep((s) => Math.min(s + 1, 2));
@@ -20,20 +21,26 @@ export default function RegisterPage() {
     const header = useMemo(() => {
         switch (activeStep) {
             case 0: return { title: t("register.step1Title"), subtitle: t("register.step1Subtitle") };
-            case 1: return { title: t("register.step2Title"), subtitle: t("register.step2Subtitle", { phone: e164 || "your phone" }) };
+            case 1: return {
+                title: t("register.step2Title"),
+                subtitle: registrationType === "phone"
+                    ? t("register.step2Subtitle", { phone: contactVal || "your phone" })
+                    : t("register.step2SubtitleEmail", { email: contactVal || "your email" })
+            };
             case 2: return { title: t("register.step3Title"), subtitle: t("register.step3Subtitle") };
             default: return { title: "", subtitle: "" };
         }
-    }, [activeStep, e164, t]);
+    }, [activeStep, contactVal, registrationType, t]);
 
     const Content = useMemo(() => {
         switch (activeStep) {
             case 0:
-                return <StepPhone onNext={(phoneE164) => { setE164(phoneE164); next(); }} />;
+                return <StepPhone onNext={(val, _, type) => { setContactVal(val); setRegistrationType(type); next(); }} />;
             case 1:
                 return (
                     <StepCode
                         length={6}
+                        type={registrationType}
                         onSubmit={next}
                     />
                 );
@@ -42,17 +49,24 @@ export default function RegisterPage() {
             default:
                 return null;
         }
-    }, [activeStep, e164]);
+    }, [activeStep, contactVal, registrationType]);
+
+    const didRun = useRef(false);
 
     const checkMe = async () => {
+        if (!localStorage.getItem("accessToken") && !localStorage.getItem("refreshToken")) {
+            return;
+        }
         try {
             const res = await authApi.getMe();
-            if (res.data.registration_stage === 'PHONE_VERIFIED')
+            if (res.data.registration_stage === 'PHONE_VERIFIED' || res.data.registration_stage === 'EMAIL_VERIFIED')
                 setActiveStep(2);
         } catch {}
     }
 
     useEffect(() => {
+        if (didRun.current) return;
+        didRun.current = true;
         checkMe()
     }, []);
 
@@ -69,7 +83,12 @@ export default function RegisterPage() {
                 <Stack direction="column" spacing={2} alignItems="center" mt={3}>
                     {activeStep === 1 && (
                         <>
-                            <Button fullWidth variant="outlined" onClick={back}>{t("register.changePhoneButton")}</Button>
+                            <Button fullWidth variant="outlined" onClick={back}>
+                                {registrationType === "phone"
+                                    ? t("register.changePhoneButton")
+                                    : (i18n.language === "ru" ? "Изменить E-mail" : i18n.language === "uz" ? "E-mailni o'zgartirish" : "Change E-mail")
+                                }
+                            </Button>
                         </>
                     )}
                 </Stack>

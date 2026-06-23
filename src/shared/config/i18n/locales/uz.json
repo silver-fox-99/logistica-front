@@ -24,16 +24,16 @@
   },
   "loginPage": {
     "title": "Kirish",
-    "subtitle": "Ro‘yxatdan o‘tishda ko‘rsatgan telefon raqamingizdan foydalaning. Raqam “+” belgisi va mamlakat kodi bilan boshlanishi kerak.",
+    "subtitle": "Tizimga kirish uchun ro‘yxatdan o‘tish paytida ko‘rsatilgan telefon raqami yoki E-mail’dan foydalaning.",
     "needToRegister": "Hali ro‘yxatdan o‘tmagansizmi?",
     "register": "Ro‘yxatdan o‘tish"
   },
   "loginForm": {
-    "phone": "Telefon raqami",
+    "phone": "Telefon raqami yoki E-mail",
     "password": "Parol",
     "login": "Kirish",
     "forgotPassword": "Parolni unutdingizmi?",
-    "error": "Telefon raqami yoki parol noto‘g‘ri",
+    "error": "Telefon raqami/E-mail yoki parol noto‘g‘ri",
     "success": "Kirish muvaffaqiyatli!"
   },
   "addCargo": {
@@ -303,7 +303,18 @@
       "geoPlaceholder": "O'zbekiston",
       "edit": "Tahrirlash",
       "cancel": "Bekor qilish",
-      "save": "Saqlash"
+      "save": "Saqlash",
+      "phoneVerified": "Tasdiqlangan",
+      "phoneUnverified": "Tasdiqlanmagan",
+      "verifyPhone": "Tasdiqlash",
+      "changePhone": "O'zgartirish",
+      "verifyPhoneTitle": "Telefon raqamini tasdiqlash",
+      "enterVerificationCode": "SMS orqali kelgan kodni kiriting",
+      "sendSmsCode": "SMS-kod yuborish",
+      "resendSmsCode": "SMS-kodni qayta yuborish",
+      "verifyPhoneSuccess": "Telefon raqami muvaffaqiyatli tasdiqlandi!",
+      "verifyPhoneError": "Telefon raqamini tasdiqlashda xatolik",
+      "enterPhone": "Telefon raqamini kiriting"
     },
     "messages": {
       "updateSuccess": "Profil ma'lumotlari muvaffaqiyatli yangilandi",
@@ -738,6 +749,7 @@
     "cargoLimit": "Oyiga yuk limiti:",
     "vehicleLimit": "Oyiga transport limiti:",
     "orderDetailsViews": "Buyurtma tafsilotlari/oy:",
+    "cardBindingTip": "💡 Kartani biriktirmasdan toʻlashni xohlaysizmi? Toʻlov tizimi oynasida kartani saqlash oʻrniga istalgan muqobil toʻlov usulini tanlang.",
     "orderDetails": "Buyurtma tafsilotlari:",
     "companies": "Kompaniyalar:",
     "companyLimit": "Kompaniya limiti",
@@ -799,6 +811,14 @@
     "phoneRequired": "Telefon raqamini kiriting",
     "phoneInvalid": "To'g'ri telefon raqamini kiriting",
     "phoneExists": "Ushbu telefon raqami allaqachon ro'yxatdan o'tgan",
+    "phoneTab": "Telefon orqali",
+    "emailTab": "E-mail orqali",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "email@example.com",
+    "emailRequired": "E-mailni kiriting",
+    "emailInvalid": "To'g'ri e-mail manzilini kiriting",
+    "emailCodeSent": "Tasdiqlash kodi elektron pochtangizga yuborildi",
+    "step2SubtitleEmail": "Biz elektron pochtangizga {{email}} tasdiqlash kodini yubordik. Quyida kodni kiriting.",
     "sendCodeButton": "Kod yuborish",
     "codeSent": "Kod telefon raqamingizga yuborildi",
     "codeSendError": "Kodni yuborib bo'lmadi",

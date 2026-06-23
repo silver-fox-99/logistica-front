@@ -17,6 +17,11 @@ export default function RequireAdmin({ children }: { children: JSX.Element }) {
                 setAllowed(user.is_admin);
                 return;
             }
+            if (!localStorage.getItem("accessToken") && !localStorage.getItem("refreshToken")) {
+                setUser(null);
+                setAllowed(false);
+                return;
+            }
             const res = await authApi.getMe();
             setUser(res.data);
             setAllowed(!!res.data?.is_admin);

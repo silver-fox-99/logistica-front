@@ -18,12 +18,15 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
 
     const check = async () => {
         try {
-
-
             if (user) {
                 setIsAuthenticated(true);
                 setLoading(false);
                 void loadTariff();
+                return;
+            }
+            if (!localStorage.getItem("accessToken") && !localStorage.getItem("refreshToken")) {
+                clearUser();
+                setIsAuthenticated(false);
                 return;
             }
             const res = await authApi.getMe();

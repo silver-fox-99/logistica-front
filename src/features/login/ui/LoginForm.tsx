@@ -10,11 +10,19 @@ import {useTranslation} from "react-i18next";
 
 
 const signInSchema = z.object({
-    phone: z
+    identify: z
         .string()
-        .min(1, "Введите номер телефона")
-        .transform((v) => v.replace(/[^\d+]/g, ""))
-        .refine((v) => /^\+?\d{7,15}$/.test(v), "Введите верный номер телефона"),
+        .min(1, "Введите номер телефона или E-mail")
+        .transform((v) => {
+            const isEmail = z.string().email().safeParse(v).success;
+            if (isEmail) return v.trim();
+            return v.replace(/[^\d+]/g, "");
+        })
+        .refine((v) => {
+            const isEmail = z.string().email().safeParse(v).success;
+            if (isEmail) return true;
+            return /^\+?\d{7,15}$/.test(v);
+        }, "Введите верный номер телефона или E-mail"),
     password: z.string().min(6, "Пароль должен быть не короче 6 символов"),
 });
 
@@ -29,11 +37,11 @@ export default function LoginForm() {
         formState: { errors, isSubmitting },
     } = useForm<SignInForm>({
         resolver: zodResolver(signInSchema),
-        defaultValues: { phone: "", password: "" },
+        defaultValues: { identify: "", password: "" },
         mode: "onTouched",
     });
 
-    const {t} = useTranslation()
+    const { t, i18n } = useTranslation();
 
     const setUser = useUserStore(s => s.setUser);
     const navigate = useNavigate()
@@ -63,15 +71,14 @@ export default function LoginForm() {
         >
             <TextField
                 label={t('loginForm.phone')}
-                type="tel"
-                autoComplete="tel"
+                type="text"
+                autoComplete="username"
                 fullWidth
                 required
-                placeholder="+1 202 555 0110"
-                inputProps={{ inputMode: "tel" }}
-                {...register("phone")}
-                error={!!errors.phone}
-                helperText={errors.phone?.message}
+                placeholder={i18n.language === "ru" ? "Введите телефон или e-mail" : i18n.language === "uz" ? "Telefon yoki e-mail kiriting" : "Enter phone or e-mail"}
+                {...register("identify")}
+                error={!!errors.identify}
+                helperText={errors.identify?.message}
             />
 
             <TextField

@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback, useEffect } from "react";
+import React, { memo, useMemo, useEffect } from "react";
 import {
     Box,
     Stack,
@@ -22,10 +22,11 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import type { PublicShipmentBase, PublicPoint } from "@/entities/public-shipment/model/types";
+import type { PublicShipmentBase } from "@/entities/public-shipment/model/types";
 import { formatDate } from "@/shared/utils/formatDate";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import { formatShipmentRoute } from "@/entities/shipment/lib/format-shipment-route";
 
 type Props = {
     data: PublicShipmentBase;
@@ -46,36 +47,6 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind,
         loadInit();
     }, [loadInit]);
 
-    const fmtPoint = useCallback(
-        (point?: PublicPoint) => {
-            if (!point) return "—";
-
-            if (point.display_name) {
-                return point.display_name;
-            }
-
-            const lang = i18n.resolvedLanguage || i18n.language || "en";
-
-            const getLocalized = (
-                base?: string | null,
-                ru?: string | null,
-                uz?: string | null,
-            ) => {
-                if (!base) return null;
-                if (lang === "ru" && ru) return ru;
-                if (lang === "uz" && uz) return uz;
-                return base;
-            };
-
-            const city = getLocalized(point.city, point.city_ru, point.city_uz);
-            const region = getLocalized(point.region, point.region_ru, point.region_uz);
-            const country = getLocalized(point.country, point.country_ru, point.country_uz);
-
-            return [city, region, country].filter(Boolean).join(", ") || "—";
-        },
-        [i18n.resolvedLanguage, i18n.language],
-    );
-
     const sortedPoints = useMemo(() => {
         return [...(data.points ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }, [data.points]);
@@ -89,12 +60,14 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind,
     }, [sortedPoints]);
 
     const routeFrom = useMemo(() => {
-        return fmtPoint(loadPoints[0] ?? sortedPoints[0]);
-    }, [fmtPoint, loadPoints, sortedPoints]);
+        const point = loadPoints[0] ?? sortedPoints[0];
+        return formatShipmentRoute(point, i18n.resolvedLanguage || i18n.language || "uz");
+    }, [i18n.resolvedLanguage, i18n.language, loadPoints, sortedPoints]);
 
     const routeTo = useMemo(() => {
-        return fmtPoint(unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1]);
-    }, [fmtPoint, unloadPoints, sortedPoints]);
+        const point = unloadPoints[0] ?? sortedPoints[sortedPoints.length - 1];
+        return formatShipmentRoute(point, i18n.resolvedLanguage || i18n.language || "uz");
+    }, [i18n.resolvedLanguage, i18n.language, unloadPoints, sortedPoints]);
 
     const dateLabel = useMemo(() => {
         const loadFrom = data.loadWindow?.from ?? data.dates?.from;

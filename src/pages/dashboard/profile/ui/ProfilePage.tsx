@@ -10,6 +10,7 @@ import { useUserStore } from "@/entities/user/model/user.store.ts";
 import { useTariffStore } from "@/entities/tariff/model/tariff.store";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { profileApi } from "@/shared/api/profileApi.ts";
+import { authApi } from "@/shared/api/authApi.ts";
 import { userReviewsApi } from "@/shared/api/userReviewsApi.ts";
 import { companiesApi } from "@/shared/api/companiesApi.ts";
 import type { UserReview } from "@/entities/user-reviews/model/types";
@@ -196,9 +197,16 @@ export default function ProfilePage() {
                     telegram: user?.meta?.telegram || "",
                     whatsapp: user?.meta?.whatsapp || "",
                     email: user?.email || "",
+                    phoneVerified: !!user?.phone_verified_at,
                 }}
                 saving={false}
                 onSave={updateUser}
+                onPhoneVerified={async () => {
+                    try {
+                        const res = await authApi.getMe();
+                        setUser(res.data);
+                    } catch {}
+                }}
             />
 
             <Paper

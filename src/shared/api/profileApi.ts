@@ -26,5 +26,15 @@ export const profileApi = {
     }) => {
         const res = await api.patch("/users/me/notification-settings", data);
         return res.data;
+    },
+
+    sendPhoneCode: async (phone: string) => {
+        const res = await api.post("/profile/phone/send-code", { phone });
+        return res.data;
+    },
+
+    verifyPhone: async (code: string) => {
+        const res = await api.post("/profile/phone/verify", { code });
+        return res.data;
     }
 }
