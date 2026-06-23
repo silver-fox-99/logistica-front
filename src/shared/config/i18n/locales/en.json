@@ -783,6 +783,11 @@
       "current": "Current",
       "upgrade": "Upgrade"
     },
+    "paymentWarningDialog": {
+      "title": "Payment Information",
+      "confirm": "Proceed to payment",
+      "cancel": "Cancel"
+    },
     "table": {
       "plan": "Plan",
       "status": "Status",

@@ -783,6 +783,11 @@
       "current": "Текущий",
       "upgrade": "Обновить"
     },
+    "paymentWarningDialog": {
+      "title": "Информация об оплате",
+      "confirm": "Перейти к оплате",
+      "cancel": "Отмена"
+    },
     "table": {
       "plan": "Тариф",
       "status": "Статус",

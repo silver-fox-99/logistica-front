@@ -783,6 +783,11 @@
       "current": "Joriy",
       "upgrade": "Yangilash"
     },
+    "paymentWarningDialog": {
+      "title": "To'lov haqida ma'lumot",
+      "confirm": "To'lovga o'tish",
+      "cancel": "Bekor qilish"
+    },
     "table": {
       "plan": "Tarif",
       "status": "Holat",

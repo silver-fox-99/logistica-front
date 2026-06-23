@@ -1,4 +1,5 @@
-import {Alert, Box, Container, Stack, Typography} from "@mui/material";
+import { useState } from "react";
+import { Box, Container, Stack, Typography} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { useRefreshMe } from "@/entities/user/model/useRefreshMe";
@@ -11,6 +12,8 @@ import { useTariffInvoices } from "@/entities/tariff/model/useTariffInvoices";
 import { useTariffCheckout } from "@/features/tariff-checkout/model/useTariffCheckout";
 import {PaymentsTabs} from "@/widgets/payments-details/ui/PaymentsTabs.tsx";
 import {PlansSection} from "@/widgets/payments-plans/ui/PlansSection.tsx";
+import { PaymentWarningDialog } from "./PaymentWarningDialog";
+import type { TariffPlan } from "@/entities/tariff-plan/model/types.ts";
 
 
 
@@ -31,6 +34,23 @@ export default function PaymentsPage() {
 
     const { checkout, loadingId } = useTariffCheckout(t);
 
+    const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<TariffPlan | null>(null);
+
+    const handleCheckoutClick = (plan: TariffPlan) => {
+        setSelectedPlanForCheckout(plan);
+    };
+
+    const handleConfirmCheckout = () => {
+        if (selectedPlanForCheckout) {
+            checkout(selectedPlanForCheckout);
+            setSelectedPlanForCheckout(null);
+        }
+    };
+
+    const handleCancelCheckout = () => {
+        setSelectedPlanForCheckout(null);
+    };
+
     return (
         <Box sx={{ minHeight: "calc(100dvh - 120px)", py: 3 }}>
             <Container maxWidth="lg">
@@ -46,27 +66,27 @@ export default function PaymentsPage() {
                         </Stack>
                     </Stack>
 
-                    <Alert
-                        severity="info"
-                        variant="outlined"
-                        sx={{
-                            borderRadius: 2,
-                            borderColor: "info.light",
-                            backgroundColor: "rgba(2, 136, 209, 0.02)",
-                            fontSize: "0.9rem"
-                        }}
-                    >
-                        {t("paymentsNew.cardBindingTip", {
-                            defaultValue: "💡 Хотите оплатить без привязки карты? В окне платежной системы выберите любой альтернативный метод оплаты вместо сохранения карты."
-                        })}
-                    </Alert>
+                    {/*<Alert*/}
+                    {/*    severity="info"*/}
+                    {/*    variant="outlined"*/}
+                    {/*    sx={{*/}
+                    {/*        borderRadius: 2,*/}
+                    {/*        borderColor: "info.light",*/}
+                    {/*        backgroundColor: "rgba(2, 136, 209, 0.02)",*/}
+                    {/*        fontSize: "0.9rem"*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    {t("paymentsNew.cardBindingTip", {*/}
+                    {/*        defaultValue: "💡 Хотите оплатить без привязки карты? В окне платежной системы выберите любой альтернативный метод оплаты вместо сохранения карты."*/}
+                    {/*    })}*/}
+                    {/*</Alert>*/}
 
                     <PlansSection
                         plans={plans}
                         loading={plansLoading}
                         currentPlanId={currentPlanId}
                         checkoutLoadingId={loadingId}
-                        onCheckout={checkout}
+                        onCheckout={handleCheckoutClick}
                     />
 
                     <PaymentsTabs
@@ -82,6 +102,12 @@ export default function PaymentsPage() {
                     />
                 </Stack>
             </Container>
+
+            <PaymentWarningDialog
+                open={!!selectedPlanForCheckout}
+                onClose={handleCancelCheckout}
+                onConfirm={handleConfirmCheckout}
+            />
         </Box>
     );
 }
