@@ -1,3 +1,4 @@
+// src/shared/ui/inputs/OtpInput.tsx
 import { useEffect, useRef } from "react";
 import { Box, TextField } from "@mui/material";
 
@@ -38,42 +39,31 @@ export default function OtpInput({ length = 6, value, onChange, autoFocus }: Otp
                 cursor: "text",
             }}
         >
-            {/* 1. СКРЫТЫЙ ИНПУТ, КОТОРЫЙ ОДОБРИТ SAFARI */}
-            <TextField
-                inputRef={hiddenInputRef}
+            {/* 1. НАТИВНЫЙ СКРЫТЫЙ ИНПУТ (Без MUI артефактов, 100% рабочий в Safari) */}
+            <input
+                ref={hiddenInputRef}
                 value={value}
                 onChange={(e) => {
                     const raw = e.target.value;
                     const digits = raw.replace(/\D/g, "").slice(0, length);
                     onChange(digits);
                 }}
-                inputProps={{
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                    maxLength: length,
-                    autoComplete: "one-time-code",
-                }}
-                sx={{
-                    // Не используем opacity: 0 и полную невидимость
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={length}
+                autoComplete="one-time-code"
+                style={{
                     position: "absolute",
-                    left: 0,
-                    top: 0,
+                    inset: 0,
                     width: "100%",
                     height: "100%",
-                    zIndex: 1,
-                    // Делаем его невидимым через цвет текста и подложки,
-                    // чтобы Safari считал его "настоящим" интерактивным полем
-                    "& .MuiOutlinedInput-root": {
-                        color: "transparent",
-                        backgroundColor: "transparent",
-                        "& fieldset": { border: "none" }, // убираем рамку
-                    },
-                    "& input": {
-                        color: "transparent",
-                        cursor: "text",
-                        height: "100%",
-                        padding: 0,
-                    }
+                    opacity: 0.01, // Минимальная прозрачность, чтобы Safari считал его видимым
+                    zIndex: 2,
+                    cursor: "text",
+                    fontSize: "16px", // Защита от автозума в iOS Safari
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
                 }}
             />
 
@@ -87,8 +77,8 @@ export default function OtpInput({ length = 6, value, onChange, autoFocus }: Otp
                         value={vals[i] === " " ? "" : vals[i]}
                         tabIndex={-1}
                         sx={{
-                            pointerEvents: "none", // Клик проходит сквозь них на скрытый инпут под ними
-                            zIndex: 0,
+                            pointerEvents: "none",
+                            zIndex: 1,
                             "& .MuiOutlinedInput-root": {
                                 borderRadius: "10px",
                                 borderColor: isFocused ? "primary.main" : "inherit",
