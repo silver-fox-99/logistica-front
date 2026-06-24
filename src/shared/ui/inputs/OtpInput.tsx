@@ -1,6 +1,5 @@
-// src/shared/ui/inputs/OtpInput.tsx
-import { useEffect, useRef } from "react";
-import { Box, TextField } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { Box } from "@mui/material";
 
 type OtpInputProps = {
     length?: number;
@@ -11,18 +10,18 @@ type OtpInputProps = {
 
 export default function OtpInput({ length = 6, value, onChange, autoFocus }: OtpInputProps) {
     const hiddenInputRef = useRef<HTMLInputElement | null>(null);
+    // Отслеживаем, находится ли инпут в фокусе
+    const [isInputFocused, setIsInputFocused] = useState(false);
 
     const vals = (value ?? "").slice(0, length).padEnd(length, " ").split("");
 
     const handleBoxClick = () => {
-        if (hiddenInputRef.current) {
-            hiddenInputRef.current.focus();
-        }
+        hiddenInputRef.current?.focus();
     };
 
     useEffect(() => {
-        if (autoFocus && hiddenInputRef.current) {
-            hiddenInputRef.current.focus();
+        if (autoFocus) {
+            hiddenInputRef.current?.focus();
         }
     }, [autoFocus]);
 
@@ -39,7 +38,7 @@ export default function OtpInput({ length = 6, value, onChange, autoFocus }: Otp
                 cursor: "text",
             }}
         >
-            {/* 1. НАТИВНЫЙ СКРЫТЫЙ ИНПУТ (Без MUI артефактов, 100% рабочий в Safari) */}
+            {/* 1. НАТИВНЫЙ СКРЫТЫЙ ИНПУТ */}
             <input
                 ref={hiddenInputRef}
                 value={value}
@@ -48,6 +47,8 @@ export default function OtpInput({ length = 6, value, onChange, autoFocus }: Otp
                     const digits = raw.replace(/\D/g, "").slice(0, length);
                     onChange(digits);
                 }}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={length}
@@ -57,44 +58,51 @@ export default function OtpInput({ length = 6, value, onChange, autoFocus }: Otp
                     inset: 0,
                     width: "100%",
                     height: "100%",
-                    opacity: 0.01, // Минимальная прозрачность, чтобы Safari считал его видимым
+                    opacity: 0.01,
                     zIndex: 2,
                     cursor: "text",
-                    fontSize: "16px", // Защита от автозума в iOS Safari
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
+                    fontSize: "16px",
                 }}
             />
 
             {/* 2. КРАСИВЫЕ КАРТОЧКИ-ВИЗУАЛИЗАТОРЫ */}
             {Array.from({ length }).map((_, i) => {
-                const isFocused = value.length === i || (value.length === length && i === length - 1);
+                // Карточка считается активной, только если инпут в фокусе
+                // и это либо текущий пустой слот, либо последний слот, если всё заполнено
+                const isCellFocused =
+                    isInputFocused &&
+                    (value.length === i || (value.length === length && i === length - 1));
 
                 return (
-                    <TextField
+                    <Box
                         key={i}
-                        value={vals[i] === " " ? "" : vals[i]}
-                        tabIndex={-1}
                         sx={{
-                            pointerEvents: "none",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "10px",
+                            border: "1px solid",
+                            // Плавное изменение цвета рамки
+                            transition: "all 0.2s ease-in-out",
+                            borderColor: isCellFocused ? "primary.main" : "divider",
+                            boxShadow: isCellFocused ? (theme) => `0 0 0 1px ${theme.palette.primary.main}` : "none",
+                            backgroundColor: "background.paper",
+
+                            // Размеры
+                            width: { xs: "100%", sm: 80 },
+                            minWidth: { xs: 44, sm: 80 },
+                            height: { xs: 56, sm: 80 },
+
+                            // Шрифт
+                            fontSize: { xs: 20, sm: 24 },
+                            fontWeight: 600,
+                            color: "text.primary",
+                            userSelect: "none",
                             zIndex: 1,
-                            "& .MuiOutlinedInput-root": {
-                                borderRadius: "10px",
-                                borderColor: isFocused ? "primary.main" : "inherit",
-                                borderWidth: isFocused ? 2 : 1,
-                            },
-                            "& input": {
-                                textAlign: "center",
-                                fontSize: { xs: 20, sm: 24 },
-                                fontWeight: 600,
-                                width: { xs: "100%", sm: 80 },
-                                minWidth: { xs: 44, sm: 80 },
-                                height: { xs: 56, sm: 80 },
-                                padding: 0,
-                            },
                         }}
-                    />
+                    >
+                        {vals[i] === " " ? "" : vals[i]}
+                    </Box>
                 );
             })}
         </Box>
