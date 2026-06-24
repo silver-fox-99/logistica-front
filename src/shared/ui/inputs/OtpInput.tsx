@@ -1,4 +1,3 @@
-// src/shared/ui/inputs/OtpInput.tsx
 import { useEffect, useRef } from "react";
 import { Box, TextField } from "@mui/material";
 
@@ -10,101 +9,89 @@ type OtpInputProps = {
 };
 
 export default function OtpInput({ length = 4, value, onChange, autoFocus }: OtpInputProps) {
-    const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+    const hiddenInputRef = useRef<HTMLInputElement | null>(null);
 
-    // нормализуем длину
     const vals = (value ?? "").slice(0, length).padEnd(length, " ").split("");
 
-    const focusIndex = (i: number) => {
-        const el = inputsRef.current[i];
-        if (el) el.focus();
+    const handleBoxClick = () => {
+        if (hiddenInputRef.current) {
+            hiddenInputRef.current.focus();
+        }
     };
 
-    const setChar = (i: number, ch: string) => {
-        const digits = value.split("");
-        digits[i] = ch;
-        const next = digits.join("").slice(0, length);
-        onChange(next);
-    };
-
-    // автофокус на первую ячейку
     useEffect(() => {
-        if (autoFocus) focusIndex(0);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (autoFocus && hiddenInputRef.current) {
+            hiddenInputRef.current.focus();
+        }
     }, [autoFocus]);
 
     return (
         <Box
-            onPaste={(e) => {
-                e.preventDefault();
-                const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, length);
-                onChange(text);
-
-                const nextIndex = Math.min(text.length, length - 1);
-                focusIndex(nextIndex);
-            }}
+            onClick={handleBoxClick}
             sx={{
+                position: "relative",
                 display: { xs: "grid", sm: "flex" },
                 gap: { xs: 1, sm: 1.5 },
                 gridTemplateColumns: { xs: `repeat(${length}, minmax(44px, 1fr))` },
                 justifyContent: "center",
                 width: "100%",
+                cursor: "text",
             }}
         >
-            {Array.from({ length }).map((_, i) => (
-                <TextField
-                    key={i}
-                    inputRef={(el) => (inputsRef.current[i] = el)}
-                    value={vals[i] === " " ? "" : vals[i]}
-                    onChange={(e) => {
-                        const raw = e.target.value;
-                        const digit = raw.replace(/\D/g, "").slice(-1);
-                        if (!digit && raw === "") {
-                            setChar(i, "");
-                            return;
-                        }
-                        if (!digit) return;
-                        setChar(i, digit);
-                        if (i < length - 1) focusIndex(i + 1);
-                    }}
-                    onKeyDown={(e) => {
-                        const target = e.target as HTMLInputElement;
-                        if (e.key === "Backspace" && !target.value && i > 0) {
-                            setChar(i - 1, "");
-                            focusIndex(i - 1);
-                            e.preventDefault();
-                        }
-                        if (e.key === "ArrowLeft" && i > 0) {
-                            focusIndex(i - 1);
-                            e.preventDefault();
-                        }
-                        if (e.key === "ArrowRight" && i < length - 1) {
-                            focusIndex(i + 1);
-                            e.preventDefault();
-                        }
-                    }}
-                    onFocus={(e) => e.currentTarget.select()}
-                    inputProps={{
-                        inputMode: "numeric",
-                        pattern: "[0-9]*",
-                        maxLength: 1,
-                    }}
-                    sx={{
-                        "& .MuiOutlinedInput-root": {
-                            borderRadius: "10px",
-                        },
-                        "& input": {
-                            textAlign: "center",
-                            fontSize: { xs: 20, sm: 24 },
-                            fontWeight: 600,
-                            width: { xs: "100%", sm: 80 },
-                            minWidth: { xs: 44, sm: 80 },
-                            height: { xs: 56, sm: 80 },
-                            padding: 0,
-                        },
-                    }}
-                />
-            ))}
+            <TextField
+                inputRef={hiddenInputRef}
+                value={value}
+                onChange={(e) => {
+                    const raw = e.target.value;
+                    const digits = raw.replace(/\D/g, "").slice(0, length);
+                    onChange(digits);
+                }}
+                inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    maxLength: length,
+                    autoComplete: "one-time-code",
+                }}
+                sx={{
+                    position: "absolute",
+                    opacity: 0,
+                    inset: 0,
+                    zIndex: 2,
+                    "& .MuiOutlinedInput-root, & input": {
+                        height: "100%",
+                        cursor: "text",
+                    }
+                }}
+            />
+
+            {Array.from({ length }).map((_, i) => {
+                const isFocused = value.length === i || (value.length === length && i === length - 1);
+
+                return (
+                    <TextField
+                        key={i}
+                        value={vals[i] === " " ? "" : vals[i]}
+                        tabIndex={-1}
+                        sx={{
+                            pointerEvents: "none",
+                            "& .MuiOutlinedInput-root": {
+                                borderRadius: "10px",
+                                borderColor: isFocused ? "primary.main" : "inherit",
+                                borderWidth: isFocused ? 2 : 1,
+                            },
+                            "& input": {
+                                textAlign: "center",
+                                fontSize: { xs: 20, sm: 24 },
+                                fontWeight: 600,
+                                width: { xs: "100%", sm: 80 },
+                                minWidth: { xs: 44, sm: 80 },
+                                height: { xs: 56, sm: 80 },
+                                padding: 0,
+                            },
+                        }}
+                    />
+                );
+            })}
         </Box>
     );
 }
