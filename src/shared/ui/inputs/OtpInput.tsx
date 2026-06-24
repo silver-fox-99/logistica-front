@@ -8,7 +8,7 @@ type OtpInputProps = {
     autoFocus?: boolean;
 };
 
-export default function OtpInput({ length = 4, value, onChange, autoFocus }: OtpInputProps) {
+export default function OtpInput({ length = 6, value, onChange, autoFocus }: OtpInputProps) {
     const hiddenInputRef = useRef<HTMLInputElement | null>(null);
 
     const vals = (value ?? "").slice(0, length).padEnd(length, " ").split("");
@@ -38,6 +38,7 @@ export default function OtpInput({ length = 4, value, onChange, autoFocus }: Otp
                 cursor: "text",
             }}
         >
+            {/* 1. СКРЫТЫЙ ИНПУТ, КОТОРЫЙ ОДОБРИТ SAFARI */}
             <TextField
                 inputRef={hiddenInputRef}
                 value={value}
@@ -53,17 +54,30 @@ export default function OtpInput({ length = 4, value, onChange, autoFocus }: Otp
                     autoComplete: "one-time-code",
                 }}
                 sx={{
+                    // Не используем opacity: 0 и полную невидимость
                     position: "absolute",
-                    opacity: 0,
-                    inset: 0,
-                    zIndex: 2,
-                    "& .MuiOutlinedInput-root, & input": {
-                        height: "100%",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 1,
+                    // Делаем его невидимым через цвет текста и подложки,
+                    // чтобы Safari считал его "настоящим" интерактивным полем
+                    "& .MuiOutlinedInput-root": {
+                        color: "transparent",
+                        backgroundColor: "transparent",
+                        "& fieldset": { border: "none" }, // убираем рамку
+                    },
+                    "& input": {
+                        color: "transparent",
                         cursor: "text",
+                        height: "100%",
+                        padding: 0,
                     }
                 }}
             />
 
+            {/* 2. КРАСИВЫЕ КАРТОЧКИ-ВИЗУАЛИЗАТОРЫ */}
             {Array.from({ length }).map((_, i) => {
                 const isFocused = value.length === i || (value.length === length && i === length - 1);
 
@@ -73,7 +87,8 @@ export default function OtpInput({ length = 4, value, onChange, autoFocus }: Otp
                         value={vals[i] === " " ? "" : vals[i]}
                         tabIndex={-1}
                         sx={{
-                            pointerEvents: "none",
+                            pointerEvents: "none", // Клик проходит сквозь них на скрытый инпут под ними
+                            zIndex: 0,
                             "& .MuiOutlinedInput-root": {
                                 borderRadius: "10px",
                                 borderColor: isFocused ? "primary.main" : "inherit",
