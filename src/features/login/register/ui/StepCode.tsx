@@ -56,14 +56,16 @@ export default function StepCode({ length = 6, type = "phone", onSubmit }: StepC
 
 
     return (
-        <Stack spacing={2}>
-            <OtpInput length={length} value={code} onChange={setCode} autoFocus />
-            <Box>
-                <Button fullWidth variant="contained" disabled={busy || code.length !== length} onClick={handleVerify} sx={{ height: 44 }}>
-                    {t("register.verifyButton")}
-                </Button>
-            </Box>
-            <Button disabled={timer > 0} onClick={handleResend} variant="text">{t("register.resendCodeButton")} {timer > 0 && `(${timer}s)`}</Button>
-        </Stack>
+        <form onSubmit={(e) => { e.preventDefault(); handleVerify(); }}>
+            <Stack spacing={2}>
+                <OtpInput length={length} value={code} onChange={setCode} autoFocus />
+                <Box>
+                    <Button type="submit" fullWidth variant="contained" disabled={busy || code.length !== length} sx={{ height: 44 }}>
+                        {t("register.verifyButton")}
+                    </Button>
+                </Box>
+                <Button disabled={timer > 0} onClick={handleResend} variant="text">{t("register.resendCodeButton")} {timer > 0 && `(${timer}s)`}</Button>
+            </Stack>
+        </form>
     );
 }

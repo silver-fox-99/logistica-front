@@ -97,51 +97,53 @@ export default function StepCodeReset({ length = 6, onVerified, onBack }: Props)
     }, [timer]);
 
     return (
-        <Stack spacing={2}>
-            <OtpInput
-                length={length}
-                value={code}
-                onChange={setCode}
-                autoFocus
-                // layout/styles handled inside OtpInput (adaptive grid for mobile)
-            />
-            <Box>
-                <Button
-                    fullWidth
-                    variant="contained"
-                    disabled={busy || code.length !== length}
-                    onClick={verify}
-                    sx={primaryBtnSx}
-                >
-                    {t("forgotPassword.verifyButton")}
-                </Button>
-            </Box>
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={1}
-                sx={{
-                    width: "100%",
-                    "& > .MuiButton-root": { width: { xs: "100%", sm: "50%" } }
-                }}
-            >
-                <Button
-                    disabled={timer > 0}
-                    variant="contained"
-                    onClick={resend}
-                    sx={secondaryBtnSx}
-                >
-                    {t("forgotPassword.resendCodeButton")} {timer > 0 && `(${timer}s)`}
-                </Button>
-                {onBack && (
+        <form onSubmit={(e) => { e.preventDefault(); verify(); }}>
+            <Stack spacing={2}>
+                <OtpInput
+                    length={length}
+                    value={code}
+                    onChange={setCode}
+                    autoFocus
+                    // layout/styles handled inside OtpInput (adaptive grid for mobile)
+                />
+                <Box>
                     <Button
-                        variant="outlined"
-                        onClick={onBack}
-                        sx={outlineBtnSx}
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        disabled={busy || code.length !== length}
+                        sx={primaryBtnSx}
                     >
-                        {t("forgotPassword.changePhoneButton")}
+                        {t("forgotPassword.verifyButton")}
                     </Button>
-                )}
+                </Box>
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1}
+                    sx={{
+                        width: "100%",
+                        "& > .MuiButton-root": { width: { xs: "100%", sm: "50%" } }
+                    }}
+                >
+                    <Button
+                        disabled={timer > 0}
+                        variant="contained"
+                        onClick={resend}
+                        sx={secondaryBtnSx}
+                    >
+                        {t("forgotPassword.resendCodeButton")} {timer > 0 && `(${timer}s)`}
+                    </Button>
+                    {onBack && (
+                        <Button
+                            variant="outlined"
+                            onClick={onBack}
+                            sx={outlineBtnSx}
+                        >
+                            {t("forgotPassword.changePhoneButton")}
+                        </Button>
+                    )}
+                </Stack>
             </Stack>
-        </Stack>
+        </form>
     );
 }

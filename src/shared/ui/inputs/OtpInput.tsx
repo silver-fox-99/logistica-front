@@ -25,6 +25,30 @@ export default function OtpInput({ length = 6, value, onChange, autoFocus }: Otp
         }
     }, [autoFocus]);
 
+    useEffect(() => {
+        if (!("OTPCredential" in window)) return;
+
+        const ac = new AbortController();
+
+        navigator.credentials
+            .get({
+                otp: { transport: ["sms"] },
+                signal: ac.signal,
+            } as any)
+            .then((otp: any) => {
+                if (otp && otp.code) {
+                    onChange(otp.code);
+                }
+            })
+            .catch((err) => {
+                console.log("Web OTP API error:", err);
+            });
+
+        return () => {
+            ac.abort();
+        };
+    }, [onChange]);
+
     return (
         <Box
             onClick={handleBoxClick}
