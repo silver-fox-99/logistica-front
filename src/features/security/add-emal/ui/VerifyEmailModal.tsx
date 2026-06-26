@@ -1,34 +1,35 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, Typography, TextField } from "@mui/material";
-import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
-import parsePhoneNumber from "libphonenumber-js";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { profileApi } from "@/shared/api/profileApi";
+import { securityApi } from "@/shared/api/securityApi";
+import { z } from "zod";
 
-interface VerifyPhoneModalProps {
+interface VerifyEmailModalProps {
     open: boolean;
     onClose: () => void;
-    onSuccess: (phone: string) => void;
-    initialPhone?: string;
+    onSuccess: () => void;
+    initialEmail?: string;
 }
 
-export default function VerifyPhoneModal({ open, onClose, onSuccess, initialPhone = "" }: VerifyPhoneModalProps) {
+export default function VerifyEmailModal({ open, onClose, onSuccess, initialEmail = "" }: VerifyEmailModalProps) {
     const { t } = useTranslation();
     const [step, setStep] = useState<0 | 1>(0);
-    const [phone, setPhone] = useState(initialPhone);
+    const [email, setEmail] = useState(initialEmail);
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(0);
 
+    const emailSchema = z.string().email();
+
     useEffect(() => {
         if (open) {
-            setPhone(initialPhone);
+            setEmail(initialEmail);
             setCode("");
             setStep(0);
             setTimer(0);
         }
-    }, [open, initialPhone]);
+    }, [open, initialEmail]);
 
     useEffect(() => {
         if (timer > 0) {
@@ -38,20 +39,19 @@ export default function VerifyPhoneModal({ open, onClose, onSuccess, initialPhon
     }, [timer]);
 
     const handleSendCode = async () => {
-        if (!matchIsValidTel(phone)) {
-            toast.error(t("profile.validation.invalidPhone"));
+        const result = emailSchema.safeParse(email);
+        if (!result.success) {
+            toast.error(t("profile.validation.invalidEmail"));
             return;
         }
         setLoading(true);
         try {
-            let e164 = phone;
-            try { const p = parsePhoneNumber(phone); if (p) e164 = p.number; } catch {}
-            await profileApi.sendPhoneCode(e164);
-            toast.success(t("register.codeSent"));
+            await securityApi.sendEmailCode(email);
+            toast.success(t("security.addEmail.successMessage"));
             setStep(1);
             setTimer(60);
         } catch (error: any) {
-            const message = error?.response?.data?.message || t("register.codeSendError");
+            const message = error?.response?.data?.message || t("security.addEmail.errorMessage");
             toast.error(message);
         } finally {
             setLoading(false);
@@ -62,48 +62,47 @@ export default function VerifyPhoneModal({ open, onClose, onSuccess, initialPhon
         if (code.length < 6) return;
         setLoading(true);
         try {
-            let e164 = phone;
-            try { const p = parsePhoneNumber(phone); if (p) e164 = p.number; } catch {}
-            await profileApi.verifyPhone(code);
-            toast.success(t("profile.contactInfo.verifyPhoneSuccess"));
-            onSuccess(e164);
+            await securityApi.confirmEmailCode(email, code);
+            toast.success(t("profile.contactInfo.verifyEmailSuccess", "E-mail успешно подтвержден!"));
+            onSuccess();
             onClose();
         } catch (error: any) {
-            const message = error?.response?.data?.message || t("profile.contactInfo.verifyPhoneError");
+            const message = error?.response?.data?.message || "Неверный код или ошибка подтверждения";
             toast.error(message);
         } finally {
             setLoading(false);
         }
     };
 
+    const isValidEmail = emailSchema.safeParse(email).success;
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
             <DialogTitle fontWeight={700}>
-                {t("profile.contactInfo.verifyPhoneTitle")}
+                {t("security.addEmail.modalTitle")}
             </DialogTitle>
             <DialogContent>
                 <Stack spacing={2.5} sx={{ mt: 1 }}>
                     {step === 0 ? (
                         <>
                             <Typography variant="body2" color="text.secondary">
-                                {t("profile.contactInfo.enterPhone")}
+                                {t("security.addEmail.modalDescription")}
                             </Typography>
-                            <MuiTelInput
-                                value={phone}
-                                onChange={setPhone}
-                                defaultCountry="UZ"
-                                forceCallingCode
-                                error={phone.length > 0 && !matchIsValidTel(phone)}
-                                helperText={phone.length > 0 && !matchIsValidTel(phone) ? t("profile.validation.invalidPhone") : ""}
-                                placeholder="+1 (555) 000-0000"
+                            <TextField
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="email@example.com"
+                                type="email"
                                 fullWidth
+                                error={email.length > 0 && !isValidEmail}
+                                helperText={email.length > 0 && !isValidEmail ? t("profile.validation.invalidEmail") : ""}
                                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
                             />
                         </>
                     ) : (
                         <>
                             <Typography variant="body2" color="text.secondary">
-                                {t("register.step2Subtitle", { phone })}
+                                {t("security.addEmail.modalSubtitle", { email })}
                             </Typography>
                             <TextField
                                 value={code}
@@ -160,10 +159,10 @@ export default function VerifyPhoneModal({ open, onClose, onSuccess, initialPhon
                     <Button
                         variant="contained"
                         onClick={handleSendCode}
-                        disabled={loading || !matchIsValidTel(phone)}
+                        disabled={loading || !isValidEmail}
                         sx={{ textTransform: "none" }}
                     >
-                        {t("profile.contactInfo.sendSmsCode")}
+                        {t("security.addEmail.sendButton")}
                     </Button>
                 ) : (
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -181,7 +180,7 @@ export default function VerifyPhoneModal({ open, onClose, onSuccess, initialPhon
                             disabled={loading || code.length < 6}
                             sx={{ textTransform: "none" }}
                         >
-                            {t("profile.contactInfo.verifyPhone")}
+                            {t("security.addEmail.confirmButton")}
                         </Button>
                     </Stack>
                 )}

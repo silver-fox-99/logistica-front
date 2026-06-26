@@ -314,6 +314,8 @@
       "resendSmsCode": "Resend SMS code",
       "verifyPhoneSuccess": "Phone successfully verified!",
       "verifyPhoneError": "Phone verification error",
+      "verifyEmailSuccess": "E-mail successfully verified!",
+      "verifyEmailError": "E-mail verification error",
       "enterPhone": "Enter phone number"
     },
     "messages": {
@@ -438,7 +440,29 @@
       "sendButton": "Send code",
       "sending": "Sending...",
       "successMessage": "Verification code sent to your E-mail",
-      "errorMessage": "Failed to send code"
+      "errorMessage": "Failed to send code",
+      "notSet": "E-mail not specified",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "bindButton": "Link E-mail",
+      "changeButton": "Change E-mail",
+      "verifyButton": "Verify E-mail",
+      "modalTitle": "E-mail Verification",
+      "modalDescription": "Enter E-mail to link. We will send a verification code.",
+      "modalSubtitle": "We sent a code to {{email}}. Enter it below.",
+      "confirmButton": "Confirm",
+      "supportChangeHint": "To change your E-mail, please contact support"
+    },
+    "bindPhone": {
+      "title": "Phone Number",
+      "description": "Your primary phone number is used for signing in and securing your account.",
+      "notSet": "Phone number not specified",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "bindButton": "Link phone",
+      "changeButton": "Change number",
+      "verifyButton": "Verify number",
+      "supportChangeHint": "To change your phone number, please contact support"
     },
     "changePassword": {
       "title": "Change password",

@@ -314,6 +314,8 @@
       "resendSmsCode": "Отправить SMS-код повторно",
       "verifyPhoneSuccess": "Телефон успешно подтвержден!",
       "verifyPhoneError": "Ошибка при верификации телефона",
+      "verifyEmailSuccess": "E-mail успешно подтвержден!",
+      "verifyEmailError": "Ошибка при верификации E-mail",
       "enterPhone": "Введите номер телефона"
     },
     "messages": {
@@ -438,7 +440,29 @@
       "sendButton": "Отправить код",
       "sending": "Отправка...",
       "successMessage": "Код подтверждения отправлен на ваш E-mail",
-      "errorMessage": "Не удалось отправить код"
+      "errorMessage": "Не удалось отправить код",
+      "notSet": "E-mail не указан",
+      "verified": "Подтвержден",
+      "unverified": "Не подтвержден",
+      "bindButton": "Привязать E-mail",
+      "changeButton": "Изменить E-mail",
+      "verifyButton": "Подтвердить E-mail",
+      "modalTitle": "Верификация E-mail",
+      "modalDescription": "Введите E-mail для привязки. Мы отправим код подтверждения.",
+      "modalSubtitle": "Мы отправили код на {{email}}. Введите его ниже.",
+      "confirmButton": "Подтвердить",
+      "supportChangeHint": "Для изменения E-mail обратитесь в поддержку"
+    },
+    "bindPhone": {
+      "title": "Номер телефона",
+      "description": "Основной номер телефона используется для входа и безопасности вашего аккаунта.",
+      "notSet": "Номер телефона не указан",
+      "verified": "Подтвержден",
+      "unverified": "Не подтвержден",
+      "bindButton": "Привязать телефон",
+      "changeButton": "Изменить номер",
+      "verifyButton": "Подтвердить номер",
+      "supportChangeHint": "Для изменения номера телефона обратитесь в поддержку"
     },
     "changePassword": {
       "title": "Изменить пароль",

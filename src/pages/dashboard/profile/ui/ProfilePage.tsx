@@ -198,15 +198,10 @@ export default function ProfilePage() {
                     whatsapp: user?.meta?.whatsapp || "",
                     email: user?.email || "",
                     phoneVerified: !!user?.phone_verified_at,
+                    emailVerified: !!user?.email_verified_at,
                 }}
                 saving={false}
                 onSave={updateUser}
-                onPhoneVerified={async () => {
-                    try {
-                        const res = await authApi.getMe();
-                        setUser(res.data);
-                    } catch {}
-                }}
             />
 
             <Paper

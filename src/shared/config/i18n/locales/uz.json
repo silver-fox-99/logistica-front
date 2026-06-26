@@ -314,6 +314,8 @@
       "resendSmsCode": "SMS-kodni qayta yuborish",
       "verifyPhoneSuccess": "Telefon raqami muvaffaqiyatli tasdiqlandi!",
       "verifyPhoneError": "Telefon raqamini tasdiqlashda xatolik",
+      "verifyEmailSuccess": "E-mail muvaffaqiyatli tasdiqlandi!",
+      "verifyEmailError": "E-mailni tasdiqlashda xatolik",
       "enterPhone": "Telefon raqamini kiriting"
     },
     "messages": {
@@ -438,7 +440,29 @@
       "sendButton": "Kod yuborish",
       "sending": "Yuborilmoqda...",
       "successMessage": "Tasdiqlash kodi E-mailingizga yuborildi",
-      "errorMessage": "Kodni yuborib bo'lmadi"
+      "errorMessage": "Kodni yuborib bo'lmadi",
+      "notSet": "E-mail ko'rsatilmagan",
+      "verified": "Tasdiqlangan",
+      "unverified": "Tasdiqlanmagan",
+      "bindButton": "E-mailni bog'lash",
+      "changeButton": "E-mailni o'zgartirish",
+      "verifyButton": "E-mailni tasdiqlash",
+      "modalTitle": "E-mailni tasdiqlash",
+      "modalDescription": "Bog'lash uchun yangi E-mail kiriting. Tasdiqlash kodini yuboramiz.",
+      "modalSubtitle": "Kodni {{email}} manziliga yubordik. Uni quyida kiriting.",
+      "confirmButton": "Tasdiqlash",
+      "supportChangeHint": "E-mailni o'zgartirish uchun yordam xizmatiga murojaat qiling"
+    },
+    "bindPhone": {
+      "title": "Telefon raqami",
+      "description": "Asosiy telefon raqamingiz tizimga kirish va hisobingiz xavfsizligi uchun ishlatiladi.",
+      "notSet": "Telefon raqami ko'rsatilmagan",
+      "verified": "Tasdiqlangan",
+      "unverified": "Tasdiqlanmagan",
+      "bindButton": "Telefonni bog'lash",
+      "changeButton": "Raqamni o'zgartirish",
+      "verifyButton": "Raqamni tasdiqlash",
+      "supportChangeHint": "Telefon raqamini o'zgartirish uchun yordam xizmatiga murojaat qiling"
     },
     "changePassword": {
       "title": "Parolni o'zgartirish",
