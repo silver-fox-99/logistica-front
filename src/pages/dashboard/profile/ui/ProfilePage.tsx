@@ -10,7 +10,6 @@ import { useUserStore } from "@/entities/user/model/user.store.ts";
 import { useTariffStore } from "@/entities/tariff/model/tariff.store";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { profileApi } from "@/shared/api/profileApi.ts";
-import { authApi } from "@/shared/api/authApi.ts";
 import { userReviewsApi } from "@/shared/api/userReviewsApi.ts";
 import { companiesApi } from "@/shared/api/companiesApi.ts";
 import type { UserReview } from "@/entities/user-reviews/model/types";

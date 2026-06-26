@@ -62,7 +62,7 @@ export default function VerifyEmailModal({ open, onClose, onSuccess, initialEmai
         if (code.length < 6) return;
         setLoading(true);
         try {
-            await securityApi.confirmEmailCode(email, code);
+            await securityApi.confirmEmailCode(code);
             toast.success(t("profile.contactInfo.verifyEmailSuccess", "E-mail успешно подтвержден!"));
             onSuccess();
             onClose();
