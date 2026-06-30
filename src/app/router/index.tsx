@@ -36,6 +36,8 @@ import DocumentsPage from "@/pages/admin/documents";
 import ReferralSettingsPage from "@/pages/admin/referral-settings";
 import ReferralPage from "@/pages/dashboard/referral";
 import NotificationsPage from "@/pages/admin/notifications";
+import UserNotificationsPage from "@/pages/dashboard/notifications";
+import AdminUserNotificationsPage from "@/pages/admin/user-notifications-admin";
 import GroupsRoles from "@/pages/admin/groups-roles";
 import MyShipmentsManagePage from "@/pages/dashboard/my-shipments-manage";
 import AdminIntegrationsPage from "@/pages/admin/integrations";
@@ -115,6 +117,7 @@ const router = createBrowserRouter([
             {path: "requests", element: <MyShipmentsManagePage />},
             {path: "user-reviews/:id", element: <UserReviewsPage /> },
             {path: "referral", element: <ReferralPage/>},
+            {path: "notifications", element: <UserNotificationsPage/>},
 
             {path: "security", element: <SecurityPage/>},
             {path: "help", element: <HelpSupportPage/>},
@@ -163,6 +166,7 @@ const router = createBrowserRouter([
             { path: "documents", element: <DocumentsPage />},
             { path: "referral-settings", element: <ReferralSettingsPage />},
             { path: "notifications", element: <NotificationsPage />},
+            { path: "user-notifications-admin", element: <AdminUserNotificationsPage /> },
             { path: "groups-roles", element: <GroupsRoles />},
             { path: "integrations", element: <AdminIntegrationsPage />},
             { path: "ads", element: <AdsPage />},

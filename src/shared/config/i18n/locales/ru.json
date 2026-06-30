@@ -264,7 +264,8 @@
       "tenders": "Тендеры",
       "tenderSearch": "Поиск тендеров",
       "myTenders": "Мои тендеры",
-      "siteReviews": "Отзывы о сайте"
+      "siteReviews": "Отзывы о сайте",
+      "notifications": "Уведомления"
     }
   },
   "profile": {
@@ -356,6 +357,16 @@
       "subtitle": "Персонализация уведомлений вашей логистической платформы",
       "warningTitle": "Telegram не привязан",
       "warningDesc": "Для получения этих уведомлений вам необходимо сначала привязать свой Telegram-аккаунт в блоке выше.",
+      "channelsTitle": "Каналы получения уведомлений",
+      "channelInApp": "Внутри сайта",
+      "channelInAppDesc": "Мгновенные уведомления (колокольчик) в шапке сайта",
+      "channelTelegram": "Telegram-бот",
+      "channelTelegramDesc": "Личные уведомления в привязанный аккаунт Telegram",
+      "channelTelegramRequired": "Необходимо привязать Telegram-аккаунт в блоке выше",
+      "channelEmail": "Электронная почта",
+      "channelEmailDesc": "Важные сводки и обновления на ваш подтвержденный email",
+      "channelEmailRequired": "Необходимо подтвердить E-mail в блоке выше",
+      "eventsTitle": "О каких событиях уведомлять",
       "newTenders": "Новые тендеры",
       "newTendersDesc": "Уведомления о создании новых тендеров на платформе",
       "myTenderBids": "Ставки в моих тендерах",
@@ -364,6 +375,10 @@
       "tenderWinDesc": "Уведомления о том, что вы победили в тендере",
       "tenderFinished": "Завершение тендеров",
       "tenderFinishedDesc": "Уведомления о завершении тендеров, в которых вы принимали участие",
+      "routeMatches": "Интересные маршруты",
+      "routeMatchesDesc": "Появление нового транспорта/грузов по маршрутам, которые вы часто ищете",
+      "systemUpdates": "Новости и скидки",
+      "systemUpdatesDesc": "Скидки на тарифы, обновления сайта, спецпредложения и новости платформы",
       "loadError": "Не удалось загрузить настройки уведомлений",
       "saveError": "Не удалось сохранить изменения"
     }
@@ -1866,5 +1881,42 @@
     "countLabel": "отзывов",
     "starsUnit": "звёзд",
     "filteringBy": "Показаны только отзывы с оценкой"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "subtitle": "Просматривайте системные события и уведомления платформы",
+    "markAllAsRead": "Прочитать все",
+    "markAsReadSingle": "Отметить как прочитанное",
+    "goToLink": "Перейти",
+    "empty": "У вас нет уведомлений",
+    "emptyTitle": "Ничего не найдено",
+    "emptyDescription": "У вас нет уведомлений, соответствующих выбранным критериям.",
+    "viewAll": "Показать все",
+    "filterAll": "Все",
+    "filterUnread": "Непрочитанные",
+    "filterRead": "Прочитанные",
+    "searchPlaceholder": "Поиск по уведомлениям...",
+    "types": {
+      "REGISTRATION": "Регистрация",
+      "REVIEW": "Новый отзыв",
+      "PLAN_CHANGE": "Тарифный план",
+      "CARGO_CREATED": "Новый груз",
+      "TRANSPORT_CREATED": "Новый транспорт",
+      "COMPANY_CREATED": "Новая компания",
+      "TENDER_CREATED": "Новый тендер",
+      "TENDER_WIN": "Победа в тендере",
+      "TENDER_FINISHED": "Тендер завершен",
+      "MY_TENDER_BIDS": "Ставка в тендере",
+      "MY_TENDER_BID": "Ставка в тендере",
+      "ROUTE_MATCHES": "Подходящий маршрут",
+      "ROUTE_MATCH": "Подходящий маршрут",
+      "SYSTEM_UPDATES": "Объявление",
+      "SYSTEM_UPDATE": "Объявление",
+      "PROMOTION": "Акция / Скидка",
+      "NEWS": "Новость платформы"
+    },
+    "time": {
+      "justNow": "Только что"
+    }
   }
 }

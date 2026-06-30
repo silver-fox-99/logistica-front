@@ -34,7 +34,7 @@ import {
     FiAward,
     FiLink2, FiTruck,
     FiBriefcase, FiSend, FiFileText,
-    FiMenu, FiX,
+    FiMenu, FiX, FiVolume2,
 } from "react-icons/fi";
 import {BsGeoAlt} from "react-icons/bs";
 import {MdOutlineAdminPanelSettings, MdOutlineRateReview} from "react-icons/md";
@@ -77,6 +77,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     { to: "/admin/initial-data", icon: <FiDatabase />, label: "Справочники", requiredAny: [viewCode("LOOKUPS" as any)] },
     { to: "/admin/black-list", icon: <FiShield />, label: "Чёрный список", requiredAny: [viewCode("BLACKLIST" as any)] },
     { to: "/admin/notifications", icon: <PiBellRingingLight />, label: "Уведомления", requiredAny: [viewCode("NOTIFICATION" as any)] },
+    { to: "/admin/user-notifications-admin", icon: <FiVolume2 />, label: "Рассылка юзерам", requiredAny: [viewCode("NOTIFICATION" as any)] },
     { to: "/admin/integrations", icon: <FiLink2 />, label: "Интеграции", requiredAny: [viewCode("INTEGRATIONS" as any)] },
     { to: "/admin/telegram-notifications", icon: <FiSend />, label: "Telegram", requiredAny: [viewCode("TELEGRAM_NOTIFICATIONS" as any)] },
     { to: "/admin/ads", icon: <LuNewspaper />, label: "Реклама", requiredAny: [viewCode("ADS" as any)] },
@@ -152,6 +153,7 @@ export default function AdminLayout() {
                         "/admin/tenders",
                         "/admin/reviews",
                         "/admin/documents",
+                        "/admin/user-notifications-admin"
                     ].includes(i.to)
                 ).filter(filterItem),
             },

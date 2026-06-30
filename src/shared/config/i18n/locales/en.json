@@ -264,7 +264,8 @@
       "tenders": "Tenders",
       "tenderSearch": "Tender search",
       "myTenders": "My tenders",
-      "siteReviews": "Site Reviews"
+      "siteReviews": "Site Reviews",
+      "notifications": "Notifications"
     }
   },
   "profile": {
@@ -356,6 +357,16 @@
       "subtitle": "Personalize the notifications of your logistics platform",
       "warningTitle": "Telegram is not linked",
       "warningDesc": "To receive these notifications, you must first link your Telegram account in the block above.",
+      "channelsTitle": "Notification Delivery Channels",
+      "channelInApp": "In-App Notifications",
+      "channelInAppDesc": "Instant notifications (bell icon) in the website header",
+      "channelTelegram": "Telegram Bot",
+      "channelTelegramDesc": "Personal notifications to your linked Telegram account",
+      "channelTelegramRequired": "You need to link your Telegram account in the block above",
+      "channelEmail": "Email",
+      "channelEmailDesc": "Important digests and updates to your verified email",
+      "channelEmailRequired": "You need to verify your E-mail in the block above",
+      "eventsTitle": "Events to Notify About",
       "newTenders": "New Tenders",
       "newTendersDesc": "Notifications about the creation of new tenders on the platform",
       "myTenderBids": "Bids in My Tenders",
@@ -364,6 +375,10 @@
       "tenderWinDesc": "Notifications when you win a tender",
       "tenderFinished": "Tender Completion",
       "tenderFinishedDesc": "Notifications when tenders you participated in are completed",
+      "routeMatches": "Matching Routes",
+      "routeMatchesDesc": "New transport/cargo matching the routes you frequently search for",
+      "systemUpdates": "News and Discounts",
+      "systemUpdatesDesc": "Tariff discounts, site updates, special offers, and platform news",
       "loadError": "Failed to load notification settings",
       "saveError": "Failed to save changes"
     }
@@ -1866,5 +1881,42 @@
     "countLabel": "reviews",
     "starsUnit": "stars",
     "filteringBy": "Showing only reviews with rating"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Review system events and platform notifications",
+    "markAllAsRead": "Mark all as read",
+    "markAsReadSingle": "Mark as read",
+    "goToLink": "Go to link",
+    "empty": "You have no notifications",
+    "emptyTitle": "Nothing Found",
+    "emptyDescription": "You have no notifications matching the selected criteria.",
+    "viewAll": "View all",
+    "filterAll": "All",
+    "filterUnread": "Unread",
+    "filterRead": "Read",
+    "searchPlaceholder": "Search notifications...",
+    "types": {
+      "REGISTRATION": "Registration",
+      "REVIEW": "New Review",
+      "PLAN_CHANGE": "Tariff Plan",
+      "CARGO_CREATED": "New Cargo",
+      "TRANSPORT_CREATED": "New Transport",
+      "COMPANY_CREATED": "New Company",
+      "TENDER_CREATED": "New Tender",
+      "TENDER_WIN": "Tender Won",
+      "TENDER_FINISHED": "Tender Completed",
+      "MY_TENDER_BIDS": "Bid Placed",
+      "MY_TENDER_BID": "Bid Placed",
+      "ROUTE_MATCHES": "Matching Route",
+      "ROUTE_MATCH": "Matching Route",
+      "SYSTEM_UPDATES": "Announcement",
+      "SYSTEM_UPDATE": "Announcement",
+      "PROMOTION": "Promo / Discount",
+      "NEWS": "Platform News"
+    },
+    "time": {
+      "justNow": "Just now"
+    }
   }
 }

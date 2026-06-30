@@ -2,8 +2,6 @@ import { Stack, Paper, Typography, Rating, Avatar, Divider } from "@mui/material
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import ProfileOverviewCard from "@/features/profile/ui/ProfileOverviewCard.tsx";
-import TelegramBindingCard from "@/features/profile/ui/TelegramBindingCard.tsx";
-import NotificationSettingsCard from "@/features/profile/ui/NotificationSettingsCard.tsx";
 import ContactInfoCard, { type ContactInfo } from "@/features/profile/ui/ContactInfoCard.tsx";
 import ProfileMembershipHistoryCard from "@/features/profile/ui/ProfileMembershipHistoryCard.tsx";
 import { useUserStore } from "@/entities/user/model/user.store.ts";
@@ -176,10 +174,6 @@ export default function ProfilePage() {
                 subscriptionExpiresAt={subscriptionExpiresAt}
                 ratings={overviewRatings}
             />
-
-            <TelegramBindingCard />
-
-            <NotificationSettingsCard />
 
             <ProfileMembershipHistoryCard
                 items={membershipHistory}

@@ -1,13 +1,14 @@
 import logo from "./logo.svg"
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import {Avatar, IconButton, useMediaQuery, Box, Drawer, Stack, Button, TextField, Autocomplete, CircularProgress, Paper, ListItemText, Typography} from "@mui/material";
-import {FiMenu, FiSearch} from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {Avatar, IconButton, useMediaQuery, Box, Drawer, Stack, Button} from "@mui/material";
+import {FiMenu} from "react-icons/fi";
+import { useState } from "react";
 import './header.scss'
 import {useUserStore} from "@/entities/user/model/user.store.ts";
 import {useTranslation} from "react-i18next";
 import LanguageSwitcher from "@/shared/ui/language-switcher/LanguageSwitcher";
-import { adminUsersApi, type AdminUser } from "@/shared/api/adminUsersApi";
+import HeaderNotificationsPopover from "@/features/user-notifications/ui/HeaderNotificationsPopover";
+import UserSearch from "@/features/user-search/ui/UserSearch";
 
 export default function Header({
     isAuthenticated, 
@@ -22,13 +23,6 @@ export default function Header({
     const {t} = useTranslation()
     const isMobile = useMediaQuery("(max-width:860px)");
     const [menuOpen, setMenuOpen] = useState(false);
-    const [searchOpen, setSearchOpen] = useState(false);
-    const [search, setSearch] = useState("");
-    const [options, setOptions] = useState<AdminUser[]>([]);
-    const [loadingOptions, setLoadingOptions] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const currentUserId = user?.id;
 
     function stringToColor(string: string) {
         let hash = 0;
@@ -58,40 +52,6 @@ export default function Header({
             children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
         };
     }
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const s = params.get("search");
-        if (s) setSearch(s);
-    }, [location.search]);
-
-    const handleSelect = (user?: AdminUser | null) => {
-        if (!user?.id) return;
-        navigate(`/dashboard/user-reviews/${user.id}`);
-        setSearchOpen(false);
-    };
-
-    const loadOptions = async (value: string) => {
-        const q = value.trim();
-        if (q.length < 1) {
-            setOptions([]);
-            return;
-        }
-        setLoadingOptions(true);
-        try {
-            const res = await adminUsersApi.list({ search: q, limit: 5, page: 1 }, true);
-            const filtered = (res.items || []).filter((o) => o.id !== currentUserId);
-            setOptions(filtered);
-        } catch {
-            setOptions([]);
-        } finally {
-            setLoadingOptions(false);
-        }
-    };
-
-    useEffect(() => {
-        const timeout = setTimeout(() => { void loadOptions(search); }, 250);
-        return () => clearTimeout(timeout);
-    }, [search]);
 
     const logoHref = "/";
     const avatarProps = stringAvatar(`${user?.first_name} ${user?.last_name}`);
@@ -106,77 +66,13 @@ export default function Header({
 
             {isAuthenticated && (
                 <div className="header__middle">
-                    {!isMobile ? (
-                        <Autocomplete<AdminUser | string, false, false, true>
-                            fullWidth
-                            size="small"
-                            freeSolo
-                            options={options}
-                            openOnFocus
-                            autoHighlight
-                            filterOptions={(x) => x}
-                            getOptionLabel={(o) =>
-                                typeof o === "string"
-                                    ? o
-                                    : [o.first_name, o.last_name].filter(Boolean).join(" ") || o.email || o.phone || o.id
-                            }
-                            loading={loadingOptions}
-                            onInputChange={(_, v) => setSearch(v)}
-                            onChange={(_, v) => {
-                                if (typeof v !== "string") handleSelect(v as AdminUser);
-                            }}
-                            renderOption={(props, option) => (
-                                <li {...props} key={typeof option === "string" ? option : option.id}>
-                                    <ListItemText
-                                        primary={
-                                            typeof option === "string"
-                                                ? option
-                                                : [option.first_name, option.last_name].filter(Boolean).join(" ") ||
-                                                  option.email ||
-                                                  option.phone ||
-                                                  option.id
-                                        }
-                                        secondary={
-                                            typeof option === "string"
-                                                ? ""
-                                                : [option.email, option.phone].filter(Boolean).join(" · ")
-                                        }
-                                    />
-                                </li>
-                            )}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    placeholder={t('header.searchPlaceholder')}
-                                    InputProps={{
-                                        ...params.InputProps,
-                                        endAdornment: (
-                                            <>
-                                                {loadingOptions ? <CircularProgress color="inherit" size={16} /> : null}
-                                                {params.InputProps.endAdornment}
-                                            </>
-                                        ),
-                                    }}
-                                    sx={{ bgcolor: "white", borderRadius: 1 }}
-                                />
-                            )}
-                            PaperComponent={(props) => <Paper elevation={3} {...props} />}
-                        />
-                    ) : (
-                        <IconButton
-                            aria-label={t('header.searchUser')}
-                            onClick={() => setSearchOpen(true)}
-                            size="large"
-                            sx={{ color: "#fff" }}
-                        >
-                            <FiSearch />
-                        </IconButton>
-                    )}
+                    <UserSearch />
                 </div>
             )}
 
             {isAuthenticated && <div className="header__column header__column--user">
                 {!isMobile && <Box component="span">{user?.first_name} {user?.last_name}</Box>}
+                <HeaderNotificationsPopover />
                 <Avatar
                     {...avatarProps}
                     component={Link}
@@ -263,82 +159,7 @@ export default function Header({
                 </>
             )}
 
-            {isAuthenticated && (
-                <Drawer
-                    anchor="top"
-                    open={searchOpen}
-                    onClose={() => setSearchOpen(false)}
-                    PaperProps={{ sx: { p: 2, borderRadius: 0, bgcolor: "rgba(255,255,255,0.98)" } }}
-                    ModalProps={{ keepMounted: true }}
-                >
-                    <Stack spacing={2}>
-                        <Typography variant="subtitle1" fontWeight={700}>
-                            {t('header.searchUser')}
-                        </Typography>
-                        <Autocomplete<AdminUser | string, false, false, true>
-                            fullWidth
-                            size="small"
-                            freeSolo
-                            options={options}
-                            openOnFocus
-                            autoHighlight
-                            filterOptions={(x) => x}
-                            getOptionLabel={(o) =>
-                                typeof o === "string"
-                                    ? o
-                                    : [o.first_name, o.last_name].filter(Boolean).join(" ") || o.email || o.phone || o.id
-                            }
-                            loading={loadingOptions}
-                            onInputChange={(_, v) => setSearch(v)}
-                            onChange={(_, v) => {
-                                if (typeof v !== "string") {
-                                    handleSelect(v as AdminUser);
-                                }
-                            }}
-                            renderOption={(props, option) => (
-                                <li {...props} key={typeof option === "string" ? option : option.id}>
-                                    <ListItemText
-                                        primary={
-                                            typeof option === "string"
-                                                ? option
-                                                : [option.first_name, option.last_name].filter(Boolean).join(" ") ||
-                                                  option.email ||
-                                                  option.phone ||
-                                                  option.id
-                                        }
-                                        secondary={
-                                            typeof option === "string"
-                                                ? ""
-                                                : [option.email, option.phone].filter(Boolean).join(" · ")
-                                        }
-                                    />
-                                </li>
-                            )}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    autoFocus
-                                    placeholder={t('header.searchPlaceholder')}
-                                    InputProps={{
-                                        ...params.InputProps,
-                                        endAdornment: (
-                                            <>
-                                                {loadingOptions ? <CircularProgress color="inherit" size={16} /> : null}
-                                                {params.InputProps.endAdornment}
-                                            </>
-                                        ),
-                                    }}
-                                    sx={{ bgcolor: "white", borderRadius: 1 }}
-                                />
-                            )}
-                            PaperComponent={(props) => <Paper elevation={3} {...props} />}
-                        />
-                        <Button variant="outlined" onClick={() => setSearchOpen(false)} sx={{ alignSelf: "flex-start" }}>
-                            {t('header.close')}
-                        </Button>
-                    </Stack>
-                </Drawer>
-            )}
+
         </div>
 
 

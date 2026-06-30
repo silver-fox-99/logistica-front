@@ -264,7 +264,8 @@
       "tenders": "Tenderlar",
       "tenderSearch": "Tenderlarni qidirish",
       "myTenders": "Mening tenderlarim",
-      "siteReviews": "Sayt sharhlari"
+      "siteReviews": "Sayt sharhlari",
+      "notifications": "Bildirishnomalar"
     }
   },
   "profile": {
@@ -356,6 +357,16 @@
       "subtitle": "Logistika platformangizning bildirishnomalarini shaxsiylashtiring",
       "warningTitle": "Telegram bog'lanmagan",
       "warningDesc": "Ushbu bildirishnomalarni olish uchun avval yuqoridagi blokda Telegram akkauntingizni bog'lashingiz kerak.",
+      "channelsTitle": "Bildirishnomalarni olish kanallari",
+      "channelInApp": "Sayt ichida",
+      "channelInAppDesc": "Sayt sarlavhasidagi lahzali bildirishnomalar (qo'ng'iroqcha)",
+      "channelTelegram": "Telegram-bot",
+      "channelTelegramDesc": "Bog'langan Telegram hisobingizga shaxsiy bildirishnomalar",
+      "channelTelegramRequired": "Yuqoridagi blokda Telegram hisobini bog'lash kerak",
+      "channelEmail": "Elektron pochta",
+      "channelEmailDesc": "Tasdiqlangan elektron pochtangizga muhim xabarlar va yangilanishlar",
+      "channelEmailRequired": "Yuqoridagi blokda E-mailni tasdiqlash kerak",
+      "eventsTitle": "Qaysi voqealar haqida bildirishnoma yuborilsin",
       "newTenders": "Yangi tenderlar",
       "newTendersDesc": "Platformada yangi tenderlar yaratilishi haqidagi bildirishnomalar",
       "myTenderBids": "Mening tenderlarimdagi takliflar",
@@ -364,6 +375,10 @@
       "tenderWinDesc": "Tenderda g'olib bo'lganingiz haqidagi bildirishnomalar",
       "tenderFinished": "Tenderlarning yakunlanishi",
       "tenderFinishedDesc": "Siz ishtirok etgan tenderlarning yakunlanishi haqidagi bildirishnomalar",
+      "routeMatches": "Qiziqarli yo'nalishlar",
+      "routeMatchesDesc": "Siz tez-tez qidiradigan yo'nalishlar bo'yicha yangi transport/yuklar paydo bo'lishi",
+      "systemUpdates": "Yangiliklar va chegirmalar",
+      "systemUpdatesDesc": "Tarif chegirmalari, sayt yangilanishlari, maxsus takliflar va platforma yangiliklari",
       "loadError": "Bildirishnoma sozlamalarini yuklab bo'lmadi",
       "saveError": "O'zgarishlarni saqlab bo'lmadi"
     }
@@ -1867,5 +1882,42 @@
     "countLabel": "ta sharh",
     "starsUnit": "yulduzli",
     "filteringBy": "Faqat quyidagi bahoga ega sharhlar ko'rsatilmoqda:"
+  },
+  "notifications": {
+    "title": "Bildirishnomalar",
+    "subtitle": "Tizim voqealari va platforma bildirishnomalarini ko'rib chiqing",
+    "markAllAsRead": "Barchasini o'qilgan deb belgilash",
+    "markAsReadSingle": "O'qilgan deb belgilash",
+    "goToLink": "O'tish",
+    "empty": "Sizda bildirishnomalar yo'q",
+    "emptyTitle": "Hech narsa topilmadi",
+    "emptyDescription": "Sizda tanlangan mezonlarga mos keladigan bildirishnomalar yo'q.",
+    "viewAll": "Barchasini ko'rsatish",
+    "filterAll": "Barchasi",
+    "filterUnread": "O'qilmagan",
+    "filterRead": "O'qilgan",
+    "searchPlaceholder": "Bildirishnomalarni qidirish...",
+    "types": {
+      "REGISTRATION": "Ro'yxatdan o'tish",
+      "REVIEW": "Yangi sharh",
+      "PLAN_CHANGE": "Tarif rejasi",
+      "CARGO_CREATED": "Yangi yuk",
+      "TRANSPORT_CREATED": "Yangi transport",
+      "COMPANY_CREATED": "Yangi kompaniya",
+      "TENDER_CREATED": "Yangi tender",
+      "TENDER_WIN": "Tenderda g'alaba qozonildi",
+      "TENDER_FINISHED": "Tender yakunlandi",
+      "MY_TENDER_BIDS": "Taklif kiritildi",
+      "MY_TENDER_BID": "Taklif kiritildi",
+      "ROUTE_MATCHES": "Mos keladigan yo'nalish",
+      "ROUTE_MATCH": "Mos keladigan yo'nalish",
+      "SYSTEM_UPDATES": "Tizim e'loni",
+      "SYSTEM_UPDATE": "Tizim e'loni",
+      "PROMOTION": "Aksiya / Chegirma",
+      "NEWS": "Platforma yangiligi"
+    },
+    "time": {
+      "justNow": "Hozirgina"
+    }
   }
 }

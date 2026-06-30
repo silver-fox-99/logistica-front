@@ -10,7 +10,7 @@ import {
     FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
     FiLogOut, FiSearch,
     FiAward, FiFileText, FiChevronDown, FiChevronRight, FiList,
-    FiMessageSquare
+    FiMessageSquare, FiBell
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
@@ -26,6 +26,7 @@ import { useIsCompanyWorkspace } from "@/pages/dashboard/company/workspace/model
 import { useCompanySidebarCompany } from "@/pages/dashboard/company/workspace/model/useCompanySidebarCompany";
 import { TenderWorkspaceSidebar } from "@/widgets/tender/tender-workspace-sidebar/ui/TenderWorkspaceSidebar";
 import { useTenderWorkspaceAccessStore } from "@/entities/tender/model/tenderWorkspaceAccess.store";
+import { useClientNotificationsWebSocket } from "@/features/user-notifications/websocket/useClientNotificationsWebSocket";
 
 function NavItem({ to, icon, label, onClick, end }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void; end?: boolean }) {
     return (
@@ -51,6 +52,7 @@ function SidebarContent({
         { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
         { to: "/dashboard/referral", icon: <FiAward />,  label: t('dashboard.menu.referrals') },
         { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },
+        { to: "/dashboard/notifications", icon: <FiBell />,   label: t('dashboard.menu.notifications') },
     ];
 
     const bottomNav = [
@@ -147,6 +149,7 @@ function SidebarContent({
 }
 
 export default function DashboardLayout() {
+    useClientNotificationsWebSocket();
     const isMobile = useMediaQuery("(max-width:860px)");
     const [open, setOpen] = useState(false);
     const location = useLocation();

@@ -23,6 +23,11 @@ export const profileApi = {
         notify_my_tender_bids?: boolean;
         notify_tender_win?: boolean;
         notify_tender_finished?: boolean;
+        notify_route_matches?: boolean;
+        notify_system_updates?: boolean;
+        channel_in_app?: boolean;
+        channel_telegram?: boolean;
+        channel_email?: boolean;
     }) => {
         const res = await api.patch("/users/me/notification-settings", data);
         return res.data;
