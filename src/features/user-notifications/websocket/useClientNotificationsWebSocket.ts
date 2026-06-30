@@ -13,6 +13,11 @@ export function useClientNotificationsWebSocket() {
 
         const wsUrl = import.meta.env.VITE_API_URL || "http://localhost:3080";
 
+        // Request browser notification permission if supported
+        if ("Notification" in window && Notification.permission === "default") {
+            void Notification.requestPermission();
+        }
+
         // Connect to the /client-notifications namespace
         const socket = io(`${wsUrl}/client-notifications`, {
             auth: {
@@ -55,6 +60,27 @@ export function useClientNotificationsWebSocket() {
                     pauseOnHover: true,
                     draggable: true,
                 });
+
+                // Show native OS/browser notification
+                if ("Notification" in window && Notification.permission === "granted") {
+                    try {
+                        const nativeNotification = new Notification(notification.title || "Новое уведомление", {
+                            body: notification.message,
+                            icon: "/favicon.ico", // Path to app icon
+                        });
+
+                        nativeNotification.onclick = () => {
+                            window.focus();
+                            if (notification.metadata?.link) {
+                                window.location.href = notification.metadata.link;
+                            } else {
+                                window.location.href = "/dashboard/notifications";
+                            }
+                        };
+                    } catch (e) {
+                        console.warn("Failed to show native browser notification:", e);
+                    }
+                }
             }
         });
 
