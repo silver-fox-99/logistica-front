@@ -45,17 +45,17 @@ export function useClientNotificationsWebSocket() {
                     unreadNotifications: [notification, ...store.unreadNotifications].slice(0, 10),
                     notifications: [notification, ...store.notifications]
                 });
-            }
 
-            // Show toast popup
-            toast.info(`Новое уведомление: ${notification.message}`, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            });
+                // Show toast popup (only once)
+                toast.info(`Новое уведомление: ${notification.message}`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+            }
         });
 
         return () => {
