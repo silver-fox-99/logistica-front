@@ -56,14 +56,28 @@ export default function LanguageSwitcher() {
                                 component="img"
                                 src={currentFlag}
                                 alt={String(currentLang)}
-                                sx={{ width: 18, height: 18, borderRadius: "50%" }}
+                                sx={{ 
+                                    width: 18, 
+                                    height: 18, 
+                                    borderRadius: "50%",
+                                    display: { xs: "none", sm: "block" } 
+                                }}
                                 onError={() => setFlagError(true)}
                                 crossOrigin="anonymous"
                                 referrerPolicy="no-referrer"
                             />
                         )
                     }
-                    sx={{ textTransform: "none", borderRadius: 3, px: 1.5, py: 0.75 }}
+                    sx={{ 
+                        textTransform: "none", 
+                        borderRadius: 3, 
+                        px: { xs: 1, sm: 1.5 }, 
+                        py: 0.75,
+                        minWidth: "auto",
+                        "& .MuiButton-startIcon": {
+                            display: { xs: "none", sm: "inline-flex" }
+                        }
+                    }}
                 >
                     {String(currentLang).toUpperCase()}
                 </Button>

@@ -10,6 +10,12 @@
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+
+    @media (max-width: 860px) {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      gap: 8px;
+    }
   }
 
   &__left {
@@ -30,6 +36,10 @@
       max-height: 50px;
       width: auto;
       height: auto;
+
+      @media (max-width: 860px) {
+        max-height: 38px;
+      }
     }
   }
 
@@ -38,7 +48,7 @@
     align-items: center;
     gap: 16px;
 
-    @media (max-width: 480px) {
+    @media (max-width: 860px) {
       gap: 8px;
     }
     

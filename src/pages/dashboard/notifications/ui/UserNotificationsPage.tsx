@@ -2,12 +2,14 @@ import React, { useEffect, useState, useMemo } from "react";
 import {
     Container, Stack, Typography, Card, CardContent, Button, Tabs, Tab,
     Box, List, ListItem, ListItemText, Divider,
-    CircularProgress, TextField, InputAdornment, IconButton, Pagination, Chip
+    CircularProgress, TextField, InputAdornment, IconButton, Pagination, Chip,
+    useTheme, useMediaQuery
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { FiSearch, FiCheck } from "react-icons/fi";
 import { useUserNotificationsStore } from "@/entities/notification/model/userNotifications.store";
+import { RouteInterestSettings } from "@/features/user-notifications/ui/RouteInterestSettings";
 
 // Relative time formatter helper
 function formatRelativeTime(dateString: string, t: any): string {
@@ -59,6 +61,9 @@ function getNotificationColor(type: string): string {
 export default function UserNotificationsPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
     const {
         notifications,
         total,
@@ -149,15 +154,20 @@ export default function UserNotificationsPage() {
                     )}
                 </Box>
 
+                <RouteInterestSettings />
+
                 {/* Filters and Search Bar */}
                 <Card variant="outlined" sx={{ borderRadius: 3, borderColor: "divider" }}>
-                    <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="space-between" alignItems="center">
+                    <CardContent sx={{ p: { xs: 1.5, sm: 2 }, "&:last-child": { pb: { xs: 1.5, sm: 2 } } }}>
+                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }}>
                             <Tabs
                                 value={activeTab}
                                 onChange={handleTabChange}
                                 indicatorColor="primary"
                                 textColor="primary"
+                                variant="scrollable"
+                                scrollButtons="auto"
+                                allowScrollButtonsMobile
                                 sx={{
                                     borderBottom: 1,
                                     borderColor: "divider",
@@ -212,7 +222,7 @@ export default function UserNotificationsPage() {
                                         <ListItem
                                             onClick={notif.metadata?.link ? () => void handleItemClick(notif) : undefined}
                                             sx={{
-                                                p: { xs: 2, sm: 2.5 },
+                                                p: { xs: 1.5, sm: 2.5 },
                                                 bgcolor: notif.is_read ? "transparent" : "action.hover",
                                                 transition: "all 0.2s",
                                                 alignItems: "flex-start",
@@ -268,11 +278,11 @@ export default function UserNotificationsPage() {
                                                     </Stack>
                                                 }
                                                 secondary={
-                                                    <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="flex-end">
-                                                        <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-word", lineHeight: 1.6, flex: 1 }}>
+                                                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "flex-end" }}>
+                                                        <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-word", lineHeight: 1.6, flex: 1, width: "100%" }}>
                                                             {notif.message}
                                                         </Typography>
-                                                        <Stack direction="row" spacing={1} alignItems="center">
+                                                        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ alignSelf: { xs: "flex-end", sm: "auto" }, mt: { xs: 1.5, sm: 0 } }}>
                                                             {notif.metadata?.link && (
                                                                 <Button
                                                                     size="small"
@@ -329,7 +339,7 @@ export default function UserNotificationsPage() {
                             onChange={handlePageChange}
                             color="primary"
                             shape="rounded"
-                            size="medium"
+                            size={isMobile ? "small" : "medium"}
                         />
                     </Box>
                 )}

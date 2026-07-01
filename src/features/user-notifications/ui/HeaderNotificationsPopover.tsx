@@ -145,7 +145,8 @@ export default function HeaderNotificationsPopover() {
                 }}
                 PaperProps={{
                     sx: {
-                        width: 360,
+                        width: "calc(100vw - 32px)",
+                        maxWidth: 360,
                         maxHeight: 480,
                         borderRadius: 3,
                         boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
