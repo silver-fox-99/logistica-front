@@ -28,6 +28,7 @@ export const profileApi = {
         channel_in_app?: boolean;
         channel_telegram?: boolean;
         channel_email?: boolean;
+        route_matching_mode?: "auto" | "manual";
     }) => {
         const res = await api.patch("/users/me/notification-settings", data);
         return res.data;

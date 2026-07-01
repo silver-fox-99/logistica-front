@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { FiTrash2, FiPlus, FiMapPin, FiLayers, FiSettings, FiCheck, FiSearch } from "react-icons/fi";
 import { useUserRouteInterestsStore } from "@/entities/user-route-interest/model/userRouteInterests.store";
 import { publicGeoApi, type PublicGeoLocationItem } from "@/shared/api/publicGeoApi";
+import { profileApi } from "@/shared/api/profileApi";
 
 function getLocalizedName(
     item: { name: string; name_ru?: string; name_uz?: string } | null | undefined,
@@ -53,6 +54,8 @@ export function RouteInterestSettings() {
     } = useUserRouteInterestsStore();
 
     const [activeTab, setActiveTab] = useState<"auto" | "manual">("auto");
+    const [matchingMode, setMatchingMode] = useState<"auto" | "manual">("auto");
+    const [settingsLoading, setSettingsLoading] = useState(false);
 
     const [autoMatchPct, setAutoMatchPct] = useState<number>(50);
     const [manualMatchPct, setManualMatchPct] = useState<number>(50);
@@ -66,9 +69,41 @@ export function RouteInterestSettings() {
     const [destLoading, setDestLoading] = useState(false);
     const [selectedDest, setSelectedDest] = useState<PublicGeoLocationItem | null>(null);
 
+    const fetchMatchingMode = useCallback(async () => {
+        try {
+            setSettingsLoading(true);
+            const res = await profileApi.getNotificationSettings();
+            if (res?.data?.route_matching_mode) {
+                setMatchingMode(res.data.route_matching_mode);
+                setActiveTab(res.data.route_matching_mode);
+            }
+        } catch (err) {
+            console.error("Failed to fetch notification settings:", err);
+        } finally {
+            setSettingsLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         void fetchInterests();
-    }, []);
+        void fetchMatchingMode();
+    }, [fetchMatchingMode]);
+
+    const handleActivateMode = async (mode: "auto" | "manual") => {
+        try {
+            setSettingsLoading(true);
+            const res = await profileApi.updateNotificationSettings({ route_matching_mode: mode });
+            if (res?.status) {
+                setMatchingMode(mode);
+                toast.success(t("notifications.routeInterests.modeActivateSuccess", "Режим отслеживания успешно изменен!"));
+            }
+        } catch (err) {
+            console.error("Failed to update notification settings:", err);
+            toast.error(t("notifications.routeInterests.error", "Произошла ошибка"));
+        } finally {
+            setSettingsLoading(false);
+        }
+    };
 
     // Check if auto mode interest is active
     const autoInterest = useMemo(() => {
@@ -316,7 +351,7 @@ export function RouteInterestSettings() {
                         <Typography 
                             variant="body2" 
                             fontWeight={activeTab === "auto" ? 800 : 600}
-                            sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" }, whiteSpace: "nowrap" }}
+                            sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" }, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 0.5 }}
                         >
                             <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
                                 {t("notifications.routeInterests.tabAuto", "Автоматический режим (ИИ)")}
@@ -324,6 +359,14 @@ export function RouteInterestSettings() {
                             <Box component="span" sx={{ display: { xs: "inline", sm: "none" } }}>
                                 {t("notifications.routeInterests.tabAutoShort", "Авто-ИИ")}
                             </Box>
+                            {matchingMode === "auto" && (
+                                <Chip
+                                    label={t("notifications.routeInterests.modeActiveBadge", "Активен")}
+                                    size="small"
+                                    color="success"
+                                    sx={{ height: 18, fontSize: "0.65rem", fontWeight: 700, px: 0.5 }}
+                                />
+                            )}
                         </Typography>
                     </Box>
 
@@ -357,7 +400,7 @@ export function RouteInterestSettings() {
                         <Typography 
                             variant="body2" 
                             fontWeight={activeTab === "manual" ? 800 : 600}
-                            sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" }, whiteSpace: "nowrap" }}
+                            sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" }, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 0.5 }}
                         >
                             <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
                                 {t("notifications.routeInterests.tabManual", "Ручной режим")}
@@ -365,6 +408,14 @@ export function RouteInterestSettings() {
                             <Box component="span" sx={{ display: { xs: "inline", sm: "none" } }}>
                                 {t("notifications.routeInterests.tabManualShort", "Вручную")}
                             </Box>
+                            {matchingMode === "manual" && (
+                                <Chip
+                                    label={t("notifications.routeInterests.modeActiveBadge", "Активен")}
+                                    size="small"
+                                    color="success"
+                                    sx={{ height: 18, fontSize: "0.65rem", fontWeight: 700, px: 0.5 }}
+                                />
+                            )}
                         </Typography>
                     </Box>
                 </Box>
@@ -372,6 +423,26 @@ export function RouteInterestSettings() {
                 {/* Active Tab Content */}
                 {activeTab === "auto" ? (
                     <Stack spacing={2.5}>
+                        {matchingMode !== "auto" && (
+                            <Alert
+                                severity="warning"
+                                variant="outlined"
+                                action={
+                                    <Button
+                                        color="warning"
+                                        size="small"
+                                        onClick={() => void handleActivateMode("auto")}
+                                        disabled={settingsLoading}
+                                        sx={{ textTransform: "none", fontWeight: 700 }}
+                                    >
+                                        {t("notifications.routeInterests.activateModeBtn", "Активировать этот режим")}
+                                    </Button>
+                                }
+                                sx={{ borderRadius: 3, borderStyle: "dashed" }}
+                            >
+                                {t("notifications.routeInterests.modeAlertManual", "Внимание: сейчас у вас активен Ручной режим отслеживания. Автоматический подбор (ИИ) будет проигнорирован.")}
+                            </Alert>
+                        )}
                         <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
                             {t(
                                 "notifications.routeInterests.autoDescription",
@@ -642,6 +713,26 @@ export function RouteInterestSettings() {
                     </Stack>
                 ) : (
                     <Stack spacing={3}>
+                        {matchingMode !== "manual" && (
+                            <Alert
+                                severity="warning"
+                                variant="outlined"
+                                action={
+                                    <Button
+                                        color="warning"
+                                        size="small"
+                                        onClick={() => void handleActivateMode("manual")}
+                                        disabled={settingsLoading}
+                                        sx={{ textTransform: "none", fontWeight: 700 }}
+                                    >
+                                        {t("notifications.routeInterests.activateModeBtn", "Активировать этот режим")}
+                                    </Button>
+                                }
+                                sx={{ borderRadius: 3, borderStyle: "dashed" }}
+                            >
+                                {t("notifications.routeInterests.modeAlertAuto", "Внимание: сейчас у вас активен Автоматический режим подбора (ИИ). Ручные настройки маршрутов будут проигнорированы.")}
+                            </Alert>
+                        )}
                         <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
                             {t(
                                 "notifications.routeInterests.manualDescription",
