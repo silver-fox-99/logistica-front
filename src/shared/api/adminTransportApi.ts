@@ -47,6 +47,7 @@ export type TransportItem = {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
+    display_type?: string | null;
     sort_updated_at?: string | null;
     up_count?: number;
     view_count?: number;
@@ -91,6 +92,11 @@ export const adminTransportApi = {
 
     restore: async (id: string) => {
         const { data } = await api.patch(`${DELETE_PREFIX}/${id}/admin/restore`);
+        return data;
+    },
+
+    reactivate: async (id: string) => {
+        const { data } = await api.patch(`${DELETE_PREFIX}/${id}/admin/reactivate`);
         return data;
     },
 };

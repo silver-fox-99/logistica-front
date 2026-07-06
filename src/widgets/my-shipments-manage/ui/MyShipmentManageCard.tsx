@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { MouseEvent } from "react";
 import {
     Box,
     Button,
@@ -10,6 +11,10 @@ import {
     Stack,
     Tooltip,
     Typography,
+    Menu,
+    MenuItem,
+    ListItemIcon,
+    ListItemText,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import {
@@ -25,6 +30,8 @@ import {
     FiRepeat,
     FiTrash2,
     FiTruck,
+    FiMoreVertical,
+    FiEyeOff,
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
@@ -44,6 +51,7 @@ type Props = {
     onDelete: (id: string) => void;
     onCopy: (id: string) => void;
     onAutoBump: (id: string) => void;
+    onDeactivate: (id: string) => void;
 };
 
 function getUpdatedValue(data: ShipmentRowData) {
@@ -76,12 +84,22 @@ export function MyShipmentManageCard({
                                          onDelete,
                                          onCopy,
                                          onAutoBump,
+                                         onDeactivate,
                                      }: Props) {
     const { t, i18n } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
     const { lookups, loadInit } = useInitStore();
 
     const [expanded, setExpanded] = useState(false);
+
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const openMenu = Boolean(anchorEl);
+    const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
 
     useEffect(() => {
         loadInit();
@@ -132,6 +150,7 @@ export function MyShipmentManageCard({
     const loadFrom = data.loadWindow?.from ?? data.dates.from;
     const loadTo = data.loadWindow?.to ?? data.loadWindow?.from ?? data.dates.from;
     const unloadDate = data.dates?.to ?? null;
+    const canEdit = data.display_type !== 'inactive'
 
     const pointsBadgeSx = {
         minWidth: 20,
@@ -157,6 +176,7 @@ export function MyShipmentManageCard({
                 borderRadius: 1,
                 borderColor: selected ? "primary.main" : "divider",
                 boxShadow: selected ? "0 0 0 1px rgba(25,118,210,0.15)" : "none",
+                opacity: !canEdit ? 0.5 : 1,
             }}
         >
             <Stack spacing={1.5}>
@@ -303,46 +323,56 @@ export function MyShipmentManageCard({
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 3.5 }}>
-                        <Stack
+                        {canEdit && <Stack
                             direction="row"
                             spacing={0.5}
                             justifyContent={{ xs: "flex-start", md: "flex-end" }}
-                            flexWrap="wrap"
+                            alignItems="center"
                         >
-                            <Tooltip title={t("shipments.shipmentCard.raiseUp")}>
-                                <IconButton onClick={() => onUp(data.id)}>
-                                    <FiRepeat />
-                                </IconButton>
-                            </Tooltip>
+                            <IconButton onClick={handleMenuOpen}>
+                                <FiMoreVertical />
+                            </IconButton>
 
-                            <Tooltip title={t("shipments.shipmentCard.edit")}>
-                                <IconButton onClick={() => onEdit(data.id)}>
-                                    <FiEdit2 />
-                                </IconButton>
-                            </Tooltip>
-
-                            <Tooltip title={t("shipments.shipmentCard.copy")}>
-                                <IconButton onClick={() => onCopy(data.id)}>
-                                    <FiCopy />
-                                </IconButton>
-                            </Tooltip>
-
-                            <Tooltip
-                                title={t("listingAutoBump.actions.open", {
-                                    defaultValue: "Auto bump",
-                                })}
+                             <Menu
+                                anchorEl={anchorEl}
+                                open={openMenu}
+                                onClose={handleMenuClose}
+                                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                             >
-                                <IconButton onClick={() => onAutoBump(data.id)}>
-                                    <FiClock />
-                                </IconButton>
-                            </Tooltip>
+                                <MenuItem onClick={() => { handleMenuClose(); onUp(data.id); }}>
+                                    <ListItemIcon><FiRepeat size={16} /></ListItemIcon>
+                                    <ListItemText>{t("shipments.shipmentCard.raiseUp")}</ListItemText>
+                                </MenuItem>
 
-                            <Tooltip title={t("shipments.shipmentCard.delete")}>
-                                <IconButton color="error" onClick={() => onDelete(data.id)}>
-                                    <FiTrash2 />
-                                </IconButton>
-                            </Tooltip>
-                        </Stack>
+                                <MenuItem onClick={() => { handleMenuClose(); onEdit(data.id); }}>
+                                    <ListItemIcon><FiEdit2 size={16} /></ListItemIcon>
+                                    <ListItemText>{t("shipments.shipmentCard.edit")}</ListItemText>
+                                </MenuItem>
+
+                                <MenuItem onClick={() => { handleMenuClose(); onCopy(data.id); }}>
+                                    <ListItemIcon><FiCopy size={16} /></ListItemIcon>
+                                    <ListItemText>{t("shipments.shipmentCard.copy")}</ListItemText>
+                                </MenuItem>
+
+                                <MenuItem onClick={() => { handleMenuClose(); onAutoBump(data.id); }}>
+                                    <ListItemIcon><FiClock size={16} /></ListItemIcon>
+                                    <ListItemText>{t("listingAutoBump.actions.open", { defaultValue: "Auto bump" })}</ListItemText>
+                                </MenuItem>
+
+                                <MenuItem onClick={() => { handleMenuClose(); onDeactivate(data.id); }}>
+                                    <ListItemIcon><FiEyeOff size={16} /></ListItemIcon>
+                                    <ListItemText>{t("shipments.shipmentCard.deactivate", { defaultValue: "Деактивировать" })}</ListItemText>
+                                </MenuItem>
+
+                                <Divider />
+
+                                <MenuItem onClick={() => { handleMenuClose(); onDelete(data.id); }} sx={{ color: 'error.main' }}>
+                                    <ListItemIcon sx={{ color: 'error.main' }}><FiTrash2 size={16} /></ListItemIcon>
+                                    <ListItemText>{t("shipments.shipmentCard.delete")}</ListItemText>
+                                </MenuItem>
+                            </Menu>
+                        </Stack>}
                     </Grid>
 
                     <Grid size={{ xs: 12 }}>

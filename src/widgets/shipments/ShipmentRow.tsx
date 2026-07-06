@@ -112,6 +112,7 @@ export default function ShipmentRow({
                     bgcolor: "background.paper",
                     width: "100%",
                     boxSizing: "border-box",
+                    opacity: data.display_type === "inactive" ? 0.5 : 1,
                 }}
             >
                 <Grid container spacing={{ xs: 1.25, md: 1.5 }} alignItems="stretch">
@@ -151,6 +152,7 @@ export default function ShipmentRow({
                             views={data.views}
                             timeAgo={data.timeAgo}
                             price={data.price}
+                            display_type={data.display_type}
                             labels={{
                                 addFavorite: t("shipments.favorites.add", "Add to favorites"),
                                 removeFavorite: t("shipments.favorites.remove", "Remove from favorites"),

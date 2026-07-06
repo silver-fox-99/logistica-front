@@ -69,6 +69,8 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind,
         return formatShipmentRoute(point, i18n.resolvedLanguage || i18n.language || "uz");
     }, [i18n.resolvedLanguage, i18n.language, unloadPoints, sortedPoints]);
 
+    const isActive = data.display_type !== 'inactive'
+
     const dateLabel = useMemo(() => {
         const loadFrom = data.loadWindow?.from ?? data.dates?.from;
         const loadTo = data.loadWindow?.to ?? data.loadWindow?.from ?? data.dates?.from;
@@ -157,6 +159,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind,
                 p: { xs: 1.5, md: 2 },
                 borderRadius: 2,
                 overflow: "hidden",
+                opacity: isActive ? 1 : 0.6,
                 transition: "border-color 0.2s ease, box-shadow 0.2s ease",
                 "&:hover": {
                     borderColor: "primary.light",
@@ -280,7 +283,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind,
                     </Stack>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 3.5 }}>
+                {isActive && <Grid size={{ xs: 12, md: 3.5 }}>
                     <Paper
                         variant="outlined"
                         sx={{
@@ -319,7 +322,7 @@ export const PublicShipmentCard = memo(function PublicShipmentCard({ data, kind,
                             </Button>
                         </Stack>
                     </Paper>
-                </Grid>
+                </Grid>}
             </Grid>
         </Paper>
     );

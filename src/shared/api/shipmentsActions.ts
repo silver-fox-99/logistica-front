@@ -21,6 +21,7 @@ export type CargoPatchDto = Partial<{
     price_amount: number;
     contact_extra_phone: string | null;
     note: string | null;
+    display_type: string | null;
 }>;
 
 export async function cargoPatch(id: string, dto: CargoPatchDto) {
@@ -50,6 +51,7 @@ export type TransportPatchDto = Partial<{
     price_amount: number;
     contact_extra_phone: string | null;
     note: string | null;
+    display_type: string | null;
 }>;
 
 export async function transportPatch(id: string, dto: TransportPatchDto) {

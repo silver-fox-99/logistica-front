@@ -101,6 +101,7 @@ export type ShipmentRowData = {
     viewCount?: string;
     isFavorite?: boolean;
     images?: string[];
+    display_type?: string | null;
 };
 
 export type CargoApiItem = {

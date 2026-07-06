@@ -151,6 +151,24 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
         [kind, reload, t]
     );
 
+    const handleDeactivate = useCallback(
+        async (id: string) => {
+            try {
+                if (kind === "cargo") {
+                    await cargoPatch(id, { display_type: 'inactive' });
+                } else {
+                    await transportPatch(id, { display_type: 'inactive' });
+                }
+
+                toast.success(t("shipments.messages.orderDeactivated"));
+                reload();
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || t("shipments.messages.orderDeactivateError"));
+            }
+        },
+        [kind, reload, t]
+    );
+
     const confirmDelete = useCallback(async () => {
         if (!deleteId) return;
 
@@ -284,6 +302,7 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
                                 onDelete={openDelete}
                                 onCopy={openCopy}
                                 onAutoBump={openAutoBump}
+                                onDeactivate={handleDeactivate}
                             />
                         </Grid>
                     ))}

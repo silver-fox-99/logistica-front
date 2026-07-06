@@ -551,6 +551,10 @@
       "orderDeleteError": "Error deleting order",
       "orderUpdated": "Order successfully updated!",
       "orderUpdateError": "Error updating order",
+      "orderDeactivated": "Order successfully deactivated!",
+      "orderDeactivateError": "Error deactivating order",
+      "inactiveAlert": "This order is no longer active and has been archived.",
+      "inactiveContactsNotice": "Contacts are hidden because the order is inactive",
       "bulkUpdateNotReady": "Bulk update is not available yet.",
       "bulkActionError": "Bulk action failed"
     },
@@ -610,6 +614,7 @@
       "edit": "Edit",
       "copy": "Copy",
       "delete": "Delete",
+      "deactivate": "Deactivate",
       "morePoints": "more",
       "updated": "Updated:",
       "signInToView": "Sign in to view contacts and details.",

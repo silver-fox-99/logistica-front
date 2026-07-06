@@ -150,7 +150,11 @@ export function ShipmentDetailsHero({
 
                         {!user && <Link to="/register" className="header__button button" >{t('header.register')}</Link>}
 
-                        {user && !contactsRevealed && onShowContacts && (
+                        {data.display_type === "inactive" ? (
+                            <Typography variant="body2" color="warning.main" fontWeight={600}>
+                                {t("shipments.messages.inactiveContactsNotice")}
+                            </Typography>
+                        ) : user && !contactsRevealed && onShowContacts && (
                             <Button
                                 variant="contained"
                                 size="small"

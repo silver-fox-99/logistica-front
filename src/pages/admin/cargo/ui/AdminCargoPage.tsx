@@ -159,6 +159,20 @@ export default function AdminCargoPage() {
         }
     };
 
+    const handleReactivate = async (id: string) => {
+        setBusy(true);
+        try {
+            await adminCargoApi.reactivate(id);
+            toast.success("Груз возвращен в активные");
+            refetch();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || "Ошибка при активации груза";
+            toast.error(message);
+        } finally {
+            setBusy(false);
+        }
+    };
+
     if (!canViewCargo) return <NoAccess />;
 
     return (
@@ -243,15 +257,18 @@ export default function AdminCargoPage() {
                         <TableBody>
                             {items.map((c) => {
                                 const isDeleted = Boolean(c.deleted_at);
+                                const isInactive = c.display_type === "inactive";
 
                                 return (
                                     <TableRow
                                         key={c.id}
                                         hover
                                         sx={{
-                                            opacity: isDeleted ? 0.68 : 1,
+                                            opacity: isDeleted ? 0.68 : isInactive ? 0.8 : 1,
                                             backgroundColor: isDeleted
                                                 ? "rgba(244, 67, 54, 0.06)"
+                                                : isInactive
+                                                ? "rgba(255, 152, 0, 0.06)"
                                                 : "inherit",
                                             "& td": {
                                                 verticalAlign: "top",
@@ -274,6 +291,13 @@ export default function AdminCargoPage() {
                                                             {fmtDT(c.deleted_at)}
                                                         </Typography>
                                                     </>
+                                                ) : c.display_type === "inactive" ? (
+                                                    <Chip
+                                                        size="small"
+                                                        color="warning"
+                                                        variant="outlined"
+                                                        label="Неактивен"
+                                                    />
                                                 ) : (
                                                     <Chip
                                                         size="small"
@@ -407,22 +431,39 @@ export default function AdminCargoPage() {
                                                             <IconButton
                                                                 color="primary"
                                                                 onClick={() => setToRestore(c)}
+                                                                disabled={busy}
                                                             >
                                                                 <FiRotateCcw />
                                                             </IconButton>
                                                         </span>
                                                     </Tooltip>
                                                 ) : (
-                                                    <Tooltip title="Удалить груз">
-                                                        <span>
-                                                            <IconButton
-                                                                color="error"
-                                                                onClick={() => setToDelete(c)}
-                                                            >
-                                                                <FiTrash2 />
-                                                            </IconButton>
-                                                        </span>
-                                                    </Tooltip>
+                                                    <>
+                                                        {c.display_type === "inactive" && (
+                                                            <Tooltip title="Вернуть обратно (Активировать)">
+                                                                <span>
+                                                                    <IconButton
+                                                                        color="success"
+                                                                        onClick={() => handleReactivate(c.id)}
+                                                                        disabled={busy}
+                                                                    >
+                                                                        <FiRotateCcw />
+                                                                    </IconButton>
+                                                                </span>
+                                                            </Tooltip>
+                                                        )}
+                                                        <Tooltip title="Удалить груз">
+                                                            <span>
+                                                                <IconButton
+                                                                    color="error"
+                                                                    onClick={() => setToDelete(c)}
+                                                                    disabled={busy}
+                                                                >
+                                                                    <FiTrash2 />
+                                                                </IconButton>
+                                                            </span>
+                                                        </Tooltip>
+                                                    </>
                                                 )}
                                             </Stack>
                                         </TableCell>

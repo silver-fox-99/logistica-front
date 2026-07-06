@@ -163,6 +163,20 @@ export default function AdminTransportPage() {
         }
     };
 
+    const handleReactivate = async (id: string) => {
+        setBusy(true);
+        try {
+            await adminTransportApi.reactivate(id);
+            toast.success("Транспорт возвращен в активные");
+            refetch();
+        } catch (error: any) {
+            const message = error?.response?.data?.message || "Ошибка при активации транспорта";
+            toast.error(message);
+        } finally {
+            setBusy(false);
+        }
+    };
+
     if (!canViewTransport) return <NoAccess />;
 
     return (
@@ -247,15 +261,18 @@ export default function AdminTransportPage() {
                         <TableBody>
                             {items.map((t) => {
                                 const isDeleted = Boolean(t.deleted_at);
+                                const isInactive = t.display_type === "inactive";
 
                                 return (
                                     <TableRow
                                         key={t.id}
                                         hover
                                         sx={{
-                                            opacity: isDeleted ? 0.68 : 1,
+                                            opacity: isDeleted ? 0.68 : isInactive ? 0.8 : 1,
                                             backgroundColor: isDeleted
                                                 ? "rgba(244, 67, 54, 0.06)"
+                                                : isInactive
+                                                ? "rgba(255, 152, 0, 0.06)"
                                                 : "inherit",
                                             "& td": {
                                                 verticalAlign: "top",
@@ -278,6 +295,13 @@ export default function AdminTransportPage() {
                                                             {fmtDT(t.deleted_at)}
                                                         </Typography>
                                                     </>
+                                                ) : t.display_type === "inactive" ? (
+                                                    <Chip
+                                                        size="small"
+                                                        color="warning"
+                                                        variant="outlined"
+                                                        label="Неактивен"
+                                                    />
                                                 ) : (
                                                     <Chip
                                                         size="small"
@@ -393,22 +417,39 @@ export default function AdminTransportPage() {
                                                             <IconButton
                                                                 color="primary"
                                                                 onClick={() => setToRestore(t)}
+                                                                disabled={busy}
                                                             >
                                                                 <FiRotateCcw />
                                                             </IconButton>
                                                         </span>
                                                     </Tooltip>
                                                 ) : (
-                                                    <Tooltip title="Удалить транспорт">
-                                                        <span>
-                                                            <IconButton
-                                                                color="error"
-                                                                onClick={() => setToDelete(t)}
-                                                            >
-                                                                <FiTrash2 />
-                                                            </IconButton>
-                                                        </span>
-                                                    </Tooltip>
+                                                    <>
+                                                        {t.display_type === "inactive" && (
+                                                            <Tooltip title="Вернуть обратно (Активировать)">
+                                                                <span>
+                                                                    <IconButton
+                                                                        color="success"
+                                                                        onClick={() => handleReactivate(t.id)}
+                                                                        disabled={busy}
+                                                                    >
+                                                                        <FiRotateCcw />
+                                                                    </IconButton>
+                                                                </span>
+                                                            </Tooltip>
+                                                        )}
+                                                        <Tooltip title="Удалить транспорт">
+                                                            <span>
+                                                                <IconButton
+                                                                    color="error"
+                                                                    onClick={() => setToDelete(t)}
+                                                                    disabled={busy}
+                                                                >
+                                                                    <FiTrash2 />
+                                                                </IconButton>
+                                                            </span>
+                                                        </Tooltip>
+                                                    </>
                                                 )}
                                             </Stack>
                                         </TableCell>

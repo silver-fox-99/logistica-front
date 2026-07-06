@@ -136,6 +136,7 @@ const adaptBase = (
         note: a.note ?? undefined,
         createdAt: a.created_at,
         isFavorite: Boolean((a as any).is_favorite),
+        display_type: a?.display_type
     };
 };
 

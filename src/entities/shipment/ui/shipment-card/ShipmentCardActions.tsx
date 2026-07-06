@@ -12,6 +12,7 @@ type Props = {
     views?: number | null;
     timeAgo?: string | null;
     price?: string | null;
+    display_type?: string | null;
     labels: {
         addFavorite: string;
         removeFavorite: string;
@@ -38,6 +39,7 @@ export function ShipmentCardActions({
                                         views,
                                         timeAgo,
                                         price,
+                                        display_type,
                                         labels,
                                         onToggleFavorite,
                                         onContacts,
@@ -84,7 +86,7 @@ export function ShipmentCardActions({
                         <span>
                             <IconButton
                                 onClick={onToggleFavorite}
-                                disabled={favoriteLoading}
+                                disabled={favoriteLoading || display_type === 'inactive'}
                                 sx={{
                                     border: "1px solid",
                                     borderColor: "divider",
@@ -105,7 +107,7 @@ export function ShipmentCardActions({
                     <Button
                         variant="contained"
                         onClick={onContacts}
-                        disabled={detailsLoading}
+                        disabled={detailsLoading || display_type === 'inactive'}
                         startIcon={<FiUser size={15} />}
                         sx={{
                             textTransform: "none",

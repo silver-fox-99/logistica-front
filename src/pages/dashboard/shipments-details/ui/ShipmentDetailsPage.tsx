@@ -69,19 +69,27 @@ export default function ShipmentDetailsPage() {
                 <Alert severity="error">{error}</Alert>
             ) : data ? (
                 <>
+                    {data.display_type === "inactive" && (
+                        <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+                            {t("shipments.messages.inactiveAlert")}
+                        </Alert>
+                    )}
+
                     {showLimitReached ? (
                         <OrderDetailsLimitReached onReload={showContacts} />
                     ) : contactsError ? (
                         <Alert severity="error">{contactsError}</Alert>
                     ) : null}
 
-                    <ShipmentDetailsView
-                        data={data}
-                        kind={resolvedKind}
-                        contactsRevealed={contactsRevealed}
-                        onShowContacts={showContacts}
-                        contactsLoading={contactsLoading}
-                    />
+                    <Box sx={{ opacity: data.display_type === "inactive" ? 0.75 : 1 }}>
+                        <ShipmentDetailsView
+                            data={data}
+                            kind={resolvedKind}
+                            contactsRevealed={contactsRevealed && data.display_type !== "inactive"}
+                            onShowContacts={showContacts}
+                            contactsLoading={contactsLoading}
+                        />
+                    </Box>
                 </>
             ) : (
                 <Alert severity="info">

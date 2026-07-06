@@ -187,6 +187,7 @@ export function adaptCargo(i: CargoApiItem): any {
         up_count: i.up_count ?? undefined,
         images: i.images ?? [],
         route: adaptRoute((i as any).route),
+        display_type: (i as any).display_type ?? null,
     };
 }
 

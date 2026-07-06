@@ -71,6 +71,7 @@ export type PublicShipmentBase = {
     price?: string;     // "USD 500.00"
     note?: string;
     createdAt?: string;
+    display_type?: string;
     isFavorite?: boolean;
 };
 
@@ -88,6 +89,7 @@ export type PublicCargoApi = {
     weight_t: string;
     volume_m3: string;
     cars_count: number;
+    display_type?: string;
     pallets_count: number;
     has_dimensions: boolean;
     length_m: string | null;
@@ -132,4 +134,5 @@ export type PublicTransportApi = {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
+    display_type?: string;
 };

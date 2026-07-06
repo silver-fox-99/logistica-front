@@ -543,6 +543,10 @@
       "orderDeleteError": "Buyurtmani o‘chirishda xatolik",
       "orderUpdated": "Buyurtma muvaffaqiyatli yangilandi!",
       "orderUpdateError": "Buyurtmani yangilashda xatolik",
+      "orderDeactivated": "Buyurtma muvaffaqiyatli faolsizlantirildi!",
+      "orderDeactivateError": "Buyurtmani faolsizlantirishda xatolik",
+      "inactiveAlert": "Ushbu buyurtma endi faol emas va arxivga joylashtirilgan.",
+      "inactiveContactsNotice": "Buyurtma faolsizligi sababli kontaktlar berkitilgan",
       "bulkUpdateNotReady": "Ommaviy yangilash hozircha mavjud emas.",
       "bulkActionError": "Ommaviy amalni bajarib bo‘lmadi"
     },
@@ -602,6 +606,7 @@
       "edit": "Tahrirlash",
       "copy": "Nusxalash",
       "delete": "O‘chirish",
+      "deactivate": "Faolsizlantirish",
       "morePoints": "yana",
       "updated": "Yangilangan:",
       "signInToView": "Kontaktlar va tafsilotlarni ko‘rish uchun tizimga kiring.",
