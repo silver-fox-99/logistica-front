@@ -13,6 +13,7 @@ import { imgbbApi } from "@/shared/api/imgbbApi";
 
 import type { AddCargoFormValues, Place } from "./types";
 import type {CargoPointDto, CreateCargoDto} from "@/entities/cargo/model/types.ts";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 export const PHONE_RE = /^\+?[1-9]\d{9,19}$/;
 
@@ -93,6 +94,7 @@ export function useAddCargoForm() {
     const { getLocalizedLabel } = useLocalizedLookup();
     const [loading, setLoading] = useState(false);
     const [createLimitOpen, setCreateLimitOpen] = useState(false);
+    const user = useUserStore((s) => s.user);
 
     const { lookups, loadInit, loading: loadingInit } = useInitStore();
 
@@ -333,6 +335,14 @@ export function useAddCargoForm() {
                 ok = false;
             }
 
+            if (!user?.phone && !v.extraPhoneAsMain) {
+                setError("contactSecondary", {
+                    type: "required",
+                    message: t("addCargo.errors.invalidPhone"),
+                });
+                ok = false;
+            }
+
             return ok;
         },
         [clearErrors, setError, t, validatePlaces],
@@ -469,6 +479,7 @@ export function useAddCargoForm() {
     );
 
     const onInvalid = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_errors: FieldErrors<AddCargoFormValues>) => {
             toast.warning(t("addCargo.validationWarning"));
         },

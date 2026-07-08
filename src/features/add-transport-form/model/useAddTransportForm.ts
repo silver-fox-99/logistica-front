@@ -11,6 +11,7 @@ import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 
 import type { AddTransportFormValues, Place } from "./types";
 import { getTodayDate, PHONE_RE, toIntOrZero } from "@/features/add-cargo-form/model/useAddCargoForm";
+import { useUserStore } from "@/entities/user/model/user.store";
 
 const EMPTY_PLACE: Place = {
     location: null,
@@ -70,6 +71,7 @@ export function useAddTransportForm() {
     const [loading, setLoading] = useState(false);
     const { getLocalizedLabel } = useLocalizedLookup();
     const [createLimitOpen, setCreateLimitOpen] = useState(false);
+    const user = useUserStore((state) => state.user);
 
     const closeCreateLimit = useCallback(() => {
         setCreateLimitOpen(false);
@@ -236,6 +238,14 @@ export function useAddTransportForm() {
             if (v.contactSecondary && !PHONE_RE.test(v.contactSecondary)) {
                 setError("contactSecondary", {
                     type: "pattern",
+                    message: t("addTransport.errors.invalidPhone"),
+                });
+                ok = false;
+            }
+
+            if (!user?.phone && !v.extraPhoneAsMain) {
+                setError("contactSecondary", {
+                    type: "required",
                     message: t("addTransport.errors.invalidPhone"),
                 });
                 ok = false;

@@ -27,6 +27,7 @@ import { useCompanySidebarCompany } from "@/pages/dashboard/company/workspace/mo
 import { TenderWorkspaceSidebar } from "@/widgets/tender/tender-workspace-sidebar/ui/TenderWorkspaceSidebar";
 import { useTenderWorkspaceAccessStore } from "@/entities/tender/model/tenderWorkspaceAccess.store";
 import { useClientNotificationsWebSocket } from "@/features/user-notifications/websocket/useClientNotificationsWebSocket";
+import { ScrollToTop } from "@/shared/lib/scrollToTop";
 
 function NavItem({ to, icon, label, onClick, end }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void; end?: boolean }) {
     return (
@@ -187,6 +188,7 @@ export default function DashboardLayout() {
                 showBurger={isMobile}
                 onMenuClick={() => toggle(true)}
             />
+            <ScrollToTop />
 
             <BookmarkPromptDialog />
 
