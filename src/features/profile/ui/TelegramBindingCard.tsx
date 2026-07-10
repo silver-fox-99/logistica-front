@@ -69,17 +69,13 @@ export default function TelegramBindingCard() {
             elevation={0}
             sx={{
                 p: 2.5,
-                borderRadius: 2,
+                borderRadius: "16px",
                 border: "1px solid",
                 borderColor: isConnected ? "success.light" : "divider",
                 bgcolor: "background.paper",
                 transition: "all 0.3s ease-in-out",
-                boxShadow: isConnected ? "0 4px 20px rgba(46, 125, 50, 0.05)" : "none",
                 "&:hover": {
                     borderColor: isConnected ? "success.main" : "primary.light",
-                    boxShadow: isConnected 
-                        ? "0 6px 24px rgba(46, 125, 50, 0.08)"
-                        : "0 6px 20px rgba(0, 0, 0, 0.02)"
                 }
             }}
         >
@@ -124,7 +120,6 @@ export default function TelegramBindingCard() {
                         sx={{
                             fontWeight: 600,
                             px: 1,
-                            borderRadius: 1.5,
                             "& .MuiChip-icon": { marginLeft: 0.5 }
                         }}
                     />
@@ -135,7 +130,7 @@ export default function TelegramBindingCard() {
                     <Box 
                         sx={{ 
                             p: 2, 
-                            borderRadius: 1.5, 
+                            borderRadius: "8px", 
                             bgcolor: "grey.50", 
                             border: "1px dashed", 
                             borderColor: "grey.200", 
@@ -173,7 +168,7 @@ export default function TelegramBindingCard() {
                                 startIcon={checking ? <CircularProgress size={16} color="inherit" /> : <FiRefreshCw />}
                                 sx={{
                                     textTransform: "none",
-                                    borderRadius: 1.5,
+                                    borderRadius: "8px",
                                     fontWeight: 600,
                                     borderColor: "primary.light",
                                 }}
@@ -190,7 +185,7 @@ export default function TelegramBindingCard() {
                                 startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <FaTelegramPlane />}
                                 sx={{
                                     textTransform: "none",
-                                    borderRadius: 1.5,
+                                    borderRadius: "8px",
                                     fontWeight: 600,
                                     boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
                                     background: "linear-gradient(45deg, #229ED9, #2AABEE)",

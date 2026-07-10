@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
-    Card, CardContent, Typography, Stack, Box, Button,
+    Paper, Typography, Stack, Box, Button,
     Autocomplete, TextField, CircularProgress, IconButton, Alert, List, ListItem, ListItemText,
     Chip, useTheme, Divider, Slider
 } from "@mui/material";
@@ -260,20 +260,15 @@ export function RouteInterestSettings() {
     };
 
     return (
-        <Card
+        <Paper
             variant="outlined"
             sx={{
-                borderRadius: 4,
+                borderRadius: "16px",
                 borderColor: "divider",
-                boxShadow: "0 4px 20px 0 rgba(0,0,0,0.05)",
-                background: theme.palette.mode === "dark"
-                    ? "linear-gradient(145deg, #1e1e1e 0%, #121212 100%)"
-                    : "linear-gradient(145deg, #ffffff 0%, #f9f9f9 100%)",
-                overflow: "hidden",
-                transition: "all 0.3s ease"
+                overflow: "hidden"
             }}
         >
-            <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+            <Box sx={{ p: { xs: 2.5, sm: 3 } }}>
                 {/* Card Title & Icon */}
                 <Stack direction="row" spacing={1.5} alignItems="center" mb={2}>
                     <Box
@@ -283,8 +278,8 @@ export function RouteInterestSettings() {
                             justifyContent: "center",
                             width: 42,
                             height: 42,
-                            borderRadius: 3,
-                            bgcolor: "primary.lighter",
+                            borderRadius: "50%",
+                            bgcolor: "#EEF4F7",
                             color: "primary.main"
                         }}
                     >
@@ -310,7 +305,7 @@ export function RouteInterestSettings() {
                     sx={{
                         display: "flex",
                         p: 0.5,
-                        borderRadius: 3.5,
+                        borderRadius: "12px",
                         bgcolor: "action.hover",
                         border: "1px solid",
                         borderColor: "divider",
@@ -331,7 +326,7 @@ export function RouteInterestSettings() {
                             gap: 1,
                             py: 1.25,
                             px: { xs: 1, sm: 2 },
-                            borderRadius: 3,
+                            borderRadius: "8px",
                             cursor: "pointer",
                             userSelect: "none",
                             bgcolor: activeTab === "auto" ? "background.paper" : "transparent",
@@ -380,7 +375,7 @@ export function RouteInterestSettings() {
                             gap: 1,
                             py: 1.25,
                             px: { xs: 1, sm: 2 },
-                            borderRadius: 3,
+                            borderRadius: "8px",
                             cursor: "pointer",
                             userSelect: "none",
                             bgcolor: activeTab === "manual" ? "background.paper" : "transparent",
@@ -438,7 +433,7 @@ export function RouteInterestSettings() {
                                         {t("notifications.routeInterests.activateModeBtn", "Активировать этот режим")}
                                     </Button>
                                 }
-                                sx={{ borderRadius: 3, borderStyle: "dashed" }}
+                                sx={{ borderRadius: "8px", borderStyle: "dashed" }}
                             >
                                 {t("notifications.routeInterests.modeAlertManual", "Внимание: сейчас у вас активен Ручной режим отслеживания. Автоматический подбор (ИИ) будет проигнорирован.")}
                             </Alert>
@@ -458,7 +453,7 @@ export function RouteInterestSettings() {
                                         alignItems="center"
                                         sx={{
                                             p: 3,
-                                            borderRadius: 3,
+                                            borderRadius: "12px",
                                             bgcolor: "action.hover",
                                             border: "1px dashed",
                                             borderColor: "divider",
@@ -474,7 +469,7 @@ export function RouteInterestSettings() {
                                                 alignItems: "center",
                                                 justifyContent: "center",
                                                 borderRadius: "50%",
-                                                bgcolor: "primary.lighter",
+                                                bgcolor: "#EEF4F7",
                                                 color: "primary.main",
                                                 my: 3,
                                                 "@keyframes pulse": {
@@ -514,10 +509,10 @@ export function RouteInterestSettings() {
                                             disabled={loading}
                                             sx={{
                                                 textTransform: "none",
-                                                borderRadius: 2,
+                                                borderRadius: "8px",
                                                 fontWeight: 600,
                                                 px: 3,
-                                                "&:hover": { bgcolor: "error.lighter" }
+                                                "&:hover": { bgcolor: "rgba(211, 47, 47, 0.06)" }
                                             }}
                                         >
                                             {loading ? (
@@ -535,8 +530,8 @@ export function RouteInterestSettings() {
                                         alignItems={{ xs: "stretch", sm: "center" }}
                                         sx={{
                                             p: 2.5,
-                                            borderRadius: 3,
-                                            bgcolor: "success.lighter",
+                                            borderRadius: "12px",
+                                            bgcolor: "rgba(46, 125, 50, 0.08)",
                                             border: "1px solid",
                                             borderColor: "success.light",
                                             transition: "all 0.2s ease-in-out"
@@ -580,10 +575,10 @@ export function RouteInterestSettings() {
                                             disabled={loading}
                                             sx={{
                                                 textTransform: "none",
-                                                borderRadius: 2,
+                                                borderRadius: "8px",
                                                 fontWeight: 600,
                                                 px: 3,
-                                                "&:hover": { bgcolor: "error.lighter" }
+                                                "&:hover": { bgcolor: "rgba(211, 47, 47, 0.06)" }
                                             }}
                                         >
                                             {loading ? (
@@ -595,7 +590,7 @@ export function RouteInterestSettings() {
                                     </Stack>
                                 )}
 
-                                <Card variant="outlined" sx={{ p: 2.5, borderRadius: 3, borderColor: "divider" }}>
+                                <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "12px", borderColor: "divider" }}>
                                     <Stack direction={{ xs: "column", sm: "row" }} spacing={3} alignItems={{ xs: "stretch", sm: "center" }}>
                                         <Box sx={{ flexGrow: 1, width: "100%", px: 1 }}>
                                             <Typography variant="body2" fontWeight={600} color="text.secondary" gutterBottom>
@@ -625,7 +620,7 @@ export function RouteInterestSettings() {
                                                 disabled={loading || autoMatchPct === autoInterest.match_percentage}
                                                 sx={{
                                                     textTransform: "none",
-                                                    borderRadius: 2,
+                                                    borderRadius: "8px",
                                                     fontWeight: 700,
                                                     px: 3,
                                                     height: 40,
@@ -641,7 +636,7 @@ export function RouteInterestSettings() {
                                             </Button>
 
                                     </Stack>
-                                </Card>
+                                </Paper>
                             </Stack>
                         ) : (
                             <Stack
@@ -651,7 +646,7 @@ export function RouteInterestSettings() {
                                 sx={{
                                     py: 4,
                                     px: 2,
-                                    borderRadius: 3,
+                                    borderRadius: "12px",
                                     bgcolor: "action.hover",
                                     border: "1px dashed",
                                     borderColor: "divider",
@@ -694,7 +689,7 @@ export function RouteInterestSettings() {
                                     disabled={loading}
                                     sx={{
                                         textTransform: "none",
-                                        borderRadius: 2.5,
+                                        borderRadius: "8px",
                                         fontWeight: 700,
                                         px: 4,
                                         py: 1.25,
@@ -728,7 +723,7 @@ export function RouteInterestSettings() {
                                         {t("notifications.routeInterests.activateModeBtn", "Активировать этот режим")}
                                     </Button>
                                 }
-                                sx={{ borderRadius: 3, borderStyle: "dashed" }}
+                                sx={{ borderRadius: "8px", borderStyle: "dashed" }}
                             >
                                 {t("notifications.routeInterests.modeAlertAuto", "Внимание: сейчас у вас активен Автоматический режим подбора (ИИ). Ручные настройки маршрутов будут проигнорированы.")}
                             </Alert>
@@ -847,7 +842,7 @@ export function RouteInterestSettings() {
                                 startIcon={<FiPlus />}
                                 sx={{
                                     textTransform: "none",
-                                    borderRadius: 2.5,
+                                    borderRadius: "8px",
                                     fontWeight: 700,
                                     width: { xs: "100%", md: "fit-content" },
                                     px: 4,
@@ -872,7 +867,7 @@ export function RouteInterestSettings() {
                                 <Alert
                                     severity="info"
                                     variant="outlined"
-                                    sx={{ borderRadius: 3, borderStyle: "dashed" }}
+                                    sx={{ borderRadius: "8px", borderStyle: "dashed" }}
                                 >
                                     {t(
                                         "notifications.routeInterests.noTrackedRoutes",
@@ -880,7 +875,7 @@ export function RouteInterestSettings() {
                                     )}
                                 </Alert>
                             ) : (
-                                <Card variant="outlined" sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden" }}>
+                                <Paper variant="outlined" sx={{ borderRadius: "12px", borderColor: "divider", overflow: "hidden" }}>
                                     <List disablePadding>
                                         {manualInterests.map((interest, index) => {
                                             const originText = [interest.origin_city, interest.origin_country].filter(Boolean).join(", ");
@@ -904,7 +899,7 @@ export function RouteInterestSettings() {
                                                                     justifyContent: "center",
                                                                     width: 32,
                                                                     height: 32,
-                                                                    borderRadius: 2,
+                                                                    borderRadius: "6px",
                                                                     bgcolor: "action.hover",
                                                                     color: "text.secondary",
                                                                     flexShrink: 0
@@ -941,7 +936,7 @@ export function RouteInterestSettings() {
                                                             onClick={() => handleDeleteManualRoute(interest.id)}
                                                             disabled={loading}
                                                             sx={{
-                                                                bgcolor: "error.lighter",
+                                                                bgcolor: "rgba(211, 47, 47, 0.06)",
                                                                 "&:hover": { bgcolor: "error.light", color: "white" },
                                                                 transition: "all 0.2s",
                                                                 flexShrink: 0
@@ -955,12 +950,12 @@ export function RouteInterestSettings() {
                                             );
                                         })}
                                     </List>
-                                </Card>
+                                </Paper>
                             )}
                         </Box>
                     </Stack>
                 )}
-            </CardContent>
-        </Card>
+            </Box>
+        </Paper>
     );
 }

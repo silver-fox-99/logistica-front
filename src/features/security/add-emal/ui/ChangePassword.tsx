@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-    Card, CardContent, CardActions, Button, Stack,
+    Paper, Box, Button, Stack,
     TextField, Typography, IconButton, InputAdornment
 } from "@mui/material";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
@@ -53,10 +53,12 @@ export function ChangePasswordCard() {
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 3 }}>
-            <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <FiLock />
+        <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider" }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" mb={1}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', bgcolor: '#EEF4F7', color: 'primary.main', flexShrink: 0 }}>
+                        <FiLock />
+                    </Box>
                     <Typography variant="h6">{t('security.changePassword.title')}</Typography>
                 </Stack>
                 <Typography variant="body2" color="text.secondary" mb={2}>
@@ -115,13 +117,13 @@ export function ChangePasswordCard() {
                         }}
                     />
 
-                    <CardActions sx={{ p: 0 }}>
-                        <Button type="submit" variant="contained" disabled={loading}>
+                    <Box sx={{ pt: 0.5 }}>
+                        <Button type="submit" variant="contained" disabled={loading} sx={{ textTransform: "none", borderRadius: "8px", fontWeight: 700, px: 2.5 }}>
                             {loading ? t('security.changePassword.pleaseWait') : t('security.changePassword.changeButton')}
                         </Button>
-                    </CardActions>
+                    </Box>
                 </Stack>
-            </CardContent>
-        </Card>
+            </Box>
+        </Paper>
     );
 }

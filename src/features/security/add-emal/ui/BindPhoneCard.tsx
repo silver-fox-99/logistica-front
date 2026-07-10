@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardActions, Button, Stack, Typography, Chip } from "@mui/material";
+import { Paper, Box, Button, Stack, Typography, Chip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { FiPhone, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 import { useUserStore } from "@/entities/user/model/user.store";
@@ -26,10 +26,12 @@ export function BindPhoneCard() {
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 3 }}>
-            <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <FiPhone />
+        <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider" }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" mb={1}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', bgcolor: '#EEF4F7', color: 'primary.main', flexShrink: 0 }}>
+                        <FiPhone />
+                    </Box>
                     <Typography variant="h6">{t('security.bindPhone.title')}</Typography>
                 </Stack>
                 <Typography variant="body2" color="text.secondary" mb={2}>
@@ -44,7 +46,7 @@ export function BindPhoneCard() {
                                 disabled
                                 defaultCountry="UZ"
                                 forceCallingCode
-                                sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: 1.5, bgcolor: "action.disabledBackground" } }}
+                                sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: "8px", bgcolor: "action.disabledBackground" } }}
                             />
                         ) : (
                             <Typography variant="body1" color="text.secondary" sx={{ py: 1 }}>
@@ -58,28 +60,28 @@ export function BindPhoneCard() {
                                 label={phoneVerified ? t('security.bindPhone.verified') : t('security.bindPhone.unverified')}
                                 color={phoneVerified ? "success" : "warning"}
                                 variant="outlined"
-                                sx={{ height: 40, borderRadius: 1.5, px: 1 }}
+                                sx={{ height: 40, px: 1 }}
                             />
                         )}
                     </Stack>
 
                     {!phoneVerified ? (
-                        <CardActions sx={{ p: 0, mt: 1 }}>
+                        <Box sx={{ mt: 1 }}>
                             <Button
                                 variant="contained"
                                 onClick={() => setModalOpen(true)}
-                                sx={{ textTransform: "none", borderRadius: 2, px: 2.5 }}
+                                sx={{ textTransform: "none", borderRadius: "8px", px: 2.5 }}
                             >
                                 {phone ? t('security.bindPhone.verifyButton') : t('security.bindPhone.bindButton')}
                             </Button>
-                        </CardActions>
+                        </Box>
                     ) : (
                         <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
                             {t('security.bindPhone.supportChangeHint')}
                         </Typography>
                     )}
                 </Stack>
-            </CardContent>
+            </Box>
 
             {modalOpen && (
                 <VerifyPhoneModal
@@ -89,6 +91,6 @@ export function BindPhoneCard() {
                     initialPhone={phone}
                 />
             )}
-        </Card>
+        </Paper>
     );
 }
