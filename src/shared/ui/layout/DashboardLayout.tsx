@@ -1,16 +1,37 @@
 import { Outlet, NavLink } from "react-router-dom";
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 import {
-    Box, Container, Paper, Stack, Button, Divider, List, ListItemButton,
-    ListItemIcon, ListItemText, Drawer,  useMediaQuery,
-    CircularProgress, Collapse
+  Box,
+  Container,
+  Paper,
+  Stack,
+  Button,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Drawer,
+  useMediaQuery,
+  CircularProgress,
+  Collapse,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import {
-    FiShield, FiUser, FiCreditCard, FiHelpCircle, FiPackage, FiTruck,
-    FiLogOut, FiSearch,
-    FiAward, FiFileText, FiChevronDown, FiChevronRight, FiList,
-    FiMessageSquare, FiBell
+  FiShield,
+  FiUser,
+  FiCreditCard,
+  FiHelpCircle,
+  FiLogOut,
+  FiSearch,
+  FiAward,
+  FiFileText,
+  FiChevronDown,
+  FiChevronRight,
+  FiList,
+  FiUsers,
+  FiBriefcase,
+  FiEdit3,
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
@@ -19,7 +40,7 @@ import { useLocation } from "react-router-dom";
 import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
 import { useUserStore } from "@/entities/user/model/user.store";
-import "./DashboardLayout.scss";
+
 import BookmarkPromptDialog from "@/features/bookmarkPrompt/ui/BookmarkPromptDialog";
 import { CompanyWorkspaceSidebar } from "@/widgets/company/company-workspace-sidebar/ui/CompanyWorkspaceSidebar";
 import { useIsCompanyWorkspace } from "@/pages/dashboard/company/workspace/model/useIsCompanyWorkspace";
@@ -29,230 +50,410 @@ import { useTenderWorkspaceAccessStore } from "@/entities/tender/model/tenderWor
 import { useClientNotificationsWebSocket } from "@/features/user-notifications/websocket/useClientNotificationsWebSocket";
 import { ScrollToTop } from "@/shared/lib/scrollToTop";
 
-function NavItem({ to, icon, label, onClick, end }: { to: string; icon: React.ReactNode; label: string; onClick?: () => void; end?: boolean }) {
-    return (
-        <ListItemButton component={NavLink} to={to} end={end} className="dashboard-buttons" onClick={onClick}>
-            <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText primary={label} primaryTypographyProps={{ fontSize: 16 }} />
-        </ListItemButton>
-    );
+// Стилизация кнопок бокового меню под новый дизайн
+const sidebarButtonStyles = {
+  borderRadius: "10px",
+  mb: 1,
+  py: 1.25,
+  color: "text.secondary",
+  transition: "all 0.2s ease-in-out",
+  "& .MuiListItemIcon-root": {
+    color: "text.secondary",
+    minWidth: "40px",
+    fontSize: "1.2rem",
+    transition: "color 0.2s ease-in-out",
+  },
+  "& .MuiListItemText-primary": {
+    fontWeight: 500,
+    fontSize: "0.95rem",
+  },
+  "&:hover": {
+    bgcolor: "rgba(15, 95, 194, 0.04)",
+    color: "primary.main",
+    "& .MuiListItemIcon-root": {
+      color: "primary.main",
+    },
+  },
+  "&.active": {
+    bgcolor: "transparent",
+    color: "primary.main",
+    "& .MuiListItemIcon-root": {
+      color: "primary.main",
+    },
+    "& .MuiListItemText-primary": {
+      fontWeight: 600,
+    },
+  },
+};
+
+function NavItem({
+  to,
+  icon,
+  label,
+  onClick,
+  end,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+  end?: boolean;
+}) {
+  return (
+    <ListItemButton
+      component={NavLink}
+      to={to}
+      end={end}
+      onClick={onClick}
+      sx={sidebarButtonStyles}
+    >
+      <ListItemIcon>{icon}</ListItemIcon>
+      <ListItemText primary={label} />
+    </ListItemButton>
+  );
 }
 
-function SidebarContent({
-                            onItemClick,
-                        }: { onItemClick?: () => void }) {
-    const user = useUserStore(state => state.user);
-    const { t } = useTranslation();
-    const location = useLocation();
-    const [tendersOpen, setTendersOpen] = useState(() => location.pathname.startsWith("/dashboard/tenders"));
+function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
+  const user = useUserStore((state) => state.user);
+  const { t } = useTranslation();
+  const location = useLocation();
+  const [tendersOpen, setTendersOpen] = useState(() =>
+    location.pathname.startsWith("/dashboard/tenders"),
+  );
 
-    const mainNav = [
-        { to: "/dashboard/search",   icon: <FiSearch />,      label: t('dashboard.menu.search') },
-        { to: "/dashboard/profile",  icon: <FiUser />,        label: t('dashboard.menu.profile') },
-        { to: "/dashboard/company",  icon: <FiPackage />,     label: t('dashboard.menu.company') },
-        { to: "/dashboard/payments", icon: <FiCreditCard />,  label: t('dashboard.menu.payments') },
-        { to: "/dashboard/referral", icon: <FiAward />,  label: t('dashboard.menu.referrals') },
-        { to: "/dashboard/requests", icon: <FiTruck />,       label: t('dashboard.menu.myOrders') },
-        { to: "/dashboard/notifications", icon: <FiBell />,   label: t('dashboard.menu.notifications') },
-    ];
+  const isTendersActive = location.pathname.startsWith("/dashboard/tenders");
 
-    const bottomNav = [
-        { to: "/reviews",            icon: <FiMessageSquare />, label: t('dashboard.menu.siteReviews', 'Отзывы о сайте') },
-        { to: "/dashboard/security", icon: <FiShield />,      label: t('dashboard.menu.security') },
-        { to: "/dashboard/help",     icon: <FiHelpCircle />,  label: t('dashboard.menu.helpSupport') },
-    ];
+  const mainNav = [
+    {
+      to: "/dashboard/search",
+      icon: <FiSearch />,
+      label: t("dashboard.menu.search"),
+    },
+    {
+      to: "/dashboard/profile",
+      icon: <FiUser />,
+      label: t("dashboard.menu.profile"),
+    },
+    {
+      to: "/dashboard/company",
+      icon: <FiBriefcase />,
+      label: t("dashboard.menu.company"),
+    },
+    {
+      to: "/dashboard/staff",
+      icon: <FiUsers />,
+      label: t("dashboard.menu.staff"),
+    },
+    {
+      to: "/dashboard/payments",
+      icon: <FiCreditCard />,
+      label: t("dashboard.menu.payments"),
+    },
+    {
+      to: "/dashboard/referral",
+      icon: <FiAward />,
+      label: t("dashboard.menu.referrals"),
+    },
+    {
+      to: "/dashboard/requests",
+      icon: <FiEdit3 />,
+      label: t("dashboard.menu.myOrders"),
+    },
+  ];
 
-    const logout = () => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
-        useUserStore.getState().clearUser();
-    };
+  const bottomNav = [
+    {
+      to: "/dashboard/security",
+      icon: <FiShield />,
+      label: t("dashboard.menu.security"),
+    },
+    {
+      to: "/dashboard/help",
+      icon: <FiHelpCircle />,
+      label: t("dashboard.menu.helpSupport"),
+    },
+  ];
 
-    return (
-        <Fragment>
-            <List disablePadding>
-                {mainNav.map((i) => (
-                    <NavItem key={i.to} {...i} onClick={onItemClick} />
-                ))}
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    window.location.href = "/login";
+    useUserStore.getState().clearUser();
+  };
 
-                <ListItemButton
-                    className={`dashboard-buttons ${location.pathname.startsWith("/dashboard/tenders") ? "active" : ""}`}
-                    onClick={() => setTendersOpen((value) => !value)}
-                >
-                    <ListItemIcon><FiFileText /></ListItemIcon>
-                    <ListItemText primary={t("dashboard.menu.tenders")} primaryTypographyProps={{ fontSize: 16 }} />
-                    {tendersOpen ? <FiChevronDown /> : <FiChevronRight />}
-                </ListItemButton>
+  return (
+    <Box sx={{ p: 0.5 }}>
+      <List disablePadding>
+        {mainNav.map((i) => (
+          <NavItem key={i.to} {...i} onClick={onItemClick} />
+        ))}
 
-                <Collapse in={tendersOpen} timeout="auto" unmountOnExit>
-                    <List disablePadding sx={{ mt: 0.5, pl: 1 }}>
-                        <NavItem to="/dashboard/tenders" end icon={<FiSearch />} label={t("dashboard.menu.tenderSearch")} onClick={onItemClick} />
-                        <NavItem to="/dashboard/tenders/my" icon={<FiList />} label={t("dashboard.menu.myTenders")} onClick={onItemClick} />
-                    </List>
-                </Collapse>
-            </List>
+        {/* Выпадающее меню Тендеров */}
+        <ListItemButton
+          onClick={() => setTendersOpen((value) => !value)}
+          sx={{
+            ...sidebarButtonStyles,
+            bgcolor: isTendersActive
+              ? "rgba(15, 95, 194, 0.03)"
+              : "transparent",
+            color: isTendersActive ? "primary.main" : "text.secondary",
+            "& .MuiListItemIcon-root": {
+              color: isTendersActive ? "primary.main" : "text.secondary",
+            },
+          }}
+        >
+          <ListItemIcon>
+            <FiFileText />
+          </ListItemIcon>
+          <ListItemText primary={t("dashboard.menu.tenders")} />
+          {tendersOpen ? (
+            <FiChevronDown size={18} />
+          ) : (
+            <FiChevronRight size={18} />
+          )}
+        </ListItemButton>
 
-            <Stack mt={1.5} spacing={1}>
-                <Button
-                    variant="outlined"
-                    fullWidth
-                    component={NavLink}
-                    to="/dashboard/create-cargo"
-                    size="small"
-                    className="dashboard-buttons dashboard-buttons__post"
-                    startIcon={<Add sx={{ fontSize: 16 }} />}
-                    onClick={onItemClick}
-                >
-                    {t('dashboard.menu.addCargo')}
-                </Button>
-                <Button
-                    variant="outlined"
-                    component={NavLink}
-                    to="/dashboard/create-transport"
-                    fullWidth
-                    size="small"
-                    className="dashboard-buttons dashboard-buttons__post"
-                    startIcon={<Add sx={{ fontSize: 16 }} />}
-                    onClick={onItemClick}
-                >
-                    {t('dashboard.menu.addTransport')}
-                </Button>
-            </Stack>
+        <Collapse in={tendersOpen} timeout="auto" unmountOnExit>
+          <List disablePadding sx={{ mt: 0.5, pl: 1.5 }}>
+            <NavItem
+              to="/dashboard/tenders"
+              end
+              icon={<FiSearch />}
+              label={t("dashboard.menu.tenderSearch")}
+              onClick={onItemClick}
+            />
+            <NavItem
+              to="/dashboard/tenders/my"
+              icon={<FiList />}
+              label={t("dashboard.menu.myTenders")}
+              onClick={onItemClick}
+            />
+          </List>
+        </Collapse>
+      </List>
 
-            <Divider sx={{ my: 1.5 }} />
+      {/* Блок целевых кнопок (Добавить груз/транспорт) */}
+      <Stack mt={2} mb={1} spacing={1}>
+        <Button
+          variant="outlined"
+          fullWidth
+          component={NavLink}
+          to="/dashboard/create-cargo"
+          startIcon={<Add />}
+          onClick={onItemClick}
+          sx={{
+            height: "42px",
+            borderRadius: "12px",
+            fontWeight: 600,
+            fontSize: "0.9rem",
+            borderColor: "primary.main",
+            color: "primary.main",
+            "&:hover": {
+              bgcolor: "rgba(15, 95, 194, 0.04)",
+              borderColor: "primary.dark",
+            },
+          }}
+        >
+          {t("dashboard.menu.addCargo")}
+        </Button>
+        <Button
+          variant="outlined"
+          component={NavLink}
+          to="/dashboard/create-transport"
+          fullWidth
+          startIcon={<Add />}
+          onClick={onItemClick}
+          sx={{
+            height: "42px",
+            borderRadius: "12px",
+            fontWeight: 600,
+            fontSize: "0.9rem",
+            borderColor: "primary.main",
+            color: "primary.main",
+            "&:hover": {
+              bgcolor: "rgba(15, 95, 194, 0.04)",
+              borderColor: "primary.dark",
+            },
+          }}
+        >
+          {t("dashboard.menu.addTransport")}
+        </Button>
+      </Stack>
 
-            <List disablePadding>
-                {user?.is_admin && (
-                    <ListItemButton
-                        onClick={() => { window.location.href = "/admin"; onItemClick?.(); }}
-                        className="dashboard-buttons dashboard-buttons__logout"
-                    >
-                        <ListItemIcon><RiAdminFill /></ListItemIcon>
-                        <ListItemText primary={t('dashboard.menu.adminPanel')} primaryTypographyProps={{ fontSize: 16 }} />
-                    </ListItemButton>
-                )}
+      <Divider sx={{ my: 2, borderColor: "divider" }} />
 
-                {bottomNav.map((i) => (
-                    <NavItem key={i.to} {...i} onClick={onItemClick} />
-                ))}
+      <List disablePadding>
+        {user?.is_admin && (
+          <ListItemButton
+            onClick={() => {
+              window.location.href = "/admin";
+              onItemClick?.();
+            }}
+            sx={{
+              ...sidebarButtonStyles,
+              color: "error.main",
+              "& .MuiListItemIcon-root": { color: "error.main" },
+              "&:hover": { bgcolor: "error.lighter" },
+            }}
+          >
+            <ListItemIcon>
+              <RiAdminFill />
+            </ListItemIcon>
+            <ListItemText primary={t("dashboard.menu.adminPanel")} />
+          </ListItemButton>
+        )}
 
-                <ListItemButton
-                    onClick={() => { logout(); onItemClick?.(); }}
-                    className="dashboard-buttons dashboard-buttons__logout"
-                >
-                    <ListItemIcon><FiLogOut /></ListItemIcon>
-                    <ListItemText primary={t('dashboard.menu.logout')} primaryTypographyProps={{ fontSize: 16 }} />
-                </ListItemButton>
-            </List>
-        </Fragment>
-    );
+        {bottomNav.map((i) => (
+          <NavItem key={i.to} {...i} onClick={onItemClick} />
+        ))}
+
+        <ListItemButton
+          onClick={() => {
+            logout();
+            onItemClick?.();
+          }}
+          sx={{
+            ...sidebarButtonStyles,
+            mt: 1,
+            color: "error.main",
+            "& .MuiListItemIcon-root": {
+              color: "error.main",
+              transition: "transform 0.2s",
+            },
+            "&:hover": {
+              bgcolor: "rgba(211, 47, 47, 0.04)",
+              "& .MuiListItemIcon-root": { transform: "translateX(3px)" },
+            },
+          }}
+        >
+          <ListItemIcon>
+            <FiLogOut />
+          </ListItemIcon>
+          <ListItemText primary={t("dashboard.menu.logout")} />
+        </ListItemButton>
+      </List>
+    </Box>
+  );
 }
 
 export default function DashboardLayout() {
-    useClientNotificationsWebSocket();
-    const isMobile = useMediaQuery("(max-width:860px)");
-    const [open, setOpen] = useState(false);
-    const location = useLocation();
-    const tenderAccess = useTenderWorkspaceAccessStore((state) => state);
+  useClientNotificationsWebSocket();
+  const isMobile = useMediaQuery("(max-width:860px)");
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const tenderAccess = useTenderWorkspaceAccessStore((state) => state);
 
-    const isCompanyWorkspace = useIsCompanyWorkspace();
-    const { company, isLoading: isCompanyLoading } = useCompanySidebarCompany();
-    const tenderWorkspaceMatch = location.pathname.match(/^\/dashboard\/tenders\/([^/]+)\/(overview|bids|settings)/);
-    const tenderId = tenderWorkspaceMatch?.[1] ?? "";
-    const tenderSidebarCanManage = Boolean(tenderId && tenderAccess.tenderId === tenderId && tenderAccess.canManage);
+  const isCompanyWorkspace = useIsCompanyWorkspace();
+  const { company, isLoading: isCompanyLoading } = useCompanySidebarCompany();
+  const tenderWorkspaceMatch = location.pathname.match(
+    /^\/dashboard\/tenders\/([^/]+)\/(overview|bids|settings)/,
+  );
+  const tenderId = tenderWorkspaceMatch?.[1] ?? "";
+  const tenderSidebarCanManage = Boolean(
+    tenderId && tenderAccess.tenderId === tenderId && tenderAccess.canManage,
+  );
 
-    const toggle = (state?: boolean) => setOpen(prev => (typeof state === "boolean" ? state : !prev));
-    const closeOnItem = () => { if (isMobile) toggle(false); };
+  const toggle = (state?: boolean) =>
+    setOpen((prev) => (typeof state === "boolean" ? state : !prev));
+  const closeOnItem = () => {
+    if (isMobile) toggle(false);
+  };
 
-    const sidebarContent = tenderId ? (
-        <TenderWorkspaceSidebar tenderId={tenderId} canManage={tenderSidebarCanManage} onItemClick={closeOnItem} />
-    ) : isCompanyWorkspace ? (
-        isCompanyLoading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                <CircularProgress size={28} />
-            </Box>
-        ) : company ? (
-            <CompanyWorkspaceSidebar company={company} onItemClick={closeOnItem} />
-        ) : (
-            <SidebarContent onItemClick={closeOnItem} />
-        )
+  const sidebarContent = tenderId ? (
+    <TenderWorkspaceSidebar
+      tenderId={tenderId}
+      canManage={tenderSidebarCanManage}
+      onItemClick={closeOnItem}
+    />
+  ) : isCompanyWorkspace ? (
+    isCompanyLoading ? (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+        <CircularProgress size={28} />
+      </Box>
+    ) : company ? (
+      <CompanyWorkspaceSidebar company={company} onItemClick={closeOnItem} />
     ) : (
-        <SidebarContent onItemClick={closeOnItem} />
-    );
+      <SidebarContent onItemClick={closeOnItem} />
+    )
+  ) : (
+    <SidebarContent onItemClick={closeOnItem} />
+  );
 
-    return (
-        <Box display="flex" flexDirection="column" minHeight="100dvh" className="dashboard-layout">
-            <Header
-                isAuthenticated
-                showBurger={isMobile}
-                onMenuClick={() => toggle(true)}
-            />
-            <ScrollToTop />
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      sx={{ bgcolor: "#F8FAFC" }}
+    >
+      <Header
+        isAuthenticated
+        showBurger={isMobile}
+        onMenuClick={() => toggle(true)}
+      />
+      <ScrollToTop />
 
-            <BookmarkPromptDialog />
+      <BookmarkPromptDialog />
 
-            <Box component="main" sx={{ bgcolor: "#F5F5F5", flexGrow: 1, paddingBottom: 32, overflow: "hidden" }}>
-                <Container
-                    maxWidth="lg"
-                    sx={{
-                        maxWidth: { xs: "100%", md: "lg" },
-                        px: { xs: "16px", md: 3 },
-                        overflow: "hidden",
-                        width: "100%",
-                        boxSizing: "border-box",
-                        "& > *": {
-                            maxWidth: "100%",
-                            boxSizing: "border-box"
-                        }
-                    }}
-                >
-                    <Stack
-                        direction="row"
-                        spacing={3}
-                        alignItems="flex-start"
-                        sx={{
-                            width: "100%",
-                            maxWidth: "100%",
-                            minWidth: 0,
-                            boxSizing: "border-box",
-                            overflow: "hidden"
-                        }}
-                    >
-                        {isMobile ? (
-                            <Drawer
-                                anchor="left"
-                                open={open}
-                                onClose={() => toggle(false)}
-                                PaperProps={{ sx: { width: 280, p: 1.5 } }}
-                                ModalProps={{ keepMounted: true }}
-                            >
-                                {sidebarContent}
-                            </Drawer>
-                        ) : (
-                            <Paper elevation={0} sx={{ p: 1.5, width: 260, flexShrink: 0, borderRadius: 3 }}>
-                                {sidebarContent}
-                            </Paper>
-                        )}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          pt: { xs: 12, md: 14 },
+          pb: 10,
+          overflow: "hidden",
+        }}
+      >
+        <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3, lg: 0 } }}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={4}
+            alignItems="flex-start"
+            sx={{ width: "100%" }}
+          >
+            {isMobile ? (
+              <Drawer
+                anchor="left"
+                open={open}
+                onClose={() => toggle(false)}
+                PaperProps={{
+                  sx: { width: 280, p: 2, borderRadius: "0 16px 16px 0" },
+                }}
+                ModalProps={{ keepMounted: true }}
+              >
+                {sidebarContent}
+              </Drawer>
+            ) : (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2.5,
+                  width: 280,
+                  flexShrink: 0,
+                  borderRadius: "16px",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                }}
+              >
+                {sidebarContent}
+              </Paper>
+            )}
 
-                        <Box
-                            flexGrow={1}
-                            sx={{
-                                width: "100%",
-                                maxWidth: "100%",
-                                minWidth: 0,
-                                overflow: "hidden",
-                                boxSizing: "border-box",
-                                mt: "12px !important"
-                            }}
-                        >
-                            <Outlet />
-                        </Box>
-                    </Stack>
-                </Container>
+            <Box
+              flexGrow={1}
+              sx={{
+                width: "100%",
+                minWidth: 0,
+              }}
+            >
+              <Outlet />
             </Box>
+          </Stack>
+        </Container>
+      </Box>
 
-            <Footer />
-        </Box>
-    );
+      <Footer />
+    </Box>
+  );
 }

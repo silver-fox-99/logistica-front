@@ -1,25 +1,19 @@
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, Paper, Typography, Button, Stack, Link as MuiLink, IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import type { ShipmentRowData, ShipmentsKind } from "@/entities/shipment/model/type";
-
+import { FiMapPin, FiCalendar, FiChevronDown, FiChevronUp, FiStar } from "react-icons/fi";
+import { useShipmentRow } from "./shipment-row/model/useShipmentRow";
 import { useShipmentFavorite } from "@/features/shipment/favorite-toggle/model/useShipmentFavorite";
 import { useShipmentDetails } from "@/features/shipment/shipment-details-modal/model/useShipmentDetails";
-import { ShipmentCardHeader } from "@/entities/shipment/ui/shipment-card/ShipmentCardHeader";
-import { ShipmentCardMeta } from "@/entities/shipment/ui/shipment-card/ShipmentCardMeta";
-import { ShipmentCardSummary } from "@/entities/shipment/ui/shipment-card/ShipmentCardSummary";
-import { ShipmentCardActions } from "@/entities/shipment/ui/shipment-card/ShipmentCardActions";
-import { ShipmentDetailsContent } from "@/entities/shipment/ui/shipment-details/ShipmentDetailsContent";
 import { ShipmentDetailsModal } from "@/entities/shipment/ui/shipment-details/ShipmentDetailsModal";
-import {useShipmentRow} from "@/widgets/shipments/shipment-row/model/useShipmentRow.ts";
-import {buildShipmentDetailsPath} from "@/features/shipment/open-shipment-details/lib/buildShipmentDetailsPath.ts";
-import {useNavigate} from "react-router-dom";
-import {ShipmentDetailsLimitModal} from "@/entities/shipment/ui/shipment-details/ShipmentDetailsLimitModal.tsx";
+import { ShipmentDetailsLimitModal } from "@/entities/shipment/ui/shipment-details/ShipmentDetailsLimitModal.tsx";
+import { useNavigate } from "react-router-dom";
+import { buildShipmentDetailsPath } from "@/features/shipment/open-shipment-details/lib/buildShipmentDetailsPath.ts";
 
 type Props = {
-    data: ShipmentRowData;
+    data: any; // Raw CargoApiItem or TransportApiItem
     scope: "public" | "my";
     onMoreOpen?: (id: string) => void;
-    kind: ShipmentsKind;
+    kind: "cargo" | "transport";
     favoriteIds?: Set<string>;
     onFavoriteChange?: (id: string, isFavorite: boolean) => void;
     onUp?: (id: string) => void;
@@ -35,26 +29,29 @@ export default function ShipmentRow({
                                         onMoreOpen,
                                         favoriteIds,
                                         onFavoriteChange,
-                                        onUp,
-                                        onEdit,
-                                        onDelete,
-                                        onCopy,
+                                        onUp: _onUp,
+                                        onEdit: _onEdit,
+                                        onDelete: _onDelete,
+                                        onCopy: _onCopy,
                                     }: Props) {
     const {
         t,
         lookups,
         findLocalizedLabel,
         expanded,
+        setExpanded,
         formatRoute,
-        loadPoints,
-        unloadPoints,
         routeFrom,
         routeTo,
-        shipmentTypeLabel,
+        vehicleTypeLabel,
+        cargoTypeLabel,
+        loadTypeLabel,
         loadDateLabel,
-        unloadDateLabel,
-        summaryItems,
-        openMore,
+        paymentTermLabel,
+        bargainLabel,
+        priceLabel,
+        paymentMethodLabel,
+        adaptedData,
     } = useShipmentRow({ data, kind });
 
     const navigate = useNavigate();
@@ -64,7 +61,7 @@ export default function ShipmentRow({
         favoriteLoading,
         toggleFavorite,
     } = useShipmentFavorite({
-        data,
+        data: adaptedData,
         scope,
         kind,
         favoriteIds,
@@ -87,109 +84,197 @@ export default function ShipmentRow({
         onMoreOpen,
     });
 
-    const handleMore = () => {
-        if (scope === "public") {
-            void openDetails();
-            return;
-        }
-
-        openMore(scope, onMoreOpen);
-    };
-
     const handleOpenOrderPage = () => {
         navigate(buildShipmentDetailsPath(kind, data.id));
     };
 
+    const isInactive = data.display_type === "inactive";
+
+    // Build specifications list for display
+    const specs = [
+        { label: t("shipments.shipmentCard.vehicleType", "Тип автомобиля"), value: vehicleTypeLabel, show: true },
+        { label: t("shipments.shipmentCard.cargoType", "Тип груза"), value: cargoTypeLabel, show: kind === "cargo" },
+        { label: t("shipments.shipmentCard.weight", "Вес"), value: data.weight_t ? `${Number(data.weight_t)} т` : "", show: true },
+        { label: t("shipments.shipmentCard.loadType", "Тип загрузки"), value: loadTypeLabel, show: expanded },
+        { label: t("addCargo.fields.vehiclesCount", "Количество автомобилей"), value: data.cars_count, show: expanded && data.cars_count },
+        { label: t("addCargo.fields.palletsCount", "Количество паллет"), value: data.pallets_count, show: expanded && data.pallets_count },
+        { label: t("shipments.shipmentCard.volume", "Объем"), value: data.volume_m3 ? `${Number(data.volume_m3)} м³` : "", show: expanded && data.volume_m3 },
+        { label: t("shipments.shipmentCard.partialLoad", "Дозагрузка"), value: data.allow_partial_load != null ? (data.allow_partial_load ? t("common.yes", "Да") : t("common.no", "Нет")) : "", show: expanded && data.allow_partial_load != null },
+        { label: t("shipments.shipmentCard.paymentTerm", "Срок оплаты"), value: paymentTermLabel, show: expanded && paymentTermLabel },
+        { label: t("shipments.shipmentCard.bargain", "Торг"), value: bargainLabel, show: expanded && bargainLabel },
+    ].filter(s => s.show && s.value !== undefined && s.value !== null && s.value !== "");
+
     return (
         <>
-            <Box
+            <Paper
+                variant="outlined"
                 sx={{
-                    px: { xs: 1.25, sm: 1.5, md: 2 },
-                    py: { xs: 1.25, sm: 1.5, md: 1.75 },
-                    borderRadius: 2,
-                    border: "1px solid",
+                    p: { xs: 2.5, md: 3 },
+                    borderRadius: "16px",
                     borderColor: "divider",
                     bgcolor: "background.paper",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    opacity: isInactive ? 0.55 : 1,
                     width: "100%",
                     boxSizing: "border-box",
-                    opacity: data.display_type === "inactive" ? 0.5 : 1,
+                    "&:hover": {
+                        boxShadow: "0px 10px 30px rgba(15, 23, 42, 0.06)",
+                        borderColor: isInactive ? "divider" : "primary.light",
+                    },
                 }}
             >
-                <Grid container spacing={{ xs: 1.25, md: 1.5 }} alignItems="stretch">
-                    <Grid size={{ xs: 12, md: 8 }}>
-                        <Stack spacing={1.25} sx={{ height: "100%", minWidth: 0 }}>
-                            <ShipmentCardHeader
-                                routeFrom={routeFrom}
-                                routeTo={routeTo}
-                                price={data.price}
-                                loadPointsCount={loadPoints.length}
-                                unloadPointsCount={unloadPoints.length}
-                                pickupPointsTitle={t("addTransport.fields.pickupPoints", "Pickup points")}
-                                dropoffPointsTitle={t("addTransport.fields.dropoffPoints", "Dropoff points")}
-                            />
-
-                            <ShipmentCardMeta
-                                kind={kind}
-                                shipmentTypeLabel={shipmentTypeLabel}
-                                loadDateLabel={loadDateLabel}
-                                unloadDateLabel={unloadDateLabel}
-                            />
-
-                            <Divider />
-
-                            <ShipmentCardSummary items={summaryItems} />
+                <Stack spacing={2}>
+                    {/* Top row: Route and Favorite icon */}
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
+                        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
+                            <Box sx={{ color: "primary.main", display: "flex", flexShrink: 0 }}>
+                                <FiMapPin size={22} />
+                            </Box>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontWeight: 800,
+                                    fontSize: { xs: "1.05rem", sm: "1.15rem" },
+                                    color: "text.primary",
+                                    lineHeight: 1.3,
+                                    wordBreak: "break-word"
+                                }}
+                            >
+                                {routeFrom} → {routeTo}
+                            </Typography>
                         </Stack>
+
+                        {scope === "public" && (
+                            <IconButton
+                                onClick={toggleFavorite}
+                                disabled={favoriteLoading || isInactive}
+                                sx={{
+                                    border: "1px solid",
+                                    borderColor: "divider",
+                                    borderRadius: "12px",
+                                    width: 42,
+                                    height: 42,
+                                    color: isFavorite ? "#ff9800" : "text.secondary",
+                                    flexShrink: 0,
+                                    transition: "all 0.2s ease",
+                                    "&:hover": {
+                                        borderColor: isFavorite ? "#ff9800" : "text.primary",
+                                        bgcolor: "rgba(0, 0, 0, 0.02)"
+                                    }
+                                }}
+                            >
+                                <FiStar size={18} fill={isFavorite ? "#ff9800" : "none"} />
+                            </IconButton>
+                        )}
+                    </Stack>
+
+                    {/* Second row: Loading Date */}
+                    <Stack direction="row" spacing={1.25} alignItems="center">
+                        <Box sx={{ color: "text.secondary", display: "flex" }}>
+                            <FiCalendar size={18} />
+                        </Box>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
+                            {t("shipments.shipmentCard.load", "Загрузка")}: {loadDateLabel}
+                        </Typography>
+                    </Stack>
+
+                    {/* Specifications Grid */}
+                    <Grid container spacing={1.5} sx={{ pt: 0.5, pb: 0.5, maxWidth: 800 }}>
+                        {specs.map((spec, i) => (
+                            <Grid key={i} size={{ xs: 12, sm: 6 }}>
+                                <Stack direction="row" spacing={1.5} justifyContent="space-between" sx={{ maxWidth: 450 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                        {spec.label}:
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary", textAlign: "right" }}>
+                                        {spec.value}
+                                    </Typography>
+                                </Stack>
+                            </Grid>
+                        ))}
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <ShipmentCardActions
-                            scope={scope}
-                            isFavorite={isFavorite}
-                            favoriteLoading={favoriteLoading}
-                            detailsLoading={detailsLoading}
-                            expanded={expanded}
-                            repeats={data.repeats}
-                            views={data.views}
-                            timeAgo={data.timeAgo}
-                            price={data.price}
-                            display_type={data.display_type}
-                            labels={{
-                                addFavorite: t("shipments.favorites.add", "Add to favorites"),
-                                removeFavorite: t("shipments.favorites.remove", "Remove from favorites"),
-                                contacts: t("addCargo.steps.contacts", "Contacts"),
-                                orderInfo: t("shipments.shipmentCard.orderDetails", "Order details"),
-                                more: t("shipments.shipmentCard.more", "More"),
-                                collapse: t("shipments.shipmentCard.collapse", "Collapse"),
-                                repeats: t("shipments.shipmentCard.repeats", "Repeats"),
-                                views: t("shipments.shipmentCard.views", "Views"),
+                    {/* Expand/Collapse Toggle */}
+                    <Box>
+                        <MuiLink
+                            component="button"
+                            variant="body2"
+                            onClick={() => setExpanded(!expanded)}
+                            sx={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                                fontWeight: 700,
+                                color: "primary.main",
+                                textDecoration: "none",
+                                outline: "none",
+                                border: "none",
+                                p: 0,
+                                cursor: "pointer",
+                                "&:hover": {
+                                    textDecoration: "underline",
+                                },
                             }}
-                            onToggleFavorite={toggleFavorite}
-                            onContacts={() => void openDetails()}
-                            onOrderInfo={() => void handleOpenOrderPage()}
-                            onMore={handleMore}
-                        />
-                    </Grid>
-                </Grid>
+                        >
+                            {expanded ? t("common.hide", "Скрыть") : t("common.showAll", "Смотреть все")}
+                            {expanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+                        </MuiLink>
+                    </Box>
 
-                {expanded && (
-                    <>
-                        <Divider sx={{ my: 2 }} />
-                        <ShipmentDetailsContent
-                            data={data}
-                            scope={scope}
-                            lookups={lookups}
-                            findLocalizedLabel={findLocalizedLabel}
-                            t={t}
-                            onUp={onUp}
-                            onEdit={onEdit}
-                            onDelete={onDelete}
-                            onCopy={onCopy}
-                            formatRoute={formatRoute}
-                        />
-                    </>
-                )}
-            </Box>
+                    {/* Bottom Actions: Price, Payment and contacts button */}
+                    <Box sx={{ pt: 2, borderTop: "1px solid", borderColor: "divider" }}>
+                        <Stack
+                            direction={{ xs: "column", sm: "row" }}
+                            spacing={2}
+                            justifyContent="space-between"
+                            alignItems={{ xs: "flex-start", sm: "center" }}
+                        >
+                            {/* Price and Payment method label */}
+                            <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" sx={{ minHeight: 44 }}>
+                                {priceLabel ? (
+                                    <Typography variant="h5" sx={{ fontWeight: 900, color: "text.primary", fontSize: "1.45rem" }}>
+                                        {priceLabel}
+                                    </Typography>
+                                ) : (
+                                    <Typography variant="h5" sx={{ fontWeight: 800, color: "text.secondary", fontSize: "1.15rem" }}>
+                                        {t("shipments.shipmentCard.priceNegotiable", "Цена договорная")}
+                                    </Typography>
+                                )}
 
+                                {paymentMethodLabel && (
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                        {t("shipments.shipmentCard.paymentMethod", "Метод оплаты")}: {paymentMethodLabel}
+                                    </Typography>
+                                )}
+                            </Stack>
+
+                            {/* Show contacts button */}
+                            {scope === "public" && (
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={openDetails}
+                                    disabled={detailsLoading || isInactive}
+                                    sx={{
+                                        px: 4,
+                                        py: 1.2,
+                                        fontSize: "0.95rem",
+                                        fontWeight: 700,
+                                        borderRadius: "8px",
+                                        textTransform: "none",
+                                        width: { xs: "100%", sm: "auto" },
+                                        height: 44,
+                                    }}
+                                >
+                                    {t("homePage.showContacts", "Показать контакты")}
+                                </Button>
+                            )}
+                        </Stack>
+                    </Box>
+                </Stack>
+            </Paper>
+
+            {/* Shipment details modal and limits modal */}
             <ShipmentDetailsModal
                 open={detailsOpen}
                 onClose={closeDetails}

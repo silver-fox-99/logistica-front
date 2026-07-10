@@ -1,7 +1,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { useMediaQuery, useTheme } from "@mui/material";
 
-import "./AddCargoPage.scss";
+
 
 import { useAddCargoForm } from "@/features/add-cargo-form/model/useAddCargoForm";
 import { AddCargoMobileForm } from "@/features/add-cargo-form/ui/AddCargoMobileForm";

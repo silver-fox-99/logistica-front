@@ -18,35 +18,7 @@ export default function StepCodeReset({ length = 6, onVerified, onBack }: Props)
     const [busy, setBusy] = useState(false);
     const [timer, setTimer] = useState(0);
 
-    const primaryBtnSx = {
-        height: 44,
-        borderRadius: "5px",
-        textTransform: "none",
-        fontWeight: 700,
-        background: "#4472B8",
-        color: "#EEF4F7",
-        "&:hover": {
-            background: "#5b87c6",
-            color: "#EEF4F7",
-            borderColor: "#5b87c6",
-            opacity: 0.92,
-        },
-    };
 
-    const secondaryBtnSx = {
-        height: 44,
-        borderRadius: "5px",
-        textTransform: "none",
-        fontWeight: 700,
-        borderColor: "#5b87c6",
-        color: "#EEF4F7",
-        background: "#5b87c6",
-        "&:hover": {
-            background: "#5b87c6",
-            borderColor: "#5b87c6",
-            opacity: 0.9,
-        },
-    };
 
     const outlineBtnSx = {
         height: 44,
@@ -112,7 +84,7 @@ export default function StepCodeReset({ length = 6, onVerified, onBack }: Props)
                         fullWidth
                         variant="contained"
                         disabled={busy || code.length !== length}
-                        sx={primaryBtnSx}
+                
                     >
                         {t("forgotPassword.verifyButton")}
                     </Button>
@@ -129,7 +101,6 @@ export default function StepCodeReset({ length = 6, onVerified, onBack }: Props)
                         disabled={timer > 0}
                         variant="contained"
                         onClick={resend}
-                        sx={secondaryBtnSx}
                     >
                         {t("forgotPassword.resendCodeButton")} {timer > 0 && `(${timer}s)`}
                     </Button>

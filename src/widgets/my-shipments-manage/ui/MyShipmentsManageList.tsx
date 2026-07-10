@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useShipments } from "@/entities/shipment/model/useShipments";
 import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
+import { adaptCargo, adaptTransport } from "@/entities/shipment/lib/adapter";
 import type { PublicFilters } from "@/widgets/shipments/ShipmentsFilterDrawer";
 
 import { MyShipmentManageCard } from "@/widgets/my-shipments-manage/ui/MyShipmentManageCard";
@@ -58,7 +59,13 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
 
-    const { items, pages, total, loading } = useShipments(kind, "my", page, limit, filters, reloadKey);
+    const { items: rawItems, pages, total, loading } = useShipments(kind, "my", page, limit, filters, reloadKey);
+
+    const items = useMemo(() => {
+        return rawItems.map((item) =>
+            kind === "cargo" ? adaptCargo(item) : adaptTransport(item)
+        );
+    }, [rawItems, kind]);
 
     useEffect(() => {
         setPage(1);

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { shipmentsApi, type ListParams } from "@/shared/api/shipmentsApi";
-import { adaptCargo, adaptTransport } from "../lib/adapter";
-import type { ShipmentsKind, ShipmentRowData } from "./type";
+import type { ShipmentsKind } from "./type";
 
 type Scope = "public" | "my";
 
@@ -53,7 +52,7 @@ export function useShipments(
     filters: Partial<ListParams> = {},
     reloadTrigger?: number,
 ) {
-    const [items, setItems] = useState<ShipmentRowData[]>([]);
+    const [items, setItems] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
     const [pages, setPages] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -82,11 +81,7 @@ export function useShipments(
 
                 if (aborted) return;
 
-                const adapted = resp.data.map((i: any) =>
-                    kind === "cargo" ? adaptCargo(i) : adaptTransport(i),
-                );
-
-                setItems(adapted);
+                setItems(resp.data);
                 setTotal(resp.total);
                 setPages(resp.pages);
             } catch (e: any) {

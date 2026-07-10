@@ -10,78 +10,89 @@ import { authApi } from "@/shared/api/authApi";
 
 type FormValues = { phone: string };
 
-export default function StepPhoneExisting({ onNext }: { onNext: (e164: string) => void }) {
-    const { t } = useTranslation();
+export default function StepPhoneExisting({
+  onNext,
+}: {
+  onNext: (e164: string) => void;
+}) {
+  const { t } = useTranslation();
 
-    const primaryBtnSx = {
-        height: 42,
-        borderRadius: "5px",
-        textTransform: "none",
-        fontWeight: 700,
-        background: "#4472B8",
-        color: "#EEF4F7",
-        "&:hover": {
-            background: "#EEF4F7",
-            color: "#4472B8",
-            borderColor: "#4472B8",
-        },
-    };
+  const schema = z.object({
+    phone: z
+      .string()
+      .min(1, t("forgotPassword.phoneRequired"))
+      .refine((v) => matchIsValidTel(v), t("forgotPassword.phoneInvalid")),
+  });
 
-    const schema = z.object({
-        phone: z.string().min(1, t("forgotPassword.phoneRequired")).refine(v => matchIsValidTel(v), t("forgotPassword.phoneInvalid")),
-    });
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { phone: "" },
+    mode: "onTouched",
+  });
 
-    const { control, handleSubmit, setError, formState: { isSubmitting } } =
-        useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { phone: "" }, mode: "onTouched" });
+  const submit = async (data: FormValues) => {
+    try {
+      let e164 = data.phone;
+      try {
+        const p = parsePhoneNumber(data.phone);
+        if (p) e164 = p.number;
+      } catch {}
 
-    const submit = async (data: FormValues) => {
-        try {
-            let e164 = data.phone;
-            try { const p = parsePhoneNumber(data.phone); if (p) e164 = p.number; } catch {}
+      const { existing } = await authApi.checkPhone(e164);
+      if (!existing) {
+        setError("phone", { message: t("forgotPassword.phoneNotFound") });
+        return;
+      }
 
-            const { existing } = await authApi.checkPhone(e164);
-            if (!existing) {
-                setError("phone", { message: t("forgotPassword.phoneNotFound") });
-                return;
-            }
+      await authApi.sendRestorePhoneCode(e164);
 
-            await authApi.sendRestorePhoneCode(e164);
+      toast.success(t("forgotPassword.codeSent"));
+      onNext(e164);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        t("forgotPassword.codeSendError");
+      toast.error(message);
+    }
+  };
 
-            toast.success(t("forgotPassword.codeSent"));
-            onNext(e164);
-        } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || t("forgotPassword.codeSendError");
-            toast.error(message);
-        }
-    };
-
-    return (
-        <Box component="form" onSubmit={handleSubmit(submit)} sx={{ display: "grid", gap: 2 }} noValidate>
-            <Controller
-                name="phone"
-                control={control}
-                render={({ field, fieldState }) => (
-                    <MuiTelInput
-                        {...field}
-                        label={t("forgotPassword.phoneLabel")}
-                        defaultCountry="UZ"
-                        forceCallingCode
-                        placeholder={t("forgotPassword.phonePlaceholder")}
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-                    />
-                )}
-            />
-            <Button
-                type="submit"
-                variant="contained"
-                disabled={isSubmitting}
-                fullWidth
-                sx={primaryBtnSx}
-            >
-                {t("forgotPassword.sendCodeButton")}
-            </Button>
-        </Box>
-    );
+  return (
+    <Box
+      component="form"
+      onSubmit={handleSubmit(submit)}
+      sx={{ display: "grid", gap: 2 }}
+      noValidate
+    >
+      <Controller
+        name="phone"
+        control={control}
+        render={({ field, fieldState }) => (
+          <MuiTelInput
+            {...field}
+            label={t("forgotPassword.phoneLabel")}
+            defaultCountry="UZ"
+            forceCallingCode
+            placeholder={t("forgotPassword.phonePlaceholder")}
+            error={!!fieldState.error}
+            helperText={fieldState.error?.message}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+          />
+        )}
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={isSubmitting}
+        fullWidth
+      >
+        {t("forgotPassword.sendCodeButton")}
+      </Button>
+    </Box>
+  );
 }

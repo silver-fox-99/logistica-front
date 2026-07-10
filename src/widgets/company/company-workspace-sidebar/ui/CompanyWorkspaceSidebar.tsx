@@ -47,17 +47,35 @@ function CompanyNavItem({ to, icon, label, disabled, onClick }: CompanyNavItemPr
             onClick={onClick}
             className="dashboard-buttons"
             sx={{
-                borderRadius: 2,
-                minHeight: 48,
-                px: 1.5,
-                "&.active": {
-                    bgcolor: "#4A76B8",
-                    color: "#fff",
+                borderRadius: "10px",
+                mb: 1,
+                py: 1.25,
+                color: "text.secondary",
+                transition: "all 0.2s ease-in-out",
+                "& .MuiListItemIcon-root": {
+                    color: "text.secondary",
+                    minWidth: 36,
+                    transition: "color 0.2s ease-in-out",
+                },
+                "& .MuiListItemText-primary": {
+                    fontWeight: 500,
+                    fontSize: "0.95rem",
+                },
+                "&:hover": {
+                    bgcolor: "rgba(15, 95, 194, 0.04)",
+                    color: "primary.main",
                     "& .MuiListItemIcon-root": {
-                        color: "#fff",
+                        color: "primary.main",
+                    },
+                },
+                "&.active": {
+                    bgcolor: "transparent",
+                    color: "primary.main",
+                    "& .MuiListItemIcon-root": {
+                        color: "primary.main",
                     },
                     "& .MuiListItemText-primary": {
-                        fontWeight: 700,
+                        fontWeight: 600,
                     },
                 },
                 "&.Mui-disabled": {
@@ -76,10 +94,6 @@ function CompanyNavItem({ to, icon, label, disabled, onClick }: CompanyNavItemPr
 
             <ListItemText
                 primary={label}
-                primaryTypographyProps={{
-                    fontSize: 16,
-                    fontWeight: 500,
-                }}
             />
         </ListItemButton>
     );

@@ -1,7 +1,5 @@
 import { Box, Paper, Typography, useMediaQuery, useTheme } from "@mui/material";
 
-import "./AddTransportPage.scss";
-
 import { useAddTransportForm } from "@/features/add-transport-form/model/useAddTransportForm";
 import { AddTransportDesktopForm } from "@/features/add-transport-form/ui/AddTransportDesktopForm";
 import { AddTransportMobileForm } from "@/features/add-transport-form/ui/AddTransportMobileForm";

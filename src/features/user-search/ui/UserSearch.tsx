@@ -75,7 +75,7 @@ export default function UserSearch() {
                     aria-label={t("header.searchUser")}
                     onClick={handleToggleExpand}
                     size="large"
-                    sx={{ color: "#fff" }}
+                    sx={{ color: "text.primary" }}
                 >
                     <FiSearch size={22} />
                 </IconButton>
@@ -107,9 +107,9 @@ export default function UserSearch() {
                             loading={loadingOptions}
                             onInputChange={(_, v) => setSearch(v)}
                             onChange={(_, v) => {
-                                if (typeof v !== "string") {
-                                    handleSelect(v as AdminUser);
-                                }
+                                    if (typeof v !== "string") {
+                                        handleSelect(v as AdminUser);
+                                    }
                             }}
                             renderOption={(props, option) => (
                                 <li {...props} key={typeof option === "string" ? option : option.id}>
@@ -170,14 +170,14 @@ export default function UserSearch() {
                     width: expanded ? "300px" : "40px",
                     height: 40,
                     borderRadius: 2,
-                    bgcolor: expanded ? "rgba(255, 255, 255, 0.1)" : "transparent",
+                    bgcolor: expanded ? "rgba(0, 0, 0, 0.04)" : "transparent",
                     border: "1px solid",
-                    borderColor: expanded ? "rgba(255, 255, 255, 0.2)" : "transparent",
+                    borderColor: expanded ? "rgba(0, 0, 0, 0.08)" : "transparent",
                     px: expanded ? 1.5 : 0,
                     overflow: "hidden",
                     "&:hover": expanded ? {
-                        borderColor: "rgba(255, 255, 255, 0.35)",
-                        bgcolor: "rgba(255, 255, 255, 0.15)"
+                        borderColor: "rgba(0, 0, 0, 0.15)",
+                        bgcolor: "rgba(0, 0, 0, 0.06)"
                     } : {}
                 }}
             >
@@ -185,10 +185,10 @@ export default function UserSearch() {
                     <IconButton
                         onClick={handleToggleExpand}
                         sx={{
-                            color: "#fff",
+                            color: "text.primary",
                             p: 1,
                             "&:hover": {
-                                bgcolor: "rgba(255, 255, 255, 0.08)"
+                                bgcolor: "rgba(0, 0, 0, 0.04)"
                             }
                         }}
                         aria-label={t("header.searchUser")}
@@ -197,7 +197,7 @@ export default function UserSearch() {
                     </IconButton>
                 ) : (
                     <>
-                        <FiSearch size={18} style={{ color: "rgba(255, 255, 255, 0.6)", marginRight: 8, flexShrink: 0 }} />
+                        <FiSearch size={18} style={{ color: "rgba(0, 0, 0, 0.45)", marginRight: 8, flexShrink: 0 }} />
                         <Autocomplete<AdminUser | string, false, false, true>
                             fullWidth
                             size="small"
@@ -257,7 +257,7 @@ export default function UserSearch() {
                             sx={{
                                 flex: 1,
                                 "& .MuiInputBase-root": {
-                                    color: "#fff !important",
+                                    color: "text.primary !important",
                                     bgcolor: "transparent !important",
                                     padding: "4px 0 !important",
                                     border: "none !important",
@@ -266,19 +266,19 @@ export default function UserSearch() {
                                     }
                                 },
                                 "& .MuiInputBase-input": {
-                                    color: "#fff !important",
-                                    caretColor: "#fff !important",
+                                    color: "text.primary !important",
+                                    caretColor: "primary.main !important",
                                     background: "transparent !important",
                                     border: "none !important",
                                     outline: "none !important",
                                     boxShadow: "none !important",
                                     "&::placeholder": {
-                                        color: "rgba(255, 255, 255, 0.6) !important",
+                                        color: "rgba(0, 0, 0, 0.4) !important",
                                         opacity: 1
                                     }
                                 },
                                 "& .MuiAutocomplete-endAdornment": {
-                                    "& button": { color: "rgba(255, 255, 255, 0.5)" }
+                                    "& button": { color: "rgba(0, 0, 0, 0.4)" }
                                 }
                             }}
                         />
@@ -286,11 +286,11 @@ export default function UserSearch() {
                             onClick={handleClose}
                             size="small"
                             sx={{
-                                color: "rgba(255, 255, 255, 0.6)",
+                                color: "rgba(0, 0, 0, 0.4)",
                                 p: 0.5,
                                 ml: 0.5,
                                 "&:hover": {
-                                    color: "#fff"
+                                    color: "text.primary"
                                 }
                             }}
                         >

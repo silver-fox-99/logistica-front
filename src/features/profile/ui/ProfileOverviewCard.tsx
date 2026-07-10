@@ -2,7 +2,6 @@ import { Paper, Stack, Avatar, Typography, Chip } from "@mui/material";
 import { FiUser } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
-import "./ProfilePage.scss";
 
 type ProfileOverviewCardProps = {
     fullName: string;

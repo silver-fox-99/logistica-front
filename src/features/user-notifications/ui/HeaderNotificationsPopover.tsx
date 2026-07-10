@@ -118,7 +118,7 @@ export default function HeaderNotificationsPopover() {
                 onClick={handleClick}
                 size="large"
                 sx={{
-                    color: "#fff",
+                    color: "text.primary",
                     transition: "transform 0.2s",
                     "&:hover": {
                         transform: "scale(1.05)",

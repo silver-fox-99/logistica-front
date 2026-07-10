@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import './index.scss'
+
 import AppRoot from './app'
 import "@/shared/config/i18n/i18n.ts";
 

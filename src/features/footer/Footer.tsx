@@ -1,114 +1,330 @@
-import { Link } from 'react-router-dom';
-import logo from '../header/logo.svg'
-import instaLogo from './instagram.svg'
-import facebookLogo from './facebook.svg'
-
-import './footer.scss'
-import {useTranslation} from "react-i18next";
 import { useState, type AnchorHTMLAttributes, type MouseEvent } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+  Box,
+  Container,
+  Typography,
+  Stack,
+  Link as MuiLink,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+
+import logo from "../header/logo.svg";
 import { useUserStore } from "@/entities/user/model/user.store";
 
 export default function Footer() {
+  const { t } = useTranslation();
+  const [contactOpen, setContactOpen] = useState(false);
 
-    const {t} = useTranslation()
-    const [contactOpen, setContactOpen] = useState(false);
-    const externalLinkProps: AnchorHTMLAttributes<HTMLAnchorElement> = { target: "_blank", rel: "noreferrer" };
-    const docs = {
-        about: "/about-company.pdf",
-        intro: "/introduction.pdf",
-        security: "/account-security.pdf",
-        terms: "/docs/user-agreement.pdf",
-        billing: "/payments-billing.pdf",
-    };
-    const phoneNumbers = ["+998 94 986 68 86", "+998 78 113 67 55"];
-    const email = "info@yologistic.uz";
-    const user = useUserStore((s) => s.user);
-    const isAuthenticated = !!user;
+  const externalLinkProps: AnchorHTMLAttributes<HTMLAnchorElement> = {
+    target: "_blank",
+    rel: "noreferrer",
+  };
 
-    const handleContactClick = (e: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
-        e.preventDefault();
-        setContactOpen(true);
-    };
+  const docs = {
+    about: "/about-company.pdf",
+    intro: "/introduction.pdf",
+    security: "/account-security.pdf",
+    terms: "/docs/user-agreement.pdf",
+    billing: "/payments-billing.pdf",
+  };
 
-    return <div className="footer">
-       <div className="footer__body container">
-           <div className="footer__column">
-               <Link to="/" aria-label="Go to home">
-                   <img className="footer__logo" src={logo} alt="logo"/>
-               </Link>
+  const phoneNumbers = ["+998 94 986 68 86", "+998 78 113 67 55"];
+  const email = "info@yologistic.uz";
+  const user = useUserStore((s) => s.user);
+  const isAuthenticated = !!user;
 
-               <div className="footer__contacts">
-                   {phoneNumbers.map((num) => (
-                       <a key={num} href={`tel:${num.replace(/\s+/g, "")}`}>{num}</a>
-                   ))}
-                   <a href="mailto:info@yologistic.uz">info@yologistic.uz</a>
-               </div>
-               
-               <div className="footer__socials">
-                   <div style={{ cursor: 'not-allowed', opacity: 0.5, pointerEvents: 'none' }}><img src={facebookLogo} alt=""/></div>
-                   <a href="https://www.instagram.com/yologisticuz/"><img src={instaLogo} alt=""/></a>
-                   <a href="https://t.me/yollogistik">
-    <svg width="28" height="28" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="240" height="240" fill="white"/>
-        <path fillRule="evenodd" clipRule="evenodd" d="M38.4343 116.518C83.2538 97.1046 113.091 84.2047 128.073 77.9463C170.716 60.193 179.68 57.1277 185.442 57C186.723 57 189.54 57.2554 191.461 58.7881C192.998 60.0653 193.382 61.7257 193.638 63.0029C193.894 64.2801 194.15 66.9623 193.894 69.0058C191.589 93.2729 181.601 152.153 176.478 179.23C174.301 190.725 170.076 194.556 165.978 194.939C157.014 195.706 150.227 189.064 141.647 183.444C128.073 174.632 120.518 169.14 107.328 160.454C92.0896 150.492 101.95 145 110.658 136.06C112.963 133.761 152.276 97.9986 153.044 94.8056C153.172 94.4224 153.172 92.8898 152.276 92.1234C151.379 91.3571 150.099 91.6126 149.074 91.868C147.666 92.1234 126.152 106.428 84.2782 134.655C78.1315 138.87 72.6251 140.913 67.631 140.785C62.1246 140.658 51.624 137.72 43.6846 135.166C34.0804 132.1 26.397 130.44 27.0373 125.076C27.4215 122.266 31.2631 119.456 38.4343 116.518Z" fill="#172735"/>
-    </svg>
-</a>
+  const handleContactClick = (
+    e: MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
+  ) => {
+    e.preventDefault();
+    setContactOpen(true);
+  };
 
+  // Общие стили для ссылок в футере
+  const linkStyles = {
+    color: "rgba(255, 255, 255, 0.8)",
+    textDecoration: "none",
+    fontSize: "0.95rem",
+    transition: "color 0.2s ease-in-out",
+    cursor: "pointer",
+    display: "inline-block",
+    "&:hover": {
+      color: "#FFFFFF",
+    },
+  };
 
-               </div>
-           </div>
+  return (
+    <Box
+      component="footer"
+      id="footer"
+      sx={{
+        bgcolor: "primary.main",
+        color: "#FFFFFF",
+        pt: 8,
+        pb: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Grid container spacing={{ xs: 4, md: 2 }} alignItems="flex-start">
+          {/* Колонка 1: Логотип и Бренд */}
+          <Grid size={{ xs: 12, sm: 6, md: 3.5 }}>
+            <Stack
+              spacing={2}
+              sx={{ alignItems: { xs: "center", sm: "flex-start" } }}
+            >
+              <MuiLink
+                component={RouterLink}
+                to="/"
+                aria-label="Go to home"
+                sx={{ display: "inline-block" }}
+              >
+                <Box
+                  component="img"
+                  src={logo}
+                  alt="Yangi Osiyo Logistikasi Logo"
+                  sx={{ height: 90, width: "auto", display: "block" }}
+                />
+              </MuiLink>
+            </Stack>
+          </Grid>
 
-           <div className="footer__column">
-               <h5 className="footer__title">{t('footer.company')}</h5>
+          {/* Колонка 2: Контакты */}
+          <Grid size={{ xs: 12, sm: 6, md: 2.5 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#FFFFFF",
+                fontWeight: 700,
+                mb: 2,
+                fontSize: "1rem",
+              }}
+            >
+              {t("footer.contacts", "Контакты")}
+            </Typography>
+            <Stack spacing={1.5}>
+              <MuiLink href={`mailto:${email}`} sx={linkStyles}>
+                {email}
+              </MuiLink>
+              {phoneNumbers.map((num) => (
+                <MuiLink
+                  key={num}
+                  href={`tel:${num.replace(/\s+/g, "")}`}
+                  sx={linkStyles}
+                >
+                  {num}
+                </MuiLink>
+              ))}
+            </Stack>
+          </Grid>
 
-               <div className="footer__links">
-                   <a href={docs.about} {...externalLinkProps}>{t('footer.aboutCompany')}</a>
-                   <button type="button" className="footer__link-button" onClick={handleContactClick}>
-                       {t('footer.contacts')}
-                   </button>
-                   <Link to="/reviews">{t('footer.siteReviews', 'Отзывы о сайте')}</Link>
-                   {isAuthenticated ? (
-                       <Link to="/dashboard/help">{t('footer.askAndAnswer')}</Link>
-                   ) : (
-                       <a href="/help" {...externalLinkProps}>{t('footer.askAndAnswer')}</a>
-                   )}
-               </div>
-           </div>
+          {/* Колонка 3: Компания */}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#FFFFFF",
+                fontWeight: 700,
+                mb: 2,
+                fontSize: "1rem",
+              }}
+            >
+              {t("footer.companyHeader", "Компания")}
+            </Typography>
+            <Stack spacing={1.5} alignItems="flex-start">
+              <MuiLink href={docs.about} {...externalLinkProps} sx={linkStyles}>
+                {t("footer.aboutPlatform", "Информация о платформе")}
+              </MuiLink>
 
-           <div className="footer__column">
-                <div className="footer__title">{t('footer.privacyAndPolicy')}</div>
+              {isAuthenticated ? (
+                <MuiLink
+                  component={RouterLink}
+                  to="/dashboard/help"
+                  sx={linkStyles}
+                >
+                  {t("footer.askAndAnswer", "Вопросы и ответы")}
+                </MuiLink>
+              ) : (
+                <MuiLink href="/help" {...externalLinkProps} sx={linkStyles}>
+                  {t("footer.askAndAnswer", "Вопросы и ответы")}
+                </MuiLink>
+              )}
 
-                <div className="footer__links">
-                   <a href={docs.intro} {...externalLinkProps}>{t('footer.terms')}</a>
-                   <a href={docs.security} {...externalLinkProps}>{t('footer.privacy')}</a>
-                   <a href={docs.billing} {...externalLinkProps}>{t('footer.billing')}</a>
-                </div>
-            </div>
-       </div>
+              <MuiLink
+                href={docs.billing}
+                {...externalLinkProps}
+                sx={linkStyles}
+              >
+                {t("footer.billingHeader", "Платежи и биллинг")}
+              </MuiLink>
 
-        {contactOpen && (
-            <div className="footer__modal-overlay" onClick={() => setContactOpen(false)} role="dialog" aria-modal="true" aria-label={t('footer.contacts')}>
-                <div className="footer__modal" onClick={(e) => e.stopPropagation()}>
-                    <div className="footer__modal-title">{t('footer.contacts')}</div>
-                    <div className="footer__modal-phones">
-                        {phoneNumbers.map((num) => (
-                            <a key={num} href={`tel:${num.replace(/\s+/g, "")}`}>
-                                {num}
-                            </a>
-                        ))}
-                    </div>
-                    <div className="footer__modal-email">
-                        <a href={`mailto:${email}`}>{email}</a>
-                    </div>
-                    <button type="button" className="footer__modal-close" onClick={() => setContactOpen(false)}>
-                        {t('header.close', 'Закрыть')}
-                    </button>
-                </div>
-            </div>
-        )}
+              <MuiLink
+                component="button"
+                type="button"
+                onClick={handleContactClick}
+                sx={{
+                  ...linkStyles,
+                  border: "none",
+                  background: "none",
+                  p: 0,
+                  textAlign: "left",
+                }}
+              >
+                {t("footer.supportHeader", "Поддержка")}
+              </MuiLink>
+            </Stack>
+          </Grid>
 
-        <div className="footer__bottom container">
-            © 2025-2026 Logistica. All rights reserved.
-        </div>
-    </div>
+          {/* Колонка 4: Условия и политика */}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#FFFFFF",
+                fontWeight: 700,
+                mb: 2,
+                fontSize: "1rem",
+              }}
+            >
+              {t("footer.termsAndPolicies", "Условия и политика")}
+            </Typography>
+            <Stack spacing={1.5}>
+              <MuiLink href={docs.intro} {...externalLinkProps} sx={linkStyles}>
+                {t("footer.termsOfUse", "Условия использования")}
+              </MuiLink>
+              <MuiLink href={docs.terms} {...externalLinkProps} sx={linkStyles}>
+                {t("footer.privacyPolicy", "Политика конфиденциальности")}
+              </MuiLink>
+              <MuiLink
+                href={docs.security}
+                {...externalLinkProps}
+                sx={linkStyles}
+              >
+                {t("footer.accountSecurity", "Безопасность аккаунта")}
+              </MuiLink>
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent={{ xs: "center", md: "flex-end" }}
+          sx={{ mt: 4, mb: 2 }}
+        >
+          <IconButton
+            component="a"
+            href="https://facebook.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Facebook"
+            sx={{
+              color: "#FFFFFF",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+            }}
+          >
+            <FaFacebookF size={18} />
+          </IconButton>
+
+          <IconButton
+            component="a"
+            href="https://www.instagram.com/yologisticuz/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram"
+            sx={{
+              color: "#FFFFFF",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+            }}
+          >
+            <FaInstagram size={18} />
+          </IconButton>
+
+          <IconButton
+            component="a"
+            href="https://linkedin.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn"
+            sx={{
+              color: "#FFFFFF",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+            }}
+          >
+            <FaLinkedinIn size={18} />
+          </IconButton>
+        </Stack>
+
+        {/* Копирайт */}
+        <Typography
+          variant="body2"
+          sx={{
+            pt: 4,
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            textAlign: "center",
+            color: "rgba(255, 255, 255, 0.6)",
+            fontSize: "0.85rem",
+          }}
+        >
+          © 2025-2026 Yangi Osiyo Logistikasi. All rights reserved.
+        </Typography>
+      </Container>
+
+      {/* Модальное окно Поддержки / Контактов на компонентах MUI */}
+      <Dialog
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+        aria-labelledby="contact-dialog-title"
+        PaperProps={{
+          sx: { borderRadius: "16px", p: 1, minWidth: "280px" },
+        }}
+      >
+        <DialogTitle id="contact-dialog-title" sx={{ fontWeight: 700 }}>
+          {t("footer.contacts", "Контакты")}
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            {phoneNumbers.map((num) => (
+              <MuiLink
+                key={num}
+                href={`tel:${num.replace(/\s+/g, "")}`}
+                sx={{
+                  color: "primary.main",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  fontSize: "1.1rem",
+                }}
+              >
+                {num}
+              </MuiLink>
+            ))}
+            <MuiLink
+              href={`mailto:${email}`}
+              sx={{ color: "text.primary", textDecoration: "none" }}
+            >
+              {email}
+            </MuiLink>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setContactOpen(false)}
+            variant="outlined"
+            color="primary"
+            fullWidth
+          >
+            {t("header.close", "Закрыть")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
 }

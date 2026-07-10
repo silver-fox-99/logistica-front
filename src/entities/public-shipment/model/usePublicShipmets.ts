@@ -1,10 +1,6 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { publicShipmentsApi } from "@/shared/api/publicShipmentsApi";
-import { adaptCargo, adaptTransport } from "../lib/adapter";
-import type { PublicShipmentBase } from "./types";
 import type { PublicFilters } from "./types";
-
 
 function compact<T extends Record<string, unknown>>(obj: T): Partial<T> {
     return (Object.keys(obj) as (keyof T)[]).reduce<Partial<T>>((acc, key) => {
@@ -17,19 +13,17 @@ function compact<T extends Record<string, unknown>>(obj: T): Partial<T> {
     }, {});
 }
 
-
 export function usePublicShipments(
     kind: "cargo" | "transport",
     page = 1,
     limit = 10,
     filters?: PublicFilters
 ) {
-    const [items, setItems] = useState<PublicShipmentBase[]>([]);
+    const [items, setItems] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
     const [pages, setPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
 
     const normalizedFilters = useMemo(() => compact(filters ?? {}), [filters]);
     const depsKey = useMemo(() => JSON.stringify({ page, limit, kind, ...normalizedFilters }), [
@@ -52,11 +46,7 @@ export function usePublicShipments(
 
                 if (aborted) return;
 
-                const adapted = (resp.data ?? []).map((i: any) =>
-                    kind === "cargo" ? adaptCargo(i) : adaptTransport(i)
-                );
-
-                setItems(adapted);
+                setItems(resp.data ?? []);
                 setTotal(resp.total ?? 0);
                 setPages(resp.pages ?? 1);
             } catch (e: any) {
@@ -73,7 +63,6 @@ export function usePublicShipments(
         return () => {
             aborted = true;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [depsKey]);
 
     return { items, total, pages, loading, error };

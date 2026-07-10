@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useShipments } from "@/entities/shipment/model/useShipments";
 import type { ShipmentsKind, ShipmentRowData } from "@/entities/shipment/model/type";
+import { adaptCargo, adaptTransport } from "@/entities/shipment/lib/adapter";
 import ShipmentRow from "@/widgets/shipments/ShipmentRow";
 
 import ConfirmDialog from "@/widgets/common/ConfirmDialog";
@@ -60,6 +61,12 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
     const { items, pages, total, loading } = useShipments(kind, scope, page, limit, filters, reloadKey);
+
+    const adaptedItems = useMemo(() => {
+        return items.map((item) =>
+            kind === "cargo" ? adaptCargo(item) : adaptTransport(item)
+        );
+    }, [items, kind]);
 
     useEffect(() => {
         onTotalChange?.(total || 0);
@@ -127,106 +134,108 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
 
     const editInitial = useMemo(() => {
         if (!editItem) return undefined;
+        const adaptedEditItem = adaptedItems.find((x) => x.id === editItem.id);
+        if (!adaptedEditItem) return undefined;
 
         const rawDateFrom =
-            (editItem as any)?.date_from ??
-            (editItem as any)?.dateFrom ??
+            (adaptedEditItem as any)?.date_from ??
+            (adaptedEditItem as any)?.dateFrom ??
             null;
 
         const normalizedDateFrom =
             Array.isArray(rawDateFrom) && rawDateFrom.length
                 ? rawDateFrom
-                : editItem?.loadWindow?.from || editItem?.loadWindow?.to
-                    ? [editItem?.loadWindow?.from, editItem?.loadWindow?.to].filter(
+                : adaptedEditItem?.loadWindow?.from || adaptedEditItem?.loadWindow?.to
+                    ? [adaptedEditItem?.loadWindow?.from, adaptedEditItem?.loadWindow?.to].filter(
                         (v): v is string => typeof v === "string" && v.length > 0
                     )
                     : null;
 
         return {
-            id: editItem.id,
+            id: adaptedEditItem.id,
             dateFrom: normalizedDateFrom,
             dateTo:
-                (editItem as any)?.date_to ??
-                editItem?.dates?.to ??
+                (adaptedEditItem as any)?.date_to ??
+                adaptedEditItem?.dates?.to ??
                 null,
 
             vehicleType:
-                (editItem as any)?.vehicle_type ??
-                editItem?.vehicleType ??
+                (adaptedEditItem as any)?.vehicle_type ??
+                adaptedEditItem?.vehicleType ??
                 "ANY",
 
             loadType:
-                (editItem as any)?.load_type ??
-                (editItem as any)?.loadType ??
+                (adaptedEditItem as any)?.load_type ??
+                (adaptedEditItem as any)?.loadType ??
                 ["ANY"],
 
             cargoType:
-                (editItem as any)?.cargo_type ??
-                (editItem as any)?.cargoType ??
+                (adaptedEditItem as any)?.cargo_type ??
+                (adaptedEditItem as any)?.cargoType ??
                 "GENERAL",
 
             allowPartialLoad:
-                (editItem as any)?.allow_partial_load ??
-                (editItem as any)?.allowPartialLoad ??
+                (adaptedEditItem as any)?.allow_partial_load ??
+                (adaptedEditItem as any)?.allowPartialLoad ??
                 false,
 
             palletsCount:
-                (editItem as any)?.pallets_count ??
-                (editItem as any)?.palletsCount ??
+                (adaptedEditItem as any)?.pallets_count ??
+                (adaptedEditItem as any)?.palletsCount ??
                 null,
 
             carsCount:
-                (editItem as any)?.cars_count ??
-                (editItem as any)?.carsCount ??
+                (adaptedEditItem as any)?.cars_count ??
+                (adaptedEditItem as any)?.carsCount ??
                 null,
 
             bargain:
-                (editItem as any)?.bargain ??
+                (adaptedEditItem as any)?.bargain ??
                 (kind === "transport" ? "ALLOWED" : null),
 
             weightT:
-                (editItem as any)?.weight_t ??
-                editItem?.weightT ??
+                (adaptedEditItem as any)?.weight_t ??
+                adaptedEditItem?.weightT ??
                 null,
 
             volumeM3:
-                (editItem as any)?.volume_m3 ??
-                editItem?.volumeM3 ??
+                (adaptedEditItem as any)?.volume_m3 ??
+                adaptedEditItem?.volumeM3 ??
                 null,
 
             hasDimensions:
-                (editItem as any)?.has_dimensions ??
-                (editItem as any)?.hasDimensions ??
+                (adaptedEditItem as any)?.has_dimensions ??
+                (adaptedEditItem as any)?.hasDimensions ??
                 false,
 
             lengthM:
-                (editItem as any)?.length_m ??
-                (editItem as any)?.length ??
+                (adaptedEditItem as any)?.length_m ??
+                (adaptedEditItem as any)?.length ??
                 null,
 
             widthM:
-                (editItem as any)?.width_m ??
-                (editItem as any)?.width ??
+                (adaptedEditItem as any)?.width_m ??
+                (adaptedEditItem as any)?.width ??
                 null,
 
             heightM:
-                (editItem as any)?.height_m ??
-                (editItem as any)?.height ??
+                (adaptedEditItem as any)?.height_m ??
+                (adaptedEditItem as any)?.height ??
                 null,
 
             priceCurrency:
-                (editItem as any)?.price_currency ??
+                (adaptedEditItem as any)?.price_currency ??
                 "USD",
 
             priceAmount:
-                (editItem as any)?.price_amount ??
-                parsePriceAmount(editItem?.price ?? "") ??
+                (adaptedEditItem as any)?.price_amount ??
+                parsePriceAmount(adaptedEditItem?.price ?? "") ??
                 null,
 
-            note: editItem?.note ?? null,
-            points: editItem?.points ?? [],
+            note: adaptedEditItem?.note ?? null,
+            points: adaptedEditItem?.points ?? [],
         };
-    }, [editItem, kind]);
+    }, [editItem, adaptedItems, kind]);
 
     const handleUp = useCallback(
         async (id: string) => {
@@ -290,9 +299,9 @@ export const ShipmentsListBody = React.memo(function ShipmentsListBody({
     );
 
     const copyInitial = useMemo(() => {
-        const item = items.find((x) => x.id === copyId);
+        const item = adaptedItems.find((x) => x.id === copyId);
         return item ? { dateFrom: item.dates?.from ?? "", dateTo: item.dates?.to ?? "" } : { dateFrom: "", dateTo: "" };
-    }, [copyId, items]);
+    }, [copyId, adaptedItems]);
 
     const handleEditSubmit = useCallback(
         async (payload: any) => {

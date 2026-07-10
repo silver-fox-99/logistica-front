@@ -11,7 +11,7 @@ import { useFilterSettingsStore } from "@/shared/store/filterSettingsStore";
 import { resolveFilters } from "@/shared/utils/filterSettings";
 import { useEffect } from "react";
 
-import "./MyShipmentsPage.scss";
+
 
 type Props = { scope: "public" | "my" };
 
