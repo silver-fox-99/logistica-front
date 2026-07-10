@@ -1,5 +1,26 @@
-import { Button, Chip, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
-import { FiCheckSquare, FiLayers, FiSquare, FiTrash2 } from "react-icons/fi";
+import { useState } from "react";
+import type { MouseEvent } from "react";
+import {
+    Button,
+    Stack,
+    ToggleButton,
+    ToggleButtonGroup,
+    Checkbox,
+    FormControlLabel,
+    Typography,
+    Menu,
+    MenuItem,
+    ListItemIcon,
+    ListItemText,
+} from "@mui/material";
+import {
+    FiChevronDown,
+    FiSliders,
+    FiLayers,
+    FiTrash2,
+    FiPackage,
+    FiTruck,
+} from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
@@ -9,40 +30,49 @@ type Props = {
     selectedCount: number;
     allPageSelected: boolean;
     hasAnyPageSelected: boolean;
+    totalCount: number;
     onKindChange: (kind: ShipmentsKind) => void;
     onSelectAllPage: () => void;
     onDeselectAllPage: () => void;
     onClearSelection: () => void;
     onOpenBulkActions: () => void;
+    onFilterClick: () => void;
 };
 
 export function MyShipmentsManageToolbar({
-                                             kind,
-                                             selectedCount,
-                                             allPageSelected,
-                                             hasAnyPageSelected,
-                                             onKindChange,
-                                             onSelectAllPage,
-                                             onDeselectAllPage,
-                                             onClearSelection,
-                                             onOpenBulkActions,
-                                         }: Props) {
+    kind,
+    selectedCount,
+    allPageSelected,
+    hasAnyPageSelected,
+    totalCount,
+    onKindChange,
+    onSelectAllPage,
+    onDeselectAllPage,
+    onClearSelection,
+    onOpenBulkActions,
+    onFilterClick,
+}: Props) {
     const { t } = useTranslation();
 
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const openMenu = Boolean(anchorEl);
+
+    const handleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
     return (
-        <Stack
-            direction={{ xs: "column", lg: "row" }}
-            spacing={1}
-            alignItems={{ xs: "stretch", lg: "center" }}
-            justifyContent="space-between"
-            sx={{ width: "100%" }}
-        >
+        <Stack spacing={2} sx={{ width: "100%", mb: 2 }}>
+            {/* ROW 1: Tabs, Filter button, Total Count */}
             <Stack
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                flexWrap="wrap"
-                useFlexGap
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                alignItems={{ xs: "stretch", sm: "center" }}
+                justifyContent="space-between"
             >
                 <ToggleButtonGroup
                     exclusive
@@ -53,129 +83,156 @@ export function MyShipmentsManageToolbar({
                         onKindChange(value);
                     }}
                     sx={{
+                        bgcolor: "#f0f2f5",
+                        borderRadius: "10px",
+                        p: 0.5,
+                        border: "none",
+                        "& .MuiToggleButtonGroup-grouped": {
+                            border: "none",
+                            borderRadius: "8px !important",
+                            mx: 0.25,
+                        },
                         "& .MuiToggleButton-root": {
-                            px: 1.5,
+                            px: 2.25,
                             py: 0.75,
-                            minWidth: 88,
                             textTransform: "none",
-                            fontWeight: 600,
-                            whiteSpace: "nowrap",
+                            fontWeight: 700,
+                            color: "text.secondary",
+                            fontSize: "0.9rem",
+                            "&.Mui-selected": {
+                                bgcolor: "background.paper",
+                                color: "primary.main",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
+                            },
                         },
                     }}
                 >
                     <ToggleButton value="cargo">
-                        {t("shipments.filters.cargo", "Cargo")}
+                        <FiPackage size={16} style={{ marginRight: 8 }} />
+                        {t("shipments.filters.cargo", "Груз")}
                     </ToggleButton>
-
                     <ToggleButton value="transport">
-                        {t("shipments.filters.transport", "Transport")}
+                        <FiTruck size={16} style={{ marginRight: 8 }} />
+                        {t("shipments.filters.transport", "Транспорт")}
                     </ToggleButton>
                 </ToggleButtonGroup>
 
-                <Chip
-                    size="small"
-                    color={selectedCount > 0 ? "primary" : "default"}
-                    label={t("shipments.manage.selectedCountShort", {
-                        count: selectedCount,
-                        defaultValue: "Selected: {{count}}",
-                    })}
-                    sx={{
-                        height: 32,
-                        fontWeight: 600,
-                        borderRadius: 2,
-                    }}
-                />
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-end">
+                    <Button
+                        variant="outlined"
+                        startIcon={<FiSliders />}
+                        onClick={onFilterClick}
+                        sx={{
+                            height: 38,
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            px: 2,
+                            borderColor: "primary.main",
+                            color: "primary.main",
+                            "&:hover": {
+                                borderColor: "primary.dark",
+                                bgcolor: "rgba(15, 95, 194, 0.04)",
+                            },
+                        }}
+                    >
+                        {t("shipments.filter.button", "Фильтр")}
+                    </Button>
+
+                    <Typography variant="body2" sx={{ fontWeight: 800, color: "text.primary" }}>
+                        {t("shipments.totalCount", { count: totalCount, defaultValue: `Всего: ${totalCount}` })}
+                    </Typography>
+                </Stack>
             </Stack>
 
+            {/* ROW 2: Selection controls & Actions dropdown menu */}
             <Stack
                 direction="row"
-                spacing={1}
+                spacing={2}
                 alignItems="center"
-                flexWrap="wrap"
-                useFlexGap
-                justifyContent={{ xs: "flex-start", lg: "flex-end" }}
+                sx={{ minHeight: 40 }}
             >
-                {!allPageSelected ? (
-                    <Tooltip title={t("shipments.manage.selectPage", "Select page")}>
-                        <span>
-                            <Button
-                                variant="outlined"
-                                startIcon={<FiCheckSquare />}
-                                onClick={onSelectAllPage}
-                                disabled={!hasAnyPageSelected && selectedCount > 0 ? false : false}
-                                sx={{
-                                    textTransform: "none",
-                                    minWidth: "auto",
-                                    px: 1.25,
-                                    py: 0.875,
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
-                                {t("shipments.manage.selectPageShort", "Select page")}
-                            </Button>
-                        </span>
-                    </Tooltip>
-                ) : (
-                    <Tooltip title={t("shipments.manage.unselectPage", "Unselect page")}>
-                        <span>
-                            <Button
-                                variant="outlined"
-                                startIcon={<FiSquare />}
-                                onClick={onDeselectAllPage}
-                                sx={{
-                                    textTransform: "none",
-                                    minWidth: "auto",
-                                    px: 1.25,
-                                    py: 0.875,
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
-                                {t("shipments.manage.unselectPageShort", "Unselect")}
-                            </Button>
-                        </span>
-                    </Tooltip>
-                )}
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={allPageSelected}
+                            indeterminate={hasAnyPageSelected && !allPageSelected}
+                            onChange={() => {
+                                if (allPageSelected) {
+                                    onDeselectAllPage();
+                                } else {
+                                    onSelectAllPage();
+                                }
+                            }}
+                        />
+                    }
+                    label={
+                        <Typography variant="body2" fontWeight={700} color="text.secondary">
+                            {t("shipments.manage.selectAll", "Все заявки")}
+                        </Typography>
+                    }
+                />
 
-                <Tooltip title={t("shipments.manage.clearSelection", "Clear selection")}>
-                    <span>
+                {selectedCount > 0 && (
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: "text.secondary" }}>
+                            {t("shipments.manage.selectedCount", { count: selectedCount, defaultValue: `Выбрано: ${selectedCount}` })}
+                        </Typography>
+
                         <Button
                             variant="outlined"
-                            color="inherit"
-                            startIcon={<FiTrash2 />}
-                            onClick={onClearSelection}
-                            disabled={selectedCount === 0}
+                            size="small"
+                            onClick={handleMenuOpen}
+                            endIcon={<FiChevronDown />}
                             sx={{
                                 textTransform: "none",
-                                minWidth: "auto",
-                                px: 1.25,
-                                py: 0.875,
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            {t("shipments.manage.clearSelectionShort", "Clear")}
-                        </Button>
-                    </span>
-                </Tooltip>
-
-                <Tooltip title={t("shipments.manage.bulkActions", "Bulk actions")}>
-                    <span>
-                        <Button
-                            variant="contained"
-                            startIcon={<FiLayers />}
-                            onClick={onOpenBulkActions}
-                            disabled={selectedCount === 0}
-                            sx={{
-                                textTransform: "none",
-                                minWidth: "auto",
+                                fontWeight: 700,
+                                borderRadius: "8px",
+                                height: 32,
                                 px: 1.5,
-                                py: 0.875,
-                                whiteSpace: "nowrap",
                             }}
                         >
-                            {t("shipments.manage.bulkActionsShort", "Bulk")}
+                            {t("shipments.manage.actionsDropdown", "Действия")}
                         </Button>
-                    </span>
-                </Tooltip>
+
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={openMenu}
+                            onClose={handleMenuClose}
+                            transformOrigin={{ horizontal: "left", vertical: "top" }}
+                            anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+                        >
+                            <MenuItem
+                                onClick={() => {
+                                    handleMenuClose();
+                                    onOpenBulkActions();
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <FiLayers size={16} />
+                                </ListItemIcon>
+                                <ListItemText>
+                                    {t("shipments.manage.bulkActionsShort", "Применить массовые действия")}
+                                </ListItemText>
+                            </MenuItem>
+
+                            <MenuItem
+                                onClick={() => {
+                                    handleMenuClose();
+                                    onClearSelection();
+                                }}
+                                sx={{ color: "error.main" }}
+                            >
+                                <ListItemIcon sx={{ color: "error.main" }}>
+                                    <FiTrash2 size={16} />
+                                </ListItemIcon>
+                                <ListItemText>
+                                    {t("shipments.manage.clearSelectionShort", "Сбросить выделение")}
+                                </ListItemText>
+                            </MenuItem>
+                        </Menu>
+                    </Stack>
+                )}
             </Stack>
         </Stack>
     );

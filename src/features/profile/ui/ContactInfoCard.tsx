@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-    Paper, Stack, Typography, TextField, InputAdornment, Button, Box, Chip
+    Paper, Stack, Typography, TextField, Button, Box, Checkbox
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { FiGlobe, FiMail, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
-import { FaTelegramPlane } from "react-icons/fa";
 import { MuiTelInput, matchIsValidTel } from "mui-tel-input";
 import { parsePhoneNumber } from "libphonenumber-js";
 
@@ -23,6 +21,7 @@ export type ContactInfo = {
     geo?: string;
     phoneVerified?: boolean;
     emailVerified?: boolean;
+    isPublic?: boolean;
 };
 
 type Props = {
@@ -44,6 +43,7 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
         geo: z.string().optional(),
         whatsapp: z.string().optional().refine((v) => !v || matchIsValidTel(v), t('profile.validation.invalidPhone')),
         email: z.string().optional().refine((v) => !v || z.string().email().safeParse(v).success, t('profile.validation.invalidEmail')),
+        isPublic: z.boolean().optional(),
     });
 
     const { control, register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<z.infer<typeof schema>>({
@@ -56,7 +56,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
             telegram: data.telegram ?? "",
             whatsapp: data.whatsapp ?? "",
             email: data.email ?? "",
-            geo: data.geo ?? ""
+            geo: data.geo ?? "",
+            isPublic: data.isPublic ?? true,
         },
         mode: "onTouched",
     });
@@ -70,7 +71,8 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
             telegram: data.telegram ?? "",
             whatsapp: data.whatsapp ?? "",
             email: data.email ?? "",
-            geo: data.geo ?? ""
+            geo: data.geo ?? "",
+            isPublic: data.isPublic ?? true,
         });
     }, [data, reset]);
 
@@ -94,220 +96,332 @@ export default function ContactInfoCard({ data, onSave, saving }: Props) {
     };
 
     return (
-        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}>
+        <Paper
+            elevation={0}
+            sx={{
+                p: 3,
+                borderRadius: "16px",
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper"
+            }}
+        >
             <form onSubmit={handleSubmit(submit)} noValidate>
-                <Stack spacing={1.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" mb={1} className="contact-info-card__title">
-                                {t('profile.contactInfo.title')}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" mb={2} className="contact-info-card__subtitle">
-                                {t('profile.contactInfo.description')}
-                            </Typography>
-                        </Box>
+                <Stack spacing={3}>
+                    <Box>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 800,
+                                fontSize: "1.25rem",
+                                color: "#0c2340",
+                                mb: 0.5
+                            }}
+                        >
+                            {t('profile.contactInfo.title', "Общая информация")}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                                fontWeight: 500,
+                                fontSize: "0.9rem"
+                            }}
+                        >
+                            {t('profile.contactInfo.description', "Здесь отображается основная информация о вашем профиле. Эти данные видны другим пользователям")}
+                        </Typography>
                     </Box>
 
-                    <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Имя</Typography>
-                            <TextField
-                                placeholder="Ваше имя"
-                                fullWidth
-                                disabled={!editing}
-                                {...register("firstName")}
-                                error={!!errors.firstName}
-                                helperText={errors.firstName?.message}
-                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>Фамилия</Typography>
-                            <TextField
-                                placeholder="Ваша фамилия"
-                                fullWidth
-                                disabled={!editing}
-                                {...register("lastName")}
-                                error={!!errors.lastName}
-                                helperText={errors.lastName?.message}
-                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                                <Typography variant="body2">{t('profile.contactInfo.phoneMain')}</Typography>
-                                <Chip
-                                    size="small"
-                                    icon={data.phoneVerified ? <FiCheckCircle /> : <FiAlertCircle />}
-                                    label={data.phoneVerified ? t('profile.contactInfo.phoneVerified') : t('profile.contactInfo.phoneUnverified')}
-                                    color={data.phoneVerified ? "success" : "warning"}
-                                    variant="outlined"
-                                    sx={{ height: 20, fontSize: "0.75rem" }}
-                                />
-                            </Stack>
-                            <Controller
-                                name="phoneMain"
-                                control={control}
-                                render={({ field }) => (
-                                    <MuiTelInput
-                                        {...field}
-                                        disabled
-                                        defaultCountry="UZ"
-                                        forceCallingCode
-                                        placeholder="+1 (555) 000-0000"
+                    <Grid container spacing={4}>
+                        {/* Left Column */}
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <Stack spacing={2.5}>
+                                {/* Имя */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>Имя</Typography>
+                                    <TextField
+                                        placeholder="Иван"
                                         fullWidth
-                                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5, bgcolor: "action.disabledBackground" } }}
-                                    />
-                                )}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.phoneAlt')}</Typography>
-                            <Controller
-                                name="phoneAlt"
-                                control={control}
-                                render={({ field }) => (
-                                    <MuiTelInput
-                                        {...field}
                                         disabled={!editing}
-                                        defaultCountry="UZ"
-                                        forceCallingCode
-                                        error={!!errors.phoneAlt}
-                                        helperText={errors.phoneAlt?.message}
-                                        placeholder="+1 (555) 000-0000"
-                                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
+                                        {...register("firstName")}
+                                        error={!!errors.firstName}
+                                        helperText={errors.firstName?.message}
+                                        sx={{
+                                            "& .MuiOutlinedInput-root": {
+                                                borderRadius: "8px",
+                                                bgcolor: editing ? "background.paper" : "#FAFBFD",
+                                            }
+                                        }}
                                     />
-                                )}
-                            />
-                        </Grid>
+                                </Box>
 
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.telegram')}</Typography>
-                            <TextField
-                                placeholder="@username"
-                                fullWidth
-                                disabled={!editing}
-                                {...register("telegram")}
-                                error={!!errors.telegram}
-                                helperText={errors.telegram?.message}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <FaTelegramPlane />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
-                            />
-                        </Grid>
+                                {/* Основной телефон */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>
+                                        Основной телефон
+                                    </Typography>
+                                    <Controller
+                                        name="phoneMain"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <MuiTelInput
+                                                {...field}
+                                                disabled
+                                                defaultCountry="UZ"
+                                                forceCallingCode
+                                                placeholder="+998 (90) 123-45-67"
+                                                fullWidth
+                                                sx={{
+                                                    "& .MuiOutlinedInput-root": {
+                                                        borderRadius: "8px",
+                                                        bgcolor: "#FAFBFD",
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </Box>
 
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.whatsapp')}</Typography>
-                            <Controller
-                                name="whatsapp"
-                                control={control}
-                                render={({ field }) => (
-                                    <MuiTelInput
-                                        {...field}
+                                {/* E-mail */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>
+                                        E-mail
+                                    </Typography>
+                                    <TextField
+                                        placeholder="email@example.com"
+                                        fullWidth
+                                        disabled
+                                        {...register("email")}
+                                        error={!!errors.email}
+                                        helperText={errors.email?.message}
+                                        sx={{
+                                            "& .MuiOutlinedInput-root": {
+                                                borderRadius: "8px",
+                                                bgcolor: "#FAFBFD",
+                                            }
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Telegram chat */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>
+                                        Telegram chat <span style={{ fontWeight: 400, color: "#A0AEC0", fontSize: "0.8rem" }}>(опционально)</span>
+                                    </Typography>
+                                    <TextField
+                                        placeholder="@username"
+                                        fullWidth
                                         disabled={!editing}
-                                        defaultCountry="UZ"
-                                        forceCallingCode
-                                        error={!!errors.whatsapp}
-                                        helperText={errors.whatsapp?.message}
-                                        placeholder="+1 (555) 000-0000"
-                                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
+                                        {...register("telegram")}
+                                        error={!!errors.telegram}
+                                        helperText={errors.telegram?.message}
+                                        sx={{
+                                            "& .MuiOutlinedInput-root": {
+                                                borderRadius: "8px",
+                                                bgcolor: editing ? "background.paper" : "#FAFBFD",
+                                            }
+                                        }}
                                     />
-                                )}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                                <Typography variant="body2">{t('profile.contactInfo.email')}</Typography>
-                                <Chip
-                                    size="small"
-                                    icon={data.emailVerified ? <FiCheckCircle /> : <FiAlertCircle />}
-                                    label={data.emailVerified ? t('profile.contactInfo.phoneVerified') : t('profile.contactInfo.phoneUnverified')}
-                                    color={data.emailVerified ? "success" : "warning"}
-                                    variant="outlined"
-                                    sx={{ height: 20, fontSize: "0.75rem" }}
-                                />
+                                </Box>
                             </Stack>
-                            <TextField
-                                placeholder="email@example.com"
-                                fullWidth
-                                disabled
-                                {...register("email")}
-                                error={!!errors.email}
-                                helperText={errors.email?.message}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <FiMail />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5, bgcolor: "action.disabledBackground" } }}
-                            />
                         </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography variant="body2" sx={{ mb: 0.5 }}>{t('profile.contactInfo.geo')}</Typography>
-                            <TextField
-                                placeholder={t('profile.contactInfo.geoPlaceholder')}
-                                fullWidth
-                                disabled={!editing}
-                                {...register("geo")}
-                                error={!!errors.geo}
-                                helperText={errors.geo?.message}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <FiGlobe />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1.5 } }}
-                            />
+                        {/* Right Column */}
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <Stack spacing={2.5}>
+                                {/* Фамилия */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>Фамилия</Typography>
+                                    <TextField
+                                        placeholder="Иванов"
+                                        fullWidth
+                                        disabled={!editing}
+                                        {...register("lastName")}
+                                        error={!!errors.lastName}
+                                        helperText={errors.lastName?.message}
+                                        sx={{
+                                            "& .MuiOutlinedInput-root": {
+                                                borderRadius: "8px",
+                                                bgcolor: editing ? "background.paper" : "#FAFBFD",
+                                            }
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Геолокация */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>Геолокация</Typography>
+                                    <TextField
+                                        placeholder="Узбекистан"
+                                        fullWidth
+                                        disabled={!editing}
+                                        {...register("geo")}
+                                        error={!!errors.geo}
+                                        helperText={errors.geo?.message}
+                                        sx={{
+                                            "& .MuiOutlinedInput-root": {
+                                                borderRadius: "8px",
+                                                bgcolor: editing ? "background.paper" : "#FAFBFD",
+                                            }
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Дополнительный телефон */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>
+                                        Дополнительный телефон <span style={{ fontWeight: 400, color: "#A0AEC0", fontSize: "0.8rem" }}>(опционально)</span>
+                                    </Typography>
+                                    <Controller
+                                        name="phoneAlt"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <MuiTelInput
+                                                {...field}
+                                                disabled={!editing}
+                                                defaultCountry="UZ"
+                                                forceCallingCode
+                                                error={!!errors.phoneAlt}
+                                                helperText={errors.phoneAlt?.message}
+                                                placeholder="+998 (90) 123-45-12"
+                                                fullWidth
+                                                sx={{
+                                                    "& .MuiOutlinedInput-root": {
+                                                        borderRadius: "8px",
+                                                        bgcolor: editing ? "background.paper" : "#FAFBFD",
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </Box>
+
+                                {/* WhatsApp */}
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 700, color: "#0c2340" }}>
+                                        WhatsApp <span style={{ fontWeight: 400, color: "#A0AEC0", fontSize: "0.8rem" }}>(опционально)</span>
+                                    </Typography>
+                                    <Controller
+                                        name="whatsapp"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <MuiTelInput
+                                                {...field}
+                                                disabled={!editing}
+                                                defaultCountry="UZ"
+                                                forceCallingCode
+                                                error={!!errors.whatsapp}
+                                                helperText={errors.whatsapp?.message}
+                                                placeholder="+998 (90) 123-45-89"
+                                                fullWidth
+                                                sx={{
+                                                    "& .MuiOutlinedInput-root": {
+                                                        borderRadius: "8px",
+                                                        bgcolor: editing ? "background.paper" : "#FAFBFD",
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </Box>
+                            </Stack>
                         </Grid>
                     </Grid>
 
-                    <Stack direction="row" justifyContent="flex-end" spacing={1}>
-                        {editing ? (
-                            <>
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => {
-                                        reset();
-                                        setEditing(false);
+                    {/* Bottom row: Checkbox and Actions */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-end",
+                            flexWrap: "wrap",
+                            gap: 2,
+                            pt: 1
+                        }}
+                    >
+                        <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-start", maxWidth: "600px" }}>
+                            <Controller
+                                name="isPublic"
+                                control={control}
+                                render={({ field: { value, onChange } }) => (
+                                    <Checkbox
+                                        checked={!!value}
+                                        onChange={(e) => onChange(e.target.checked)}
+                                        disabled={!editing}
+                                        sx={{
+                                            color: "primary.main",
+                                            p: 0,
+                                            mt: 0.3,
+                                            "&.Mui-checked": {
+                                                color: "primary.main",
+                                            }
+                                        }}
+                                    />
+                                )}
+                            />
+                            <Stack spacing={0.5}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        fontWeight: 700,
+                                        color: "primary.main",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 0.5
                                     }}
-                                    disabled={isSubmitting || saving}
-                                    sx={{ textTransform: "none" }}
                                 >
-                                    {t('profile.contactInfo.cancel')}
-                                </Button>
+                                    Публичный профиль
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    Публичный профиль позволяет другим пользователям находить вас на платформе и видеть информацию о вас
+                                </Typography>
+                            </Stack>
+                        </Box>
+
+                        <Box sx={{ ml: "auto" }}>
+                            {editing ? (
+                                <Stack direction="row" spacing={1.5}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => {
+                                            reset();
+                                            setEditing(false);
+                                        }}
+                                        disabled={isSubmitting || saving}
+                                        sx={{ textTransform: "none", fontWeight: 700, px: 3, py: 1, borderRadius: "8px" }}
+                                    >
+                                        {t('profile.contactInfo.cancel', "Отмена")}
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        disabled={isSubmitting || saving}
+                                        sx={{ textTransform: "none", fontWeight: 700, px: 3, py: 1, borderRadius: "8px" }}
+                                    >
+                                        {t('profile.contactInfo.save', "Сохранить")}
+                                    </Button>
+                                </Stack>
+                            ) : (
                                 <Button
-                                    type="submit"
                                     variant="contained"
-                                    disabled={isSubmitting || saving}
-                                    sx={{ textTransform: "none" }}
+                                    onClick={() => setEditing(true)}
+                                    sx={{
+                                        textTransform: "none",
+                                        fontWeight: 700,
+                                        px: 4,
+                                        py: 1.2,
+                                        borderRadius: "8px",
+                                        bgcolor: "primary.main",
+                                        "&:hover": {
+                                            bgcolor: "primary.dark",
+                                        }
+                                    }}
                                 >
-                                    {t('profile.contactInfo.save')}
+                                    {t('profile.contactInfo.edit', "Редактировать")}
                                 </Button>
-                            </>
-                        ) : (
-                            <Button
-                                variant="contained"
-                                onClick={() => setEditing(true)}
-                                sx={{ textTransform: "none" }}
-                            >
-                                {t('profile.contactInfo.edit')}
-                            </Button>
-                        )}
-                    </Stack>
+                            )}
+                        </Box>
+                    </Box>
                 </Stack>
             </form>
         </Paper>

@@ -83,7 +83,7 @@ export function PriceField({ control, label, currencyOpts, getLocalizedLabel }: 
                                 />
                             </InputAdornment>
                         }
-                        sx={{ borderRadius: 2, ".MuiOutlinedInput-input": { py: 1.25 } }}
+                        sx={{ borderRadius: "8px", ".MuiOutlinedInput-input": { py: 1.25 } }}
                     />
                 )}
             />

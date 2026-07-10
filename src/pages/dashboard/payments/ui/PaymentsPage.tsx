@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Box, Container, Stack, Typography} from "@mui/material";
+import { Box, Container, Paper, Stack, Typography} from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { FiCreditCard } from "react-icons/fi";
 
 import { useRefreshMe } from "@/entities/user/model/useRefreshMe";
 
@@ -55,16 +56,52 @@ export default function PaymentsPage() {
         <Box sx={{ minHeight: "calc(100dvh - 120px)", py: 3 }}>
             <Container maxWidth="lg">
                 <Stack spacing={3}>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between">
-                        <Stack spacing={0.25}>
-                            <Typography variant="h5" fontWeight={800}>
-                                {t("paymentsNew.title", { defaultValue: "Payments" })}
+                    <Paper
+                        variant="outlined"
+                        sx={{
+                            p: 2.25,
+                            borderRadius: "16px",
+                            mb: 0.5,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            bgcolor: "background.paper",
+                            borderColor: "divider",
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                width: 48,
+                                height: 48,
+                                borderRadius: "12px",
+                                bgcolor: "rgba(15, 95, 194, 0.08)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "primary.main",
+                            }}
+                        >
+                            <FiCreditCard size={24} />
+                        </Box>
+                        <Box>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontWeight: 850,
+                                    color: "text.primary",
+                                    letterSpacing: "-0.02em",
+                                    mb: 0.25,
+                                }}
+                            >
+                                {t("paymentsNew.title", { defaultValue: "Тарифы" })}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {t("paymentsNew.subtitle", { defaultValue: "Manage your plan, limits, and invoices." })}
+                            <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500 }}>
+                                {t("paymentsNew.subtitle", {
+                                    defaultValue: "Выберите подходящий тариф и управляйте вашими лимитами использования.",
+                                })}
                             </Typography>
-                        </Stack>
-                    </Stack>
+                        </Box>
+                    </Paper>
 
                     {/*<Alert*/}
                     {/*    severity="info"*/}

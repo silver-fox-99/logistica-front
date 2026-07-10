@@ -54,7 +54,7 @@ export function ShipmentDetailsMap({ route }: Props) {
                 <Box
                     sx={{
                         minHeight: { xs: 240, md: 320 },
-                        borderRadius: 1.5,
+                        borderRadius: "8px",
                         bgcolor: "grey.100",
                         display: "flex",
                         alignItems: "center",
@@ -72,7 +72,7 @@ export function ShipmentDetailsMap({ route }: Props) {
                     <Box
                         sx={{
                             overflow: "hidden",
-                            borderRadius: 1.5,
+                            borderRadius: "8px",
                             height: { xs: 260, md: 360 },
                             "& .leaflet-container": {
                                 height: "100%",

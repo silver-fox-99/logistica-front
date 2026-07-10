@@ -359,8 +359,10 @@ export function AddTransportDesktopForm({
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                        {t("addTransport.fields.email")}
+                    </Typography>
                     <TextField
-                        label={t("addTransport.fields.email")}
                         placeholder={t("addTransport.fields.emailPlaceholder")}
                         fullWidth
                         {...register("email")}

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Box, Card, CardContent, Chip, LinearProgress, Stack, Typography } from "@mui/material";
+import { Box, Chip, LinearProgress, Stack, Typography } from "@mui/material";
 import { FiCheckCircle } from "react-icons/fi";
 import { buildLimitItemsConfig, usageKeyMap } from "@/entities/tariff/lib/limits";
 import { useTranslation } from "react-i18next";
@@ -27,14 +27,12 @@ export const LimitsTab: React.FC<Props> = ({ effectiveEntitlements, usage }) => 
     }
 
     return (
-        <Box display="grid" gridTemplateColumns={{ xs: "1fr" }} gap={2}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-                <CardContent sx={{ display: "grid", gap: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={700}>
-                        {t("paymentsNew.tabs.limits", { defaultValue: "Limits" })}
-                    </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Typography variant="h6" fontWeight={800} sx={{ color: "text.primary" }}>
+                {t("paymentsNew.tabs.limits", { defaultValue: "Текущие лимиты" })}
+            </Typography>
 
-                    <Stack spacing={{ xs: 2.5, sm: 3 }}>
+            <Stack spacing={{ xs: 2.5, sm: 3 }}>
                         {limitsConfig.map((item) => {
                             const Icon = item.icon;
 
@@ -183,8 +181,6 @@ export const LimitsTab: React.FC<Props> = ({ effectiveEntitlements, usage }) => 
                             );
                         })}
                     </Stack>
-                </CardContent>
-            </Card>
         </Box>
     );
 };

@@ -53,7 +53,16 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
 
     return (
         <>
-            <Paper sx={{ p: { xs: 2, md: 2.25 }, borderRadius: 3 }}>
+            <Paper
+                variant="outlined"
+                sx={{
+                    p: { xs: 2, md: 2.25 },
+                    borderRadius: "16px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                    bgcolor: "background.paper",
+                    borderColor: "divider",
+                }}
+            >
                 <Stack spacing={1.5}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
                         <Stack direction="row" alignItems="center" gap={1}>
@@ -63,8 +72,9 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                                     placeItems: "center",
                                     width: 36,
                                     height: 36,
-                                    borderRadius: 2,
-                                    bgcolor: "rgba(0,0,0,0.04)",
+                                    borderRadius: "8px",
+                                    bgcolor: "rgba(15, 95, 194, 0.08)",
+                                    color: "primary.main",
                                 }}
                             >
                                 <FiFileText />
@@ -77,7 +87,7 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                             label={chip.label}
                             color={chip.color}
                             variant="outlined"
-                            sx={{ borderRadius: 2 }}
+                            sx={{ borderRadius: "8px" }}
                         />
                     </Stack>
 
@@ -92,7 +102,17 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                     )}
 
                     <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} sx={{ pt: 0.5 }}>
-                        <Button variant="outlined" onClick={onOpen} sx={{ justifyContent: "space-between" }}>
+                        <Button
+                            variant="outlined"
+                            onClick={onOpen}
+                            sx={{
+                                justifyContent: "center",
+                                height: 38,
+                                borderRadius: "8px",
+                                textTransform: "none",
+                                fontWeight: 700,
+                            }}
+                        >
                             {t("referralProgram.agreement.actions.view")}
                         </Button>
 
@@ -101,7 +121,13 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                                 variant="contained"
                                 onClick={onSignClick}
                                 disabled={!accepted}
-                                sx={{ justifyContent: "space-between" }}
+                                sx={{
+                                    justifyContent: "center",
+                                    height: 38,
+                                    borderRadius: "8px",
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                }}
                             >
                                 {t("referralProgram.agreement.actions.sign")}
                             </Button>
@@ -117,8 +143,19 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                 </Stack>
             </Paper>
 
-            <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-                <DialogTitle>{agreement.documentTitle}</DialogTitle>
+            <Dialog
+                open={open}
+                onClose={onClose}
+                fullWidth
+                maxWidth="md"
+                PaperProps={{
+                    sx: {
+                        borderRadius: "16px",
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                    },
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800 }}>{agreement.documentTitle}</DialogTitle>
                 <DialogContent dividers>
                     {loadingContent ? (
                         <Typography variant="body2" sx={{ opacity: 0.85 }}>
@@ -130,8 +167,19 @@ function AgreementCardBase({ agreement, open, onOpen, onClose, onSign, loadingCo
                         </Typography>
                     )}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={onClose}>{t("common.close")}</Button>
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button
+                        onClick={onClose}
+                        variant="outlined"
+                        sx={{
+                            height: 36,
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                        }}
+                    >
+                        {t("common.close")}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </>

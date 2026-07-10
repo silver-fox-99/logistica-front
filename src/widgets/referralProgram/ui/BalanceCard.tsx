@@ -36,7 +36,16 @@ function BalanceCardBase({ kpi }: Props) {
     );
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 2.25 }, borderRadius: 3 }}>
+        <Paper
+            variant="outlined"
+            sx={{
+                p: { xs: 2, md: 2.25 },
+                borderRadius: "16px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                bgcolor: "background.paper",
+                borderColor: "divider",
+            }}
+        >
             <Stack spacing={1.25}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
                     <Typography variant="h6" fontWeight={800}>

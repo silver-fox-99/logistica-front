@@ -170,13 +170,13 @@ export function ShipmentDetailsHero({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderRadius: 1.5,
-                                    minHeight: 34,
+                                    borderRadius: "8px",
+                                    height: 38,
                                 }}
                             >
                                 {contactsLoading
-                                    ? t("shipments.actions.loading", "Loading...")
-                                    : t("shipments.details.showContacts", "Show contacts")}
+                                    ? t("shipments.actions.loading", "Загрузка...")
+                                    : t("shipments.details.showContacts", "Показать контакты")}
                             </Button>
                         )}
 

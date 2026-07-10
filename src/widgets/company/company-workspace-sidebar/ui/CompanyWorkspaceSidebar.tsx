@@ -48,14 +48,15 @@ function CompanyNavItem({ to, icon, label, disabled, onClick }: CompanyNavItemPr
             className="dashboard-buttons"
             sx={{
                 borderRadius: "10px",
-                mb: 1,
-                py: 1.25,
+                mb: 0.25,
+                py: 0.75,
+                px: 1.5,
                 color: "text.secondary",
                 transition: "all 0.2s ease-in-out",
                 "& .MuiListItemIcon-root": {
                     color: "text.secondary",
-                    minWidth: 36,
-                    transition: "color 0.2s ease-in-out",
+                    minWidth: "34px",
+                    transition: "all 0.2s ease-in-out",
                 },
                 "& .MuiListItemText-primary": {
                     fontWeight: 500,
@@ -66,6 +67,7 @@ function CompanyNavItem({ to, icon, label, disabled, onClick }: CompanyNavItemPr
                     color: "primary.main",
                     "& .MuiListItemIcon-root": {
                         color: "primary.main",
+                        transform: "translateX(3px)",
                     },
                 },
                 "&.active": {
@@ -75,7 +77,7 @@ function CompanyNavItem({ to, icon, label, disabled, onClick }: CompanyNavItemPr
                         color: "primary.main",
                     },
                     "& .MuiListItemText-primary": {
-                        fontWeight: 600,
+                        fontWeight: 650,
                     },
                 },
                 "&.Mui-disabled": {

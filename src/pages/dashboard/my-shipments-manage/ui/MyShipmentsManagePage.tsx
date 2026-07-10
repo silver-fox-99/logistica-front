@@ -1,11 +1,14 @@
 import { useCallback, useMemo, useState } from "react";
-import {Alert, Box, Button, Paper, Stack, Typography} from "@mui/material";
-import { FiLayers, FiSliders } from "react-icons/fi";
+import { Alert, Box, Container, Paper, Typography } from "@mui/material";
+import { FiCalendar } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
-import { ShipmentsFilterDrawer, type PublicFilters } from "@/widgets/shipments/ShipmentsFilterDrawer.tsx";
+import {
+  ShipmentsFilterDrawer,
+  type PublicFilters,
+} from "@/widgets/shipments/ShipmentsFilterDrawer.tsx";
 import { MyShipmentsManageToolbar } from "@/widgets/my-shipments-manage/ui/MyShipmentsManageToolbar";
 import { MyShipmentsManageList } from "@/widgets/my-shipments-manage/ui/MyShipmentsManageList";
 import { MyShipmentsBulkActionsDrawer } from "@/widgets/my-shipments-bulk-actions-drawer/ui/MyShipmentsBulkActionsDrawer";
@@ -14,16 +17,16 @@ import { resolveFilters } from "@/shared/utils/filterSettings";
 import { useEffect } from "react";
 
 import {
-    cargoBulkAction,
-    transportBulkAction,
+  cargoBulkAction,
+  transportBulkAction,
 } from "@/shared/api/shipmentsActions";
 
 type BulkActionPayload =
-    | { action: "raise" }
-    | { action: "delete" }
-    | {
-    action: "update";
-    payload: {
+  | { action: "raise" }
+  | { action: "delete" }
+  | {
+      action: "update";
+      payload: {
         date_from?: string;
         date_to?: string;
         price_amount?: number;
@@ -31,295 +34,268 @@ type BulkActionPayload =
         bargain?: string | null;
         allow_partial_load?: boolean;
         note?: string | null;
+      };
     };
-};
 
 const DEFAULT_KIND: ShipmentsKind = "cargo";
 
 export default function MyShipmentsManagePage() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
-    const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-    const [bulkDrawerOpen, setBulkDrawerOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [bulkDrawerOpen, setBulkDrawerOpen] = useState(false);
 
-    const [totalCount, setTotalCount] = useState(0);
-    const [pageIds, setPageIds] = useState<string[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pageIds, setPageIds] = useState<string[]>([]);
 
-    const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(DEFAULT_KIND);
-    const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(() => {
-        const settings = useFilterSettingsStore.getState().settings;
-        const defaults = settings?.my.default || {};
-        return resolveFilters(defaults);
+  const [appliedKind, setAppliedKind] = useState<ShipmentsKind>(DEFAULT_KIND);
+  const [appliedFilters, setAppliedFilters] = useState<PublicFilters>(() => {
+    const settings = useFilterSettingsStore.getState().settings;
+    const defaults = settings?.my.default || {};
+    return resolveFilters(defaults);
+  });
+
+  useEffect(() => {
+    const syncSettings = async () => {
+      const settings = await useFilterSettingsStore.getState().loadSettings();
+      const defaults = settings.my.default;
+      setAppliedFilters(resolveFilters(defaults));
+    };
+    syncSettings();
+  }, []);
+
+  const [reloadKey, setReloadKey] = useState(0);
+  const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const listKey = useMemo(() => {
+    return `${appliedKind}-${JSON.stringify(appliedFilters)}`;
+  }, [appliedKind, appliedFilters]);
+
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const selectedCount = selectedIds.length;
+
+  const toggleOne = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      }
+
+      return [...prev, id];
     });
+  }, []);
 
-    useEffect(() => {
-        const syncSettings = async () => {
-            const settings = await useFilterSettingsStore.getState().loadSettings();
-            const defaults = settings.my.default;
-            setAppliedFilters(resolveFilters(defaults));
-        };
-        syncSettings();
-    }, []);
+  const clearSelection = useCallback(() => {
+    setSelectedIds([]);
+  }, []);
 
-    const [reloadKey, setReloadKey] = useState(0);
-    const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
+  const selectAllOnPage = useCallback(() => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
 
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+      pageIds.forEach((id) => {
+        next.add(id);
+      });
 
-    const listKey = useMemo(() => {
-        return `${appliedKind}-${JSON.stringify(appliedFilters)}`;
-    }, [appliedKind, appliedFilters]);
+      return Array.from(next);
+    });
+  }, [pageIds]);
 
-    const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
-    const selectedCount = selectedIds.length;
+  const deselectAllOnPage = useCallback(() => {
+    if (!pageIds.length) return;
 
-    const toggleOne = useCallback((id: string) => {
-        setSelectedIds((prev) => {
-            if (prev.includes(id)) {
-                return prev.filter((item) => item !== id);
-            }
+    setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
+  }, [pageIds]);
 
-            return [...prev, id];
-        });
-    }, []);
+  const allPageSelected = useMemo(() => {
+    if (!pageIds.length) return false;
+    return pageIds.every((id) => selectedSet.has(id));
+  }, [pageIds, selectedSet]);
 
-    const clearSelection = useCallback(() => {
-        setSelectedIds([]);
-    }, []);
+  const hasAnyPageSelected = useMemo(() => {
+    if (!pageIds.length) return false;
+    return pageIds.some((id) => selectedSet.has(id));
+  }, [pageIds, selectedSet]);
 
-    const selectAllOnPage = useCallback(() => {
-        setSelectedIds((prev) => {
-            const next = new Set(prev);
+  const handleBulkSubmit = useCallback(
+    async (actionData: BulkActionPayload) => {
+      const ids = [...selectedIds];
 
-            pageIds.forEach((id) => {
-                next.add(id);
+      if (!ids.length) {
+        return;
+      }
+
+      if (actionData.action === "update") {
+        toast.info(
+          t("shipments.messages.bulkUpdateNotReady", {
+            defaultValue: "Bulk update is not available yet.",
+          }),
+        );
+        return;
+      }
+
+      try {
+        if (appliedKind === "cargo") {
+          if (actionData.action === "raise") {
+            await cargoBulkAction({
+              action: "up",
+              ids,
             });
+          }
 
-            return Array.from(next);
-        });
-    }, [pageIds]);
+          if (actionData.action === "delete") {
+            await cargoBulkAction({
+              action: "delete",
+              ids,
+            });
+          }
+        } else {
+          if (actionData.action === "raise") {
+            await transportBulkAction({
+              action: "up",
+              ids,
+            });
+          }
 
-    const deselectAllOnPage = useCallback(() => {
-        if (!pageIds.length) return;
+          if (actionData.action === "delete") {
+            await transportBulkAction({
+              action: "delete",
+              ids,
+            });
+          }
+        }
 
-        setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
-    }, [pageIds]);
+        toast.success(
+          actionData.action === "delete"
+            ? t("shipments.messages.orderDeleted")
+            : t("shipments.messages.orderRaised"),
+        );
 
-    const allPageSelected = useMemo(() => {
-        if (!pageIds.length) return false;
-        return pageIds.every((id) => selectedSet.has(id));
-    }, [pageIds, selectedSet]);
+        clearSelection();
+        setBulkDrawerOpen(false);
+        requestReload();
+      } catch (error: any) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("shipments.messages.bulkActionError", {
+              defaultValue: "Bulk action failed",
+            }),
+        );
+      }
+    },
+    [appliedKind, clearSelection, requestReload, selectedIds, t],
+  );
 
-    const hasAnyPageSelected = useMemo(() => {
-        if (!pageIds.length) return false;
-        return pageIds.some((id) => selectedSet.has(id));
-    }, [pageIds, selectedSet]);
+  return (
+    <Box sx={{ minHeight: "calc(100dvh - 120px)" }}>
+      <Paper
+        variant="outlined"
+        sx={{
+          p: 2.25,
+          borderRadius: "16px",
+          mb: 2,
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          bgcolor: "background.paper",
+          borderColor: "divider",
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: "12px",
+            bgcolor: "rgba(15, 95, 194, 0.08)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "primary.main",
+            flexShrink: 0,
+          }}
+        >
+          <FiCalendar size={24} />
+        </Box>
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 850,
+              color: "text.primary",
+              letterSpacing: "-0.02em",
+              mb: 0.25,
+            }}
+          >
+            {t("shipments.manage.title", "Управление моими заявками")}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "text.secondary", fontWeight: 500 }}
+          >
+            {t(
+              "shipments.manage.subtitle",
+              "Управляйте своими заявками, выбирайте несколько позиций и применяйте массовые действия",
+            )}
+          </Typography>
+        </Box>
+      </Paper>
 
-    const handleBulkSubmit = useCallback(
-        async (actionData: BulkActionPayload) => {
-            const ids = [...selectedIds];
+      <Alert severity="warning" sx={{ mb: 3, borderRadius: "12px" }}>
+        {t("shipments.autoDeleteNotice")}
+      </Alert>
 
-            if (!ids.length) {
-                return;
-            }
+      <MyShipmentsManageToolbar
+        kind={appliedKind}
+        selectedCount={selectedCount}
+        allPageSelected={allPageSelected}
+        hasAnyPageSelected={hasAnyPageSelected}
+        totalCount={totalCount}
+        onKindChange={setAppliedKind}
+        onSelectAllPage={selectAllOnPage}
+        onDeselectAllPage={deselectAllOnPage}
+        onClearSelection={clearSelection}
+        onOpenBulkActions={() => setBulkDrawerOpen(true)}
+        onFilterClick={() => setFilterDrawerOpen(true)}
+      />
 
-            if (actionData.action === "update") {
-                toast.info(
-                    t("shipments.messages.bulkUpdateNotReady", {
-                        defaultValue: "Bulk update is not available yet.",
-                    })
-                );
-                return;
-            }
+      <div key={listKey}>
+        <MyShipmentsManageList
+          kind={appliedKind}
+          filters={appliedFilters}
+          selectedIds={selectedSet}
+          onToggleSelect={toggleOne}
+          onRequestReload={requestReload}
+          onTotalChange={setTotalCount}
+          onPageIdsChange={setPageIds}
+          reloadKey={reloadKey}
+        />
+      </div>
 
-            try {
-                if (appliedKind === "cargo") {
-                    if (actionData.action === "raise") {
-                        await cargoBulkAction({
-                            action: "up",
-                            ids,
-                        });
-                    }
+      <ShipmentsFilterDrawer
+        open={filterDrawerOpen}
+        pageKey="my"
+        initialKind={appliedKind}
+        initialFilters={appliedFilters}
+        onClose={() => setFilterDrawerOpen(false)}
+        onApply={(kind, filters) => {
+          setFilterDrawerOpen(false);
+          setAppliedKind(kind);
+          setAppliedFilters(filters);
+          setSelectedIds([]);
+          setReloadKey((k) => k + 1);
+        }}
+      />
 
-                    if (actionData.action === "delete") {
-                        await cargoBulkAction({
-                            action: "delete",
-                            ids,
-                        });
-                    }
-                } else {
-                    if (actionData.action === "raise") {
-                        await transportBulkAction({
-                            action: "up",
-                            ids,
-                        });
-                    }
-
-                    if (actionData.action === "delete") {
-                        await transportBulkAction({
-                            action: "delete",
-                            ids,
-                        });
-                    }
-                }
-
-                toast.success(
-                    actionData.action === "delete"
-                        ? t("shipments.messages.orderDeleted")
-                        : t("shipments.messages.orderRaised")
-                );
-
-                clearSelection();
-                setBulkDrawerOpen(false);
-                requestReload();
-            } catch (error: any) {
-                toast.error(
-                    error?.response?.data?.message ||
-                    t("shipments.messages.bulkActionError", {
-                        defaultValue: "Bulk action failed",
-                    })
-                );
-            }
-        },
-        [appliedKind, clearSelection, requestReload, selectedIds, t]
-    );
-
-    return (
-        <>
-            <Paper
-                variant="outlined"
-                sx={{
-                    p: 2,
-                    borderRadius: 1,
-                    borderColor: "divider",
-                    mb: 2,
-                    width: "100%",
-                    boxSizing: "border-box",
-                }}
-            >
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        flexWrap: { xs: "wrap", md: "nowrap" },
-                    }}
-                >
-                    <Box
-                        sx={{
-                            width: 52,
-                            height: 52,
-                            borderRadius: 1,
-                            display: "grid",
-                            placeItems: "center",
-                            bgcolor: "rgba(68, 114, 184, 0.08)",
-                            color: "primary.main",
-                            flexShrink: 0,
-                        }}
-                    >
-                        <FiLayers size={22} />
-                    </Box>
-
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="h6" fontWeight={800} mb={0.5}>
-                            {t("shipments.manage.title", "Manage my shipments")}
-                        </Typography>
-
-                        <Typography variant="body2" color="text.secondary">
-                            {t(
-                                "shipments.manage.subtitle",
-                                "Manage your orders, select multiple items, and apply bulk actions."
-                            )}
-                        </Typography>
-                    </Box>
-
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            fontWeight: 700,
-                            color: "text.primary",
-                            minWidth: { xs: "100%", md: "auto" },
-                        }}
-                    >
-                        {t("shipments.total", { count: totalCount })}
-                    </Typography>
-                </Box>
-            </Paper>
-
-            <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
-                {t("shipments.autoDeleteNotice")}
-            </Alert>
-
-            <Stack
-                direction={{ xs: "column", md: "row" }}
-                spacing={1}
-                alignItems={{ xs: "stretch", md: "center" }}
-                justifyContent="space-between"
-                sx={{ mb: 1.5 }}
-            >
-                <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={1}
-                    alignItems={{ xs: "stretch", sm: "center" }}
-                >
-                    <Button
-                        variant="contained"
-                        startIcon={<FiSliders />}
-                        sx={{ textTransform: "none" }}
-                        onClick={() => setFilterDrawerOpen(true)}
-                    >
-                        {t("shipments.filter.button")}
-                    </Button>
-                </Stack>
-
-                <MyShipmentsManageToolbar
-                    kind={appliedKind}
-                    selectedCount={selectedCount}
-                    allPageSelected={allPageSelected}
-                    hasAnyPageSelected={hasAnyPageSelected}
-                    onKindChange={setAppliedKind}
-                    onSelectAllPage={selectAllOnPage}
-                    onDeselectAllPage={deselectAllOnPage}
-                    onClearSelection={clearSelection}
-                    onOpenBulkActions={() => setBulkDrawerOpen(true)}
-                />
-            </Stack>
-
-            <div key={listKey}>
-                <MyShipmentsManageList
-                    kind={appliedKind}
-                    filters={appliedFilters}
-                    selectedIds={selectedSet}
-                    onToggleSelect={toggleOne}
-                    onRequestReload={requestReload}
-                    onTotalChange={setTotalCount}
-                    onPageIdsChange={setPageIds}
-                    reloadKey={reloadKey}
-                />
-            </div>
-
-            <ShipmentsFilterDrawer
-                open={filterDrawerOpen}
-                pageKey="my"
-                initialKind={appliedKind}
-                initialFilters={appliedFilters}
-                onClose={() => setFilterDrawerOpen(false)}
-                onApply={(kind, filters) => {
-                    setFilterDrawerOpen(false);
-                    setAppliedKind(kind);
-                    setAppliedFilters(filters);
-                    setSelectedIds([]);
-                    setReloadKey((k) => k + 1);
-                }}
-            />
-
-            <MyShipmentsBulkActionsDrawer
-                open={bulkDrawerOpen}
-                kind={appliedKind}
-                selectedCount={selectedCount}
-                onClose={() => setBulkDrawerOpen(false)}
-                onSubmit={handleBulkSubmit}
-            />
-        </>
-    );
+      <MyShipmentsBulkActionsDrawer
+        open={bulkDrawerOpen}
+        kind={appliedKind}
+        selectedCount={selectedCount}
+        onClose={() => setBulkDrawerOpen(false)}
+        onSubmit={handleBulkSubmit}
+      />
+    </Box>
+  );
 }

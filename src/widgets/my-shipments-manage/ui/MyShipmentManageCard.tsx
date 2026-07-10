@@ -9,7 +9,6 @@ import {
     IconButton,
     Paper,
     Stack,
-    Tooltip,
     Typography,
     Menu,
     MenuItem,
@@ -26,10 +25,8 @@ import {
     FiEdit2,
     FiEye,
     FiMapPin,
-    FiPackage,
     FiRepeat,
     FiTrash2,
-    FiTruck,
     FiMoreVertical,
     FiEyeOff,
 } from "react-icons/fi";
@@ -74,18 +71,18 @@ function getUpCountValue(data: ShipmentRowData) {
     return raw ? +raw : 0;
 }
 
-export function MyShipmentManageCard({
-                                         data,
-                                         kind,
-                                         selected,
-                                         onSelect,
-                                         onUp,
-                                         onEdit,
-                                         onDelete,
-                                         onCopy,
-                                         onAutoBump,
-                                         onDeactivate,
-                                     }: Props) {
+export function MyShipmentManageCard(props: Props) {
+    const {
+        data,
+        selected,
+        onSelect,
+        onUp,
+        onEdit,
+        onDelete,
+        onCopy,
+        onAutoBump,
+        onDeactivate,
+    } = props;
     const { t, i18n } = useTranslation();
     const { findLocalizedLabel } = useLocalizedLookup();
     const { lookups, loadInit } = useInitStore();
@@ -152,212 +149,68 @@ export function MyShipmentManageCard({
     const unloadDate = data.dates?.to ?? null;
     const canEdit = data.display_type !== 'inactive'
 
-    const pointsBadgeSx = {
-        minWidth: 20,
-        height: 20,
-        px: 0.5,
-        borderRadius: "999px",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        bgcolor: "primary.main",
-        color: "primary.contrastText",
-        fontSize: 11,
-        fontWeight: 700,
-        lineHeight: 1,
-        flexShrink: 0,
-    };
 
     return (
         <Paper
             variant="outlined"
             sx={{
-                p: 2,
-                borderRadius: 1,
+                p: 3,
+                borderRadius: "16px",
                 borderColor: selected ? "primary.main" : "divider",
-                boxShadow: selected ? "0 0 0 1px rgba(25,118,210,0.15)" : "none",
-                opacity: !canEdit ? 0.5 : 1,
+                borderWidth: selected ? "2px" : "1px",
+                boxShadow: selected ? "0 4px 12px rgba(15, 95, 194, 0.08)" : "0 4px 12px rgba(0,0,0,0.02)",
+                opacity: !canEdit ? 0.6 : 1,
+                bgcolor: "background.paper",
+                transition: "border-color 0.2s, box-shadow 0.2s",
             }}
         >
-            <Stack spacing={1.5}>
-                <Grid container spacing={1.5} alignItems="flex-start">
-                    <Grid size={{ xs: 12, md: 8.5 }}>
-                        <Stack spacing={1.25}>
-                            <Stack
-                                direction="row"
-                                spacing={1}
-                                alignItems="flex-start"
-                                sx={{ width: "100%" }}
-                            >
-                                <Checkbox
-                                    checked={selected}
-                                    onChange={onSelect}
-                                    sx={{ mt: -0.5, ml: -0.5, flexShrink: 0 }}
-                                />
-
-                                <Stack spacing={1} sx={{ minWidth: 0, flex: 1 }}>
-                                    <Stack
-                                        direction="row"
-                                        spacing={1}
-                                        alignItems="center"
-                                        flexWrap="wrap"
-                                    >
-                                        <Chip
-                                            size="small"
-                                            color={kind === "cargo" ? "info" : "success"}
-                                            icon={kind === "cargo" ? <FiPackage /> : <FiTruck />}
-                                            label={
-                                                kind === "cargo"
-                                                    ? t("shipments.shipmentCard.cargo")
-                                                    : t("shipments.shipmentCard.transport")
-                                            }
-                                            sx={{ flexShrink: 0, borderRadius: 2 }}
-                                        />
-                                    </Stack>
-
-                                    <Stack
-                                        direction={{ xs: "column", sm: "row" }}
-                                        spacing={{ xs: 0.5, sm: 1.25 }}
-                                        alignItems={{ xs: "flex-start", sm: "center" }}
-                                        flexWrap="wrap"
-                                        sx={{ minWidth: 0 }}
-                                    >
-                                        <Stack
-                                            direction="row"
-                                            spacing={0.75}
-                                            alignItems="center"
-                                            sx={{
-                                                minWidth: 0,
-                                                maxWidth: { xs: "100%", md: 360, lg: 440 },
-                                                flex: "1 1 auto",
-                                            }}
-                                        >
-                                            <FiMapPin />
-
-                                            <Tooltip title={routeFrom}>
-                                                <Typography
-                                                    fontWeight={700}
-                                                    noWrap
-                                                    sx={{
-                                                        minWidth: 0,
-                                                        maxWidth: "100%",
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
-                                                        whiteSpace: "nowrap",
-                                                        lineHeight: 1.25,
-                                                        display: "block",
-                                                    }}
-                                                >
-                                                    {routeFrom}
-                                                </Typography>
-                                            </Tooltip>
-
-                                            {loadPoints.length > 1 && (
-                                                <Tooltip
-                                                    title={t("shipments.manage.pickupPointsCount", {
-                                                        count: loadPoints.length,
-                                                        defaultValue: "Pickup points: {{count}}",
-                                                    })}
-                                                >
-                                                    <Box sx={pointsBadgeSx}>
-                                                        {loadPoints.length > 99 ? "99+" : loadPoints.length}
-                                                    </Box>
-                                                </Tooltip>
-                                            )}
-                                        </Stack>
-
-                                        <Typography
-                                            color="text.secondary"
-                                            sx={{ display: { xs: "none", sm: "block" } }}
-                                        >
-                                            →
-                                        </Typography>
-
-                                        <Stack
-                                            direction="row"
-                                            spacing={0.75}
-                                            alignItems="center"
-                                            sx={{
-                                                minWidth: 0,
-                                                maxWidth: { xs: "100%", md: 360, lg: 440 },
-                                                flex: "1 1 auto",
-                                            }}
-                                        >
-                                            <FiMapPin />
-
-                                            <Tooltip title={routeTo}>
-                                                <Typography
-                                                    fontWeight={700}
-                                                    noWrap
-                                                    sx={{
-                                                        minWidth: 0,
-                                                        maxWidth: "100%",
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
-                                                        whiteSpace: "nowrap",
-                                                        lineHeight: 1.25,
-                                                        display: "block",
-                                                    }}
-                                                >
-                                                    {routeTo}
-                                                </Typography>
-                                            </Tooltip>
-
-                                            {unloadPoints.length > 1 && (
-                                                <Tooltip
-                                                    title={t("shipments.manage.dropoffPointsCount", {
-                                                        count: unloadPoints.length,
-                                                        defaultValue: "Drop-off points: {{count}}",
-                                                    })}
-                                                >
-                                                    <Box sx={pointsBadgeSx}>
-                                                        {unloadPoints.length > 99 ? "99+" : unloadPoints.length}
-                                                    </Box>
-                                                </Tooltip>
-                                            )}
-                                        </Stack>
-                                    </Stack>
-                                </Stack>
-                            </Stack>
-                        </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 3.5 }}>
-                        {canEdit && <Stack
-                            direction="row"
-                            spacing={0.5}
-                            justifyContent={{ xs: "flex-start", md: "flex-end" }}
-                            alignItems="center"
-                        >
+            <Stack spacing={2}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                    <Checkbox
+                        checked={selected}
+                        onChange={onSelect}
+                        sx={{ ml: -1 }}
+                    />
+                    
+                    {canEdit && (
+                        <>
                             <IconButton onClick={handleMenuOpen}>
                                 <FiMoreVertical />
                             </IconButton>
 
-                             <Menu
+                            <Menu
                                 anchorEl={anchorEl}
                                 open={openMenu}
                                 onClose={handleMenuClose}
-                                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                                sx={{
+                                    "& .MuiPaper-root": {
+                                        borderRadius: "12px",
+                                        boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                    }
+                                }}
                             >
                                 <MenuItem onClick={() => { handleMenuClose(); onUp(data.id); }}>
                                     <ListItemIcon><FiRepeat size={16} /></ListItemIcon>
-                                    <ListItemText>{t("shipments.shipmentCard.raiseUp")}</ListItemText>
+                                    <ListItemText>{t("shipments.shipmentCard.raiseUp", "Поднять")}</ListItemText>
                                 </MenuItem>
 
                                 <MenuItem onClick={() => { handleMenuClose(); onEdit(data.id); }}>
                                     <ListItemIcon><FiEdit2 size={16} /></ListItemIcon>
-                                    <ListItemText>{t("shipments.shipmentCard.edit")}</ListItemText>
+                                    <ListItemText>{t("shipments.shipmentCard.edit", "Редактировать")}</ListItemText>
                                 </MenuItem>
 
                                 <MenuItem onClick={() => { handleMenuClose(); onCopy(data.id); }}>
                                     <ListItemIcon><FiCopy size={16} /></ListItemIcon>
-                                    <ListItemText>{t("shipments.shipmentCard.copy")}</ListItemText>
+                                    <ListItemText>{t("shipments.shipmentCard.copy", "Копировать")}</ListItemText>
                                 </MenuItem>
 
                                 <MenuItem onClick={() => { handleMenuClose(); onAutoBump(data.id); }}>
-                                    <ListItemIcon><FiClock size={16} /></ListItemIcon>
-                                    <ListItemText>{t("listingAutoBump.actions.open", { defaultValue: "Auto bump" })}</ListItemText>
+                                    <ListItemIcon><FiCalendar size={16} /></ListItemIcon>
+                                    <ListItemText>{t("listingAutoBump.actions.open", { defaultValue: "Автоподнятие" })}</ListItemText>
                                 </MenuItem>
 
                                 <MenuItem onClick={() => { handleMenuClose(); onDeactivate(data.id); }}>
@@ -365,130 +218,122 @@ export function MyShipmentManageCard({
                                     <ListItemText>{t("shipments.shipmentCard.deactivate", { defaultValue: "Деактивировать" })}</ListItemText>
                                 </MenuItem>
 
-                                <Divider />
+                                <Divider sx={{ my: 0.5 }} />
 
-                                <MenuItem onClick={() => { handleMenuClose(); onDelete(data.id); }} sx={{ color: 'error.main' }}>
-                                    <ListItemIcon sx={{ color: 'error.main' }}><FiTrash2 size={16} /></ListItemIcon>
-                                    <ListItemText>{t("shipments.shipmentCard.delete")}</ListItemText>
+                                <MenuItem onClick={() => { handleMenuClose(); onDelete(data.id); }} sx={{ color: "error.main" }}>
+                                    <ListItemIcon sx={{ color: "error.main" }}><FiTrash2 size={16} /></ListItemIcon>
+                                    <ListItemText>{t("shipments.shipmentCard.delete", "Удалить")}</ListItemText>
                                 </MenuItem>
                             </Menu>
-                        </Stack>}
-                    </Grid>
+                        </>
+                    )}
+                </Stack>
 
-                    <Grid size={{ xs: 12 }}>
-                        <Stack
-                            direction={{ xs: "column", lg: "row" }}
-                            spacing={1}
-                            alignItems={{ xs: "stretch", lg: "center" }}
-                            justifyContent="space-between"
-                        >
-                            <Stack direction="row" gap={1} flexWrap="wrap">
-                                <Chip
-                                    size="small"
-                                    variant="outlined"
-                                    icon={<FiCalendar />}
-                                    sx={{
-                                        borderRadius: 2
-                                    }}
-                                    label={`${t("shipments.shipmentCard.load")}: ${formatDate(loadFrom)}${
-                                        loadFrom !== loadTo ? ` – ${formatDate(loadTo)}` : ""
-                                    }`}
-                                />
+                <Stack spacing={1.5}>
+                    {/* Route line */}
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <FiMapPin size={18} color="#0f5fc2" />
+                        <Typography variant="body1" fontWeight={750} sx={{ color: "text.primary" }}>
+                            {routeFrom} → {routeTo}
+                        </Typography>
+                    </Stack>
 
-                                {unloadDate && (
-                                    <Chip
-                                        size="small"
-                                        variant="outlined"
-                                        icon={<FiClock />}
-                                        sx={{
-                                            borderRadius: 2
-                                        }}
-                                        label={`${t("shipments.shipmentCard.unload")}: ${formatDate(unloadDate)}`}
-                                    />
-                                )}
-
-                                <Chip
-                                    size="small"
-                                    icon={<FiEye />}
-                                    label={t("shipments.manage.viewsCount", {
-                                        count: views,
-                                        defaultValue: "Views: {{count}}",
-                                    })}
-                                    sx={{
-                                        borderRadius: 2
-                                    }}
-                                />
-
-                                <Chip
-                                    size="small"
-                                    icon={<FiRepeat />}
-                                    label={t("shipments.manage.upCount", {
-                                        count: upCount,
-                                        defaultValue: "Raised: {{count}}",
-                                    })}
-                                    sx={{
-                                        borderRadius: 2
-                                    }}
-                                />
-
-                                <Chip
-                                    size="small"
-                                    icon={<FiClock />}
-                                    label={t("shipments.manage.updatedAt", {
-                                        value: updatedAt ? formatDate(updatedAt) : t("common.dash"),
-                                        defaultValue: "Updated: {{value}}",
-                                    })}
-                                    sx={{
-                                        borderRadius: 2
-                                    }}
-                                />
-
-                                {data.paymentType && (
-                                    <Chip
-                                        size="small"
-                                        color="success"
-                                        label={data.paymentType}
-                                    />
-                                )}
-
-                                {data.price && (
-                                    <Chip
-                                        size="small"
-                                        color="success"
-                                        variant="outlined"
-                                        label={data.price}
-                                    />
-                                )}
-                            </Stack>
-
-                            <Box>
-                                <Button
-                                    variant="contained"
-                                    size="small"
-                                    endIcon={expanded ? <FiChevronUp /> : <FiChevronDown />}
-                                    onClick={() => setExpanded((prev) => !prev)}
-                                    sx={{
-                                        textTransform: "none",
-                                        minWidth: 140,
-                                        alignSelf: { xs: "stretch", lg: "auto" },
-                                    }}
-                                >
-                                    {expanded
-                                        ? t("shipments.shipmentCard.collapse")
-                                        : t("shipments.shipmentCard.more")}
-                                </Button>
-                            </Box>
+                    {/* Date rows */}
+                    <Stack spacing={0.75}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <FiCalendar size={16} color="text.secondary" />
+                            <Typography variant="body2" color="text.secondary">
+                                {t("shipments.shipmentCard.load")}: {formatDate(loadFrom)}{loadFrom !== loadTo ? ` – ${formatDate(loadTo)}` : ""}
+                            </Typography>
                         </Stack>
-                    </Grid>
-                </Grid>
+                        {unloadDate && (
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <FiClock size={16} color="text.secondary" />
+                                <Typography variant="body2" color="text.secondary">
+                                    {t("shipments.shipmentCard.unload")}: {formatDate(unloadDate)}
+                                </Typography>
+                            </Stack>
+                        )}
+                    </Stack>
+
+                    {/* Stats chips */}
+                    <Stack direction="row" spacing={1.25} flexWrap="wrap">
+                        <Chip
+                            size="small"
+                            variant="outlined"
+                            icon={<FiEye size={14} />}
+                            label={t("shipments.manage.viewsCount", { count: views, defaultValue: `Просмотры: ${views}` })}
+                            sx={{
+                                borderRadius: "8px",
+                                bgcolor: "rgba(15, 95, 194, 0.04)",
+                                color: "primary.main",
+                                borderColor: "rgba(15, 95, 194, 0.2)",
+                                "& .MuiChip-icon": { color: "primary.main" },
+                                fontWeight: 600,
+                            }}
+                        />
+                        <Chip
+                            size="small"
+                            variant="outlined"
+                            icon={<FiRepeat size={14} />}
+                            label={t("shipments.manage.upCount", { count: upCount, defaultValue: `Поднятий: ${upCount}` })}
+                            sx={{
+                                borderRadius: "8px",
+                                bgcolor: "rgba(15, 95, 194, 0.04)",
+                                color: "primary.main",
+                                borderColor: "rgba(15, 95, 194, 0.2)",
+                                "& .MuiChip-icon": { color: "primary.main" },
+                                fontWeight: 600,
+                            }}
+                        />
+                        <Chip
+                            size="small"
+                            variant="outlined"
+                            icon={<FiClock size={14} />}
+                            label={t("shipments.manage.updatedAt", { value: updatedAt ? formatDate(updatedAt) : t("common.dash"), defaultValue: `Обновлено: ${updatedAt ? formatDate(updatedAt) : '—'}` })}
+                            sx={{
+                                borderRadius: "8px",
+                                bgcolor: "rgba(15, 95, 194, 0.04)",
+                                color: "primary.main",
+                                borderColor: "rgba(15, 95, 194, 0.2)",
+                                "& .MuiChip-icon": { color: "primary.main" },
+                                fontWeight: 600,
+                            }}
+                        />
+                    </Stack>
+                </Stack>
+
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1 }}>
+                    <Typography variant="h5" fontWeight={900} sx={{ color: "text.primary" }}>
+                        {data.price || "—"}
+                    </Typography>
+
+                    <Button
+                        variant="contained"
+                        size="small"
+                        endIcon={expanded ? <FiChevronUp /> : <FiChevronDown />}
+                        onClick={() => setExpanded((prev) => !prev)}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            borderRadius: "8px",
+                            height: 38,
+                            minWidth: 120,
+                        }}
+                    >
+                        {expanded
+                            ? t("shipments.shipmentCard.collapse", "Свернуть")
+                            : t("shipments.shipmentCard.more", "Подробнее")}
+                    </Button>
+                </Stack>
 
                 {expanded && (
                     <>
-                        <Divider />
+                        <Divider sx={{ my: 1.5 }} />
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                                    {t("shipments.shipmentCard.orderDetails")}
+                                <Typography variant="subtitle2" fontWeight={800} mb={1} color="text.primary">
+                                    {t("shipments.shipmentCard.orderDetails", "Детали заявки")}
                                 </Typography>
 
                                 <Stack spacing={0.75} color="text.secondary">
@@ -552,14 +397,14 @@ export function MyShipmentManageCard({
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                                    {t("userReviews.form.routeTitle")}
+                                <Typography variant="subtitle2" fontWeight={800} mb={1} color="text.primary">
+                                    {t("userReviews.form.routeTitle", "Маршрут")}
                                 </Typography>
 
                                 <Stack spacing={1.25}>
                                     <Box>
-                                        <Typography variant="body2" fontWeight={700} mb={0.5}>
-                                            {t("shipments.shipmentCard.load")}
+                                        <Typography variant="body2" fontWeight={700} mb={0.5} color="text.primary">
+                                            {t("shipments.shipmentCard.load", "Загрузка")}
                                         </Typography>
 
                                         <Stack spacing={0.5}>
@@ -582,8 +427,8 @@ export function MyShipmentManageCard({
                                     </Box>
 
                                     <Box>
-                                        <Typography variant="body2" fontWeight={700} mb={0.5}>
-                                            {t("shipments.shipmentCard.unload")}
+                                        <Typography variant="body2" fontWeight={700} mb={0.5} color="text.primary">
+                                            {t("shipments.shipmentCard.unload", "Разгрузка")}
                                         </Typography>
 
                                         <Stack spacing={0.5}>
@@ -608,9 +453,9 @@ export function MyShipmentManageCard({
                             </Grid>
 
                             {data.note && (
-                                <Grid size={{ xs: 12 }}>
-                                    <Typography variant="subtitle2" fontWeight={700} mb={0.5}>
-                                        {t("shipments.shipmentCard.additionalInfo")}
+                                <Grid size={{ xs: 12 }} sx={{ mt: 1 }}>
+                                    <Typography variant="subtitle2" fontWeight={800} mb={0.5} color="text.primary">
+                                        {t("shipments.shipmentCard.additionalInfo", "Дополнительная информация")}
                                     </Typography>
 
                                     <Typography variant="body2" color="text.secondary">

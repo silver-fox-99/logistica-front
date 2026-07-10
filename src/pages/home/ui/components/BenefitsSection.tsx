@@ -48,7 +48,7 @@ export default function BenefitsSection() {
         </Box>
       </Stack>
 
-      <Grid container spacing={6} alignItems="center">
+      <Grid container spacing={6} alignItems="stretch">
         {/* Левая колонка: Список преимуществ */}
         <Grid size={{ xs: 12, md: 7 }}>
           <Grid container spacing={4}>
@@ -174,7 +174,7 @@ export default function BenefitsSection() {
 
         {/* Правая колонка: Сетка изображений и плашка "Наша цель" */}
         <Grid size={{ xs: 12, md: 5 }}>
-          <Stack spacing={2.5}>
+          <Stack spacing={2.5} sx={{ height: "100%", justifyContent: "space-between" }}>
             {/* Верхняя большая картинка */}
             <Box
               component="img"
@@ -182,19 +182,20 @@ export default function BenefitsSection() {
               alt="White truck on road"
               sx={{
                 width: "100%",
-                height: 240,
+                flex: "1.2 1 200px",
+                minHeight: 180,
                 objectFit: "cover",
                 borderRadius: "20px",
               }}
             />
 
             {/* Второй ряд: Блок "Наша цель" + Картинка с водителем */}
-            <Grid container spacing={2.5}>
+            <Grid container spacing={2.5} sx={{ flex: "1 1 180px", minHeight: 160 }}>
               <Grid size={6}>
                 <Box
                   sx={{
                     width: "100%",
-                    height: 200,
+                    height: "100%",
                     bgcolor: "#031A30", // Глубокий темно-синий цвет из дизайна
                     borderRadius: "20px",
                     p: 3,
@@ -232,7 +233,7 @@ export default function BenefitsSection() {
                   alt="Driver with tablet"
                   sx={{
                     width: "100%",
-                    height: 200,
+                    height: "100%",
                     objectFit: "cover",
                     borderRadius: "20px",
                   }}
@@ -247,7 +248,8 @@ export default function BenefitsSection() {
               alt="Industrial seaport cargo"
               sx={{
                 width: "100%",
-                height: 200,
+                flex: "1 1 180px",
+                minHeight: 160,
                 objectFit: "cover",
                 borderRadius: "20px",
               }}

@@ -18,10 +18,8 @@ import {
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import {
-  FiShield,
   FiUser,
   FiCreditCard,
-  FiHelpCircle,
   FiLogOut,
   FiSearch,
   FiAward,
@@ -29,9 +27,10 @@ import {
   FiChevronDown,
   FiChevronRight,
   FiList,
-  FiUsers,
   FiBriefcase,
-  FiEdit3,
+  FiLock,
+  FiHeadphones,
+  FiCalendar,
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
@@ -53,15 +52,16 @@ import { ScrollToTop } from "@/shared/lib/scrollToTop";
 // Стилизация кнопок бокового меню под новый дизайн
 const sidebarButtonStyles = {
   borderRadius: "10px",
-  mb: 1,
-  py: 1.25,
+  mb: 0.25,
+  py: 0.75,
+  px: 1.5,
   color: "text.secondary",
   transition: "all 0.2s ease-in-out",
   "& .MuiListItemIcon-root": {
     color: "text.secondary",
-    minWidth: "40px",
+    minWidth: "34px",
     fontSize: "1.2rem",
-    transition: "color 0.2s ease-in-out",
+    transition: "all 0.2s ease-in-out",
   },
   "& .MuiListItemText-primary": {
     fontWeight: 500,
@@ -72,6 +72,7 @@ const sidebarButtonStyles = {
     color: "primary.main",
     "& .MuiListItemIcon-root": {
       color: "primary.main",
+      transform: "translateX(3px)",
     },
   },
   "&.active": {
@@ -81,7 +82,7 @@ const sidebarButtonStyles = {
       color: "primary.main",
     },
     "& .MuiListItemText-primary": {
-      fontWeight: 600,
+      fontWeight: 650,
     },
   },
 };
@@ -140,11 +141,6 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       label: t("dashboard.menu.company"),
     },
     {
-      to: "/dashboard/staff",
-      icon: <FiUsers />,
-      label: t("dashboard.menu.staff"),
-    },
-    {
       to: "/dashboard/payments",
       icon: <FiCreditCard />,
       label: t("dashboard.menu.payments"),
@@ -156,7 +152,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
     },
     {
       to: "/dashboard/requests",
-      icon: <FiEdit3 />,
+      icon: <FiCalendar />,
       label: t("dashboard.menu.myOrders"),
     },
   ];
@@ -164,12 +160,12 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
   const bottomNav = [
     {
       to: "/dashboard/security",
-      icon: <FiShield />,
+      icon: <FiLock />,
       label: t("dashboard.menu.security"),
     },
     {
       to: "/dashboard/help",
-      icon: <FiHelpCircle />,
+      icon: <FiHeadphones />,
       label: t("dashboard.menu.helpSupport"),
     },
   ];
@@ -198,7 +194,17 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
               : "transparent",
             color: isTendersActive ? "primary.main" : "text.secondary",
             "& .MuiListItemIcon-root": {
+              minWidth: "34px",
               color: isTendersActive ? "primary.main" : "text.secondary",
+              transition: "all 0.2s ease-in-out",
+            },
+            "&:hover": {
+              bgcolor: "rgba(15, 95, 194, 0.04)",
+              color: "primary.main",
+              "& .MuiListItemIcon-root": {
+                color: "primary.main",
+                transform: "translateX(3px)",
+              },
             },
           }}
         >
@@ -233,7 +239,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       </List>
 
       {/* Блок целевых кнопок (Добавить груз/транспорт) */}
-      <Stack mt={2} mb={1} spacing={1}>
+      <Stack mt={1.5} mb={0.5} spacing={0.75}>
         <Button
           variant="outlined"
           fullWidth
@@ -242,10 +248,11 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
           startIcon={<Add />}
           onClick={onItemClick}
           sx={{
-            height: "42px",
-            borderRadius: "12px",
-            fontWeight: 600,
+            height: "40px",
+            borderRadius: "8px",
+            fontWeight: 700,
             fontSize: "0.9rem",
+            textTransform: "none",
             borderColor: "primary.main",
             color: "primary.main",
             "&:hover": {
@@ -264,10 +271,11 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
           startIcon={<Add />}
           onClick={onItemClick}
           sx={{
-            height: "42px",
-            borderRadius: "12px",
-            fontWeight: 600,
+            height: "40px",
+            borderRadius: "8px",
+            fontWeight: 700,
             fontSize: "0.9rem",
+            textTransform: "none",
             borderColor: "primary.main",
             color: "primary.main",
             "&:hover": {
@@ -280,7 +288,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
         </Button>
       </Stack>
 
-      <Divider sx={{ my: 2, borderColor: "divider" }} />
+      <Divider sx={{ my: 1.5, borderColor: "divider" }} />
 
       <List disablePadding>
         {user?.is_admin && (
@@ -292,8 +300,17 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             sx={{
               ...sidebarButtonStyles,
               color: "error.main",
-              "& .MuiListItemIcon-root": { color: "error.main" },
-              "&:hover": { bgcolor: "error.lighter" },
+              "& .MuiListItemIcon-root": {
+                minWidth: "34px",
+                color: "error.main",
+                transition: "all 0.2s ease-in-out",
+              },
+              "&:hover": {
+                bgcolor: "error.lighter",
+                "& .MuiListItemIcon-root": {
+                  transform: "translateX(3px)",
+                },
+              },
             }}
           >
             <ListItemIcon>
@@ -317,12 +334,15 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             mt: 1,
             color: "error.main",
             "& .MuiListItemIcon-root": {
+              minWidth: "34px",
               color: "error.main",
-              transition: "transform 0.2s",
+              transition: "all 0.2s ease-in-out",
             },
             "&:hover": {
               bgcolor: "rgba(211, 47, 47, 0.04)",
-              "& .MuiListItemIcon-root": { transform: "translateX(3px)" },
+              "& .MuiListItemIcon-root": {
+                transform: "translateX(3px)",
+              },
             },
           }}
         >
@@ -427,7 +447,7 @@ export default function DashboardLayout() {
               <Paper
                 elevation={0}
                 sx={{
-                  p: 2.5,
+                  p: 2,
                   width: 280,
                   flexShrink: 0,
                   borderRadius: "16px",

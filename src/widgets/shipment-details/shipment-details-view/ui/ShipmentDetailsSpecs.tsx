@@ -6,6 +6,16 @@ import type { ShipmentRowData, ShipmentsKind } from "@/entities/shipment/model/t
 import { ShipmentDetailsSection } from "./ShipmentDetailsSection";
 import { useInitStore } from "@/shared/store/initStore";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
+import { 
+    FiTruck, 
+    FiPackage, 
+    FiLayers, 
+    FiActivity, 
+    FiGrid, 
+    FiMaximize, 
+    FiCreditCard, 
+    FiPercent
+} from "react-icons/fi";
 
 type Props = {
     data: ShipmentRowData;
@@ -113,6 +123,35 @@ export function ShipmentDetailsSpecs({ data, kind }: Props) {
 
     const rows = kind === "cargo" ? cargoRows : transportRows;
 
+    const getSpecIcon = (lbl: string) => {
+        const lower = lbl.toLowerCase();
+        if (lower.includes("транспорт") || lower.includes("vehicle") || lower.includes("машин") || lower.includes("cars")) {
+            return <FiTruck size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("груз") || lower.includes("cargo")) {
+            return <FiPackage size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("загруз") || lower.includes("load")) {
+            return <FiLayers size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("вес") || lower.includes("weight") || lower.includes("грузопод") || lower.includes("capacity")) {
+            return <FiActivity size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("паллет") || lower.includes("pallet") || lower.includes("кол-во") || lower.includes("count")) {
+            return <FiGrid size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("размер") || lower.includes("dimension") || lower.includes("dims")) {
+            return <FiMaximize size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("оплат") || lower.includes("payment") || lower.includes("расчет")) {
+            return <FiCreditCard size={18} color="#0f5fc2" />;
+        }
+        if (lower.includes("торг") || lower.includes("bargain")) {
+            return <FiPercent size={18} color="#0f5fc2" />;
+        }
+        return <FiPackage size={18} color="#0f5fc2" />;
+    };
+
     if (!rows.length) return null;
 
     return (
@@ -128,19 +167,36 @@ export function ShipmentDetailsSpecs({ data, kind }: Props) {
                     <Grid key={label} size={{ xs: 12, sm: 6, lg: 4 }}>
                         <Box
                             sx={{
-                                p: 1.25,
-                                borderRadius: 1.5,
+                                p: 1.5,
+                                borderRadius: "8px",
                                 bgcolor: "background.default",
                                 border: "1px solid",
                                 borderColor: "divider",
                                 minHeight: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1.5,
                             }}
                         >
-                            <Stack spacing={0.5}>
-                                <Typography variant="caption" color="text.secondary">
+                            <Box
+                                sx={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: "8px",
+                                    bgcolor: "rgba(15, 95, 194, 0.06)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {getSpecIcon(label)}
+                            </Box>
+                            <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 550 }}>
                                     {label}
                                 </Typography>
-                                <Typography variant="body2" fontWeight={700}>
+                                <Typography variant="body2" fontWeight={800} sx={{ color: "text.primary" }}>
                                     {value}
                                 </Typography>
                             </Stack>

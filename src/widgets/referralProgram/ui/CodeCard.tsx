@@ -35,7 +35,7 @@ function CopyRow({ label, value, onCopy, compact = false }: CopyRowProps) {
                     p: compact ? 1 : 1.25,
                     border: "1px solid",
                     borderColor: "divider",
-                    borderRadius: 2,
+                    borderRadius: "8px",
                     bgcolor: "background.paper",
                 }}
             >
@@ -101,7 +101,16 @@ function CodeCardBase({ codeInfo }: Props) {
     };
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 2.25 }, borderRadius: 3 }}>
+        <Paper
+            variant="outlined"
+            sx={{
+                p: { xs: 2, md: 2.25 },
+                borderRadius: "16px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                bgcolor: "background.paper",
+                borderColor: "divider",
+            }}
+        >
             <Stack spacing={1.5}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
                     <Stack direction="row" alignItems="center" gap={1}>
@@ -111,8 +120,9 @@ function CodeCardBase({ codeInfo }: Props) {
                                 placeItems: "center",
                                 width: 36,
                                 height: 36,
-                                borderRadius: 2,
-                                bgcolor: "rgba(0,0,0,0.04)",
+                                borderRadius: "8px",
+                                bgcolor: "rgba(15, 95, 194, 0.08)",
+                                color: "primary.main",
                                 flexShrink: 0,
                             }}
                         >

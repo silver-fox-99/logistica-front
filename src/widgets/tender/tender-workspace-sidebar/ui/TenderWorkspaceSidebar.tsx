@@ -5,15 +5,16 @@ import { useTranslation } from "react-i18next";
 
 const sidebarButtonStyles = {
   borderRadius: "10px",
-  mb: 1,
-  py: 1.25,
+  mb: 0.25,
+  py: 0.75,
+  px: 1.5,
   color: "text.secondary",
   transition: "all 0.2s ease-in-out",
   "& .MuiListItemIcon-root": {
     color: "text.secondary",
-    minWidth: "40px",
+    minWidth: "34px",
     fontSize: "1.2rem",
-    transition: "color 0.2s ease-in-out",
+    transition: "all 0.2s ease-in-out",
   },
   "& .MuiListItemText-primary": {
     fontWeight: 500,
@@ -24,6 +25,7 @@ const sidebarButtonStyles = {
     color: "primary.main",
     "& .MuiListItemIcon-root": {
       color: "primary.main",
+      transform: "translateX(3px)",
     },
   },
   "&.active": {
@@ -33,7 +35,7 @@ const sidebarButtonStyles = {
       color: "primary.main",
     },
     "& .MuiListItemText-primary": {
-      fontWeight: 600,
+      fontWeight: 650,
     },
   },
 };

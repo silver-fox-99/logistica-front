@@ -141,6 +141,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: "8px",
+        },
+      },
+    },
     MuiTab: {
       styleOverrides: {
         root: {

@@ -31,7 +31,7 @@ export function ShipmentDetailsGallery({ images }: Props) {
                             width: "100%",
                             height: { xs: 200, md: 220 },
                             objectFit: "cover",
-                            borderRadius: 1.5,
+                            borderRadius: "8px",
                             border: "1px solid",
                             borderColor: "divider",
                             display: "block",

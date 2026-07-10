@@ -59,8 +59,17 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
     );
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 2.25 }, borderRadius: 3 }}>
-            <Tabs value={tab} onChange={onTabChange} sx={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
+        <Paper
+            variant="outlined"
+            sx={{
+                p: { xs: 2, md: 2.25 },
+                borderRadius: "16px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                bgcolor: "background.paper",
+                borderColor: "divider",
+            }}
+        >
+            <Tabs value={tab} onChange={onTabChange} sx={{ borderBottom: "1px solid rgba(0,0,0,0.08)", mb: 3 }}>
                 <Tab label={t("referralProgram.tabs.overview")} />
                 <Tab label={t("referralProgram.tabs.invitedUsers")} />
                 <Tab label={t("referralProgram.tabs.earningsHistory")} />
@@ -70,7 +79,7 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
             {/* OVERVIEW */}
             <TabPanel value={tab} index={0}>
                 <Stack spacing={2}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "12px", bgcolor: "background.default" }}>
                         <Typography fontWeight={800} sx={{ mb: 1 }}>
                             {t("referralProgram.overview.howItWorks.title")}
                         </Typography>
@@ -81,7 +90,7 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                         </Stack>
                     </Paper>
 
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "12px" }}>
                         <Typography fontWeight={800} sx={{ mb: 1 }}>
                             {t("referralProgram.overview.recentEarnings.title")}
                         </Typography>
@@ -152,7 +161,7 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                                             label={statusLabel(r.status)}
                                             color={statusChipColor(r.status)}
                                             variant="outlined"
-                                            sx={{ borderRadius: 2 }}
+                                            sx={{ borderRadius: "8px" }}
                                         />
                                     </TableCell>
                                     <TableCell>{r.rewarded_at ? formatDate(r.rewarded_at) : t("common.dash")}</TableCell>
@@ -188,7 +197,7 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                                             label={statusLabel(r.status)}
                                             color={statusChipColor(r.status)}
                                             variant="outlined"
-                                            sx={{ borderRadius: 2 }}
+                                            sx={{ borderRadius: "8px" }}
                                         />
                                     </TableCell>
                                     <TableCell>
@@ -196,7 +205,7 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
                                             size="small"
                                             label={reasonLabel((r as any).reason)}
                                             variant="outlined"
-                                            sx={{ borderRadius: 2 }}
+                                            sx={{ borderRadius: "8px" }}
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -209,21 +218,21 @@ function ReferralTabsBase({ invitedUsers, recentEarnings }: Props) {
             {/* FAQ */}
             <TabPanel value={tab} index={3}>
                 <Stack spacing={1}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "12px" }}>
                         <Typography fontWeight={800}>{t("referralProgram.faq.q1.title")}</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
                             {t("referralProgram.faq.q1.text")}
                         </Typography>
                     </Paper>
 
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "12px" }}>
                         <Typography fontWeight={800}>{t("referralProgram.faq.q2.title")}</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
                             {t("referralProgram.faq.q2.text")}
                         </Typography>
                     </Paper>
 
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "12px" }}>
                         <Typography fontWeight={800}>{t("referralProgram.faq.q3.title")}</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.85, mt: 0.5 }}>
                             {t("referralProgram.faq.q3.text")}

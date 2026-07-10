@@ -338,7 +338,7 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
                 justifyContent="space-between"
                 sx={{ mt: 2, gap: 1.5 }}
             >
-                <FormControl size="small" sx={{ minWidth: 120 }}>
+                <FormControl size="small" sx={{ minWidth: 120, "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}>
                     <InputLabel id="shipments-limit-label">
                         {t("shipments.actions.perPage", { defaultValue: "Per page" })}
                     </InputLabel>
@@ -347,6 +347,7 @@ export const MyShipmentsManageList = React.memo(function MyShipmentsManageList({
                         value={limit}
                         label={t("shipments.actions.perPage", { defaultValue: "Per page" })}
                         onChange={(event) => setLimit(Number(event.target.value))}
+                        sx={{ borderRadius: "8px" }}
                     >
                         <MenuItem value={5}>5</MenuItem>
                         <MenuItem value={10}>10</MenuItem>

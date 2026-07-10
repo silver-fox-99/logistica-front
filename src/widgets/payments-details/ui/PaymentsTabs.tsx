@@ -41,9 +41,9 @@ export const PaymentsTabs: React.FC<Props> = ({
     const [tab, setTab] = useState(0);
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 3 }}>
-            <CardContent>
-                <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+        <Card variant="outlined" sx={{ borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+            <CardContent sx={{ p: 3 }}>
+                <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3 }}>
                     <Tab label={t("paymentsNew.tabs.limits", "Limits")} />
                     <Tab label={t("paymentsNew.tabs.history", "History")} />
                     <Tab label={t("paymentsNew.tabs.invoices", "Invoices")} />

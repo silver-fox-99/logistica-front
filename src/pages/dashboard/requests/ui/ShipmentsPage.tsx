@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Box, Button, Paper, Stack, Typography} from "@mui/material";
-import { FiSliders } from "react-icons/fi";
+import { FiSliders, FiPackage, FiTruck } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
@@ -79,99 +79,204 @@ export default function ShipmentsListPage({ scope }: Props) {
     const [reloadKey, setReloadKey] = useState(0);
     const requestReload = useCallback(() => setReloadKey((k) => k + 1), []);
 
+    const handleToggleKind = useCallback((kind: ShipmentsKind) => {
+        setAppliedKind(kind);
+        try {
+            const stored = localStorage.getItem("shipments:filters:drawer-form");
+            const parsed = stored ? JSON.parse(stored) : {};
+            parsed.kind = kind;
+            localStorage.setItem("shipments:filters:drawer-form", JSON.stringify(parsed));
+        } catch {}
+        setReloadKey((k) => k + 1);
+    }, []);
+
     const listKey = useMemo(() => {
         return `${appliedKind}-${JSON.stringify(appliedFilters)}`;
     }, [appliedKind, appliedFilters]);
 
     return (
         <>
+            {/* 1. Headline Card */}
             <Paper
                 variant="outlined"
                 sx={{
-                    p: 2,
-                    borderRadius: 2,
+                    p: 2.5,
+                    borderRadius: "16px",
                     borderColor: "divider",
                     mb: 2,
                     width: "100%",
                     boxSizing: "border-box",
                 }}
             >
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        flexWrap: { xs: "wrap", sm: "nowrap" },
-                    }}
-                >
-                    <Box className="shipments-page__icon">
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: 48,
+                            height: 48,
+                            borderRadius: "50%",
+                            bgcolor: "#EEF4F7",
+                            color: "primary.main",
+                            flexShrink: 0
+                        }}
+                    >
                         <svg
-                            width="42"
-                            height="42"
-                            viewBox="0 0 42 42"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         >
-                            <circle cx="20.833" cy="20.833" r="20.833" fill="#EEF4F7" />
-                            <circle cx="18" cy="18" r="6" stroke="#4472B8" strokeWidth="2.5" fill="none" />
-                            <path d="M24 24L28 28" stroke="#4472B8" strokeWidth="2.5" strokeLinecap="round" />
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                     </Box>
 
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" mb={1} className="shipments-page__title">
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 800,
+                                fontSize: "1.25rem",
+                                color: "#0c2340",
+                                mb: 0.5
+                            }}
+                        >
                             {scope === "my"
                                 ? t("shipments.myShipments.title")
-                                : t("shipments.myShipments.searchTitle")}
+                                : t("shipments.myShipments.searchTitle", "Поиск заявок")}
                         </Typography>
                         <Typography
                             variant="body2"
                             color="text.secondary"
-                            mb={2}
-                            className="shipments-page__subtitle"
+                            sx={{
+                                fontWeight: 500,
+                                fontSize: "0.9rem"
+                            }}
                         >
                             {scope === "my"
                                 ? t("shipments.myShipments.description")
-                                : t("shipments.myShipments.searchDescription")}
+                                : t("shipments.myShipments.searchDescription", "Найдите подходящие заказы от других пользователей")}
                         </Typography>
                     </Box>
-
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            fontWeight: 600,
-                            color: "text.primary",
-                            textAlign: "right",
-                            minWidth: { xs: "100%", sm: "auto" },
-                            alignSelf: { xs: "flex-start", sm: "center" },
-                        }}
-                    >
-                        {t("shipments.total", { count: totalCount })}
-                    </Typography>
                 </Box>
             </Paper>
 
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={1}
-                alignItems={{ xs: "stretch", sm: "center" }}
-                justifyContent="space-between"
-                sx={{ mb: 1, width: "100%" }}
-            >
-                <Button
-                    variant="contained"
-                    startIcon={<FiSliders />}
-                    sx={{ textTransform: "none", width: { xs: "100%", sm: "auto" } }}
-                    onClick={() => setDrawerOpen(true)}
-                >
-                    {t("shipments.filter.button")}
-                </Button>
-            </Stack>
-
+            {/* 2. Banner */}
             <PublicPlacementBanner
                 page="/dashboard/search"
                 placementKey="top-list"
             />
+
+            {/* 3. Controls / Filters */}
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    mt: 2.5,
+                    mb: 2,
+                    width: "100%",
+                    boxSizing: "border-box",
+                }}
+            >
+                {/* Left Side: Cargo / Transport Toggle Buttons */}
+                <Box
+                    sx={{
+                        display: "inline-flex",
+                        bgcolor: "#f1f3f5", // Light grey background for the container
+                        p: 0.5,
+                        borderRadius: "12px",
+                        border: "1px solid",
+                        borderColor: "divider",
+                    }}
+                >
+                    <Button
+                        onClick={() => handleToggleKind("cargo")}
+                        startIcon={<FiPackage size={16} />}
+                        sx={{
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            px: 3,
+                            py: 1,
+                            bgcolor: appliedKind === "cargo" ? "background.paper" : "transparent",
+                            color: appliedKind === "cargo" ? "primary.main" : "text.secondary",
+                            boxShadow: appliedKind === "cargo" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                            border: appliedKind === "cargo" ? "1px solid" : "1px solid transparent",
+                            borderColor: appliedKind === "cargo" ? "divider" : "transparent",
+                            "&:hover": {
+                                bgcolor: appliedKind === "cargo" ? "background.paper" : "rgba(0,0,0,0.03)",
+                            }
+                        }}
+                    >
+                        {t("shipments.shipmentCard.cargo", "Груз")}
+                    </Button>
+                    <Button
+                        onClick={() => handleToggleKind("transport")}
+                        startIcon={<FiTruck size={16} />}
+                        sx={{
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            px: 3,
+                            py: 1,
+                            bgcolor: appliedKind === "transport" ? "background.paper" : "transparent",
+                            color: appliedKind === "transport" ? "primary.main" : "text.secondary",
+                            boxShadow: appliedKind === "transport" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                            border: appliedKind === "transport" ? "1px solid" : "1px solid transparent",
+                            borderColor: appliedKind === "transport" ? "divider" : "transparent",
+                            "&:hover": {
+                                bgcolor: appliedKind === "transport" ? "background.paper" : "rgba(0,0,0,0.03)",
+                            }
+                        }}
+                    >
+                        {t("shipments.shipmentCard.transport", "Транспорт")}
+                    </Button>
+                </Box>
+
+                {/* Right Side: Filter button and Total Count */}
+                <Stack direction="row" alignItems="center" spacing={2} sx={{ ml: "auto" }}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setDrawerOpen(true)}
+                        startIcon={<FiSliders size={16} />}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            px: 2.5,
+                            py: 1,
+                            borderRadius: "8px",
+                            borderColor: "primary.main",
+                            color: "primary.main",
+                            "&:hover": {
+                                borderColor: "primary.dark",
+                                bgcolor: "rgba(25, 118, 210, 0.04)",
+                            }
+                        }}
+                    >
+                        {t("shipments.filter.button", "Фильтр")}
+                    </Button>
+
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            fontWeight: 750,
+                            color: "text.primary",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {t("shipments.total", { count: totalCount })}
+                    </Typography>
+                </Stack>
+            </Box>
 
             <div key={listKey}>
                 <ShipmentsListBody

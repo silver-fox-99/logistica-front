@@ -5,11 +5,11 @@ import ProfileOverviewCard from "@/features/profile/ui/ProfileOverviewCard.tsx";
 import ContactInfoCard, { type ContactInfo } from "@/features/profile/ui/ContactInfoCard.tsx";
 import ProfileMembershipHistoryCard from "@/features/profile/ui/ProfileMembershipHistoryCard.tsx";
 import { useUserStore } from "@/entities/user/model/user.store.ts";
-import { useTariffStore } from "@/entities/tariff/model/tariff.store";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { profileApi } from "@/shared/api/profileApi.ts";
 import { userReviewsApi } from "@/shared/api/userReviewsApi.ts";
 import { companiesApi } from "@/shared/api/companiesApi.ts";
+import { shipmentsApi } from "@/shared/api/shipmentsApi.ts";
 import type { UserReview } from "@/entities/user-reviews/model/types";
 import { formatDate } from "@/shared/utils/formatDate.ts";
 import type {CompanyMembershipHistoryItem} from "@/entities/company/model/types.ts";
@@ -17,7 +17,6 @@ import type {CompanyMembershipHistoryItem} from "@/entities/company/model/types.
 export default function ProfilePage() {
     const user = useUserStore((s) => s.user);
     const setUser = useUserStore((s) => s.setUser);
-    const activeSubscription = useTariffStore((s) => s.activeSubscription);
     const { t } = useTranslation();
 
     const [selfReviews, setSelfReviews] = useState<UserReview[]>([]);
@@ -26,18 +25,17 @@ export default function ProfilePage() {
     const [membershipHistory, setMembershipHistory] = useState<CompanyMembershipHistoryItem[]>([]);
     const [membershipHistoryLoading, setMembershipHistoryLoading] = useState(false);
 
-    const userDate = useMemo(() => {
-        if (!user?.created_at) return t("profile.overview.unknown");
+    const [totalCargoCount, setTotalCargoCount] = useState(0);
+    const [totalTransportCount, setTotalTransportCount] = useState(0);
 
-        return (
-            new Date(user.created_at).toLocaleString("en-GB", {
-                dateStyle: "medium",
-                timeStyle: "short",
-                hour12: false,
-                timeZone: "UTC",
-            }) + ` (${t("profile.overview.utcTimezone")})`
-        );
-    }, [t, user?.created_at]);
+    const userDate = useMemo(() => {
+        if (!user?.created_at) return "—";
+        const dt = new Date(user.created_at);
+        const dd = String(dt.getDate()).padStart(2, "0");
+        const mm = String(dt.getMonth() + 1).padStart(2, "0");
+        const yyyy = dt.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    }, [user?.created_at]);
 
     const loadSelfReviews = useCallback(async () => {
         if (!user?.id) {
@@ -80,14 +78,26 @@ export default function ProfilePage() {
         }
     }, [t, user?.id]);
 
+    const loadTotalShipments = useCallback(async () => {
+        try {
+            const [cargoRes, transportRes] = await Promise.all([
+                shipmentsApi.list("cargo", "my", { page: 1, limit: 1 }),
+                shipmentsApi.list("transport", "my", { page: 1, limit: 1 }),
+            ]);
+            setTotalCargoCount(cargoRes.total || 0);
+            setTotalTransportCount(transportRes.total || 0);
+        } catch {}
+    }, []);
+
     const loadProfileExtras = useCallback(async () => {
         if (!user?.id) return;
 
         await Promise.all([
             loadSelfReviews(),
             loadMembershipHistory(),
+            loadTotalShipments(),
         ]);
-    }, [loadMembershipHistory, loadSelfReviews, user?.id]);
+    }, [loadMembershipHistory, loadSelfReviews, loadTotalShipments, user?.id]);
 
     useEffect(() => {
         void loadProfileExtras();
@@ -99,45 +109,9 @@ export default function ProfilePage() {
         return selfReviews.length ? sum / selfReviews.length : null;
     }, [selfReviews]);
 
-    const overviewRatings = useMemo(() => {
-        const fallback =
-            (user as any)?.rating ??
-            (user as any)?.rating_value ??
-            (user as any)?.reviews_rating ??
-            null;
-        const value = avgRating ?? (fallback != null ? Number(fallback) : null);
-        return value != null ? [{ label: "★", value, color: "success" as const }] : [];
-    }, [avgRating, user]);
-
-    const planLabel =
-        activeSubscription?.plan?.name ??
-        activeSubscription?.plan?.code ??
-        (activeSubscription
-            ? t("profile.overview.activePlan")
-            : t("profile.overview.freePlan"));
-
     const baseName =
         [user?.first_name, user?.last_name].filter(Boolean).join(" ").trim() ||
         t("profile.overview.unknown");
-
-    const fullNameWithPlan = `${baseName} (${planLabel})`;
-
-    const subscriptionExpiresAt = useMemo(() => {
-        if (!activeSubscription) return null;
-        if (activeSubscription.lifetime) {
-            return t("profile.overview.lifetime", "бессрочно");
-        }
-        if (!activeSubscription.ends_at) return null;
-
-        const dt = new Date(activeSubscription.ends_at);
-        return dt.toLocaleDateString("ru-RU", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    }, [activeSubscription, t]);
 
     const updateUser = async (
         values: ContactInfo & { phoneMainE164?: string; phoneAltE164?: string }
@@ -149,10 +123,12 @@ export default function ProfilePage() {
                 email: values.email,
                 phone: values.phoneMainE164,
                 meta: {
+                    ...user?.meta,
                     geo: values.geo,
                     phoneAlt: values.phoneAltE164,
                     telegram: values.telegram,
                     whatsapp: values.whatsapp,
+                    isPublic: values.isPublic,
                 },
             };
 
@@ -165,14 +141,22 @@ export default function ProfilePage() {
         }
     };
 
+    const ratingFallback =
+        avgRating ??
+        (user as any)?.rating ??
+        (user as any)?.rating_value ??
+        (user as any)?.reviews_rating ??
+        4.7;
+
     return (
         <Stack spacing={3}>
             <ProfileOverviewCard
-                fullName={fullNameWithPlan}
-                location={user?.meta?.geo || t("profile.overview.unknown")}
-                registeredAt={userDate || t("profile.overview.unknown")}
-                subscriptionExpiresAt={subscriptionExpiresAt}
-                ratings={overviewRatings}
+                fullName={baseName}
+                location={user?.meta?.geo || "—"}
+                registeredAt={userDate}
+                ratingValue={ratingFallback}
+                reviewsCount={selfReviews.length}
+                requestsCount={totalCargoCount + totalTransportCount}
             />
 
             <ProfileMembershipHistoryCard
@@ -192,6 +176,7 @@ export default function ProfilePage() {
                     email: user?.email || "",
                     phoneVerified: !!user?.phone_verified_at,
                     emailVerified: !!user?.email_verified_at,
+                    isPublic: user?.meta?.isPublic ?? true,
                 }}
                 saving={false}
                 onSave={updateUser}
@@ -199,15 +184,35 @@ export default function ProfilePage() {
 
             <Paper
                 variant="outlined"
-                sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}
+                sx={{
+                    p: 3,
+                    borderRadius: "16px",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                }}
             >
                 <Stack spacing={2}>
                     <Stack spacing={0.5}>
-                        <Typography variant="h6" fontWeight={700}>
-                            {t("profile.reviews.title")}
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 800,
+                                fontSize: "1.25rem",
+                                color: "#0c2340",
+                                mb: 0.5
+                            }}
+                        >
+                            {t("profile.reviews.title", "Отзывы о вас")}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {t("profile.reviews.description")}
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                                fontWeight: 500,
+                                fontSize: "0.9rem"
+                            }}
+                        >
+                            {t("profile.reviews.description", "Здесь отображаются опубликованные отзывы других пользователей")}
                         </Typography>
                     </Stack>
 
@@ -218,13 +223,13 @@ export default function ProfilePage() {
                     )}
 
                     {!selfReviewsLoading && selfReviews.length === 0 && (
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
                             {t("profile.reviews.empty")}
                         </Typography>
                     )}
 
                     {!selfReviewsLoading && selfReviews.length > 0 && (
-                        <Stack spacing={2.5}>
+                        <Stack spacing={2.5} sx={{ mt: 1 }}>
                             {selfReviews.map((review, idx) => (
                                 <Stack key={review.id} spacing={1.5}>
                                     <ProfileReviewRow review={review} />

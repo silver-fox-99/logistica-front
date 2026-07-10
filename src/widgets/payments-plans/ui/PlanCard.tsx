@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Box, Button, Card, CardContent, Chip, Divider, Stack, Tooltip, Typography } from "@mui/material";
-import { FiArrowUpRight, FiCheckCircle, FiShield, FiX } from "react-icons/fi";
+import { FiCheckCircle, FiShield, FiX } from "react-icons/fi";
 import { normalizeValueDisplay } from "@/entities/tariff/lib/plan";
 import { formatEntitlementValue } from "@/shared/config/entitlements";
 import { useTranslation } from "react-i18next";
@@ -75,9 +75,7 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
         [plan, t]
     );
 
-    const gradient = isCurrent
-        ? "linear-gradient(135deg, rgba(76,175,80,0.16), rgba(76,175,80,0.05))"
-        : "linear-gradient(135deg, rgba(68,114,184,0.08), rgba(68,114,184,0.02))";
+
 
     const hasPriceInfo =
         plan.price !== null &&
@@ -97,23 +95,28 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
         <Card
             variant="outlined"
             sx={{
-                borderRadius: 3,
+                borderRadius: "16px",
                 height: "100%",
                 position: "relative",
-                background: gradient,
-                borderColor: isCurrent ? "success.light" : "divider",
-                boxShadow: isCurrent ? "0 10px 25px rgba(76,175,80,0.15)" : "0 6px 18px rgba(0,0,0,0.05)",
-                transition: "transform 200ms ease, box-shadow 200ms ease",
-                "&:hover": { transform: "translateY(-2px)", boxShadow: "0 10px 28px rgba(0,0,0,0.12)" },
+                bgcolor: "background.paper",
+                borderColor: isCurrent ? "success.main" : "divider",
+                borderWidth: isCurrent ? "2px" : "1px",
+                boxShadow: isCurrent ? "0 8px 24px rgba(46,125,50,0.08)" : "0 4px 12px rgba(0,0,0,0.03)",
+                transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out",
+                "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: isCurrent ? "0 12px 28px rgba(46,125,50,0.12)" : "0 12px 24px rgba(15, 95, 194, 0.08)",
+                    borderColor: isCurrent ? "success.main" : "primary.light",
+                },
             }}
         >
-            <CardContent sx={{ display: "grid", gap: 1.25, height: "100%", p: 2.5 }}>
-                <Stack direction="row" spacing={1} alignItems="baseline" justifyContent="space-between">
-                    <Stack spacing={0.25}>
-                        <Typography variant="h6" fontWeight={800}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%", p: 3, gap: 2.5 }}>
+                <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
+                    <Stack spacing={0.5}>
+                        <Typography variant="h5" fontWeight={900} sx={{ color: "text.primary" }}>
                             {plan.name}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                             {plan.description || "—"}
                         </Typography>
                     </Stack>
@@ -127,86 +130,100 @@ export const PlanCard: React.FC<Props> = ({ plan, isCurrent, checkoutLoading, on
                                 borderColor: `${pleasantGreen}55`,
                                 borderWidth: 1,
                                 borderStyle: "solid",
+                                fontWeight: 700,
                             }}
-                            label={t("paymentsNew.current", "Current")}
+                            label={t("paymentsNew.current", "Текущий")}
                             icon={<FiShield size={14} />}
                         />
                     )}
                 </Stack>
 
-                <Box>
-                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 0.5 }}>
-                        {t("paymentsNew.perks", "Perks")}
+                {hasPriceInfo && (
+                    <Box>
+                        {discountInfo ? (
+                            <Stack spacing={0.5}>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{ textDecoration: "line-through" }}
+                                    >
+                                        {plan.price} {plan.currency} / {renderBillingPeriod(plan)}
+                                    </Typography>
+                                    <Chip
+                                        size="small"
+                                        color="error"
+                                        label={`-${discountInfo.percent}%`}
+                                        sx={{ height: 18, fontSize: "0.7rem", fontWeight: 700 }}
+                                    />
+                                </Stack>
+                                <Typography variant="h4" fontWeight={900} color="success.main">
+                                    {discountInfo.discountedPriceLabel}
+                                </Typography>
+                            </Stack>
+                        ) : (
+                            <Typography variant="h4" fontWeight={900} sx={{ color: "text.primary", letterSpacing: "-0.03em" }}>
+                                {Number(plan.price) === 0 ? t("paymentsNew.free", "Бесплатно") : `${plan.price} ${plan.currency}`}
+                                {Number(plan.price) !== 0 && (
+                                    <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5, fontWeight: 500 }}>
+                                        / {renderBillingPeriod(plan)}
+                                    </Typography>
+                                )}
+                            </Typography>
+                        )}
+                    </Box>
+                )}
+
+                <Divider />
+
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, color: "text.primary" }}>
+                        {t("paymentsNew.perks", "Что входит:")}
                     </Typography>
-                    <Stack spacing={0.6}>
+                    <Stack spacing={1}>
                         {features.map((row, idx) => {
                             const labelText = (row.label || "").toString().replace(/[:：]\s*$/, "");
                             return (
-                                <Typography key={idx} variant="body2" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                    <strong>{labelText}:</strong> {renderFeatureValue(row.value)}
-                                </Typography>
+                                <Box key={idx} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                        {labelText}
+                                    </Typography>
+                                    {renderFeatureValue(row.value)}
+                                </Box>
                             );
                         })}
                     </Stack>
                 </Box>
 
-                <Divider />
+                <Divider sx={{ my: 1 }} />
 
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent={hasPriceInfo ? "space-between" : "flex-end"} mt="auto">
-                    {hasPriceInfo && (
-                        <Stack spacing={0.25}>
-                            {discountInfo ? (
-                                <Stack spacing={0.5}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            sx={{ textDecoration: "line-through" }}
-                                        >
-                                            {plan.price} {plan.currency} / {renderBillingPeriod(plan)}
-                                        </Typography>
-                                        <Chip
-                                            size="small"
-                                            color="error"
-                                            label={`-${discountInfo.percent}%`}
-                                            sx={{ height: 18, fontSize: "0.7rem", fontWeight: 700 }}
-                                        />
-                                    </Stack>
-                                    <Typography variant="subtitle2" fontWeight={800} color="success.main">
-                                        {discountInfo.discountedPriceLabel}
-                                    </Typography>
-                                </Stack>
-                            ) : (
-                                <Typography variant="subtitle2" fontWeight={800}>
-                                    {plan.price} {plan.currency} / {renderBillingPeriod(plan)}
-                                </Typography>
-                            )}
-                            <Typography variant="caption" color="text.secondary">
-                                {t("paymentsNew.billingPeriod", "Billing period")}:{" "}
-                                {renderBillingPeriod(plan)}
-                            </Typography>
-                        </Stack>
-                    )}
-
+                <Box sx={{ mt: "auto" }}>
                     <Tooltip title={isCurrent ? t("paymentsNew.tooltips.current", "This is your current plan.") : t("paymentsNew.buttons.upgrade", "Create an invoice to upgrade.")}>
-            <span>
-              <Button
-                  size="small"
-                  variant={isCurrent ? "outlined" : "contained"}
-                  color={isCurrent ? "success" : "primary"}
-                  disabled={isCurrent || checkoutLoading}
-                  endIcon={<FiArrowUpRight />}
-                  onClick={() => (isCurrent ? undefined : onCheckout(plan))}
-              >
-                {checkoutLoading
-                    ? t("paymentsNew.buttons.processing", "Processing...")
-                    : isCurrent
-                        ? t("paymentsNew.buttons.current", "Current")
-                        : t("paymentsNew.buttons.upgrade", "Upgrade")}
-              </Button>
-            </span>
+                        <span style={{ width: "100%", display: "block" }}>
+                            <Button
+                                fullWidth
+                                size="large"
+                                variant={isCurrent ? "outlined" : "contained"}
+                                color={isCurrent ? "inherit" : "primary"}
+                                disabled={isCurrent || checkoutLoading}
+                                onClick={() => (isCurrent ? undefined : onCheckout(plan))}
+                                sx={{
+                                    height: "44px",
+                                    borderRadius: "10px",
+                                    fontWeight: 700,
+                                    fontSize: "0.95rem",
+                                    textTransform: "none",
+                                }}
+                            >
+                                {checkoutLoading
+                                    ? t("paymentsNew.buttons.processing", "Обработка...")
+                                    : isCurrent
+                                        ? t("paymentsNew.buttons.current", "Текущий")
+                                        : t("paymentsNew.buttons.upgrade", "Подключить")}
+                            </Button>
+                        </span>
                     </Tooltip>
-                </Stack>
+                </Box>
             </CardContent>
         </Card>
     );
