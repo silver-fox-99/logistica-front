@@ -31,6 +31,7 @@ import {
   FiLock,
   FiHeadphones,
   FiCalendar,
+  FiMessageSquare,
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
@@ -162,6 +163,11 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       to: "/dashboard/security",
       icon: <FiLock />,
       label: t("dashboard.menu.security"),
+    },
+    {
+      to: "/reviews",
+      icon: <FiMessageSquare />,
+      label: t("dashboard.menu.siteReviews"),
     },
     {
       to: "/dashboard/help",
