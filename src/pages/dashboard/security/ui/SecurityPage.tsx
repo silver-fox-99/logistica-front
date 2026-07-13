@@ -23,7 +23,7 @@ export default function SecurityPage() {
       >
         <Box sx={{ p: { xs: 2.5, md: 3 } }}>
           <Stack spacing={1.5}>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h6" fontWeight={600}>
               {t("security.userAgreementTitle")}
             </Typography>
             <Typography variant="body2" color="text.secondary">

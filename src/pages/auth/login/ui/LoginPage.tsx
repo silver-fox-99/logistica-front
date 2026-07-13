@@ -47,7 +47,7 @@ export default function LoginPage() {
             to="/register"
             sx={{
               color: "primary.main",
-              fontWeight: 700,
+              fontWeight: 600,
               textDecoration: "none",
               fontSize: "1rem",
               "&:hover": { textDecoration: "underline" },

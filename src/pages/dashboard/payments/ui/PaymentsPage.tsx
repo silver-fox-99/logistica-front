@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { FiCreditCard } from "react-icons/fi";
+import { PageHeader } from "@/shared/ui/PageHeader";
 
 import { useRefreshMe } from "@/entities/user/model/useRefreshMe";
 
@@ -62,56 +63,14 @@ export default function PaymentsPage() {
   return (
     <Box sx={{ minHeight: "calc(100dvh - 120px)" }}>
       <Stack spacing={3}>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 2.25,
-            borderRadius: "16px",
-            mb: 0.5,
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            bgcolor: "background.paper",
-            borderColor: "divider",
-          }}
-        >
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: "12px",
-              bgcolor: "rgba(15, 95, 194, 0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "primary.main",
-            }}
-          >
-            <FiCreditCard size={24} />
-          </Box>
-          <Box>
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 850,
-                color: "text.primary",
-                letterSpacing: "-0.02em",
-                mb: 0.25,
-              }}
-            >
-              {t("paymentsNew.title", { defaultValue: "Тарифы" })}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: "text.secondary", fontWeight: 500 }}
-            >
-              {t("paymentsNew.subtitle", {
-                defaultValue:
-                  "Выберите подходящий тариф и управляйте вашими лимитами использования.",
-              })}
-            </Typography>
-          </Box>
-        </Paper>
+        <PageHeader
+          title={t("paymentsNew.title", { defaultValue: "Тарифы" })}
+          subtitle={t("paymentsNew.subtitle", {
+            defaultValue:
+              "Выберите подходящий тариф и управляйте вашими лимитами использования.",
+          })}
+          icon={<FiCreditCard size={24} />}
+        />
 
         {/*<Alert*/}
         {/*    severity="info"*/}

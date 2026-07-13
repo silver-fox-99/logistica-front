@@ -41,7 +41,7 @@ export default function AuthTop({ icon, title, subtitle }: AuthTopProps) {
       )}
       <Typography
         variant="h3"
-        sx={{ fontWeight: 800, mb: 1.5, color: "text.primary" }}
+        sx={{ fontWeight: 600, mb: 1.5, color: "text.primary" }}
       >
         {title}
       </Typography>

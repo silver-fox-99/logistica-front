@@ -321,7 +321,7 @@ export default function ReviewsPage() {
                       color="inherit"
                       size="small"
                       onClick={() => handleRatingFilterChange(null)}
-                      sx={{ fontWeight: 700 }}
+                      sx={{ fontWeight: 600 }}
                     >
                       {t("common.reset", "Сбросить")}
                     </Button>
@@ -334,7 +334,7 @@ export default function ReviewsPage() {
                 </Alert>
               )}
 
-              <Typography variant="h6" fontWeight={700}>
+              <Typography variant="h6" fontWeight={600}>
                 {t("reviews.listTitle", "Отзывы пользователей")} ({total})
               </Typography>
 
@@ -391,7 +391,7 @@ export default function ReviewsPage() {
                               {initials}
                             </Avatar>
                             <Stack spacing={0.25} flex={1}>
-                              <Typography fontWeight={700} variant="body1">
+                              <Typography fontWeight={600} variant="body1">
                                 {authorName}
                               </Typography>
                               <Typography
@@ -451,7 +451,7 @@ export default function ReviewsPage() {
           {/* Right Column: Submit Feedback / Guest Prompts */}
           <Grid size={{ xs: 12, md: 4 }}>
             <Stack spacing={2.5}>
-              <Typography variant="h6" fontWeight={700}>
+              <Typography variant="h6" fontWeight={600}>
                 {t("reviews.formTitle", "Оставить отзыв")}
               </Typography>
 
@@ -516,7 +516,7 @@ export default function ReviewsPage() {
                       sx={{
                         textTransform: "none",
                         py: 1.2,
-                        fontWeight: 700,
+                        fontWeight: 600,
                         borderRadius: 1,
                       }}
                     >
@@ -555,7 +555,7 @@ export default function ReviewsPage() {
                     >
                       <FiMessageSquare size={26} color="#1976d2" />
                     </Avatar>
-                    <Typography variant="h6" fontWeight={700}>
+                    <Typography variant="h6" fontWeight={600}>
                       {t("reviews.guestTitle", "Поделитесь мнением")}
                     </Typography>
                     <Typography
@@ -576,7 +576,7 @@ export default function ReviewsPage() {
                         fullWidth
                         sx={{
                           textTransform: "none",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           borderRadius: 1,
                         }}
                       >
@@ -589,7 +589,7 @@ export default function ReviewsPage() {
                         fullWidth
                         sx={{
                           textTransform: "none",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           borderRadius: 1,
                         }}
                       >

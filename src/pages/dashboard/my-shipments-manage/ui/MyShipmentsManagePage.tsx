@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
-import { Alert, Box, Paper, Typography } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import { FiCalendar } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/shared/ui/PageHeader";
 import { toast } from "react-toastify";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
@@ -189,59 +190,14 @@ export default function MyShipmentsManagePage() {
 
   return (
     <Box sx={{ minHeight: "calc(100dvh - 120px)" }}>
-      <Paper
-        variant="outlined"
-        sx={{
-          p: 2.25,
-          borderRadius: "16px",
-          mb: 2,
-          display: "flex",
-          alignItems: "center",
-          gap: 2,
-          bgcolor: "background.paper",
-          borderColor: "divider",
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: "12px",
-            bgcolor: "rgba(15, 95, 194, 0.08)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "primary.main",
-            flexShrink: 0,
-          }}
-        >
-          <FiCalendar size={24} />
-        </Box>
-        <Box>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 850,
-              color: "text.primary",
-              letterSpacing: "-0.02em",
-              mb: 0.25,
-            }}
-          >
-            {t("shipments.manage.title", "Управление моими заявками")}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary", fontWeight: 500 }}
-          >
-            {t(
-              "shipments.manage.subtitle",
-              "Управляйте своими заявками, выбирайте несколько позиций и применяйте массовые действия",
-            )}
-          </Typography>
-        </Box>
-      </Paper>
+      <PageHeader
+        title={t("shipments.manage.title", "Управление моими заявками")}
+        subtitle={t(
+          "shipments.manage.subtitle",
+          "Управляйте своими заявками, выбирайте несколько позиций и применяйте массовые действия",
+        )}
+        icon={<FiCalendar size={24} />}
+      />
 
       <Alert severity="warning" sx={{ mb: 3, borderRadius: "12px" }}>
         {t("shipments.autoDeleteNotice")}

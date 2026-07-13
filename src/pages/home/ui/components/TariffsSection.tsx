@@ -89,7 +89,7 @@ export default function TariffsSection({
                 "& .MuiToggleButtonGroup-grouped": {
                   border: 0,
                   borderRadius: "10px",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   px: 3,
                   py: 1,
                   "&.Mui-selected": {
@@ -181,7 +181,7 @@ export default function TariffsSection({
                           top: -12,
                           left: "50%",
                           transform: "translateX(-50%)",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: 11,
                           height: 24,
                         }}
@@ -193,7 +193,7 @@ export default function TariffsSection({
                         <Typography
                           variant="subtitle2"
                           color="primary.main"
-                          fontWeight={700}
+                          fontWeight={600}
                           textTransform="uppercase"
                           letterSpacing={0.8}
                           sx={{ fontSize: "0.75rem" }}
@@ -202,7 +202,7 @@ export default function TariffsSection({
                         </Typography>
                         <Typography
                           variant="h5"
-                          sx={{ fontWeight: 800, mt: 0.5 }}
+                          sx={{ fontWeight: 600, mt: 0.5 }}
                         >
                           {plan.name}
                         </Typography>
@@ -379,7 +379,7 @@ export default function TariffsSection({
                         mt: 3,
                         py: 1.5,
                         borderRadius: "10px",
-                        fontWeight: 700,
+                        fontWeight: 600,
                         fontSize: "0.95rem",
                       }}
                     >

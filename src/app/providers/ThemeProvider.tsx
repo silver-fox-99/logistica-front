@@ -75,7 +75,7 @@ const theme = createTheme({
       color: "#0F172A",
     },
     h6: {
-      fontWeight: 700,
+      fontWeight: 600,
       fontSize: "1rem", // 16px
       lineHeight: 1.4,
       color: "#0F172A",

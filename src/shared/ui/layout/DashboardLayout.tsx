@@ -256,7 +256,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
           sx={{
             height: "40px",
             borderRadius: "8px",
-            fontWeight: 700,
+            fontWeight: 600,
             fontSize: "0.9rem",
             textTransform: "none",
             borderColor: "primary.main",
@@ -280,7 +280,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
           sx={{
             height: "40px",
             borderRadius: "8px",
-            fontWeight: 700,
+            fontWeight: 600,
             fontSize: "0.9rem",
             textTransform: "none",
             borderColor: "primary.main",
@@ -307,10 +307,10 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             }}
             sx={{
               ...sidebarButtonStyles,
-              color: "error.main",
+              color: "primary.main",
               "& .MuiListItemIcon-root": {
                 minWidth: "34px",
-                color: "error.main",
+                color: "primary.main",
                 transition: "all 0.2s ease-in-out",
               },
               "&:hover": {

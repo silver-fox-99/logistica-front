@@ -37,7 +37,10 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                   color: "primary.contrastText",
                 }}
               >
-                {t("homePage.heroTitle", "Найдите груз и транспорт за несколько минут")}
+                {t(
+                  "homePage.heroTitle",
+                  "Найдите груз и транспорт за несколько минут",
+                )}
               </Typography>
 
               <Typography
@@ -67,7 +70,7 @@ export default function HeroSection({ isAuthenticated }: HeroSectionProps) {
                     px: 5,
                     py: 2,
                     fontSize: "1.05rem",
-                    fontWeight: 700,
+                    fontWeight: 600,
                     borderRadius: "10px",
                     boxShadow: "0 10px 25px -5px rgba(15, 95, 194, 0.3)",
                   }}

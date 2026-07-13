@@ -103,7 +103,7 @@ export default function Footer() {
               variant="h6"
               sx={{
                 color: "#FFFFFF",
-                fontWeight: 700,
+                fontWeight: 600,
                 mb: 2,
                 fontSize: "1rem",
               }}
@@ -132,7 +132,7 @@ export default function Footer() {
               variant="h6"
               sx={{
                 color: "#FFFFFF",
-                fontWeight: 700,
+                fontWeight: 600,
                 mb: 2,
                 fontSize: "1rem",
               }}
@@ -189,7 +189,7 @@ export default function Footer() {
               variant="h6"
               sx={{
                 color: "#FFFFFF",
-                fontWeight: 700,
+                fontWeight: 600,
                 mb: 2,
                 fontSize: "1rem",
               }}
@@ -287,7 +287,7 @@ export default function Footer() {
           sx: { borderRadius: "16px", p: 1, minWidth: "280px" },
         }}
       >
-        <DialogTitle id="contact-dialog-title" sx={{ fontWeight: 700 }}>
+        <DialogTitle id="contact-dialog-title" sx={{ fontWeight: 600 }}>
           {t("footer.contacts", "Контакты")}
         </DialogTitle>
         <DialogContent>

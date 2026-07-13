@@ -25,10 +25,7 @@ export default function BenefitsSection() {
         spacing={1.5}
         sx={{ textAlign: "center", mb: 8, alignItems: "center" }}
       >
-        <Typography
-          variant="h2"
-          sx={{ color: "text.primary", fontWeight: 800 }}
-        >
+        <Typography variant="h2" sx={{ color: "text.primary" }}>
           {t(
             "homePage.benefitsTitle",
             "Создаем современную платформу для логистики и грузоперевозок",
@@ -155,7 +152,7 @@ export default function BenefitsSection() {
                     <Typography
                       variant="h6"
                       sx={{
-                        fontWeight: 700,
+                        fontWeight: 600,
                         fontSize: "1.05rem",
                         color: "text.primary",
                       }}

@@ -146,7 +146,7 @@ export default function RegisterPage() {
                 sx={{
                   height: "48px",
                   fontSize: "1rem",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   borderColor: "primary.main",
                   color: "primary.main",
                   "&:hover": {
@@ -193,7 +193,7 @@ export default function RegisterPage() {
                 borderColor: "primary.main",
                 color: "primary.main",
                 fontSize: "1rem",
-                fontWeight: 700,
+                fontWeight: 600,
                 height: "48px",
                 "&:hover": {
                   borderColor: "primary.dark",

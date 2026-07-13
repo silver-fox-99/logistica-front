@@ -161,7 +161,7 @@ export default function Header({
                 {!isMobile && (
                   <Typography
                     variant="body2"
-                    sx={{ color: "text.primary", fontWeight: 700 }}
+                    sx={{ color: "text.primary", fontWeight: 600 }}
                   >
                     {user?.first_name} {user?.last_name}
                   </Typography>
@@ -177,7 +177,7 @@ export default function Header({
                     width: 36,
                     height: 36,
                     fontSize: "0.875rem",
-                    fontWeight: 700,
+                    fontWeight: 600,
                     ...(avatarProps.sx || {}),
                   }}
                 />
@@ -251,7 +251,7 @@ export default function Header({
                 sx={{
                   width: 44,
                   height: 44,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...(avatarProps.sx || {}),
                 }}
               />

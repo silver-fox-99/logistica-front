@@ -3,14 +3,13 @@ import {
   Box,
   CircularProgress,
   Container,
-  Paper,
   Stack,
-  Typography,
 } from "@mui/material";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FiFileText, FiUsers } from "react-icons/fi";
+import { PageHeader } from "@/shared/ui/PageHeader";
 
 import { useShipmentDetailsPage } from "@/entities/shipment/model/useShipmentDetailsPage";
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
@@ -50,66 +49,27 @@ export default function ShipmentDetailsPage() {
     <Box sx={{ minHeight: "calc(100dvh - 120px)", pb: 3, pt: 16 }}>
       <Container maxWidth="lg">
         <Stack spacing={2.5} sx={{ width: "100%" }}>
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2.25,
-              borderRadius: "16px",
-              mb: 0.5,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              bgcolor: "background.paper",
-              borderColor: "divider",
-              width: "100%",
-            }}
-          >
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                borderRadius: "12px",
-                bgcolor: "rgba(15, 95, 194, 0.08)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "primary.main",
-              }}
-            >
-              {resolvedKind === "cargo" ? (
+          <PageHeader
+            title={t("shipments.shipmentCard.orderDetails", "Детали заявки")}
+            subtitle={
+              resolvedKind === "cargo"
+                ? t(
+                    "shipments.shipmentCard.cargoSub",
+                    "Детальная информация о выбранном грузе",
+                  )
+                : t(
+                    "shipments.shipmentCard.transportSub",
+                    "Детальная информация о выбранном транспорте",
+                  )
+            }
+            icon={
+              resolvedKind === "cargo" ? (
                 <FiFileText size={24} />
               ) : (
                 <FiUsers size={24} />
-              )}
-            </Box>
-            <Box>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 850,
-                  color: "text.primary",
-                  letterSpacing: "-0.02em",
-                  mb: 0.25,
-                }}
-              >
-                {t("shipments.shipmentCard.orderDetails", "Детали заявки")}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", fontWeight: 500 }}
-              >
-                {resolvedKind === "cargo"
-                  ? t(
-                      "shipments.shipmentCard.cargoSub",
-                      "Детальная информация о выбранном грузе",
-                    )
-                  : t(
-                      "shipments.shipmentCard.transportSub",
-                      "Детальная информация о выбранном транспорте",
-                    )}
-              </Typography>
-            </Box>
-          </Paper>
+              )
+            }
+          />
 
           {loading ? (
             <Stack alignItems="center" justifyContent="center" sx={{ py: 8 }}>

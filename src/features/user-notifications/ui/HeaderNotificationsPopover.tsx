@@ -176,7 +176,7 @@ export default function HeaderNotificationsPopover() {
             justifyContent: "space-between",
           }}
         >
-          <Typography variant="subtitle1" fontWeight={700}>
+          <Typography variant="subtitle1" fontWeight={600}>
             {t("notifications.title", "Уведомления")}
           </Typography>
           {unreadCount > 0 && (
@@ -275,7 +275,7 @@ export default function HeaderNotificationsPopover() {
                                     size="small"
                                     sx={{
                                       fontSize: "0.65rem",
-                                      fontWeight: 700,
+                                      fontWeight: 600,
                                       color: "#fff",
                                       bgcolor: color || "primary.main",
                                       borderRadius: 1,

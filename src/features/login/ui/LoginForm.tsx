@@ -69,7 +69,7 @@ export default function LoginForm() {
       {/* Поле Номер телефона / Email */}
       <Typography
         variant="body2"
-        sx={{ fontWeight: 700, mb: 1, color: "text.primary" }}
+        sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
       >
         {t("loginForm.phone")}
       </Typography>
@@ -90,7 +90,7 @@ export default function LoginForm() {
       {/* Поле Пароль */}
       <Typography
         variant="body2"
-        sx={{ fontWeight: 700, mb: 1, color: "text.primary" }}
+        sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
       >
         {t("loginForm.password")}
       </Typography>
@@ -115,7 +115,7 @@ export default function LoginForm() {
         sx={{
           bgcolor: "primary.main",
           fontSize: "1rem",
-          fontWeight: 700,
+          fontWeight: 600,
           height: "48px",
           mb: 2,
           "&:hover": {
@@ -136,7 +136,7 @@ export default function LoginForm() {
           borderColor: "primary.main",
           color: "primary.main",
           fontSize: "1rem",
-          fontWeight: 700,
+          fontWeight: 600,
           height: "48px",
           "&:hover": {
             borderColor: "primary.dark",

@@ -89,7 +89,7 @@ function ReferralProgramWidgetBase() {
             <Typography
               variant="h5"
               sx={{
-                fontWeight: 850,
+                fontWeight: 600,
                 color: "text.primary",
                 letterSpacing: "-0.02em",
                 mb: 0.25,

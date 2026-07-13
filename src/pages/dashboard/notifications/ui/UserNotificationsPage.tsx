@@ -189,7 +189,7 @@ export default function UserNotificationsPage() {
               <Typography
                 variant="h6"
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   fontSize: "1.25rem",
                   color: "#0c2340",
                   mb: 0.5,
@@ -218,7 +218,7 @@ export default function UserNotificationsPage() {
               sx={{
                 textTransform: "none",
                 borderRadius: "8px",
-                fontWeight: 700,
+                fontWeight: 600,
                 height: 40,
                 borderColor: "primary.main",
                 color: "primary.main",
@@ -343,7 +343,7 @@ export default function UserNotificationsPage() {
           <Box sx={{ py: 8, px: 2, textAlign: "center" }}>
             <Typography
               variant="h6"
-              fontWeight={700}
+              fontWeight={600}
               color="text.secondary"
               mb={1}
             >
@@ -440,7 +440,7 @@ export default function UserNotificationsPage() {
                                   size="small"
                                   sx={{
                                     fontSize: "0.7rem",
-                                    fontWeight: 700,
+                                    fontWeight: 600,
                                     color: "#fff",
                                     bgcolor: color || "primary.main",
                                     borderRadius: "6px",

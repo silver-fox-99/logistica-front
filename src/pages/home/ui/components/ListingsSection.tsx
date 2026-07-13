@@ -198,7 +198,7 @@ export default function ListingsSection({
                       borderStyle: "dashed",
                     }}
                   >
-                    <Typography fontWeight={700} variant="h6">
+                    <Typography fontWeight={600} variant="h6">
                       {t("homePage.noResults", "Нет результатов")}
                     </Typography>
                     <Typography
@@ -264,7 +264,7 @@ export default function ListingsSection({
                   px: 3,
                   py: 1.2,
                   borderRadius: "8px",
-                  fontWeight: 700,
+                  fontWeight: 600,
                 }}
               >
                 {t("homePage.viewAllShipments", "Посмотреть все объявления")}
