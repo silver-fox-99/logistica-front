@@ -41,8 +41,7 @@ const theme = createTheme({
     divider: "#E2E8F0", // Slate-200
   },
   typography: {
-    fontFamily:
-      "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: "'Inter', sans-serif",
     fontSize: 16,
     htmlFontSize: 16,
     h1: {

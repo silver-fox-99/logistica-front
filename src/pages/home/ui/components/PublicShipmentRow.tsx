@@ -133,7 +133,7 @@ export default function PublicShipmentRow({ item, kind, isAuthenticated }: Publi
                                         }:
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
-                                        {item.weight_t ? `${Number(item.weight_t)} т` : "—"}
+                                        {item.weight_t ? `${Number(item.weight_t)} ${t("shipments.shipmentCard.weightUnitShort", "т")}` : "—"}
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -145,7 +145,7 @@ export default function PublicShipmentRow({ item, kind, isAuthenticated }: Publi
                                             {t("shipments.shipmentCard.volume", "Объем")}:
                                         </Typography>
                                         <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
-                                            {Number(item.volume_m3)} м³
+                                            {Number(item.volume_m3)} {t("shipments.shipmentCard.volumeUnitShort", "м³")}
                                         </Typography>
                                     </Stack>
                                 </Grid>

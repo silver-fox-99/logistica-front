@@ -34,7 +34,7 @@ export default function Header({
 }) {
   const user = useUserStore((s) => s.user);
   const { t } = useTranslation();
-  const isMobile = useMediaQuery("(max-width:860px)");
+  const isMobile = useMediaQuery("(max-width:900px)");
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Функция генерации уникального цвета для аватара
@@ -106,7 +106,7 @@ export default function Header({
         margin: "0 auto",
         left: 0,
         right: 0,
-        top: 20,
+        top: { xs: 0, md: "20px" },
         zIndex: (theme) => theme.zIndex.drawer - 1,
         borderRadius: { xs: 0, md: "12px" },
       }}

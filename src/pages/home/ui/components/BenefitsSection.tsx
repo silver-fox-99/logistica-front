@@ -29,7 +29,10 @@ export default function BenefitsSection() {
           variant="h2"
           sx={{ color: "text.primary", fontWeight: 800 }}
         >
-          Создаем современную платформу для логистики и грузоперевозок
+          {t(
+            "homePage.benefitsTitle",
+            "Создаем современную платформу для логистики и грузоперевозок",
+          )}
         </Typography>
 
         <Box sx={{ maxWidth: 750 }}>
@@ -41,9 +44,10 @@ export default function BenefitsSection() {
               color: "text.secondary",
             }}
           >
-            Наша компания — это современная онлайн-платформа в сфере логистики и
-            грузоперевозок, созданная для удобного и безопасного взаимодействия
-            между грузоотправителями, перевозчиками и водителями
+            {t(
+              "homePage.benefitsSubtitle",
+              "Наша компания — это современная онлайн-платформа в сфере логистики и грузоперевозок, созданная для удобного и безопасного взаимодействия между грузоотправителями, перевозчиками и водителями",
+            )}
           </Typography>
         </Box>
       </Stack>
@@ -174,7 +178,10 @@ export default function BenefitsSection() {
 
         {/* Правая колонка: Сетка изображений и плашка "Наша цель" */}
         <Grid size={{ xs: 12, md: 5 }}>
-          <Stack spacing={2.5} sx={{ height: "100%", justifyContent: "space-between" }}>
+          <Stack
+            spacing={2.5}
+            sx={{ height: "100%", justifyContent: "space-between" }}
+          >
             {/* Верхняя большая картинка */}
             <Box
               component="img"
@@ -190,7 +197,11 @@ export default function BenefitsSection() {
             />
 
             {/* Второй ряд: Блок "Наша цель" + Картинка с водителем */}
-            <Grid container spacing={2.5} sx={{ flex: "1 1 180px", minHeight: 160 }}>
+            <Grid
+              container
+              spacing={2.5}
+              sx={{ flex: "1 1 180px", minHeight: { xs: "auto", md: 160 } }}
+            >
               <Grid size={6}>
                 <Box
                   sx={{

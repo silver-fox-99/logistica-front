@@ -366,7 +366,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
 
 export default function DashboardLayout() {
   useClientNotificationsWebSocket();
-  const isMobile = useMediaQuery("(max-width:860px)");
+  const isMobile = useMediaQuery("(max-width:900px)");
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const tenderAccess = useTenderWorkspaceAccessStore((state) => state);
@@ -427,7 +427,7 @@ export default function DashboardLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          pt: { xs: 12, md: 14 },
+          pt: 14,
           pb: 10,
           overflow: "hidden",
         }}
