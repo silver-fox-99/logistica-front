@@ -1,10 +1,9 @@
 import {
     Avatar,
     Button,
-    Card,
-    CardContent,
     Chip,
     Divider,
+    Paper,
     Stack,
     Typography,
 } from "@mui/material";
@@ -48,8 +47,7 @@ export function CompanyJoinRequestsCard({
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 2 }}>
-            <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+        <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider", p: { xs: 2.5, md: 3 } }}>
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
@@ -160,6 +158,7 @@ export function CompanyJoinRequestsCard({
                                                         variant="contained"
                                                         onClick={() => onApprove(request.id)}
                                                         disabled={isSubmitting}
+                                                        sx={{ borderRadius: "8px" }}
                                                     >
                                                         {t("companyTeam.requests.approve")}
                                                     </Button>
@@ -168,6 +167,7 @@ export function CompanyJoinRequestsCard({
                                                         color="error"
                                                         onClick={() => onReject(request.id)}
                                                         disabled={isSubmitting}
+                                                        sx={{ borderRadius: "8px" }}
                                                     >
                                                         {t("companyTeam.requests.reject")}
                                                     </Button>
@@ -180,7 +180,6 @@ export function CompanyJoinRequestsCard({
                         </Stack>
                     )}
                 </Stack>
-            </CardContent>
-        </Card>
+        </Paper>
     );
 }

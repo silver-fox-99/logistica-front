@@ -3,10 +3,9 @@ import {
     Avatar,
     Box,
     Button,
-    Card,
-    CardContent,
     Chip,
     MenuItem,
+    Paper,
     Stack,
     TextField,
     Typography,
@@ -63,8 +62,7 @@ export function CompanyMembersCard({
 
     return (
         <>
-            <Card variant="outlined" sx={{ borderRadius: 2, borderColor: "divider" }}>
-                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+            <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider", p: { xs: 2, md: 3 } }}>
                     <Stack spacing={2.5}>
                         <Stack spacing={0.5}>
                             <Typography variant="h6" fontWeight={700}>
@@ -92,7 +90,7 @@ export function CompanyMembersCard({
                                             key={member.id}
                                             sx={{
                                                 p: 2,
-                                                borderRadius: 3,
+                                                borderRadius: "12px",
                                                 bgcolor: "grey.50",
                                             }}
                                         >
@@ -212,7 +210,7 @@ export function CompanyMembersCard({
                                                             color="error"
                                                             onClick={() => onRemove(member.id)}
                                                             disabled={isSubmitting || member.role === "OWNER"}
-                                                            sx={{ minWidth: { sm: 120 } }}
+                                                            sx={{ minWidth: { sm: 120 }, borderRadius: "8px" }}
                                                         >
                                                             {t("companyTeam.members.remove")}
                                                         </Button>
@@ -227,7 +225,7 @@ export function CompanyMembersCard({
                                                         sx={{
                                                             flex: 1,
                                                             p: 1.5,
-                                                            borderRadius: 2.5,
+                                                            borderRadius: "8px",
                                                             bgcolor: "background.paper",
                                                         }}
                                                     >
@@ -276,7 +274,7 @@ export function CompanyMembersCard({
                                                         sx={{
                                                             flex: 1,
                                                             p: 1.5,
-                                                            borderRadius: 2.5,
+                                                            borderRadius: "8px",
                                                             bgcolor: "background.paper",
                                                         }}
                                                     >
@@ -314,8 +312,7 @@ export function CompanyMembersCard({
                             </Stack>
                         )}
                     </Stack>
-                </CardContent>
-            </Card>
+            </Paper>
 
             <CompanyRolePermissionsDialog
                 open={Boolean(permissionsRole)}

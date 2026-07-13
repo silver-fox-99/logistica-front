@@ -261,6 +261,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             textTransform: "none",
             borderColor: "primary.main",
             color: "primary.main",
+            justifyContent: "flex-start",
             "&:hover": {
               bgcolor: "rgba(15, 95, 194, 0.04)",
               borderColor: "primary.dark",
@@ -284,6 +285,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             textTransform: "none",
             borderColor: "primary.main",
             color: "primary.main",
+            justifyContent: "flex-start",
             "&:hover": {
               bgcolor: "rgba(15, 95, 194, 0.04)",
               borderColor: "primary.dark",

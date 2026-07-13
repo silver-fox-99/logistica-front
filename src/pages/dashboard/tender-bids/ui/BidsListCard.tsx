@@ -36,7 +36,7 @@ function ParamItem({ icon, label, value, tooltip, color }: ParamItemProps) {
                 minWidth: 0,
                 px: 1.5,
                 py: 1,
-                borderRadius: 1.5,
+                borderRadius: "8px",
                 bgcolor: "grey.50",
                 border: "1px solid",
                 borderColor: "divider",
@@ -81,7 +81,7 @@ export function BidsListCard({
         : null;
 
     return (
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
             <Stack spacing={1.5}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
                     <Box>
@@ -142,7 +142,7 @@ export function BidsListCard({
                 )}
 
                 {!bids.length && (
-                    <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    <Alert severity="info" sx={{ borderRadius: "8px" }}>
                         {t("tenders.bids.empty")}
                     </Alert>
                 )}

@@ -177,7 +177,7 @@ export default function TenderBidsPage() {
                         gap: 1,
                         px: 2,
                         py: 1.25,
-                        borderRadius: 2,
+                        borderRadius: "12px",
                         bgcolor: isExpired ? "error.50" : "grey.50",
                         border: "1px solid",
                         borderColor: isExpired ? "error.light" : "divider",

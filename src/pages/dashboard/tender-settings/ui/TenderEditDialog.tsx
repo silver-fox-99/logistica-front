@@ -87,7 +87,7 @@ export function TenderEditDialog({
 
             <DialogContent>
                 <Stack spacing={2} sx={{ pt: 1 }}>
-                    <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    <Alert severity="info" sx={{ borderRadius: "8px" }}>
                         {t("tenders.settings.editInfo")}
                     </Alert>
 

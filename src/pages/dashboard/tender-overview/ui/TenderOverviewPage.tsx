@@ -225,13 +225,13 @@ export default function TenderOverviewPage() {
         <Stack spacing={2}>
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Paper elevation={0} sx={{ p: 2, borderRadius: 2, height: "100%" }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "16px", borderColor: "divider", height: "100%" }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.overview.participants")}</Typography>
                         <Typography variant="h5" fontWeight={800}>{bids.length}</Typography>
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Paper elevation={0} sx={{ p: 2, borderRadius: 2, height: "100%" }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "16px", borderColor: "divider", height: "100%" }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.overview.averageBid")}</Typography>
                         <Typography variant="h5" fontWeight={800}>
                             {avg == null ? empty : `${avg} ${tender.currency}`}
@@ -239,7 +239,7 @@ export default function TenderOverviewPage() {
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Paper elevation={0} sx={{ p: 2, borderRadius: 2, height: "100%" }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: "16px", borderColor: "divider", height: "100%" }}>
                         <Typography variant="caption" color="text.secondary">{t("tenders.overview.economy")}</Typography>
                         <Typography variant="h5" fontWeight={800}>
                             {economy == null ? empty : `${formatPrice(economy)} ${tender.currency}`}
@@ -251,11 +251,10 @@ export default function TenderOverviewPage() {
                 {canSeeTenderPhone && tender.phone && (
                     <Grid size={{ xs: 12 }}>
                         <Paper
-                            elevation={0}
+                            variant="outlined"
                             sx={{
-                                p: 2,
-                                borderRadius: 2,
-                                border: "1px solid",
+                                p: 2.5,
+                                borderRadius: "16px",
                                 borderColor: "success.light",
                                 bgcolor: "rgba(46, 125, 50, 0.04)",
                             }}
@@ -271,7 +270,7 @@ export default function TenderOverviewPage() {
                                         sx={{
                                             width: 40,
                                             height: 40,
-                                            borderRadius: 1,
+                                            borderRadius: "8px",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
@@ -308,7 +307,7 @@ export default function TenderOverviewPage() {
                 )}
             </Grid>
 
-            <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
                 <Stack spacing={2}>
                     <Typography variant="h6" fontWeight={800}>{t("tenders.overview.route")}</Typography>
 
@@ -333,7 +332,7 @@ export default function TenderOverviewPage() {
                 </Stack>
             </Paper>
 
-            <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
                 <Stack spacing={2}>
                     <Box>
                         <Typography variant="h6" fontWeight={800}>

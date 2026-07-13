@@ -22,10 +22,12 @@ export function PublicCompanyContactsSidebar({
 
     return (
         <Paper
+            variant="outlined"
             elevation={0}
             sx={{
                 p: { xs: 2, md: 2.5 },
-                borderRadius: 2,
+                borderRadius: "16px",
+                borderColor: "divider",
                 bgcolor: "background.paper",
                 position: { lg: "sticky" },
                 top: { lg: 24 },
@@ -65,6 +67,7 @@ export function PublicCompanyContactsSidebar({
                         onClick={onJoinClick}
                         disabled={isSubmitting}
                         fullWidth
+                        sx={{ borderRadius: "8px" }}
                     >
                         {isAuthenticated
                             ? t("publicCompany.contacts.applyToJoin")
@@ -76,6 +79,7 @@ export function PublicCompanyContactsSidebar({
                         onClick={onBack}
                         startIcon={<FiArrowLeft />}
                         fullWidth
+                        sx={{ borderRadius: "8px" }}
                     >
                         {t("publicCompany.contacts.goBack")}
                     </Button>

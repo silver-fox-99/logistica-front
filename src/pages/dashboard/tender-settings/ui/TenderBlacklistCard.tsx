@@ -34,7 +34,7 @@ export function TenderBlacklistCard({
     const { t } = useTranslation();
 
     return (
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
             <Stack spacing={1.5}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
                     <Box>
@@ -90,7 +90,7 @@ export function TenderBlacklistCard({
 
                 {!loading &&
                     items.map((item) => (
-                        <Paper key={item.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2 }}>
+                        <Paper key={item.id} variant="outlined" sx={{ p: 1.5, borderRadius: "12px", borderColor: "divider" }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
                                 <Box>
                                     <Typography fontWeight={700}>{item.phone}</Typography>

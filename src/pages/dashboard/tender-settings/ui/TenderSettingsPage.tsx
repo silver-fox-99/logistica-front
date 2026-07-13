@@ -173,7 +173,7 @@ export default function TenderSettingsPage() {
 
     if (!isOwner) {
         return (
-            <Alert severity="info" sx={{ borderRadius: 2 }}>
+            <Alert severity="info" sx={{ borderRadius: "8px" }}>
                 {t("tenders.settings.participantReadOnly")}
             </Alert>
         );

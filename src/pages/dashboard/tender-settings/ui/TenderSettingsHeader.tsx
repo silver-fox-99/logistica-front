@@ -19,7 +19,7 @@ export function TenderSettingsHeader({
     const { t } = useTranslation();
 
     return (
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
             <Stack spacing={1}>
                 <Typography variant="h6" fontWeight={800}>
                     {t("tenders.settings.title")}
@@ -30,7 +30,7 @@ export function TenderSettingsHeader({
                 </Typography>
 
                 {!canEdit && (
-                    <Alert severity="warning" sx={{ borderRadius: 2 }}>
+                    <Alert severity="warning" sx={{ borderRadius: "8px" }}>
                         {t("tenders.settings.hasBidsWarning")}
                     </Alert>
                 )}
@@ -46,7 +46,7 @@ export function TenderSettingsHeader({
                 </Stack>
 
                 {ownerCode && (
-                    <Alert severity="success" sx={{ borderRadius: 2 }}>
+                    <Alert severity="success" sx={{ borderRadius: "8px" }}>
                         <Typography fontWeight={800}>
                             {t("tenders.bids.winnerCodeTitle")}: {ownerCode}
                         </Typography>

@@ -47,7 +47,7 @@ export function BidFormCard({
     };
 
     return (
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
             <Stack spacing={2}>
                 <Box>
                     <Typography variant="h6" fontWeight={800}>

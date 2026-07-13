@@ -3,9 +3,8 @@ import {
     Alert,
     Box,
     Button,
-    Card,
-    CardContent,
     CircularProgress,
+    Paper,
     Stack,
     Tab,
     Tabs,
@@ -139,21 +138,19 @@ export default function CompanyTeamPage() {
             {error ? <Alert severity="error">{error}</Alert> : null}
             {success ? <Alert severity="success">{success}</Alert> : null}
 
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-                <CardContent sx={{ p: "0 !important" }}>
-                    <Tabs
-                        value={tab}
-                        onChange={(_, value) => setTab(value)}
-                        variant="scrollable"
-                        scrollButtons="auto"
-                    >
-                        <Tab value="active" label={t("companyTeam.tabs.active", { count: activeCount })} />
-                        <Tab value="history" label={t("companyTeam.tabs.history", { count: historyCount })} />
-                        <Tab value="invitations" label={t("companyTeam.tabs.invitations", { count: invitationsCount })} />
-                        <Tab value="requests" label={t("companyTeam.tabs.requests", { count: requestsCount })} />
-                    </Tabs>
-                </CardContent>
-            </Card>
+            <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider" }}>
+                <Tabs
+                    value={tab}
+                    onChange={(_, value) => setTab(value)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                >
+                    <Tab value="active" label={t("companyTeam.tabs.active", { count: activeCount })} />
+                    <Tab value="history" label={t("companyTeam.tabs.history", { count: historyCount })} />
+                    <Tab value="invitations" label={t("companyTeam.tabs.invitations", { count: invitationsCount })} />
+                    <Tab value="requests" label={t("companyTeam.tabs.requests", { count: requestsCount })} />
+                </Tabs>
+            </Paper>
 
             {isLoading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>

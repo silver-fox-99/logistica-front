@@ -5,10 +5,9 @@ import {
     Avatar,
     Box,
     Button,
-    Card,
-    CardContent,
     Chip,
     CircularProgress,
+    Paper,
     Stack,
     Typography,
 } from "@mui/material";
@@ -45,7 +44,7 @@ export default function CompanyInvitationAcceptPage() {
 
     if (!invitation) {
         return (
-            <Alert severity="error">
+            <Alert severity="error" sx={{ borderRadius: "8px" }}>
                 {error || "Invitation not found."}
             </Alert>
         );
@@ -69,12 +68,11 @@ export default function CompanyInvitationAcceptPage() {
                 </Typography>
             </Stack>
 
-            {error ? <Alert severity="error">{error}</Alert> : null}
-            {success ? <Alert severity="success">{success}</Alert> : null}
+            {error ? <Alert severity="error" sx={{ borderRadius: "8px" }}>{error}</Alert> : null}
+            {success ? <Alert severity="success" sx={{ borderRadius: "8px" }}>{success}</Alert> : null}
 
-            <Card variant="outlined" sx={{ borderRadius: 4 }}>
-                <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-                    <Stack spacing={2.5}>
+            <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: "16px", borderColor: "divider" }}>
+                <Stack spacing={2.5}>
                         <Stack direction="row" spacing={1.5} alignItems="center">
                             <Avatar src={invitation.company?.logo || undefined}>
                                 {companyName.slice(0, 1).toUpperCase()}
@@ -121,7 +119,7 @@ export default function CompanyInvitationAcceptPage() {
                             <Box
                                 sx={{
                                     p: 2,
-                                    borderRadius: 3,
+                                    borderRadius: "12px",
                                     bgcolor: "grey.50",
                                     border: "1px solid",
                                     borderColor: "divider",
@@ -137,7 +135,7 @@ export default function CompanyInvitationAcceptPage() {
                             <Box
                                 sx={{
                                     p: 2,
-                                    borderRadius: 3,
+                                    borderRadius: "12px",
                                     bgcolor: "grey.50",
                                     border: "1px solid",
                                     borderColor: "divider",
@@ -157,6 +155,7 @@ export default function CompanyInvitationAcceptPage() {
                                 variant="contained"
                                 disabled={!canRespond || isSubmitting}
                                 onClick={accept}
+                                sx={{ borderRadius: "8px" }}
                             >
                                 Accept invitation
                             </Button>
@@ -166,6 +165,7 @@ export default function CompanyInvitationAcceptPage() {
                                 color="error"
                                 disabled={!canRespond || isSubmitting}
                                 onClick={decline}
+                                sx={{ borderRadius: "8px" }}
                             >
                                 Decline invitation
                             </Button>
@@ -175,14 +175,14 @@ export default function CompanyInvitationAcceptPage() {
                                     component={NavLink}
                                     to={`/dashboard/companies/${invitation.company_id}`}
                                     variant="text"
+                                    sx={{ borderRadius: "8px" }}
                                 >
                                     Open company
                                 </Button>
                             ) : null}
                         </Stack>
                     </Stack>
-                </CardContent>
-            </Card>
+            </Paper>
         </Stack>
     );
 }

@@ -4,14 +4,15 @@ import {
     Alert,
     Box,
     CircularProgress,
-    Container,
+    Paper,
     Stack,
+    Typography,
+    Button,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { FiBriefcase, FiChevronLeft } from "react-icons/fi";
 import { usePublicCompany } from "@/pages/public/company/model/usePublicCompany";
 import { PublicCompanyHeader } from "@/widgets/company/public-company-profile/ui/PublicCompanyHeader";
-import { PublicCompanyOverviewSection } from "@/widgets/company/public-company-profile/ui/PublicCompanyOverviewSection";
-import { PublicCompanyContactsSidebar } from "@/widgets/company/public-company-profile/ui/PublicCompanyContactsSidebar";
 import { PublicCompanyMembersSection } from "@/widgets/company/public-company-profile/ui/PublicCompanyMembersSection";
 import { CreateCompanyJoinRequestDialog } from "@/features/company/join-request/ui/CreateCompanyJoinRequestDialog";
 import { companiesApi } from "@/shared/api/companiesApi";
@@ -68,82 +69,100 @@ export default function PublicCompanyPage() {
     };
 
     return (
-        <Box
-            sx={{
-                minHeight: "100dvh",
-                bgcolor: "#f7f8fa",
-                py: { xs: 2.5, md: 4 },
-            }}
-        >
-            <Container maxWidth="lg">
-                {isLoading ? (
-                    <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
-                        <CircularProgress />
+        <Stack spacing={3}>
+            {/* Page Header (Matching ShipmentsPage and standard redesign pattern) */}
+            <Paper
+                variant="outlined"
+                sx={{
+                    p: { xs: 2, md: 2.5 },
+                    borderRadius: "16px",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                }}
+            >
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <Box
+                        sx={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            bgcolor: "#EEF4F7",
+                            color: "primary.main",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <FiBriefcase size={20} />
                     </Box>
-                ) : error || !company ? (
-                    <Alert severity="error">
-                        {error || t("publicCompany.page.notFound")}
-                    </Alert>
-                ) : (
-                    <Stack spacing={{ xs: 2, md: 3 }}>
-                        {submitError ? <Alert severity="error">{submitError}</Alert> : null}
-                        {success ? <Alert severity="success">{success}</Alert> : null}
-
-                        <PublicCompanyHeader
-                            company={company}
-                            isAuthenticated={isAuthenticated}
-                            isSubmitting={isSubmitting}
-                            onJoinClick={handleJoinClick}
-                        />
-
-                        {!isAuthenticated ? (
-                            <Alert severity="info">
-                                {t("publicCompany.page.joinInfoAuthRequired")}
-                            </Alert>
-                        ) : null}
-
-                        <Stack
-                            direction={{ xs: "column", lg: "row" }}
-                            spacing={{ xs: 2, md: 3 }}
-                            alignItems="flex-start"
-                        >
-                            <Stack
-                                spacing={{ xs: 2, md: 3 }}
-                                sx={{
-                                    flex: 1,
-                                    minWidth: 0,
-                                }}
-                            >
-                                <PublicCompanyOverviewSection company={company} />
-                                <PublicCompanyMembersSection members={company.members || []} />
-                            </Stack>
-
-                            <Box
-                                sx={{
-                                    width: { xs: "100%", lg: 320 },
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <PublicCompanyContactsSidebar
-                                    company={company}
-                                    isAuthenticated={isAuthenticated}
-                                    isSubmitting={isSubmitting}
-                                    onJoinClick={handleJoinClick}
-                                    onBack={() => navigate(-1)}
-                                />
-                            </Box>
-                        </Stack>
-
-                        <CreateCompanyJoinRequestDialog
-                            open={dialogOpen}
-                            isSubmitting={isSubmitting}
-                            submitError={submitError}
-                            onClose={() => setDialogOpen(false)}
-                            onSubmit={handleSubmitJoinRequest}
-                        />
+                    <Stack spacing={0.25}>
+                        <Typography variant="h6" fontWeight={800}>
+                            {t("companyPage.title", "Компании")}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {t("companyPage.subtitle", "Управляйте своими компаниями или просматривайте публичные профили компаний")}
+                        </Typography>
                     </Stack>
-                )}
-            </Container>
-        </Box>
+                </Stack>
+            </Paper>
+
+            {/* Back button */}
+            <Button
+                onClick={() => navigate(-1)}
+                startIcon={<FiChevronLeft />}
+                sx={{
+                    alignSelf: "flex-start",
+                    textTransform: "none",
+                    color: "primary.main",
+                    fontWeight: 700,
+                    p: 0,
+                    minWidth: 0,
+                    "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
+                }}
+            >
+                {t("publicCompany.contacts.goBack", "Назад")}
+            </Button>
+
+            {isLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+                    <CircularProgress />
+                </Box>
+            ) : error || !company ? (
+                <Alert severity="error">
+                    {error || t("publicCompany.page.notFound")}
+                </Alert>
+            ) : (
+                <Stack spacing={3}>
+                    {submitError ? <Alert severity="error">{submitError}</Alert> : null}
+                    {success ? <Alert severity="success">{success}</Alert> : null}
+
+                    {/* Main Company Card */}
+                    <PublicCompanyHeader
+                        company={company}
+                        isAuthenticated={isAuthenticated}
+                        isSubmitting={isSubmitting}
+                        onJoinClick={handleJoinClick}
+                    />
+
+                    {!isAuthenticated && (
+                        <Alert severity="info" sx={{ borderRadius: "8px" }}>
+                            {t("publicCompany.page.joinInfoAuthRequired")}
+                        </Alert>
+                    )}
+
+                    {/* Team Members List */}
+                    <PublicCompanyMembersSection members={company.members || []} />
+
+                    <CreateCompanyJoinRequestDialog
+                        open={dialogOpen}
+                        isSubmitting={isSubmitting}
+                        submitError={submitError}
+                        onClose={() => setDialogOpen(false)}
+                        onSubmit={handleSubmitJoinRequest}
+                    />
+                </Stack>
+            )}
+        </Stack>
     );
 }

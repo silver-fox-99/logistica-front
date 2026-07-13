@@ -1,4 +1,4 @@
-import { Avatar, Box, Chip, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import type { PublicCompanyMember } from "@/entities/company/model/types";
@@ -26,44 +26,42 @@ export function PublicCompanyMembersSection({ members }: Props) {
     };
 
     return (
-        <Box
-            sx={{
-                px: { xs: 0, md: 0 },
-                py: { xs: 0.5, md: 0.5 },
-            }}
-        >
-            <Stack spacing={2}>
+        <Box sx={{ py: 1 }}>
+            <Stack spacing={2.5}>
                 <Stack spacing={0.5}>
-                    <Typography variant="h6" fontWeight={700}>
-                        {t("publicCompany.members.title")}
+                    <Typography variant="h5" fontWeight={700}>
+                        {t("publicCompany.members.title", "Участники команды")}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {t("publicCompany.members.description")}
+                        {t("publicCompany.members.description", "Люди, публично связанные с этой компанией")}
                     </Typography>
                 </Stack>
 
                 {members.length === 0 ? (
-                    <Box
+                    <Paper
+                        variant="outlined"
                         sx={{
-                            px: 2,
-                            py: 2.5,
-                            borderRadius: 2,
+                            px: 2.5,
+                            py: 3,
+                            borderRadius: "16px",
+                            borderColor: "divider",
                             bgcolor: "background.paper",
                         }}
                     >
                         <Typography variant="body2" color="text.secondary">
                             {t("publicCompany.members.empty")}
                         </Typography>
-                    </Box>
+                    </Paper>
                 ) : (
                     <Box
                         sx={{
                             display: "grid",
                             gridTemplateColumns: {
                                 xs: "1fr",
-                                sm: "repeat(2, minmax(0, 1fr))",
+                                sm: "repeat(2, 1fr)",
+                                md: "repeat(3, 1fr)",
                             },
-                            gap: 1.5,
+                            gap: 2,
                         }}
                     >
                         {members.map((member) => {
@@ -77,119 +75,78 @@ export function PublicCompanyMembersSection({ members }: Props) {
                                 : null;
 
                             return (
-                                <Box
+                                <Paper
                                     key={member.id}
+                                    variant="outlined"
                                     sx={{
-                                        p: 2,
-                                        borderRadius: 2,
+                                        p: 2.5,
+                                        borderRadius: "16px",
+                                        borderColor: "divider",
                                         bgcolor: "background.paper",
-                                        minWidth: 0,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: 2,
                                     }}
                                 >
-                                    <Stack spacing={1.25}>
-                                        <Stack direction="row" spacing={1.25} alignItems="center">
-                                            {profileUrl ? (
-                                                <Box
-                                                    component={NavLink}
-                                                    to={profileUrl}
-                                                    sx={{
-                                                        display: "inline-flex",
-                                                        textDecoration: "none",
-                                                        color: "inherit",
-                                                        flexShrink: 0,
-                                                    }}
-                                                >
-                                                    <Avatar
-                                                        src={member.user?.avatar || undefined}
-                                                        sx={{
-                                                            width: 48,
-                                                            height: 48,
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        {fullName[0]?.toUpperCase()}
-                                                    </Avatar>
-                                                </Box>
-                                            ) : (
-                                                <Avatar
-                                                    src={member.user?.avatar || undefined}
-                                                    sx={{ width: 48, height: 48 }}
-                                                >
+                                    {/* Top row: Avatar on left, Role Tag on right */}
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                        {profileUrl ? (
+                                            <Box
+                                                component={NavLink}
+                                                to={profileUrl}
+                                                sx={{ display: "inline-flex", textDecoration: "none", color: "inherit" }}
+                                            >
+                                                <Avatar src={member.user?.avatar || undefined} sx={{ width: 44, height: 44, cursor: "pointer" }}>
                                                     {fullName[0]?.toUpperCase()}
                                                 </Avatar>
-                                            )}
+                                            </Box>
+                                        ) : (
+                                            <Avatar src={member.user?.avatar || undefined} sx={{ width: 44, height: 44 }}>
+                                                {fullName[0]?.toUpperCase()}
+                                            </Avatar>
+                                        )}
 
-                                            <Stack spacing={0.35} minWidth={0} sx={{ flex: 1 }}>
-                                                <Stack
-                                                    direction="row"
-                                                    spacing={1}
-                                                    alignItems="center"
-                                                    flexWrap="wrap"
-                                                    useFlexGap
-                                                >
-                                                    {profileUrl ? (
-                                                        <Typography
-                                                            component={NavLink}
-                                                            to={profileUrl}
-                                                            variant="subtitle1"
-                                                            fontWeight={700}
-                                                            sx={{
-                                                                wordBreak: "break-word",
-                                                                textDecoration: "none",
-                                                                color: "text.primary",
-                                                                transition: "0.2s ease",
-                                                                "&:hover": {
-                                                                    color: "primary.main",
-                                                                    textDecoration: "underline",
-                                                                },
-                                                            }}
-                                                        >
-                                                            {fullName}
-                                                        </Typography>
-                                                    ) : (
-                                                        <Typography
-                                                            variant="subtitle1"
-                                                            fontWeight={700}
-                                                            sx={{ wordBreak: "break-word" }}
-                                                        >
-                                                            {fullName}
-                                                        </Typography>
-                                                    )}
-
-                                                    <Chip
-                                                        size="small"
-                                                        label={formatRole(member.role)}
-                                                        variant="filled"
-                                                        sx={{
-                                                            bgcolor: "action.hover",
-                                                            fontWeight: 600,
-                                                        }}
-                                                    />
-                                                </Stack>
-
-                                                {member.user?.email ? (
-                                                    <Typography
-                                                        variant="body2"
-                                                        color="text.secondary"
-                                                        sx={{ wordBreak: "break-word" }}
-                                                    >
-                                                        {member.user.email}
-                                                    </Typography>
-                                                ) : null}
-
-                                                {member.user?.phone ? (
-                                                    <Typography
-                                                        variant="body2"
-                                                        color="text.secondary"
-                                                        sx={{ wordBreak: "break-word" }}
-                                                    >
-                                                        {member.user.phone}
-                                                    </Typography>
-                                                ) : null}
-                                            </Stack>
-                                        </Stack>
+                                        <Chip
+                                            size="small"
+                                            label={formatRole(member.role)}
+                                            sx={{
+                                                bgcolor: "rgba(15, 95, 194, 0.06)",
+                                                color: "primary.main",
+                                                fontWeight: 650,
+                                                borderRadius: "6px",
+                                                border: "none",
+                                            }}
+                                        />
                                     </Stack>
-                                </Box>
+
+                                    {/* Member Name and Contact info */}
+                                    <Stack spacing={0.5}>
+                                        {profileUrl ? (
+                                            <Typography
+                                                component={NavLink}
+                                                to={profileUrl}
+                                                variant="subtitle1"
+                                                fontWeight={700}
+                                                sx={{
+                                                    wordBreak: "break-word",
+                                                    textDecoration: "none",
+                                                    color: "text.primary",
+                                                    "&:hover": { color: "primary.main", textDecoration: "underline" },
+                                                }}
+                                            >
+                                                {fullName}
+                                            </Typography>
+                                        ) : (
+                                            <Typography variant="subtitle1" fontWeight={700} sx={{ wordBreak: "break-word" }}>
+                                                {fullName}
+                                            </Typography>
+                                        )}
+
+                                        <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-word" }}>
+                                            {member.user?.phone || member.user?.email || "—"}
+                                        </Typography>
+                                    </Stack>
+                                </Paper>
                             );
                         })}
                     </Box>

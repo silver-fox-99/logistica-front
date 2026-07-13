@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { Add } from "@mui/icons-material";
-import { FiMapPin } from "react-icons/fi";
+import { FiList, FiMapPin } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import { TenderStatus, type Tender, type TenderListParams } from "@/entities/tender/model/types";
@@ -63,9 +63,14 @@ function TenderCard({ tender }: { tender: Tender }) {
 
     return (
         <Paper
-            elevation={0}
             variant="outlined"
-            sx={{ p: 2, borderRadius: 2 }}
+            sx={{
+                p: 2.5,
+                borderRadius: "16px",
+                borderColor: "divider",
+                transition: "border-color 0.15s",
+                "&:hover": { borderColor: "primary.light" },
+            }}
             component={NavLink}
             to={`/dashboard/tenders/${tender.id}/overview`}
             style={{ textDecoration: "none", color: "inherit" }}
@@ -280,29 +285,60 @@ export default function TendersPage({ scope = "search" }: Props) {
     return (
         <Box sx={{ py: 3 }}>
             <Stack spacing={2}>
-                <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={1.5}>
-                    <Box>
-                        <Typography variant="h5" fontWeight={800}>
-                            {title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {subtitle}
-                        </Typography>
-                    </Box>
+                <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
+                    <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems={{ md: "center" }} gap={1.5}>
+                        <Stack direction="row" spacing={1.5} alignItems="center">
+                            <Box
+                                sx={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: "50%",
+                                    bgcolor: "#EEF4F7",
+                                    color: "primary.main",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {scope === "my" ? (
+                                    <FiList size={22} />
+                                ) : (
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                )}
+                            </Box>
+                            <Box>
+                                <Typography variant="h6" fontWeight={800}>
+                                    {title}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {subtitle}
+                                </Typography>
+                            </Box>
+                        </Stack>
 
-                    <Button
-                        component={NavLink}
-                        to="/dashboard/tenders/create"
-                        variant="contained"
-                        startIcon={<Add />}
-                        sx={{ alignSelf: { xs: "stretch", md: "center" } }}
-                    >
-                        {t("tenders.list.create")}
-                    </Button>
-                </Stack>
+                        <Button
+                            component={NavLink}
+                            to="/dashboard/tenders/create"
+                            variant="contained"
+                            startIcon={<Add />}
+                            sx={{
+                                alignSelf: { xs: "stretch", md: "center" },
+                                borderRadius: "8px",
+                                textTransform: "none",
+                                fontWeight: 700,
+                            }}
+                        >
+                            {t("tenders.list.create")}
+                        </Button>
+                    </Stack>
+                </Paper>
 
                 {scope === "my" && (
-                    <Paper elevation={0} sx={{ borderRadius: 2 }}>
+                    <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider" }}>
                         <Tabs
                             value={myTab}
                             onChange={(_, value) => setMyTab(value)}
@@ -317,7 +353,7 @@ export default function TendersPage({ scope = "search" }: Props) {
                     </Paper>
                 )}
 
-                <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: "16px", borderColor: "divider" }}>
                     <TenderSearchBar
                         value={search}
                         activeFiltersCount={activeFiltersCount}
@@ -364,7 +400,7 @@ export default function TendersPage({ scope = "search" }: Props) {
                         ))}
 
                         {!items.length && (
-                            <Paper elevation={0} sx={{ p: 4, borderRadius: 2, textAlign: "center" }}>
+                            <Paper variant="outlined" sx={{ p: 4, borderRadius: "16px", borderColor: "divider", textAlign: "center" }}>
                                 <Typography color="text.secondary">{emptyText}</Typography>
                             </Paper>
                         )}

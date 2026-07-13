@@ -260,7 +260,7 @@ function TenderPointsFieldArray({ kind, name, form, errorMessages = [] }: Tender
             </Typography>
 
             {fields.map((field, index) => (
-                <Paper key={field.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2 }}>
+                <Paper key={field.id} variant="outlined" sx={{ p: 1.5, borderRadius: "12px", borderColor: "divider" }}>
                     <Stack spacing={1.25}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
                             <Typography variant="subtitle2">
@@ -486,7 +486,7 @@ export default function TenderCreatePage() {
 
     return (
         <Box sx={{ py: 3 }}>
-            <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
+            <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: "16px", borderColor: "divider" }}>
                 <Stack spacing={3} component="form" noValidate onSubmit={onSubmit}>
                     <Box>
                         <Typography variant="h5" fontWeight={700}>
@@ -598,7 +598,7 @@ export default function TenderCreatePage() {
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Alert severity="info" sx={{ borderRadius: 2 }}>
+                            <Alert severity="info" sx={{ borderRadius: "8px" }}>
                                 <AlertTitle sx={{ fontWeight: 800 }}>
                                     {t("tenders.create.howItWorksTitle")}
                                 </AlertTitle>
@@ -730,7 +730,7 @@ export default function TenderCreatePage() {
 
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" justifyContent="center" mt={1.5}>
-                                <Button type="submit" variant="contained" sx={{ minWidth: 260 }} disabled={loading || loadingInit}>
+                                <Button type="submit" variant="contained" sx={{ minWidth: 260, borderRadius: "8px", fontWeight: 700 }} disabled={loading || loadingInit}>
                                     {loading ? t("tenders.common.loading") : t("tenders.create.createButton")}
                                 </Button>
                             </Stack>

@@ -4,7 +4,6 @@ import {
     Alert,
     Box,
     Button,
-    Card,
     Chip,
     CircularProgress,
     InputAdornment,
@@ -76,11 +75,10 @@ export default function CompanyPage() {
     return (
         <Stack spacing={3}>
             <Paper
-                elevation={0}
+                variant="outlined"
                 sx={{
                     p: { xs: 2, md: 3 },
-                    borderRadius: 2,
-                    border: "1px solid",
+                    borderRadius: "16px",
                     borderColor: "divider",
                 }}
             >
@@ -181,11 +179,10 @@ export default function CompanyPage() {
 
             {current.isLoading ? (
                 <Paper
-                    elevation={0}
+                    variant="outlined"
                     sx={{
                         py: 8,
-                        borderRadius: 2,
-                        border: "1px solid",
+                        borderRadius: "16px",
                         borderColor: "divider",
                     }}
                 >
@@ -198,11 +195,10 @@ export default function CompanyPage() {
                 </Paper>
             ) : !hasItems ? (
                 <Paper
-                    elevation={0}
+                    variant="outlined"
                     sx={{
                         p: { xs: 2.5, md: 3 },
-                        borderRadius: 2,
-                        border: "1px solid",
+                        borderRadius: "16px",
                         borderColor: "divider",
                     }}
                 >
@@ -248,12 +244,12 @@ export default function CompanyPage() {
                             t("companyPage.card.noContacts");
 
                         return (
-                            <Card
+                            <Paper
                                 key={company.id}
                                 variant="outlined"
                                 sx={{
-                                    borderRadius: 2,
-                                    boxShadow: "none",
+                                    borderRadius: "16px",
+                                    borderColor: "divider",
                                 }}
                             >
                                 <Stack
@@ -341,7 +337,7 @@ export default function CompanyPage() {
                                         )}
                                     </Stack>
                                 </Stack>
-                            </Card>
+                            </Paper>
                         );
                     })}
                 </Stack>
@@ -367,7 +363,7 @@ function ToggleTabButton({
             color={active ? "primary" : "inherit"}
             sx={{
                 minWidth: 160,
-                borderRadius: 1.5,
+                borderRadius: "8px",
                 textTransform: "none",
                 fontWeight: 600,
                 px: 2,

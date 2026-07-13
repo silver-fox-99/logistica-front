@@ -1,4 +1,4 @@
-import { Card, CardContent, LinearProgress, Stack, Typography } from "@mui/material";
+import { LinearProgress, Paper, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { Company } from "@/entities/company/model/types";
 
@@ -34,28 +34,26 @@ export function CompanyProgressCard({ company }: Props) {
     const percent = calcCompletion(company);
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 4 }}>
-            <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-                <Stack spacing={1.5}>
-                    <Typography variant="h6" fontWeight={700}>
-                        {t("companyOverviewCards.progressCard.title")}
-                    </Typography>
+        <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider", p: { xs: 2.5, md: 3 } }}>
+            <Stack spacing={1.5}>
+                <Typography variant="h6" fontWeight={700}>
+                    {t("companyOverviewCards.progressCard.title")}
+                </Typography>
 
-                    <Typography variant="body2" color="text.secondary">
-                        {t("companyOverviewCards.progressCard.description")}
-                    </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {t("companyOverviewCards.progressCard.description")}
+                </Typography>
 
-                    <Typography variant="body2" fontWeight={600}>
-                        {t("companyOverviewCards.progressCard.completed", { percent })}
-                    </Typography>
+                <Typography variant="body2" fontWeight={600}>
+                    {t("companyOverviewCards.progressCard.completed", { percent })}
+                </Typography>
 
-                    <LinearProgress
-                        variant="determinate"
-                        value={percent}
-                        sx={{ height: 8, borderRadius: 999 }}
-                    />
-                </Stack>
-            </CardContent>
-        </Card>
+                <LinearProgress
+                    variant="determinate"
+                    value={percent}
+                    sx={{ height: 8, borderRadius: 999 }}
+                />
+            </Stack>
+        </Paper>
     );
 }

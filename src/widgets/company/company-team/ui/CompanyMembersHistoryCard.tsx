@@ -1,9 +1,8 @@
 import {
     Avatar,
     Box,
-    Card,
-    CardContent,
     Chip,
+    Paper,
     Stack,
     Typography,
 } from "@mui/material";
@@ -44,8 +43,7 @@ export function CompanyMembersHistoryCard({ members }: Props) {
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 2, borderColor: "divider" }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+        <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider", p: { xs: 2, md: 3 } }}>
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
@@ -73,7 +71,7 @@ export function CompanyMembersHistoryCard({ members }: Props) {
                                         key={member.id}
                                         sx={{
                                             p: 2,
-                                            borderRadius: 3,
+                                            borderRadius: "12px",
                                             bgcolor: "grey.50",
                                         }}
                                     >
@@ -194,7 +192,6 @@ export function CompanyMembersHistoryCard({ members }: Props) {
                         </Stack>
                     )}
                 </Stack>
-            </CardContent>
-        </Card>
+        </Paper>
     );
 }

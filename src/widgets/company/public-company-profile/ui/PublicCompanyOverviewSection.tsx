@@ -20,10 +20,12 @@ export function PublicCompanyOverviewSection({ company }: Props) {
 
     return (
         <Paper
+            variant="outlined"
             elevation={0}
             sx={{
                 p: { xs: 2, md: 3 },
-                borderRadius: 2,
+                borderRadius: "16px",
+                borderColor: "divider",
                 bgcolor: "background.paper",
                 width: "100%",
             }}

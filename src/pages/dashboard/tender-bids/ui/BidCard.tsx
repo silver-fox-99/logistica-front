@@ -41,8 +41,8 @@ export function BidCard({
         <Paper
             variant="outlined"
             sx={{
-                p: 2,
-                borderRadius: 2,
+                p: 2.5,
+                borderRadius: "16px",
                 borderColor: isLeader ? "success.light" : "divider",
                 bgcolor: isLeader ? "success.50" : "background.paper",
             }}
@@ -107,7 +107,7 @@ export function BidCard({
                                     width: "fit-content",
                                     px: 1.25,
                                     py: 0.75,
-                                    borderRadius: 1,
+                                    borderRadius: "6px",
                                     bgcolor: "grey.100",
                                 }}
                             >
@@ -154,7 +154,7 @@ export function BidCard({
                             minWidth: 0,
                             px: 2,
                             py: 0.85,
-                            borderRadius: 1,
+                            borderRadius: "8px",
                             textTransform: "none",
                             fontWeight: 700,
                         }}

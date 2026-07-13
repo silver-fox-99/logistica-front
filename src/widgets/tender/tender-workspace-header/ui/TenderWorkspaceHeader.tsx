@@ -32,7 +32,7 @@ export function TenderWorkspaceHeader({
         : t("tenders.common.empty");
 
     return (
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: "16px", borderColor: "divider" }}>
             <Stack spacing={1}>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                     <Chip label={t("tenders.workspace.header.type")} size="small" color="primary" />

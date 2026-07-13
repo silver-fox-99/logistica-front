@@ -1,10 +1,9 @@
 import {
     Avatar,
     Button,
-    Card,
-    CardContent,
     Chip,
     Divider,
+    Paper,
     Stack,
     Typography,
 } from "@mui/material";
@@ -51,8 +50,7 @@ export function CompanyInvitationsCard({
     };
 
     return (
-        <Card variant="outlined" sx={{ borderRadius: 2 }}>
-            <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+        <Paper variant="outlined" sx={{ borderRadius: "16px", borderColor: "divider", p: { xs: 2.5, md: 3 } }}>
                 <Stack spacing={2.5}>
                     <Stack spacing={0.5}>
                         <Typography variant="h6" fontWeight={700}>
@@ -160,6 +158,7 @@ export function CompanyInvitationsCard({
                                                     variant="outlined"
                                                     startIcon={<FiCopy />}
                                                     onClick={() => handleCopyLink(invitation.token)}
+                                                    sx={{ borderRadius: "8px" }}
                                                 >
                                                     {t("companyTeam.invitations.copyLink")}
                                                 </Button>
@@ -171,6 +170,7 @@ export function CompanyInvitationsCard({
                                                     rel="noreferrer"
                                                     variant="outlined"
                                                     startIcon={<FiExternalLink />}
+                                                    sx={{ borderRadius: "8px" }}
                                                 >
                                                     {t("companyTeam.invitations.openLink")}
                                                 </Button>
@@ -181,6 +181,7 @@ export function CompanyInvitationsCard({
                                                 color="error"
                                                 disabled={isSubmitting || invitation.status !== "PENDING"}
                                                 onClick={() => onCancel(invitation.id)}
+                                                sx={{ borderRadius: "8px" }}
                                             >
                                                 {t("companyTeam.invitations.cancelInvitation")}
                                             </Button>
@@ -191,7 +192,6 @@ export function CompanyInvitationsCard({
                         </Stack>
                     )}
                 </Stack>
-            </CardContent>
-        </Card>
+        </Paper>
     );
 }
