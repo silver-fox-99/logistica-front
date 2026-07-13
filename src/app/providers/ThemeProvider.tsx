@@ -45,31 +45,31 @@ const theme = createTheme({
     fontSize: 16,
     htmlFontSize: 16,
     h1: {
-      fontWeight: 800,
+      fontWeight: 600,
       fontSize: "2.5rem", // 40px
       lineHeight: 1.2,
       color: "#0F172A",
     },
     h2: {
-      fontWeight: 800,
+      fontWeight: 500,
       fontSize: "2rem", // 32px
       lineHeight: 1.3,
       color: "#0F172A",
     },
     h3: {
-      fontWeight: 800,
+      fontWeight: 500,
       fontSize: "1.75rem", // 28px
       lineHeight: 1.3,
       color: "#0F172A",
     },
     h4: {
-      fontWeight: 800,
+      fontWeight: 500,
       fontSize: "1.5rem", // 24px
       lineHeight: 1.35,
       color: "#0F172A",
     },
     h5: {
-      fontWeight: 700,
+      fontWeight: 500,
       fontSize: "1.25rem", // 20px
       lineHeight: 1.4,
       color: "#0F172A",
@@ -83,16 +83,18 @@ const theme = createTheme({
     body1: {
       fontSize: "1rem", // 16px
       lineHeight: 1.5,
+      fontWeight: 300,
       color: "#475569",
     },
     body2: {
       fontSize: "0.875rem", // 14px
       lineHeight: 1.57,
+      fontWeight: 300,
       color: "#475569",
     },
     button: {
       textTransform: "none",
-      fontWeight: 700,
+      fontWeight: 500,
       fontSize: "1rem",
     },
   },
@@ -100,6 +102,15 @@ const theme = createTheme({
     borderRadius: 12,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          WebkitFontSmoothing: "antialiased",
+          MozOsxFontSmoothing: "grayscale",
+          textRendering: "optimizeLegibility",
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
