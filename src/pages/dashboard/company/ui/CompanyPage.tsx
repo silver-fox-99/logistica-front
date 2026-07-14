@@ -15,13 +15,14 @@ import {
 import {
   FiArrowRight,
   FiBriefcase,
-  FiGlobe,
   FiMapPin,
   FiPhone,
   FiPlus,
   FiSearch,
 } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
+import { GoArrowRight } from "react-icons/go";
+
+import { Trans, useTranslation } from "react-i18next";
 import { useMyCompanies } from "@/pages/dashboard/company/model/useMyCompanies";
 import { usePublicCompanies } from "@/pages/dashboard/company/model/usePublicCompanies";
 
@@ -88,84 +89,14 @@ export default function CompanyPage() {
       <Paper
         variant="outlined"
         sx={{
-          p: { xs: 2, md: 3 },
+          p: { xs: 2.5, md: 4 },
           borderRadius: "16px",
           borderColor: "divider",
+          boxShadow: "0px 10px 30px rgba(15, 23, 42, 0.04)",
         }}
       >
-        <Stack spacing={2.5}>
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={2}
-            justifyContent="space-between"
-            alignItems={{ xs: "stretch", md: "flex-start" }}
-          >
-            <Stack spacing={0.75}>
-              <Typography variant="h4" fontWeight={600}>
-                {t("companyPage.title")}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" maxWidth={700}>
-                {t("companyPage.subtitle")}
-              </Typography>
-            </Stack>
-
-            <Button
-              component={NavLink}
-              to="/dashboard/new/company"
-              variant="contained"
-              startIcon={<FiPlus />}
-              sx={{ alignSelf: { xs: "stretch", md: "center" } }}
-            >
-              {t("companyPage.createCompany")}
-            </Button>
-          </Stack>
-
-          <Box
-            sx={{
-              display: "inline-flex",
-              p: 0.5,
-              borderRadius: 2,
-              bgcolor: "action.hover",
-              width: "fit-content",
-              maxWidth: "100%",
-              gap: 0.5,
-              flexWrap: "wrap",
-            }}
-          >
-            <ToggleTabButton
-              active={tab === "public"}
-              onClick={() => setTab("public")}
-              label={t("companyPage.segments.public")}
-            />
-            <ToggleTabButton
-              active={tab === "my"}
-              onClick={() => setTab("my")}
-              label={t("companyPage.segments.my")}
-            />
-          </Box>
-
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={1.5}
-            justifyContent="space-between"
-            alignItems={{ xs: "stretch", md: "center" }}
-          >
-            <Stack spacing={0.5}>
-              <Typography variant="h6" fontWeight={600}>
-                {headerTitle}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {headerSubtitle}
-              </Typography>
-            </Stack>
-
-            <Chip
-              label={t("companyPage.stats.total", { count: current.total })}
-              variant="outlined"
-              sx={{ alignSelf: { xs: "flex-start", md: "center" } }}
-            />
-          </Stack>
-
+        <Stack spacing={3}>
+          {/* 1. Search Bar */}
           <TextField
             fullWidth
             value={current.query}
@@ -175,14 +106,161 @@ export default function CompanyPage() {
                 ? t("companyPage.search.myPlaceholder")
                 : t("companyPage.search.publicPlaceholder")
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FiSearch />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "text.secondary" }}>
+                    <FiSearch size={18} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "8px",
+                bgcolor: "background.paper",
+                "& fieldset": {
+                  borderColor: "#E2E8F0",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#CBD5E1",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
             }}
           />
+
+          {/* 2. Headline and Total Count */}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            spacing={2}
+          >
+            <Stack spacing={0.5}>
+              <Typography variant="h6" fontWeight={700} sx={{ color: "#0F172A" }}>
+                {headerTitle}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {headerSubtitle}
+              </Typography>
+            </Stack>
+
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 400,
+                color: "text.primary",
+                whiteSpace: "nowrap",
+                alignSelf: "center",
+              }}
+            >
+              <Trans
+                i18nKey="shipments.total"
+                values={{ count: current.total }}
+                components={{ bold: <strong style={{ fontWeight: 700 }} /> }}
+              />
+            </Typography>
+          </Stack>
+
+          {/* 3. Toggle Buttons and Create Button */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "stretch", sm: "center" }}
+            gap={2.5}
+          >
+            <Box
+              sx={{
+                display: "inline-flex",
+                bgcolor: "#f1f3f5",
+                p: 0.5,
+                borderRadius: "12px",
+                border: "1px solid",
+                borderColor: "divider",
+                alignSelf: { xs: "flex-start", sm: "auto" },
+              }}
+            >
+              <Button
+                onClick={() => setTab("public")}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1,
+                  bgcolor:
+                    tab === "public" ? "background.paper" : "transparent",
+                  color:
+                    tab === "public" ? "primary.main" : "text.secondary",
+                  boxShadow:
+                    tab === "public" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                  border:
+                    tab === "public" ? "1px solid" : "1px solid transparent",
+                  borderColor: tab === "public" ? "divider" : "transparent",
+                  "&:hover": {
+                    bgcolor:
+                      tab === "public"
+                        ? "background.paper"
+                        : "rgba(0,0,0,0.03)",
+                  },
+                }}
+              >
+                {t("companyPage.segments.public")}
+              </Button>
+              <Button
+                onClick={() => setTab("my")}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1,
+                  bgcolor:
+                    tab === "my" ? "background.paper" : "transparent",
+                  color:
+                    tab === "my" ? "primary.main" : "text.secondary",
+                  boxShadow:
+                    tab === "my" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                  border:
+                    tab === "my" ? "1px solid" : "1px solid transparent",
+                  borderColor: tab === "my" ? "divider" : "transparent",
+                  "&:hover": {
+                    bgcolor:
+                      tab === "my"
+                        ? "background.paper"
+                        : "rgba(0,0,0,0.03)",
+                  },
+                }}
+              >
+                {t("companyPage.segments.my")}
+              </Button>
+            </Box>
+
+            <Button
+              component={NavLink}
+              to="/dashboard/new/company"
+              variant="contained"
+              startIcon={<FiPlus />}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                borderRadius: "8px",
+                px: 3,
+                py: 1,
+                boxShadow: "none",
+                "&:hover": {
+                  boxShadow: "none",
+                },
+                alignSelf: { xs: "stretch", sm: "center" },
+              }}
+            >
+              {t("companyPage.createCompany")}
+            </Button>
+          </Stack>
         </Stack>
       </Paper>
 
@@ -328,7 +406,8 @@ export default function CompanyPage() {
                         component={NavLink}
                         to={`/dashboard/companies/${company.id}`}
                         variant="outlined"
-                        startIcon={<FiGlobe />}
+                        sx={{ whiteSpace: "nowrap" }}
+                        endIcon={<GoArrowRight />}
                         fullWidth
                       >
                         {t("companyPage.actions.publicPage")}
@@ -366,35 +445,7 @@ export default function CompanyPage() {
   );
 }
 
-function ToggleTabButton({
-  active,
-  onClick,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-}) {
-  return (
-    <Button
-      type="button"
-      onClick={onClick}
-      variant={active ? "contained" : "text"}
-      color={active ? "primary" : "inherit"}
-      sx={{
-        minWidth: 160,
-        borderRadius: "8px",
-        textTransform: "none",
-        fontWeight: 600,
-        px: 2,
-        py: 1,
-        boxShadow: active ? 1 : "none",
-      }}
-    >
-      {label}
-    </Button>
-  );
-}
+
 
 function InfoRow({
   icon,
