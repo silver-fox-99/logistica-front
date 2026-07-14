@@ -12,16 +12,19 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Box,
 } from "@mui/material";
 import {
   FiChevronDown,
-  FiSliders,
   FiLayers,
   FiTrash2,
   FiPackage,
   FiTruck,
 } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
+
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
+import SettingsIcon from "@/pages/dashboard/requests/icons/settings.svg";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
 
@@ -68,93 +71,136 @@ export function MyShipmentsManageToolbar({
   return (
     <Stack spacing={2} sx={{ width: "100%", mb: 2 }}>
       {/* ROW 1: Tabs, Filter button, Total Count */}
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={2}
-        alignItems={{ xs: "stretch", sm: "center" }}
-        justifyContent="space-between"
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 1.5,
+          width: "100%",
+          boxSizing: "border-box",
+        }}
       >
-        <ToggleButtonGroup
-          exclusive
-          value={kind}
-          size="small"
-          onChange={(_, value) => {
-            if (!value) return;
-            onKindChange(value);
-          }}
-          sx={{
-            bgcolor: "#f0f2f5",
-            borderRadius: "10px",
-            p: 0.5,
-            border: "none",
-            "& .MuiToggleButtonGroup-grouped": {
-              border: "none",
-              borderRadius: "8px !important",
-              mx: 0.25,
-            },
-            "& .MuiToggleButton-root": {
-              px: 2.25,
-              py: 0.75,
-              textTransform: "none",
-              fontWeight: 600,
-              color: "text.secondary",
-              fontSize: "0.9rem",
-              "&.Mui-selected": {
-                bgcolor: "background.paper",
-                color: "primary.main",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-              },
-            },
-          }}
+        {/* Row 1: Cargo / Transport Toggle (left) & Mobile Filter Button (right) */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={1.5}
+          sx={{ width: "100%", flex: 1 }}
         >
-          <ToggleButton value="cargo">
-            <FiPackage size={16} style={{ marginRight: 8 }} />
-            {t("shipments.filters.cargo", "Груз")}
-          </ToggleButton>
-          <ToggleButton value="transport">
-            <FiTruck size={16} style={{ marginRight: 8 }} />
-            {t("shipments.filters.transport", "Транспорт")}
-          </ToggleButton>
-        </ToggleButtonGroup>
+          <ToggleButtonGroup
+            exclusive
+            value={kind}
+            size="small"
+            onChange={(_, value) => {
+              if (!value) return;
+              onKindChange(value);
+            }}
+            sx={{
+              bgcolor: "#f0f2f5",
+              borderRadius: "10px",
+              p: 0.5,
+              border: "none",
+              "& .MuiToggleButtonGroup-grouped": {
+                border: "none",
+                borderRadius: "8px !important",
+                mx: 0.25,
+              },
+              "& .MuiToggleButton-root": {
+                px: { xs: 2, sm: 2.25 },
+                py: 0.75,
+                textTransform: "none",
+                fontWeight: 600,
+                color: "text.secondary",
+                fontSize: "0.9rem",
+                "&.Mui-selected": {
+                  bgcolor: "background.paper",
+                  color: "primary.main",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
+                },
+              },
+            }}
+          >
+            <ToggleButton value="cargo">
+              <FiPackage size={16} style={{ marginRight: 8 }} />
+              {t("shipments.filters.cargo", "Груз")}
+            </ToggleButton>
+            <ToggleButton value="transport">
+              <FiTruck size={16} style={{ marginRight: 8 }} />
+              {t("shipments.filters.transport", "Транспорт")}
+            </ToggleButton>
+          </ToggleButtonGroup>
 
+          {/* Mobile-only Filter Button */}
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <Button
+              variant="outlined"
+              onClick={onFilterClick}
+              startIcon={<SvgIcon src={SettingsIcon} />}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                px: 2,
+                py: 1,
+                borderRadius: "8px",
+                borderColor: "primary.main",
+                color: "primary.main",
+                minWidth: "auto",
+                height: 38,
+                "& .MuiButton-startIcon": { margin: 0 },
+              }}
+            />
+          </Box>
+        </Stack>
+
+        {/* Desktop Filter Button & Total Count Stack */}
         <Stack
           direction="row"
           spacing={2}
           alignItems="center"
-          justifyContent="flex-end"
+          sx={{
+            justifyContent: { xs: "flex-start", sm: "flex-end" },
+            mt: { xs: 0.5, sm: 0 },
+          }}
         >
-          <Button
-            variant="outlined"
-            startIcon={<FiSliders />}
-            onClick={onFilterClick}
-            sx={{
-              height: 38,
-              borderRadius: "8px",
-              textTransform: "none",
-              fontWeight: 600,
-              px: 2,
-              borderColor: "primary.main",
-              color: "primary.main",
-              "&:hover": {
-                borderColor: "primary.dark",
-                bgcolor: "rgba(15, 95, 194, 0.04)",
-              },
-            }}
-          >
-            {t("shipments.filter.button", "Фильтр")}
-          </Button>
+          {/* Desktop-only Filter Button */}
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <Button
+              variant="outlined"
+              startIcon={<SvgIcon src={SettingsIcon} />}
+              onClick={onFilterClick}
+              sx={{
+                height: 38,
+                borderRadius: "8px",
+                textTransform: "none",
+                fontWeight: 600,
+                px: 2,
+                borderColor: "primary.main",
+                color: "primary.main",
+                "&:hover": {
+                  borderColor: "primary.dark",
+                  bgcolor: "rgba(15, 95, 194, 0.04)",
+                },
+              }}
+            >
+              {t("shipments.filter.button", "Фильтр")}
+            </Button>
+          </Box>
 
           <Typography
             variant="body2"
             sx={{ fontWeight: 600, color: "text.primary" }}
           >
-            {t("shipments.totalCount", {
-              count: totalCount,
-              defaultValue: `Всего: ${totalCount}`,
-            })}
+            <Trans
+              i18nKey="shipments.total"
+              values={{ count: totalCount }}
+              components={{ bold: <strong style={{ fontWeight: 700 }} /> }}
+            />
           </Typography>
         </Stack>
-      </Stack>
+      </Box>
 
       {/* ROW 2: Selection controls & Actions dropdown menu */}
       <Stack

@@ -148,119 +148,153 @@ export default function ShipmentsListPage({ scope }: Props) {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 2,
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 1.5,
           mt: 2.5,
           mb: 2,
           width: "100%",
           boxSizing: "border-box",
         }}
       >
-        {/* Left Side: Cargo / Transport Toggle Buttons */}
-        <Box
-          sx={{
-            display: "inline-flex",
-            bgcolor: "#f1f3f5", // Light grey background for the container
-            p: 0.5,
-            borderRadius: "12px",
-            border: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          <Button
-            onClick={() => handleToggleKind("cargo")}
-            startIcon={<SvgIcon src={CargoIcon} />}
-            sx={{
-              borderRadius: "8px",
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              bgcolor:
-                appliedKind === "cargo" ? "background.paper" : "transparent",
-              color:
-                appliedKind === "cargo" ? "primary.main" : "text.secondary",
-              boxShadow:
-                appliedKind === "cargo" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
-              border:
-                appliedKind === "cargo" ? "1px solid" : "1px solid transparent",
-              borderColor: appliedKind === "cargo" ? "divider" : "transparent",
-              "&:hover": {
-                bgcolor:
-                  appliedKind === "cargo"
-                    ? "background.paper"
-                    : "rgba(0,0,0,0.03)",
-              },
-            }}
-          >
-            {t("shipments.shipmentCard.cargo", "Груз")}
-          </Button>
-          <Button
-            onClick={() => handleToggleKind("transport")}
-            startIcon={<SvgIcon src={TransportIcon} />}
-            sx={{
-              borderRadius: "8px",
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1,
-              bgcolor:
-                appliedKind === "transport"
-                  ? "background.paper"
-                  : "transparent",
-              color:
-                appliedKind === "transport" ? "primary.main" : "text.secondary",
-              boxShadow:
-                appliedKind === "transport"
-                  ? "0 2px 8px rgba(0,0,0,0.05)"
-                  : "none",
-              border:
-                appliedKind === "transport"
-                  ? "1px solid"
-                  : "1px solid transparent",
-              borderColor:
-                appliedKind === "transport" ? "divider" : "transparent",
-              "&:hover": {
-                bgcolor:
-                  appliedKind === "transport"
-                    ? "background.paper"
-                    : "rgba(0,0,0,0.03)",
-              },
-            }}
-          >
-            {t("shipments.shipmentCard.transport", "Транспорт")}
-          </Button>
-        </Box>
-
-        {/* Right Side: Filter button and Total Count */}
+        {/* Row 1: Cargo / Transport Toggle (left) & Mobile Filter Button (right) */}
         <Stack
           direction="row"
           alignItems="center"
-          spacing={2}
-          sx={{ ml: "auto" }}
+          justifyContent="space-between"
+          spacing={1.5}
+          sx={{ width: "100%", flex: 1 }}
         >
-          <Button
-            variant="outlined"
-            onClick={() => setDrawerOpen(true)}
-            startIcon={<SvgIcon src={SettingsIcons} />}
+          <Box
             sx={{
-              textTransform: "none",
-              fontWeight: 400,
-              px: 2.5,
-              py: 1,
-              borderRadius: "8px",
-              borderColor: "primary.main",
-              color: "primary.main",
-              "&:hover": {
-                borderColor: "primary.dark",
-                bgcolor: "rgba(25, 118, 210, 0.04)",
-              },
+              display: "inline-flex",
+              bgcolor: "#f1f3f5", // Light grey background for the container
+              p: 0.5,
+              borderRadius: "12px",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           >
-            {t("shipments.filter.button", "Фильтр")}
-          </Button>
+            <Button
+              onClick={() => handleToggleKind("cargo")}
+              startIcon={<SvgIcon src={CargoIcon} />}
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                fontWeight: 600,
+                px: { xs: 2.25, sm: 3 },
+                py: 1,
+                bgcolor:
+                  appliedKind === "cargo" ? "background.paper" : "transparent",
+                color:
+                  appliedKind === "cargo" ? "primary.main" : "text.secondary",
+                boxShadow:
+                  appliedKind === "cargo" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                border:
+                  appliedKind === "cargo" ? "1px solid" : "1px solid transparent",
+                borderColor: appliedKind === "cargo" ? "divider" : "transparent",
+                "&:hover": {
+                  bgcolor:
+                    appliedKind === "cargo"
+                      ? "background.paper"
+                      : "rgba(0,0,0,0.03)",
+                },
+              }}
+            >
+              {t("shipments.shipmentCard.cargo", "Груз")}
+            </Button>
+            <Button
+              onClick={() => handleToggleKind("transport")}
+              startIcon={<SvgIcon src={TransportIcon} />}
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                fontWeight: 600,
+                px: { xs: 2.25, sm: 3 },
+                py: 1,
+                bgcolor:
+                  appliedKind === "transport"
+                    ? "background.paper"
+                    : "transparent",
+                color:
+                  appliedKind === "transport" ? "primary.main" : "text.secondary",
+                boxShadow:
+                  appliedKind === "transport"
+                    ? "0 2px 8px rgba(0,0,0,0.05)"
+                    : "none",
+                border:
+                  appliedKind === "transport"
+                    ? "1px solid"
+                    : "1px solid transparent",
+                borderColor:
+                  appliedKind === "transport" ? "divider" : "transparent",
+                "&:hover": {
+                  bgcolor:
+                    appliedKind === "transport"
+                      ? "background.paper"
+                      : "rgba(0,0,0,0.03)",
+                },
+              }}
+            >
+              {t("shipments.shipmentCard.transport", "Транспорт")}
+            </Button>
+          </Box>
+
+          {/* Mobile-only Filter Button */}
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <Button
+              variant="outlined"
+              onClick={() => setDrawerOpen(true)}
+              startIcon={<SvgIcon src={SettingsIcons} />}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                px: 2,
+                py: 1,
+                borderRadius: "8px",
+                borderColor: "primary.main",
+                color: "primary.main",
+                minWidth: "auto",
+                "& .MuiButton-startIcon": { margin: 0 },
+              }}
+            />
+          </Box>
+        </Stack>
+
+        {/* Desktop Filter Button & Total Count Stack */}
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          sx={{
+            justifyContent: { xs: "flex-start", sm: "flex-end" },
+            mt: { xs: 0.5, sm: 0 },
+          }}
+        >
+          {/* Desktop-only Filter Button */}
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <Button
+              variant="outlined"
+              onClick={() => setDrawerOpen(true)}
+              startIcon={<SvgIcon src={SettingsIcons} />}
+              sx={{
+                textTransform: "none",
+                fontWeight: 400,
+                px: 2.5,
+                py: 1,
+                borderRadius: "8px",
+                borderColor: "primary.main",
+                color: "primary.main",
+                "&:hover": {
+                  borderColor: "primary.dark",
+                  bgcolor: "rgba(25, 118, 210, 0.04)",
+                },
+              }}
+            >
+              {t("shipments.filter.button", "Фильтр")}
+            </Button>
+          </Box>
 
           <Typography
             variant="body1"

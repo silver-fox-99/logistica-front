@@ -32,6 +32,9 @@ import {
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
+import CalendarIcon from "@/widgets/shipments/icons/calendar.svg";
+
 import type {
   GeoPoint,
   ShipmentRowData,
@@ -308,7 +311,9 @@ export function MyShipmentManageCard(props: Props) {
         <Stack spacing={1.5}>
           {/* Route line */}
           <Stack direction="row" spacing={1} alignItems="center">
-            <FiMapPin size={18} color="#0f5fc2" />
+            <Box sx={{ color: "black", display: "flex", flexShrink: 0 }}>
+              <FiMapPin size={18} />
+            </Box>
             <Typography
               variant="body1"
               fontWeight={750}
@@ -321,7 +326,9 @@ export function MyShipmentManageCard(props: Props) {
           {/* Date rows */}
           <Stack spacing={0.75}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <FiCalendar size={16} color="text.secondary" />
+              <Box sx={{ color: "text.secondary", display: "flex" }}>
+                <SvgIcon src={CalendarIcon} size={16} />
+              </Box>
               <Typography variant="body2" color="text.secondary">
                 {t("shipments.shipmentCard.load")}: {formatDate(loadFrom)}
                 {loadFrom !== loadTo ? ` – ${formatDate(loadTo)}` : ""}

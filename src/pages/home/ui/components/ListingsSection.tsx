@@ -97,112 +97,152 @@ export default function ListingsSection({
         >
           <Stack spacing={3.5}>
             {/* Dashboard Control Bar */}
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              justifyContent="space-between"
-              alignItems={{ xs: "stretch", sm: "center" }}
-              gap={2.5}
+            <Box
               sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                justifyContent: "space-between",
+                alignItems: { xs: "stretch", sm: "center" },
+                gap: 1.5,
+                width: "100%",
+                boxSizing: "border-box",
                 borderBottom: "1px solid",
                 borderColor: "divider",
                 pb: 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  bgcolor: "#f1f3f5",
-                  p: 0.5,
-                  borderRadius: "12px",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  alignSelf: { xs: "flex-start", sm: "auto" },
-                }}
-              >
-                <Button
-                  onClick={() => onTabChange("cargo")}
-                  startIcon={<SvgIcon src={CargoIcon} />}
-                  sx={{
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    fontWeight: 600,
-                    px: 3,
-                    py: 1,
-                    bgcolor:
-                      tab === "cargo" ? "background.paper" : "transparent",
-                    color:
-                      tab === "cargo" ? "primary.main" : "text.secondary",
-                    boxShadow:
-                      tab === "cargo" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
-                    border:
-                      tab === "cargo" ? "1px solid" : "1px solid transparent",
-                    borderColor: tab === "cargo" ? "divider" : "transparent",
-                    "&:hover": {
-                      bgcolor:
-                        tab === "cargo"
-                          ? "background.paper"
-                          : "rgba(0,0,0,0.03)",
-                    },
-                  }}
-                >
-                  {t("homePage.cargoTab", "Грузы")}
-                </Button>
-                <Button
-                  onClick={() => onTabChange("transport")}
-                  startIcon={<SvgIcon src={TransportIcon} />}
-                  sx={{
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    fontWeight: 600,
-                    px: 3,
-                    py: 1,
-                    bgcolor:
-                      tab === "transport" ? "background.paper" : "transparent",
-                    color:
-                      tab === "transport" ? "primary.main" : "text.secondary",
-                    boxShadow:
-                      tab === "transport" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
-                    border:
-                      tab === "transport" ? "1px solid" : "1px solid transparent",
-                    borderColor: tab === "transport" ? "divider" : "transparent",
-                    "&:hover": {
-                      bgcolor:
-                        tab === "transport"
-                          ? "background.paper"
-                          : "rgba(0,0,0,0.03)",
-                    },
-                  }}
-                >
-                  {t("homePage.transportTab", "Транспорт")}
-                </Button>
-              </Box>
-
+              {/* Row 1: Cargo / Transport Toggle (left) & Mobile Filter Button (right) */}
               <Stack
                 direction="row"
-                gap={1.5}
                 alignItems="center"
-                flexWrap="wrap"
+                justifyContent="space-between"
+                spacing={1.5}
+                sx={{ width: "100%", flex: 1 }}
               >
-                <Button
-                  variant="outlined"
-                  onClick={() => setDrawerOpen(true)}
-                  startIcon={<SvgIcon src={SettingsIcon} />}
+                <Box
                   sx={{
-                    textTransform: "none",
-                    fontWeight: 500,
-                    px: 2.5,
-                    py: 1,
-                    borderRadius: "8px",
-                    borderColor: "primary.main",
-                    color: "primary.main",
-                    "&:hover": {
-                      borderColor: "primary.dark",
-                      bgcolor: "rgba(25, 118, 210, 0.04)",
-                    },
+                    display: "inline-flex",
+                    bgcolor: "#f1f3f5",
+                    p: 0.5,
+                    borderRadius: "12px",
+                    border: "1px solid",
+                    borderColor: "divider",
                   }}
                 >
-                  {t("homePage.filtersButton", "Фильтры")}
-                </Button>
+                  <Button
+                    onClick={() => onTabChange("cargo")}
+                    startIcon={<SvgIcon src={CargoIcon} />}
+                    sx={{
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      px: { xs: 2.25, sm: 3 },
+                      py: 1,
+                      bgcolor:
+                        tab === "cargo" ? "background.paper" : "transparent",
+                      color:
+                        tab === "cargo" ? "primary.main" : "text.secondary",
+                      boxShadow:
+                        tab === "cargo" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                      border:
+                        tab === "cargo" ? "1px solid" : "1px solid transparent",
+                      borderColor: tab === "cargo" ? "divider" : "transparent",
+                      "&:hover": {
+                        bgcolor:
+                          tab === "cargo"
+                            ? "background.paper"
+                            : "rgba(0,0,0,0.03)",
+                      },
+                    }}
+                  >
+                    {t("homePage.cargoTab", "Грузы")}
+                  </Button>
+                  <Button
+                    onClick={() => onTabChange("transport")}
+                    startIcon={<SvgIcon src={TransportIcon} />}
+                    sx={{
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      px: { xs: 2.25, sm: 3 },
+                      py: 1,
+                      bgcolor:
+                        tab === "transport" ? "background.paper" : "transparent",
+                      color:
+                        tab === "transport" ? "primary.main" : "text.secondary",
+                      boxShadow:
+                        tab === "transport" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                      border:
+                        tab === "transport" ? "1px solid" : "1px solid transparent",
+                      borderColor: tab === "transport" ? "divider" : "transparent",
+                      "&:hover": {
+                        bgcolor:
+                          tab === "transport"
+                            ? "background.paper"
+                            : "rgba(0,0,0,0.03)",
+                      },
+                    }}
+                  >
+                    {t("homePage.transportTab", "Транспорт")}
+                  </Button>
+                </Box>
+
+                {/* Mobile-only Filter Button */}
+                <Box sx={{ display: { xs: "block", sm: "none" } }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setDrawerOpen(true)}
+                    startIcon={<SvgIcon src={SettingsIcon} />}
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 600,
+                      px: 2,
+                      py: 1,
+                      borderRadius: "8px",
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                      minWidth: "auto",
+                      "& .MuiButton-startIcon": { margin: 0 },
+                    }}
+                  />
+                </Box>
+              </Stack>
+
+              {/* Desktop Filter Button & Total Count Stack */}
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{
+                  justifyContent: { xs: "flex-start", sm: "flex-end" },
+                  mt: { xs: 0.5, sm: 0 },
+                  flexWrap: "wrap",
+                  gap: 1.5,
+                }}
+              >
+                {/* Desktop-only Filter Button */}
+                <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setDrawerOpen(true)}
+                    startIcon={<SvgIcon src={SettingsIcon} />}
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 500,
+                      px: 2.5,
+                      py: 1,
+                      borderRadius: "8px",
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                      "&:hover": {
+                        borderColor: "primary.dark",
+                        bgcolor: "rgba(25, 118, 210, 0.04)",
+                      },
+                    }}
+                  >
+                    {t("homePage.filtersButton", "Фильтры")}
+                  </Button>
+                </Box>
 
                 {activeFiltersCount > 0 ? (
                   <Chip
@@ -230,7 +270,7 @@ export default function ListingsSection({
                   />
                 </Typography>
               </Stack>
-            </Stack>
+            </Box>
 
             {/* Card listings */}
             <Grid container spacing={2}>
