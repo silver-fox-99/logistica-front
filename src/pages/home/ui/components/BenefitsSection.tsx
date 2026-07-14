@@ -1,17 +1,16 @@
 import { Box, Typography, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import {
-  FiUserPlus,
-  FiSearch,
-  FiMessageSquare,
-  FiUser,
-  FiBriefcase,
-  FiLock,
-} from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import featuresTruckImg from "../features-truck.jpg";
 import featuresOperatorImg from "../features-operator.jpg";
 import featuresPortImg from "../features-port.jpg";
+import ProfileIcon from "../icons/profile.svg";
+import BoxIcon from "../icons/box.svg";
+import CommentIcon from "../icons/comment.svg";
+import CaseIcon from "../icons/case.svg";
+import SupportIcon from "../icons/support.svg";
+import EyeIcon from "../icons/eye.svg";
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
 
 export default function BenefitsSection() {
   const { t } = useTranslation();
@@ -63,7 +62,7 @@ export default function BenefitsSection() {
                   "homePage.userRegistrationDesc",
                   "Для начала работы достаточно зарегистрироваться по номеру телефона и подтвердить его с помощью SMS-кода. После регистрации открывается личный кабинет с полным доступом ко всем возможностям платформы",
                 ),
-                icon: <FiUserPlus size={22} />,
+                icon: <SvgIcon src={ProfileIcon} size={22} />,
                 color: "#0F5FC2",
               },
               {
@@ -72,7 +71,7 @@ export default function BenefitsSection() {
                   "homePage.cargoSearchDesc",
                   "Размещайте грузы или транспорт, указывайте маршрут, параметры перевозки и быстро находите подходящие предложения без лишних посредников",
                 ),
-                icon: <FiSearch size={22} />,
+                icon: <SvgIcon src={BoxIcon} size={22} />,
                 color: "#0F5FC2",
               },
               {
@@ -84,7 +83,7 @@ export default function BenefitsSection() {
                   "homePage.userInteractionDesc",
                   "Платформа обеспечивает прямую связь между заказчиками и перевозчиками, позволяя быстрее договариваться об условиях перевозки и сокращать время поиска партнёров",
                 ),
-                icon: <FiMessageSquare size={22} />,
+                icon: <SvgIcon src={CommentIcon} size={22} />,
                 color: "#0F5FC2",
               },
               {
@@ -93,7 +92,7 @@ export default function BenefitsSection() {
                   "homePage.personalAccountDesc",
                   "Управляйте своими заявками, редактируйте профиль, отслеживайте статусы перевозок, получайте уведомления и контролируйте все процессы в одном месте.",
                 ),
-                icon: <FiUser size={22} />,
+                icon: <SvgIcon src={CaseIcon} size={22} />,
                 color: "#0F5FC2",
               },
               {
@@ -105,7 +104,7 @@ export default function BenefitsSection() {
                   "homePage.legalSupportDesc",
                   "Зарегистрированные пользователи могут обратиться в службу поддержки и получить бесплатную консультацию по вопросам, связанным с грузоперевозками и работой платформы",
                 ),
-                icon: <FiBriefcase size={22} />,
+                icon: <SvgIcon src={SupportIcon} size={22} />,
                 color: "#0F5FC2",
               },
               {
@@ -117,7 +116,7 @@ export default function BenefitsSection() {
                   "homePage.securityConfidentialityDesc",
                   "Мы защищаем персональные данные пользователей и обеспечиваем безопасную работу сервиса. Все данные обрабатываются в соответствии с действующим законодательством",
                 ),
-                icon: <FiLock size={22} />,
+                icon: <SvgIcon src={EyeIcon} size={22} />,
                 color: "#0F5FC2",
               },
             ].map((item, index) => (
@@ -139,8 +138,6 @@ export default function BenefitsSection() {
                       justifyContent: "center",
                       width: 44,
                       height: 44,
-                      borderRadius: "10px",
-                      bgcolor: "rgba(15, 95, 194, 0.06)",
                       color: item.color,
                       flexShrink: 0,
                       mt: 0.5,

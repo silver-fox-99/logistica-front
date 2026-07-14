@@ -11,7 +11,6 @@ import {
 import Grid from "@mui/material/Grid";
 import {
   FiMapPin,
-  FiCalendar,
   FiChevronDown,
   FiChevronUp,
 } from "react-icons/fi";
@@ -19,6 +18,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocalizedLookup } from "@/shared/utils/lookupUtils";
 import { useInitStore } from "@/shared/store/initStore";
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
+import CalendarIcon from "@/widgets/shipments/icons/calendar.svg";
 
 interface PublicShipmentRowProps {
   item: any;
@@ -230,7 +231,7 @@ export default function PublicShipmentRow({
           <Stack spacing={2}>
             {/* Route label with map pin */}
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Box sx={{ color: "primary.main", display: "flex", mt: 0.5 }}>
+              <Box sx={{ color: "black", display: "flex", flexShrink: 0 }}>
                 <FiMapPin size={20} />
               </Box>
               <Typography
@@ -248,7 +249,7 @@ export default function PublicShipmentRow({
             {/* Calendar date row */}
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Box sx={{ color: "text.secondary", display: "flex" }}>
-                <FiCalendar size={18} />
+                <SvgIcon src={CalendarIcon} size={20} />
               </Box>
               <Typography
                 variant="body2"

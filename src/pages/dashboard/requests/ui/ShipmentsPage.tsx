@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { FiSliders, FiPackage, FiTruck } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { PageHeader } from "@/shared/ui/PageHeader";
 
 import type { ShipmentsKind } from "@/entities/shipment/model/type";
@@ -14,6 +13,10 @@ import { PublicPlacementBanner } from "@/widgets/public-ads/ui/PublicPlacementBa
 import { useFilterSettingsStore } from "@/shared/store/filterSettingsStore";
 import { resolveFilters } from "@/shared/utils/filterSettings";
 import { useEffect } from "react";
+import SettingsIcons from "../icons/settings.svg";
+import CargoIcon from "../icons/cargo.svg";
+import TransportIcon from "../icons/truck.svg";
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
 
 type Props = { scope: "public" | "my" };
 
@@ -168,7 +171,7 @@ export default function ShipmentsListPage({ scope }: Props) {
         >
           <Button
             onClick={() => handleToggleKind("cargo")}
-            startIcon={<FiPackage size={16} />}
+            startIcon={<SvgIcon src={CargoIcon} />}
             sx={{
               borderRadius: "8px",
               textTransform: "none",
@@ -196,7 +199,7 @@ export default function ShipmentsListPage({ scope }: Props) {
           </Button>
           <Button
             onClick={() => handleToggleKind("transport")}
-            startIcon={<FiTruck size={16} />}
+            startIcon={<SvgIcon src={TransportIcon} />}
             sx={{
               borderRadius: "8px",
               textTransform: "none",
@@ -241,10 +244,10 @@ export default function ShipmentsListPage({ scope }: Props) {
           <Button
             variant="outlined"
             onClick={() => setDrawerOpen(true)}
-            startIcon={<FiSliders size={16} />}
+            startIcon={<SvgIcon src={SettingsIcons} />}
             sx={{
               textTransform: "none",
-              fontWeight: 600,
+              fontWeight: 400,
               px: 2.5,
               py: 1,
               borderRadius: "8px",
@@ -262,12 +265,16 @@ export default function ShipmentsListPage({ scope }: Props) {
           <Typography
             variant="body1"
             sx={{
-              fontWeight: 750,
+              fontWeight: 400,
               color: "text.primary",
               whiteSpace: "nowrap",
             }}
           >
-            {t("shipments.total", { count: totalCount })}
+            <Trans
+              i18nKey="shipments.total"
+              values={{ count: totalCount }}
+              components={{ bold: <strong style={{ fontWeight: 700 }} /> }}
+            />
           </Typography>
         </Stack>
       </Box>

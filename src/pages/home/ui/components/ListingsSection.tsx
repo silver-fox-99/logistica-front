@@ -3,18 +3,20 @@ import {
   Typography,
   Stack,
   Paper,
-  Tabs,
-  Tab,
   Button,
   Chip,
   CircularProgress,
   Pagination,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { FiPackage, FiTruck, FiFilter, FiChevronRight } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
+import { FiChevronRight } from "react-icons/fi";
+import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import PublicShipmentRow from "./PublicShipmentRow";
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
+import CargoIcon from "@/pages/dashboard/requests/icons/cargo.svg";
+import TransportIcon from "@/pages/dashboard/requests/icons/truck.svg";
+import SettingsIcon from "@/pages/dashboard/requests/icons/settings.svg";
 
 interface ListingsSectionProps {
   tab: "cargo" | "transport";
@@ -106,31 +108,74 @@ export default function ListingsSection({
                 pb: 2,
               }}
             >
-              <Tabs
-                value={tab}
-                onChange={(_, value: "cargo" | "transport") =>
-                  onTabChange(value)
-                }
+              <Box
                 sx={{
-                  "& .MuiTabs-indicator": {
-                    height: 3,
-                    borderRadius: "3px 3px 0 0",
-                  },
+                  display: "inline-flex",
+                  bgcolor: "#f1f3f5",
+                  p: 0.5,
+                  borderRadius: "12px",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  alignSelf: { xs: "flex-start", sm: "auto" },
                 }}
               >
-                <Tab
-                  value="cargo"
-                  icon={<FiPackage size={18} />}
-                  iconPosition="start"
-                  label={t("homePage.cargoTab", "Грузы")}
-                />
-                <Tab
-                  value="transport"
-                  icon={<FiTruck size={18} />}
-                  iconPosition="start"
-                  label={t("homePage.transportTab", "Транспорт")}
-                />
-              </Tabs>
+                <Button
+                  onClick={() => onTabChange("cargo")}
+                  startIcon={<SvgIcon src={CargoIcon} />}
+                  sx={{
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1,
+                    bgcolor:
+                      tab === "cargo" ? "background.paper" : "transparent",
+                    color:
+                      tab === "cargo" ? "primary.main" : "text.secondary",
+                    boxShadow:
+                      tab === "cargo" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                    border:
+                      tab === "cargo" ? "1px solid" : "1px solid transparent",
+                    borderColor: tab === "cargo" ? "divider" : "transparent",
+                    "&:hover": {
+                      bgcolor:
+                        tab === "cargo"
+                          ? "background.paper"
+                          : "rgba(0,0,0,0.03)",
+                    },
+                  }}
+                >
+                  {t("homePage.cargoTab", "Грузы")}
+                </Button>
+                <Button
+                  onClick={() => onTabChange("transport")}
+                  startIcon={<SvgIcon src={TransportIcon} />}
+                  sx={{
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1,
+                    bgcolor:
+                      tab === "transport" ? "background.paper" : "transparent",
+                    color:
+                      tab === "transport" ? "primary.main" : "text.secondary",
+                    boxShadow:
+                      tab === "transport" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+                    border:
+                      tab === "transport" ? "1px solid" : "1px solid transparent",
+                    borderColor: tab === "transport" ? "divider" : "transparent",
+                    "&:hover": {
+                      bgcolor:
+                        tab === "transport"
+                          ? "background.paper"
+                          : "rgba(0,0,0,0.03)",
+                    },
+                  }}
+                >
+                  {t("homePage.transportTab", "Транспорт")}
+                </Button>
+              </Box>
 
               <Stack
                 direction="row"
@@ -140,9 +185,21 @@ export default function ListingsSection({
               >
                 <Button
                   variant="outlined"
-                  startIcon={<FiFilter />}
                   onClick={() => setDrawerOpen(true)}
-                  sx={{ borderRadius: "8px", fontWeight: 600 }}
+                  startIcon={<SvgIcon src={SettingsIcon} />}
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 500,
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: "8px",
+                    borderColor: "primary.main",
+                    color: "primary.main",
+                    "&:hover": {
+                      borderColor: "primary.dark",
+                      bgcolor: "rgba(25, 118, 210, 0.04)",
+                    },
+                  }}
                 >
                   {t("homePage.filtersButton", "Фильтры")}
                 </Button>
@@ -158,20 +215,20 @@ export default function ListingsSection({
                   />
                 ) : null}
 
-                <Chip
-                  size="medium"
-                  variant="filled"
-                  label={t("homePage.totalCount", {
-                    count: total,
-                    defaultValue: `Всего: ${total}`,
-                  })}
+                <Typography
+                  variant="body1"
                   sx={{
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    bgcolor: "rgba(15,95,194,0.06)",
-                    color: "primary.main",
+                    fontWeight: 400,
+                    color: "text.primary",
+                    whiteSpace: "nowrap",
                   }}
-                />
+                >
+                  <Trans
+                    i18nKey="shipments.total"
+                    values={{ count: total }}
+                    components={{ bold: <strong style={{ fontWeight: 700 }} /> }}
+                  />
+                </Typography>
               </Stack>
             </Stack>
 

@@ -540,7 +540,7 @@
       "loading": "Loading...",
       "perPage": "Per page"
     },
-    "total": "Total: {{count}}",
+    "total": "Total: <bold>{{count}}</bold>",
     "messages": {
       "invalidOrderType": "Invalid order type",
       "orderCopied": "Order successfully copied!",

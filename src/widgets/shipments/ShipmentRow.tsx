@@ -7,13 +7,7 @@ import {
   Link as MuiLink,
   IconButton,
 } from "@mui/material";
-import {
-  FiMapPin,
-  FiCalendar,
-  FiChevronDown,
-  FiChevronUp,
-  FiStar,
-} from "react-icons/fi";
+import { FiMapPin, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useShipmentRow } from "./shipment-row/model/useShipmentRow";
 import { useShipmentFavorite } from "@/features/shipment/favorite-toggle/model/useShipmentFavorite";
 import { useShipmentDetails } from "@/features/shipment/shipment-details-modal/model/useShipmentDetails";
@@ -21,6 +15,9 @@ import { ShipmentDetailsModal } from "@/entities/shipment/ui/shipment-details/Sh
 import { ShipmentDetailsLimitModal } from "@/entities/shipment/ui/shipment-details/ShipmentDetailsLimitModal.tsx";
 import { useNavigate } from "react-router-dom";
 import { buildShipmentDetailsPath } from "@/features/shipment/open-shipment-details/lib/buildShipmentDetailsPath.ts";
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
+import CalendarIcon from "./icons/calendar.svg";
+import FavoriteIcon from "./icons/favorite.svg";
 
 type Props = {
   data: any; // Raw CargoApiItem or TransportApiItem
@@ -194,15 +191,13 @@ export default function ShipmentRow({
               alignItems="center"
               sx={{ minWidth: 0 }}
             >
-              <Box
-                sx={{ color: "primary.main", display: "flex", flexShrink: 0 }}
-              >
-                <FiMapPin size={22} />
+              <Box sx={{ color: "black", display: "flex", flexShrink: 0 }}>
+                <FiMapPin size={20} />
               </Box>
               <Typography
                 variant="h6"
                 sx={{
-                  fontWeight: 600,
+                  fontWeight: 500,
                   fontSize: { xs: "1.05rem", sm: "1.15rem" },
                   color: "text.primary",
                   lineHeight: 1.3,
@@ -218,8 +213,6 @@ export default function ShipmentRow({
                 onClick={toggleFavorite}
                 disabled={favoriteLoading || isInactive}
                 sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
                   borderRadius: "12px",
                   width: 42,
                   height: 42,
@@ -232,7 +225,7 @@ export default function ShipmentRow({
                   },
                 }}
               >
-                <FiStar size={18} fill={isFavorite ? "#ff9800" : "none"} />
+                <SvgIcon src={FavoriteIcon} size={22} />
               </IconButton>
             )}
           </Stack>
@@ -240,7 +233,7 @@ export default function ShipmentRow({
           {/* 2. Loading Date */}
           <Stack direction="row" spacing={1.25} alignItems="center">
             <Box sx={{ color: "text.secondary", display: "flex" }}>
-              <FiCalendar size={18} />
+              <SvgIcon src={CalendarIcon} size={20} />
             </Box>
             <Typography
               variant="body2"

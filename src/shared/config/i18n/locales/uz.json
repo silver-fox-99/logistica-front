@@ -532,7 +532,7 @@
       "loading": "Yuklanmoqda...",
       "perPage": "Sahifada"
     },
-    "total": "Jami: {{count}}",
+    "total": "Jami: <bold>{{count}}</bold>",
     "messages": {
       "invalidOrderType": "Noto‘g‘ri buyurtma turi",
       "orderCopied": "Buyurtma muvaffaqiyatli nusxalandi!",

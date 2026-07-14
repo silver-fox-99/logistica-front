@@ -532,7 +532,7 @@
       "loading": "Загрузка...",
       "perPage": "На странице"
     },
-    "total": "Всего: {{count}}",
+    "total": "Всего: <bold>{{count}}</bold>",
     "messages": {
       "invalidOrderType": "Неверный тип заявки",
       "orderCopied": "Заявка успешно скопирована!",

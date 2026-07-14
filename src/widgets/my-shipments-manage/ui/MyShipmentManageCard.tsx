@@ -401,7 +401,7 @@ export function MyShipmentManageCard(props: Props) {
         >
           <Typography
             variant="h5"
-            fontWeight={900}
+            fontWeight={600}
             sx={{ color: "text.primary" }}
           >
             {data.price || "—"}

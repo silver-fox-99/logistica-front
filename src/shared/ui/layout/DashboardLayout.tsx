@@ -18,24 +18,26 @@ import {
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import {
-  FiUser,
-  FiCreditCard,
-  FiLogOut,
   FiSearch,
-  FiAward,
   FiFileText,
   FiChevronDown,
   FiChevronRight,
   FiList,
-  FiBriefcase,
-  FiLock,
-  FiHeadphones,
-  FiCalendar,
   FiMessageSquare,
 } from "react-icons/fi";
 import { RiAdminFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
+
+import ProfileIcon from "./icons/profile.svg";
+import CompanyIcon from "./icons/company.svg";
+import PaymentsIcon from "./icons/payments.svg";
+import ReferralIcon from "./icons/referral.svg";
+import RequestsIcon from "./icons/requests.svg";
+import SecurityIcon from "./icons/security.svg";
+import SupportIcon from "./icons/support.svg";
+import LogoutIcon from "./icons/logout.svg";
+import { SvgIcon } from "@/shared/ui/SvgIcon/SvgIcon";
 
 import Header from "@/features/header/Header";
 import Footer from "@/features/footer/Footer";
@@ -83,7 +85,7 @@ const sidebarButtonStyles = {
       color: "primary.main",
     },
     "& .MuiListItemText-primary": {
-      fontWeight: 650,
+      color: "primary.main",
     },
   },
 };
@@ -133,27 +135,27 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
     },
     {
       to: "/dashboard/profile",
-      icon: <FiUser />,
+      icon: <SvgIcon src={ProfileIcon} />,
       label: t("dashboard.menu.profile"),
     },
     {
       to: "/dashboard/company",
-      icon: <FiBriefcase />,
+      icon: <SvgIcon src={CompanyIcon} />,
       label: t("dashboard.menu.company"),
     },
     {
       to: "/dashboard/payments",
-      icon: <FiCreditCard />,
+      icon: <SvgIcon src={PaymentsIcon} />,
       label: t("dashboard.menu.payments"),
     },
     {
       to: "/dashboard/referral",
-      icon: <FiAward />,
+      icon: <SvgIcon src={ReferralIcon} />,
       label: t("dashboard.menu.referrals"),
     },
     {
       to: "/dashboard/requests",
-      icon: <FiCalendar />,
+      icon: <SvgIcon src={RequestsIcon} />,
       label: t("dashboard.menu.myOrders"),
     },
   ];
@@ -161,7 +163,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
   const bottomNav = [
     {
       to: "/dashboard/security",
-      icon: <FiLock />,
+      icon: <SvgIcon src={SecurityIcon} />,
       label: t("dashboard.menu.security"),
     },
     {
@@ -171,7 +173,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
     },
     {
       to: "/dashboard/help",
-      icon: <FiHeadphones />,
+      icon: <SvgIcon src={SupportIcon} />,
       label: t("dashboard.menu.helpSupport"),
     },
   ];
@@ -245,7 +247,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       </List>
 
       {/* Блок целевых кнопок (Добавить груз/транспорт) */}
-      <Stack mt={1.5} mb={0.5} spacing={0.75}>
+      <Stack mt={6} mb={0.5} spacing={0.75}>
         <Button
           variant="outlined"
           fullWidth
@@ -355,7 +357,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
           }}
         >
           <ListItemIcon>
-            <FiLogOut />
+            <SvgIcon src={LogoutIcon} />
           </ListItemIcon>
           <ListItemText primary={t("dashboard.menu.logout")} />
         </ListItemButton>

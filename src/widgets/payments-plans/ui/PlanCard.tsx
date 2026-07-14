@@ -207,7 +207,7 @@ export const PlanCard: React.FC<Props> = ({
           <Stack spacing={0.5}>
             <Typography
               variant="h5"
-              fontWeight={900}
+              fontWeight={600}
               sx={{ color: "text.primary" }}
             >
               {plan.name}
@@ -257,14 +257,14 @@ export const PlanCard: React.FC<Props> = ({
                     sx={{ height: 18, fontSize: "0.7rem", fontWeight: 600 }}
                   />
                 </Stack>
-                <Typography variant="h4" fontWeight={900} color="success.main">
+                <Typography variant="h4" fontWeight={600} color="success.main">
                   {discountInfo.discountedPriceLabel}
                 </Typography>
               </Stack>
             ) : (
               <Typography
                 variant="h4"
-                fontWeight={900}
+                fontWeight={600}
                 sx={{ color: "text.primary", letterSpacing: "-0.03em" }}
               >
                 {Number(plan.price) === 0
